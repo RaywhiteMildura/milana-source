@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+html,body{margin:0;padding:0;background:#efe9df}
+a{color:#6f273a}a:hover{color:#8b3b52}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+input{font:inherit}
+@keyframes msPulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes msFlash{0%{opacity:.95}100%{opacity:0}}
+@keyframes msPop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes msRise{0%{transform:translateY(14px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes msSheet{0%{transform:translateY(60%);opacity:0}100%{transform:translateY(0);opacity:1}}
+</style>
+</helmet>
+<div style="display:flex;justify-content:center;padding:26px 0 40px">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="430,900">
+<div style="position:relative;height:100%;overflow:hidden;background:#f4f0e9;font-family:-apple-system,'SF Pro Text','Helvetica Neue',sans-serif;color:#201a17">
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column">
+    <header style="background:#201a17;color:#fff;padding:64px 18px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <div style="width:36px;height:36px;border:1px solid rgba(201,170,120,.55);border-radius:50%;display:grid;place-items:center;font-family:Georgia,'Times New Roman',serif;font-weight:700;color:#c9aa78">M</div>
+        <div style="min-width:0">
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:19px;letter-spacing:.02em">Milana Source</div>
+          <div style="font-size:10.5px;color:rgba(255,255,255,.62);white-space:nowrap">China Sourcing · October 2026</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.72);background:rgba(255,255,255,.08);border-radius:999px;padding:6px 11px"><span style="width:7px;height:7px;border-radius:50%;background:#e0a746"></span>{{ localCount }} local</div>
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:20px 18px 120px">
+      <button onClick="{{ openVenueSheet }}" style="border:0;background:transparent;padding:2px 0;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.09em;color:#9d7643;text-transform:uppercase">Day 4 · at {{ venue }} <span style="font-size:9px">▾</span></button>
+      <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:27px;line-height:1.08;margin:6px 0 16px">Morning, Damian.</h1>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;padding:14px 15px">
+          <strong style="display:block;font-family:Georgia,'Times New Roman',serif;font-size:28px">{{ todayCount }}</strong>
+          <span style="color:#625852;font-size:11.5px">Captured today</span>
+        </div>
+        <div style="background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;padding:14px 15px">
+          <strong style="display:block;font-family:Georgia,'Times New Roman',serif;font-size:28px">{{ shortCount }}</strong>
+          <span style="color:#625852;font-size:11.5px">Shortlisted</span>
+        </div>
+      </div>
+      <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ navReview }}" role="button" style="margin-top:12px;background:linear-gradient(120deg,#241c19,#4b2530 75%);border-radius:18px;padding:15px 16px;color:#fff;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 8px 22px rgba(39,28,20,.18)">
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(201,170,120,.18);display:grid;place-items:center;color:#c9aa78;font-size:18px;flex-shrink:0">▣</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14.5px;font-weight:800">Evening review · {{ pendingCount }} to complete</div>
+            <div style="font-size:11.5px;color:rgba(255,255,255,.7);margin-top:2px">Cards &amp; labels read to text — just confirm</div>
+          </div>
+          <span style="color:#c9aa78;font-size:18px">›</span>
+        </div>
+      </sc-if>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin:22px 0 10px">
+        <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:19px;margin:0">Latest captures</h2>
+        <button onClick="{{ navProducts }}" style="border:0;background:transparent;font-size:12px;color:#6f273a;font-weight:800;padding:4px">All {{ totalCount }} →</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <sc-for list="{{ recent }}" as="r" hint-placeholder-count="3">
+          <div onClick="{{ r.onOpen }}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
+            <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:{{ r.bg }}"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+              <div style="font-size:12px;color:#625852;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sup }}</div>
+            </div>
+            <span style="font-size:10.5px;font-weight:800;border-radius:999px;padding:5px 9px;background:{{ r.stBg }};color:{{ r.stFg }};flex-shrink:0">{{ r.st }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="font-size:12px;color:#625852;line-height:1.5;margin:18px 2px 0">Everything saves on this phone first — no signal needed at the fair, the factory or on the road.</p>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isProducts }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column">
+    <header style="background:#201a17;color:#fff;padding:64px 18px 12px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px">Products</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">{{ matchCount }} records</div>
+      </div>
+      <input value="{{ q }}" onChange="{{ onQ }}" placeholder="Search product, company or place" style="width:100%;box-sizing:border-box;margin-top:10px;border:0;border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.10);color:#fff;outline:none;font-size:14px" />
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:12px 18px 120px">
+      <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:8px;margin:0 -18px;padding-left:18px;padding-right:18px">
+        <sc-for list="{{ filterChips }}" as="c" hint-placeholder-count="5">
+          <button onClick="{{ c.onTap }}" style="flex-shrink:0;min-height:38px;padding:0 13px;border-radius:999px;font-size:12.5px;font-weight:700;border:{{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};white-space:nowrap">{{ c.name }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;margin:0 -18px;padding-left:18px;padding-right:18px">
+        <sc-for list="{{ venueChips }}" as="c" hint-placeholder-count="4">
+          <button onClick="{{ c.onTap }}" style="flex-shrink:0;min-height:34px;padding:0 12px;border-radius:999px;font-size:11.5px;font-weight:700;border:{{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};white-space:nowrap">◎ {{ c.name }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+          <div onClick="{{ r.onOpen }}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
+            <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:{{ r.bg }};position:relative">
+              <sc-if value="{{ r.multi }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:3px;bottom:3px;font-size:9px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:6px;padding:2px 5px">{{ r.count }}</span></sc-if>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+              <div style="font-size:12px;color:#625852;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sup }} · {{ r.venue }}</div>
+            </div>
+            <span style="font-size:10.5px;font-weight:800;border-radius:999px;padding:5px 9px;background:{{ r.stBg }};color:{{ r.stFg }};flex-shrink:0">{{ r.st }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:40px 20px;color:#625852;border:1px dashed #d7cbbd;border-radius:18px;font-size:13px">Nothing matches — clear the search or capture it now.</div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isSuppliers }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column">
+    <header style="background:#201a17;color:#fff;padding:64px 18px 14px">
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px">Companies</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">One record per company — booth, factory or showroom</div>
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:14px 18px 120px;display:flex;flex-direction:column;gap:9px">
+      <sc-for list="{{ suppRows }}" as="sp" hint-placeholder-count="4">
+        <div onClick="{{ sp.onTap }}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:12px;cursor:pointer">
+          <div style="width:44px;height:44px;border:1px solid #c9aa78;border-radius:50%;display:grid;place-items:center;font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:700;color:#9d7643;flex-shrink:0">{{ sp.initial }}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sp.name }}</div>
+            <div style="font-size:12px;color:#625852;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sp.sub }}</div>
+          </div>
+          <span style="color:#9d7643;font-size:17px">›</span>
+        </div>
+      </sc-for>
+      <p style="font-size:12px;color:#625852;line-height:1.5;margin:8px 2px 0">Card photos become full company records (name, WeChat, contact) at evening review — nothing typed on the floor.</p>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isCompare }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column">
+    <header style="background:#201a17;color:#fff;padding:64px 18px 14px">
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px">Compare</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">{{ cmpCount }} of 3 selected</div>
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:14px 18px 120px">
+      <sc-if value="{{ cmpEmpty }}" hint-placeholder-val="{{ true }}">
+        <div style="text-align:center;padding:44px 22px;color:#625852;border:1px dashed #d7cbbd;border-radius:18px;background:rgba(255,255,255,.4)">
+          <strong style="display:block;color:#201a17;font-family:Georgia,'Times New Roman',serif;font-size:19px;margin-bottom:7px">Nothing to compare</strong>
+          <p style="margin:0;font-size:13px;line-height:1.5">Open a product and tap “Add to compare” — up to three side by side.</p>
+          <button onClick="{{ navProducts }}" style="margin-top:16px;min-height:46px;padding:0 18px;border:0;border-radius:13px;background:#201a17;color:#fff;font-size:14px;font-weight:800">Open products</button>
+        </div>
+      </sc-if>
+      <div style="display:flex;gap:10px;overflow-x:auto;align-items:stretch;padding-bottom:8px">
+        <sc-for list="{{ cmpCards }}" as="c" hint-placeholder-count="2">
+          <div style="flex-shrink:0;width:206px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="height:110px;background:{{ c.bg }};position:relative">
+              <button onClick="{{ c.onRemove }}" style="position:absolute;right:7px;top:7px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(31,25,23,.78);color:#fff;font-size:13px" aria-label="Remove">✕</button>
+            </div>
+            <div style="padding:12px 13px;display:flex;flex-direction:column;gap:7px;flex:1">
+              <div style="font-size:14px;font-weight:800;line-height:1.25">{{ c.name }}</div>
+              <div style="font-size:11.5px;color:#625852">{{ c.sup }}</div>
+              <div style="border-top:1px solid #ece3d6;padding-top:7px;font-size:12px;display:flex;justify-content:space-between"><span style="color:#625852">Rating</span><b style="color:#9d7643">{{ c.rating }}</b></div>
+              <div style="font-size:12px;display:flex;justify-content:space-between"><span style="color:#625852">Price</span><b>{{ c.price }}</b></div>
+              <div style="font-size:12px;display:flex;justify-content:space-between;gap:8px"><span style="color:#625852">Rooms</span><b style="text-align:right">{{ c.rooms }}</b></div>
+              <div style="font-size:12px;display:flex;justify-content:space-between;gap:8px"><span style="color:#625852">Place</span><b style="text-align:right">{{ c.venue }}</b></div>
+              <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:6px">
+                <span style="font-size:10.5px;font-weight:800;border-radius:999px;padding:5px 9px;background:{{ c.stBg }};color:{{ c.stFg }}">{{ c.st }}</span>
+                <button onClick="{{ c.onOpen }}" style="border:0;background:transparent;color:#6f273a;font-size:12px;font-weight:800;padding:6px 2px">Open →</button>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:25;display:flex;flex-direction:column;background:#f4f0e9">
+    <header style="background:#201a17;color:#fff;padding:60px 14px 14px;display:flex;align-items:center;gap:10px">
+      <button onClick="{{ goHome }}" style="width:44px;height:44px;border:0;border-radius:14px;background:rgba(255,255,255,.10);color:#fff;font-size:19px;flex-shrink:0" aria-label="Back">‹</button>
+      <div style="flex:1">
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:18px">Evening review</div>
+        <div style="font-size:10.5px;color:rgba(255,255,255,.6);margin-top:1px">{{ pendingCount }} records to complete</div>
+      </div>
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:14px 18px 30px;display:flex;flex-direction:column;gap:9px">
+      <div style="background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;padding:14px 15px">
+        <div style="font-size:14px;font-weight:800">Day pack · {{ todayCount }} captures</div>
+        <div style="font-size:12px;color:#625852;margin-top:3px;line-height:1.45">One tidy file for Fiona and the builder — photos, notes and quotes together.</div>
+        <div style="display:flex;gap:8px;margin-top:11px">
+          <button onClick="{{ shareToast }}" style="flex:1;min-height:44px;border:0;border-radius:12px;background:#201a17;color:#fff;font-size:13px;font-weight:800">Export PDF</button>
+          <button onClick="{{ shareToast }}" style="flex:1;min-height:44px;border:1px solid #d7cbbd;border-radius:12px;background:#fffdf9;color:#201a17;font-size:13px;font-weight:800">Share to WeChat</button>
+        </div>
+      </div>
+      <sc-if value="{{ noPending }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:36px 20px;color:#625852;border:1px dashed #d7cbbd;border-radius:18px;font-size:13px"><b style="color:#355f4b">✓ All records complete.</b><br>Every capture has a name and a company.</div>
+      </sc-if>
+      <sc-for list="{{ pendRows }}" as="r" hint-placeholder-count="2">
+        <div onClick="{{ r.onTap }}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
+          <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:{{ r.bg }}"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+            <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap">
+              <sc-for list="{{ r.missing }}" as="m" hint-placeholder-count="2">
+                <span style="font-size:10px;font-weight:800;border-radius:999px;padding:3px 8px;background:#f6e5e3;color:#8b2d2d">{{ m }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <span style="color:#9d7643;font-size:17px">›</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isReviewItem }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:26;display:flex;flex-direction:column;background:#f4f0e9">
+    <header style="background:#201a17;color:#fff;padding:60px 14px 14px;display:flex;align-items:center;gap:10px">
+      <button onClick="{{ navReview }}" style="width:44px;height:44px;border:0;border-radius:14px;background:rgba(255,255,255,.10);color:#fff;font-size:19px;flex-shrink:0" aria-label="Back">‹</button>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:18px">Complete record</div>
+        <div style="font-size:10.5px;color:rgba(255,255,255,.6);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ rvName }}</div>
+      </div>
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:16px 18px 24px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852">FROM THE COMPANY CARD</div>
+        <span style="font-size:10px;font-family:ui-monospace,Menlo,monospace;color:#9d7643;background:rgba(157,118,67,.12);border-radius:6px;padding:3px 6px">read on device</span>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:9px">
+        <div style="width:74px;height:96px;border-radius:11px;border:1px solid #d7cbbd;background:{{ cardSw }};flex-shrink:0"></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px;min-width:0">
+          <input value="{{ rvCompany }}" onChange="{{ onRvCompany }}" placeholder="Company name" style="width:100%;box-sizing:border-box;border:1px solid #d7cbbd;border-radius:12px;padding:11px 12px;background:#fff;outline:none;font-size:14px;font-weight:700" />
+          <input value="{{ rvContact }}" onChange="{{ onRvContact }}" placeholder="Contact person" style="width:100%;box-sizing:border-box;border:1px solid #d7cbbd;border-radius:12px;padding:11px 12px;background:#fff;outline:none;font-size:13.5px" />
+          <input value="{{ rvWechat }}" onChange="{{ onRvWechat }}" placeholder="WeChat / phone" style="width:100%;box-sizing:border-box;border:1px solid #d7cbbd;border-radius:12px;padding:11px 12px;background:#fff;outline:none;font-size:13.5px" />
+        </div>
+      </div>
+      <div style="font-size:11px;color:#94601e;margin-top:8px;line-height:1.45;font-family:ui-monospace,Menlo,monospace">check the characters against the card photo before confirming</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:20px">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852">FROM THE LABEL</div>
+        <span style="font-size:10px;font-family:ui-monospace,Menlo,monospace;color:#9d7643;background:rgba(157,118,67,.12);border-radius:6px;padding:3px 6px">read on device</span>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:9px">
+        <div style="width:74px;height:96px;border-radius:11px;border:1px solid #d7cbbd;background:{{ labelSw }};flex-shrink:0"></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px;min-width:0">
+          <input value="{{ rvPname }}" onChange="{{ onRvPname }}" placeholder="Product name" style="width:100%;box-sizing:border-box;border:1px solid #d7cbbd;border-radius:12px;padding:11px 12px;background:#fff;outline:none;font-size:14px;font-weight:700" />
+          <input value="{{ rvCode }}" onChange="{{ onRvCode }}" placeholder="Model / code" style="width:100%;box-sizing:border-box;border:1px solid #d7cbbd;border-radius:12px;padding:11px 12px;background:#fff;outline:none;font-size:13.5px" />
+          <input value="{{ rvSize }}" onChange="{{ onRvSize }}" placeholder="Size / spec" style="width:100%;box-sizing:border-box;border:1px solid #d7cbbd;border-radius:12px;padding:11px 12px;background:#fff;outline:none;font-size:13.5px" />
+        </div>
+      </div>
+    </div>
+    <div style="background:rgba(255,253,249,.97);border-top:1px solid #d7cbbd;padding:10px 16px 30px">
+      <button onClick="{{ confirmReview }}" style-active="transform:scale(.98)" style="width:100%;min-height:58px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:17px;font-weight:800;transition:transform .12s">✓ Confirm record</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isTabView }}" hint-placeholder-val="{{ true }}">
+    <nav style="position:absolute;left:0;right:0;bottom:0;z-index:20;background:rgba(255,253,249,.97);border-top:1px solid #d7cbbd;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;padding:6px 8px 26px">
+      <button onClick="{{ navHome }}" style="border:0;background:transparent;color:{{ homeFg }};min-height:54px;display:grid;place-items:center;gap:1px;font-size:10px;font-weight:700;border-radius:12px"><b style="font-size:19px;line-height:1">⌂</b>Today</button>
+      <button onClick="{{ navProducts }}" style="border:0;background:transparent;color:{{ prodFg }};min-height:54px;display:grid;place-items:center;gap:1px;font-size:10px;font-weight:700;border-radius:12px"><b style="font-size:19px;line-height:1">◫</b>Products</button>
+      <div style="display:grid;place-items:center">
+        <button onClick="{{ startCapture }}" style-active="transform:scale(.94)" style="width:62px;height:62px;border-radius:50%;border:0;background:#6f273a;color:#fff;font-size:30px;line-height:1;box-shadow:0 8px 20px rgba(111,39,58,.38);transform:translateY(-16px);transition:transform .12s" aria-label="New capture">＋</button>
+      </div>
+      <button onClick="{{ navSuppliers }}" style="border:0;background:transparent;color:{{ suppFg }};min-height:54px;display:grid;place-items:center;gap:1px;font-size:10px;font-weight:700;border-radius:12px"><b style="font-size:19px;line-height:1">◎</b>Companies</button>
+      <button onClick="{{ navCompare }}" style="border:0;background:transparent;color:{{ cmpFg }};min-height:54px;display:grid;place-items:center;gap:1px;font-size:10px;font-weight:700;border-radius:12px;position:relative"><b style="font-size:19px;line-height:1">⇄</b>Compare
+        <sc-if value="{{ cmpBadgeOn }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:4px;right:14px;min-width:16px;height:16px;border-radius:999px;background:#6f273a;color:#fff;font-size:9.5px;font-weight:800;display:grid;place-items:center;padding:0 4px">{{ cmpCount }}</span></sc-if>
+      </button>
+    </nav>
+  </sc-if>
+
+  <sc-if value="{{ isShoot }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;background:#f4f0e9">
+    <header style="background:#201a17;color:#fff;padding:60px 14px 10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <button onClick="{{ closeFlow }}" style="width:44px;height:44px;border:0;border-radius:14px;background:rgba(255,255,255,.10);color:#fff;font-size:17px" aria-label="Close">✕</button>
+        <div style="text-align:center">
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:19px">New capture</div>
+          <div style="font-size:10.5px;color:rgba(255,255,255,.6)">Shoot · tag · save</div>
+        </div>
+        <div style="width:44px"></div>
+      </div>
+      <button onClick="{{ openVenueSheet }}" style="margin-top:9px;width:100%;border:0;border-radius:11px;background:rgba(201,170,120,.14);color:#c9aa78;font-size:12px;font-weight:700;min-height:36px;display:flex;align-items:center;justify-content:center;gap:6px">◎ {{ venue }} <span style="opacity:.6">▾</span></button>
+    </header>
+    <div style="flex:1;display:flex;flex-direction:column;gap:9px;padding:12px 14px">
+      <sc-for list="{{ slots }}" as="s" hint-placeholder-count="3">
+        <div onClick="{{ s.open }}" role="button" style="flex:{{ s.flex }};min-height:96px;border-radius:20px;border:{{ s.border }};background:{{ s.bg }};position:relative;overflow:hidden;cursor:pointer">
+          <sc-if value="{{ s.empty }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px">
+              <div style="width:40px;height:40px;border-radius:50%;border:2px solid #9d7643;color:#9d7643;display:grid;place-items:center;font-family:Georgia,'Times New Roman',serif;font-size:19px;font-weight:700">{{ s.n }}</div>
+              <div style="font-size:16px;font-weight:800">{{ s.label }}</div>
+              <div style="font-size:11.5px;color:#625852;font-family:ui-monospace,Menlo,monospace;text-align:center">{{ s.hint }}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ s.filled }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:rgba(31,25,23,.72);color:#fff">
+              <span style="font-size:13px;font-weight:700">{{ s.overlay }}</span>
+              <span style="font-size:12px;color:rgba(255,255,255,.75)">{{ s.action }}</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:rgba(255,253,249,.97);border-top:1px solid #d7cbbd;padding:10px 16px 30px">
+      <sc-if value="{{ detailsDisabled }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;font-size:12px;color:#94601e;font-weight:700;padding-bottom:8px">Shoot at least one product photo</div>
+      </sc-if>
+      <button onClick="{{ toDetails }}" disabled="{{ detailsDisabled }}" style-active="transform:scale(.98)" style="width:100%;min-height:58px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:17px;font-weight:800;opacity:{{ detailsOpacity }};transition:transform .12s">Tag it →</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isTag }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;background:#f4f0e9">
+    <header style="background:#201a17;color:#fff;padding:60px 14px 12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <button onClick="{{ backToShoot }}" style="width:44px;height:44px;border:0;border-radius:14px;background:rgba(255,255,255,.10);color:#fff;font-size:19px" aria-label="Back">‹</button>
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:19px">Tag it</div>
+        <div style="width:44px"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <sc-for list="{{ slots }}" as="s" hint-placeholder-count="3">
+          <div onClick="{{ s.open }}" role="button" style="flex:1;height:46px;border-radius:10px;border:{{ s.thumbBorder }};background:{{ s.thumbBg }};display:grid;place-items:center;cursor:pointer;position:relative">
+            <sc-if value="{{ s.empty }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;color:rgba(255,255,255,.55);font-weight:700">+ {{ s.label }}</span></sc-if>
+            <sc-if value="{{ s.multi }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:4px;bottom:4px;font-size:9px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:6px;padding:2px 5px">{{ s.count }}</span></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:16px 16px 24px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin:0 0 9px">WHAT IS IT?</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ catChips }}" as="c" hint-placeholder-count="12">
+          <button onClick="{{ c.onTap }}" style-active="transform:scale(.96)" style="min-height:48px;padding:0 16px;border-radius:14px;font-size:14px;font-weight:700;border:{{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};transition:transform .1s">{{ c.name }}</button>
+        </sc-for>
+      </div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin:22px 0 9px">WHICH ROOM?</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ roomChips }}" as="c" hint-placeholder-count="8">
+          <button onClick="{{ c.onTap }}" style-active="transform:scale(.96)" style="min-height:44px;padding:0 15px;border-radius:999px;font-size:13.5px;font-weight:700;border:{{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};transition:transform .1s">{{ c.name }}</button>
+        </sc-for>
+        <button onClick="{{ toggleRoomsMore }}" style="min-height:44px;padding:0 15px;border-radius:999px;font-size:13.5px;font-weight:800;border:1px dashed #9d7643;background:transparent;color:#9d7643">{{ roomsMoreLabel }}</button>
+      </div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin:22px 0 6px">YOUR CALL</div>
+      <div style="display:flex;gap:4px">
+        <sc-for list="{{ starBtns }}" as="st" hint-placeholder-count="5">
+          <button onClick="{{ st.onTap }}" style="width:52px;height:52px;border:0;background:transparent;font-size:36px;line-height:1;padding:0;color:{{ st.color }}">★</button>
+        </sc-for>
+      </div>
+      <div style="margin-top:12px">
+        <sc-if value="{{ recIdle }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ onRec }}" style="width:100%;min-height:54px;border:1px solid #d7cbbd;border-radius:14px;background:#fffdf9;color:#201a17;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px"><span style="width:10px;height:10px;border-radius:50%;background:#8b2d2d"></span>Record a voice note</button>
+        </sc-if>
+        <sc-if value="{{ recOn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ onRec }}" style="width:100%;min-height:54px;border:0;border-radius:14px;background:#6f273a;color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px"><span style="width:10px;height:10px;border-radius:50%;background:#fff;animation:msPulse 1s infinite"></span>Recording {{ recTime }} — tap to stop</button>
+        </sc-if>
+        <sc-if value="{{ recDone }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;border:1px solid #d7cbbd;border-radius:14px;background:#fffdf9;padding:8px 8px 8px 15px;min-height:54px">
+            <span style="font-size:14.5px;font-weight:700;flex:1">▶ Voice note · {{ voiceTime }}</span>
+            <button onClick="{{ delVoice }}" style="width:40px;height:40px;border:0;border-radius:11px;background:#ebe3d8;color:#625852;font-size:15px" aria-label="Delete voice note">✕</button>
+          </div>
+        </sc-if>
+      </div>
+      <div style="margin-top:12px">
+        <sc-if value="{{ priceClosed }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ togglePrice }}" style="border:0;background:transparent;color:#6f273a;font-size:14px;font-weight:800;padding:10px 2px">＋ Add quoted price</button>
+        </sc-if>
+        <sc-if value="{{ priceOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:8px;align-items:stretch">
+            <sc-for list="{{ curBtns }}" as="cu" hint-placeholder-count="3">
+              <button onClick="{{ cu.onTap }}" style="min-width:56px;min-height:48px;border-radius:12px;font-size:13px;font-weight:800;border:{{ cu.bd }};background:{{ cu.bg }};color:{{ cu.fg }}">{{ cu.name }}</button>
+            </sc-for>
+            <input value="{{ price }}" onChange="{{ onPrice }}" inputMode="decimal" placeholder="Quoted amount" style="flex:1;min-width:0;border:1px solid #d7cbbd;border-radius:12px;padding:0 13px;background:#fff;color:#201a17;outline:none" />
+          </div>
+        </sc-if>
+      </div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin:22px 0 9px">COMPANY</div>
+      <sc-if value="{{ hasCompany }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid #b9d2c4;background:#e9f2ec;border-radius:14px;padding:13px 15px">
+          <div style="font-size:14px;font-weight:800;color:#355f4b">{{ companyTitle }}</div>
+          <div style="font-size:12.5px;color:#4a6355;line-height:1.45;margin-top:3px">{{ companySub }}</div>
+          <button onClick="{{ openCardCam }}" style="margin-top:9px;border:0;background:transparent;color:#355f4b;font-size:12.5px;font-weight:800;padding:4px 0;text-decoration:underline">Different company? Shoot the new card</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noCompany }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ suppChips }}" as="c" hint-placeholder-count="2">
+            <button onClick="{{ c.onTap }}" style="min-height:44px;padding:0 15px;border-radius:999px;font-size:13.5px;font-weight:700;border:{{ c.bd }};background:{{ c.bg }};color:{{ c.fg }}">{{ c.name }}</button>
+          </sc-for>
+          <button onClick="{{ openCardCam }}" style="min-height:44px;padding:0 15px;border-radius:999px;font-size:13.5px;font-weight:800;border:1px dashed #9d7643;background:transparent;color:#9d7643">＋ Shoot the card</button>
+        </div>
+      </sc-if>
+    </div>
+    <div style="background:rgba(255,253,249,.97);border-top:1px solid #d7cbbd;padding:10px 16px 30px;display:flex;gap:10px;flex-direction:{{ barFlip }}">
+      <button onClick="{{ backToShoot }}" style="width:58px;min-height:58px;border:1px solid #d7cbbd;border-radius:16px;background:#fffdf9;color:#201a17;font-size:20px" aria-label="Back to photos">‹</button>
+      <button onClick="{{ save }}" disabled="{{ saveDisabled }}" style-active="transform:scale(.98)" style="flex:1;min-height:58px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:17px;font-weight:800;opacity:{{ saveOpacity }};transition:transform .12s">{{ saveLabel }}</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isSaved }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;background:#f4f0e9">
+    <header style="background:#201a17;color:#fff;padding:60px 14px 14px;text-align:center">
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:19px">Capture saved</div>
+      <div style="font-size:10.5px;color:rgba(255,255,255,.6);margin-top:2px">{{ venue }}</div>
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:26px 20px 24px;text-align:center">
+      <div style="width:86px;height:86px;border-radius:50%;background:#9d7643;color:#fff;font-size:38px;display:grid;place-items:center;margin:0 auto;animation:msPop .35s ease;box-shadow:0 10px 26px rgba(157,118,67,.35)">✓</div>
+      <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:25px;margin:18px 0 4px">Saved on this device</h2>
+      <p style="font-size:12.5px;color:#625852;margin:0">Captured in {{ savedTime }} · syncs to Villa Milana d’Oro when online.</p>
+      <div style="background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;padding:14px;margin-top:22px;text-align:left;animation:msRise .4s ease">
+        <div style="display:flex;gap:8px">
+          <sc-for list="{{ slots }}" as="s" hint-placeholder-count="3">
+            <div style="flex:1;height:64px;border-radius:11px;border:{{ s.border }};background:{{ s.bg }};display:grid;place-items:center;position:relative">
+              <sc-if value="{{ s.empty }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;color:#a2937f;font-weight:700">skipped</span></sc-if>
+              <sc-if value="{{ s.multi }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:4px;bottom:4px;font-size:9px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:6px;padding:2px 5px">{{ s.count }}</span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:11px">
+          <sc-for list="{{ sumChips }}" as="ch" hint-placeholder-count="4">
+            <span style="font-size:11.5px;font-weight:700;border-radius:999px;padding:6px 10px;background:{{ ch.bg }};color:{{ ch.fg }}">{{ ch.t }}</span>
+          </sc-for>
+        </div>
+      </div>
+      <p style="font-size:11.5px;color:#625852;margin:14px 4px 0;line-height:1.5">Name, code and company details get read from your photos at evening review.</p>
+    </div>
+    <div style="padding:10px 16px 30px;display:flex;flex-direction:column;gap:8px">
+      <button onClick="{{ nextCapture }}" style-active="transform:scale(.98)" style="width:100%;min-height:58px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:17px;font-weight:800;transition:transform .12s">{{ nextLabel }}</button>
+      <button onClick="{{ goHome }}" style="width:100%;min-height:48px;border:0;background:transparent;color:#625852;font-size:14px;font-weight:700">Back to today</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ detailOn }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;background:#f4f0e9">
+    <header style="background:#201a17;color:#fff;padding:60px 14px 14px;display:flex;align-items:center;gap:10px">
+      <button onClick="{{ closeDetail }}" style="width:44px;height:44px;border:0;border-radius:14px;background:rgba(255,255,255,.10);color:#fff;font-size:19px;flex-shrink:0" aria-label="Back">‹</button>
+      <div style="min-width:0;flex:1">
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ dName }}</div>
+        <div style="font-size:10.5px;color:rgba(255,255,255,.6);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ dSub }}</div>
+      </div>
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:16px 18px 24px">
+      <sc-if value="{{ dNeedsReview }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ dOpenReview }}" style="width:100%;margin-bottom:12px;min-height:50px;border:1px solid #e5cfa9;border-radius:14px;background:#f9efdd;color:#94601e;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px">▣ Complete this record — read card &amp; label →</button>
+      </sc-if>
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px">
+        <sc-for list="{{ dPhotos }}" as="ph" hint-placeholder-count="3">
+          <div style="flex-shrink:0;width:128px">
+            <div style="height:108px;border-radius:13px;border:1px solid #d7cbbd;background:{{ ph.bg }}"></div>
+            <div style="font-size:10px;color:#625852;font-weight:700;margin-top:4px;text-align:center;font-family:ui-monospace,Menlo,monospace">{{ ph.cap }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+        <sc-for list="{{ dChips }}" as="ch" hint-placeholder-count="4">
+          <span style="font-size:11.5px;font-weight:700;border-radius:999px;padding:6px 10px;background:{{ ch.bg }};color:{{ ch.fg }}">{{ ch.t }}</span>
+        </sc-for>
+      </div>
+      <sc-if value="{{ dHasNote }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:14px;padding:13px 15px;font-size:13.5px;line-height:1.5;color:#3d3530">{{ dNote }}</div>
+      </sc-if>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button onClick="{{ dShortlist }}" style-active="transform:scale(.97)" style="flex:1;min-height:52px;border:0;border-radius:14px;background:#201a17;color:#fff;font-size:15px;font-weight:800;transition:transform .1s">★ Shortlist</button>
+        <button onClick="{{ dReject }}" style-active="transform:scale(.97)" style="flex:1;min-height:52px;border:1px solid #e0c4c0;border-radius:14px;background:#f8e7e5;color:#8b2d2d;font-size:15px;font-weight:800;transition:transform .1s">Reject</button>
+      </div>
+      <button onClick="{{ dToggleCompare }}" style="width:100%;margin-top:10px;min-height:52px;border:1px solid #d7cbbd;border-radius:14px;background:{{ dCmpBg }};color:{{ dCmpFg }};font-size:15px;font-weight:800">⇄ {{ dCmpLabel }}</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ venueSheetOn }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:50">
+    <div onClick="{{ closeVenueSheet }}" style="position:absolute;inset:0;background:rgba(31,25,23,.45)"></div>
+    <div style="position:absolute;left:0;right:0;bottom:0;background:#fffdf9;border-radius:24px 24px 0 0;padding:18px 18px 40px;max-height:72%;overflow-y:auto;animation:msSheet .25s ease;box-shadow:0 -14px 40px rgba(39,28,20,.25)">
+      <div style="width:38px;height:4px;border-radius:99px;background:#d7cbbd;margin:0 auto 14px"></div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:20px">Where are you?</div>
+      <div style="font-size:12px;color:#625852;margin:4px 0 6px;line-height:1.45">Captures file under this place. Moving to a new place resets the company card.</div>
+      <sc-for list="{{ venueGroups }}" as="g" hint-placeholder-count="3">
+        <div style="margin-top:14px">
+          <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">{{ g.name }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ g.opts }}" as="v" hint-placeholder-count="3">
+              <button onClick="{{ v.onTap }}" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:700;border:{{ v.bd }};background:{{ v.bg }};color:{{ v.fg }}">{{ v.name }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ cameraOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:55;background:#16110f;display:flex;flex-direction:column;color:#fff">
+    <div style="padding:60px 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <button onClick="{{ cancelCam }}" style="min-height:44px;padding:0 12px;border:0;border-radius:13px;background:rgba(255,255,255,.10);color:#fff;font-size:14px;font-weight:700">Cancel</button>
+      <div style="text-align:center">
+        <div style="font-size:15px;font-weight:800">{{ camTitle }}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">{{ camHint }}</div>
+      </div>
+      <div style="display:flex;gap:6px;min-width:44px;justify-content:flex-end">
+        <sc-for list="{{ camDots }}" as="d" hint-placeholder-count="3">
+          <span style="width:8px;height:8px;border-radius:50%;background:{{ d.bg }};border:{{ d.bd }}"></span>
+        </sc-for>
+      </div>
+    </div>
+    <div style="flex:1;position:relative;display:grid;place-items:center">
+      <div style="position:relative;width:82%;aspect-ratio:4/3">
+        <div style="position:absolute;left:0;top:0;width:30px;height:30px;border-left:3px solid #c9aa78;border-top:3px solid #c9aa78;border-top-left-radius:10px"></div>
+        <div style="position:absolute;right:0;top:0;width:30px;height:30px;border-right:3px solid #c9aa78;border-top:3px solid #c9aa78;border-top-right-radius:10px"></div>
+        <div style="position:absolute;left:0;bottom:0;width:30px;height:30px;border-left:3px solid #c9aa78;border-bottom:3px solid #c9aa78;border-bottom-left-radius:10px"></div>
+        <div style="position:absolute;right:0;bottom:0;width:30px;height:30px;border-right:3px solid #c9aa78;border-bottom:3px solid #c9aa78;border-bottom-right-radius:10px"></div>
+        <div style="position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.4);font-family:ui-monospace,Menlo,monospace;font-size:11.5px;text-align:center;line-height:1.6">camera preview<br>simulated in this prototype</div>
+      </div>
+    </div>
+    <div style="padding:16px 22px 44px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-direction:{{ barFlip }}">
+      <div style="width:84px;display:flex;justify-content:flex-start">
+        <div style="width:48px;height:48px;border-radius:11px;border:{{ lastThumbBorder }};background:{{ lastThumbBg }};position:relative">
+          <sc-if value="{{ camCountOn }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:-6px;top:-6px;font-size:10px;font-weight:800;background:#c9aa78;color:#231a15;border-radius:999px;padding:3px 7px">{{ camCount }}</span></sc-if>
+        </div>
+      </div>
+      <button onClick="{{ snap }}" style-active="transform:scale(.9)" style="width:78px;height:78px;border-radius:50%;border:4px solid #fff;background:transparent;display:grid;place-items:center;transition:transform .1s;flex-shrink:0" aria-label="Shutter">
+        <span style="width:60px;height:60px;border-radius:50%;background:#fff;display:block"></span>
+      </button>
+      <div style="width:84px;display:flex;justify-content:flex-end">
+        <button onClick="{{ camNext }}" style-active="transform:scale(.95)" style="min-height:48px;padding:0 14px;border:0;border-radius:999px;background:{{ camNextBg }};color:{{ camNextFg }};font-size:14px;font-weight:800;transition:transform .1s;white-space:nowrap">{{ camNextLabel }}</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ flashOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;z-index:70;background:#fff;animation:msFlash .3s ease forwards;pointer-events:none"></div>
+  </sc-if>
+
+  <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:50%;bottom:118px;transform:translateX(-50%);z-index:80;background:#201a17;color:#fff;border-radius:999px;padding:11px 17px;font-size:12.5px;max-width:82%;text-align:center;box-shadow:0 10px 30px rgba(39,28,20,.3)">{{ toastMsg }}</div>
+  </sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:470,&quot;height&quot;:960},&quot;leftHanded&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Ergonomics&quot;}}">
+class Component extends DCLogic {
+  CATS = ['Joinery','Windows & doors','Natural stone','Sintered slabs','Tiles','Lighting','Hardware','Bathrooms','Stone fabrication','Furniture','Appliances','Other'];
+  ROOMS_TOP = ['Kitchen','Main ensuite','Hidden pantry','Wine display','Main bedroom','Walk-in robe','Laundry','Entry'];
+  ROOMS_MORE = ['Formal lounge','Study','Bedrooms','Pool','Exterior','General'];
+  VGROUPS = [
+    { name: 'Fairs', opts: ['Canton Fair Phase 1','Canton Fair Phase 2','CCIH CeramBath','China Ceramics City'] },
+    { name: 'Factories', opts: ['Joinery Factory A','Joinery Factory B','Windows & Doors Factory','Stone Fabricator'] },
+    { name: 'Showrooms & markets', opts: ['Meiju','Huayi'] },
+    { name: 'On the road', opts: ['Hotel / evening','Other stop'] }
+  ];
+  PROD = [
+    'repeating-linear-gradient(98deg,rgba(255,255,255,.20) 0 2px,transparent 2px 16px),linear-gradient(115deg,#e0d1b5,#c3a678 45%,#ecdfc6)',
+    'repeating-linear-gradient(120deg,rgba(255,255,255,.07) 0 1px,transparent 1px 12px),linear-gradient(125deg,#41584a,#2b4034 55%,#5b7461)',
+    'repeating-linear-gradient(105deg,rgba(111,39,58,.30) 0 2px,transparent 2px 20px),linear-gradient(110deg,#eadfd4,#c39aa2 38%,#7a3247 62%,#e6d8c8)',
+    'repeating-linear-gradient(115deg,rgba(255,255,255,.09) 0 1px,transparent 1px 10px),linear-gradient(120deg,#37302b,#241f1c 55%,#48403a)',
+    'linear-gradient(120deg,#d9bd8c,#a87f4b 52%,#e3cda1)'
+  ];
+  LABEL_SW = 'repeating-linear-gradient(0deg,#f8f4ec 0 12px,#ddd1bc 12px 13px)';
+  CARD_SW = 'linear-gradient(135deg,#fffdf9 55%,#e6d3ae 55%,#e6d3ae 62%,#fffdf9 62%)';
+  ST = {
+    'Preferred':   { bg: '#e3efe8', fg: '#355f4b' },
+    'Shortlisted': { bg: '#e3efe8', fg: '#355f4b' },
+    'Captured':    { bg: '#ebe3d8', fg: '#625852' },
+    'Needs review':{ bg: '#f5ead8', fg: '#94601e' },
+    'Rejected':    { bg: '#f6e5e3', fg: '#8b2d2d' }
+  };
+  OCR_CO = {
+    'Booth 10.2-C41': { company: 'Foshan Jinlan Joinery Co., Ltd', contact: 'Lily Chen · Sales Director', wechat: 'JinlanLily_88' },
+    'Booth 9.1-B07':  { company: 'Xiamen Wanli Stone Co., Ltd', contact: 'Mark Zhou · Export Manager', wechat: 'wanli-stone-mark' },
+    'default':        { company: 'Guangzhou Meiju Building Materials Co., Ltd', contact: 'Amy Liang · Sales', wechat: 'meiju_amy2026' }
+  };
+  OCR_LB = {
+    'Joinery':        { pname: 'Fluted walnut veneer door', code: 'C41-208', size: '2400 × 720 × 45 mm' },
+    'Natural stone':  { pname: 'Verde Alpi polished slab', code: 'VA-3120', size: '2800 × 1600 × 20 mm' },
+    'Sintered slabs': { pname: 'Sintered slab — satin face', code: 'SS-1206', size: '3200 × 1600 × 12 mm' },
+    'Hardware':       { pname: 'Brushed brass pull', code: 'HB-320', size: '320 mm centres' },
+    'default':        { pname: '', code: '', size: '' }
+  };
+
+  state = {
+    view: 'home', camera: null, flash: false, venueSheetOn: false,
+    product: [], labelShot: null, cardShot: null,
+    session: { card: null, count: 0, key: '' }, cardN: 0,
+    category: '', rooms: [], roomsMore: false, rating: 0,
+    priceOpen: false, currency: 'CNY', price: '',
+    rec: 'idle', recSec: 0, voiceLen: 0,
+    startedAt: null, savedSec: 0,
+    venue: 'Canton Fair Phase 1', supplier: '', toast: '',
+    q: '', catFilter: 'All', venueFilter: 'All places', detailId: null,
+    compareIds: [], reviewId: null,
+    rv: { company: '', contact: '', wechat: '', pname: '', code: '', size: '' },
+    captures: [
+      { id: 1, name: 'OC10 Taj Mahal Satin', cat: 'Sintered slabs', rooms: ['Main ensuite'], rating: 5, sup: 'Infinity Surfaces', venue: 'Meiju', st: 'Shortlisted', time: '09:12', photos: 1, bgi: 0, note: 'Calm, pale champagne. Proven in full-room applications.', today: true },
+      { id: 2, name: 'Calacatta Viola MB22', cat: 'Sintered slabs', rooms: ['Hidden pantry'], rating: 5, sup: 'Infinity Surfaces', venue: 'Meiju', st: 'Preferred', time: '09:31', photos: 2, bgi: 2, note: 'Hidden jewel-box pantry. Pick the calmer face with generous ivory.', today: true },
+      { id: 3, name: 'Macchia Vecchia Honed', cat: 'Sintered slabs', rooms: ['Kitchen'], rating: 5, sup: 'Maximum / Artedomus', venue: 'Huayi', st: 'Preferred', time: '10:02', photos: 3, bgi: 4, note: 'Subtle warm face. Main kitchen hero with restraint.', today: true },
+      { id: 4, name: 'Fluted walnut door', cat: 'Joinery', rooms: ['Study'], rating: 3, sup: 'Booth 10.2-C41', venue: 'Canton Fair Phase 1', st: 'Needs review', time: '10:44', photos: 2, bgi: 3, note: '', today: true, needsReview: true, missing: ['company name', 'code'] },
+      { id: 5, name: 'Brushed brass pull 320', cat: 'Hardware', rooms: ['Kitchen'], rating: 4, sup: 'Booth 10.2-C41', venue: 'Canton Fair Phase 1', st: 'Captured', time: '10:51', photos: 1, bgi: 4, note: 'Weighty. Ask for solid vs plated confirmation.', today: true },
+      { id: 6, name: 'Verde Alpi slab', cat: 'Natural stone', rooms: ['Wine display'], rating: 4, sup: 'Booth 9.1-B07', venue: 'Stone Fabricator', st: 'Needs review', time: 'Yesterday', photos: 3, bgi: 1, note: '', today: false, needsReview: true, missing: ['company name', 'size'] },
+      { id: 7, name: 'Linear pendant, aged brass', cat: 'Lighting', rooms: ['Formal lounge'], rating: 2, sup: 'Booth 11.3-F22', venue: 'Canton Fair Phase 1', st: 'Rejected', time: 'Yesterday', photos: 1, bgi: 4, note: 'Finish too yellow in person.', today: false },
+      { id: 8, name: 'Travertine mosaic', cat: 'Tiles', rooms: ['Pool'], rating: 3, sup: 'China Ceramics City', venue: 'China Ceramics City', st: 'Captured', time: 'Yesterday', photos: 2, bgi: 0, note: '', today: false }
+    ]
+  };
+
+  componentDidMount() {
+    this.tickI = setInterval(() => { if (this.state.rec === 'rec') this.setState({ recSec: this.state.recSec + 1 }); }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this.tickI); if (this.toastT) clearTimeout(this.toastT); }
+
+  fmt(sec) { const m = Math.floor(sec / 60), s = sec % 60; return m + ':' + String(s).padStart(2, '0'); }
+  ord(n) { return n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : n + 'th'; }
+  elapsedSec() { return this.state.startedAt ? Math.max(0, Math.floor((Date.now() - this.state.startedAt) / 1000)) : 0; }
+  sessWord() {
+    const v = this.state.venue;
+    if (this.VGROUPS[1].opts.includes(v)) return 'factory';
+    if (this.VGROUPS[2].opts.includes(v)) return 'showroom';
+    if (this.VGROUPS[0].opts.includes(v)) return 'booth';
+    return 'company';
+  }
+
+  resetDraft() {
+    return { product: [], labelShot: null, cardShot: null, category: '', rooms: [], roomsMore: false,
+      rating: 0, priceOpen: false, currency: 'CNY', price: '', rec: 'idle', recSec: 0, voiceLen: 0, supplier: '' };
+  }
+  startCapture = () => this.setState({ ...this.resetDraft(), view: 'shoot', camera: 'product', startedAt: Date.now(), detailId: null, reviewId: null });
+  closeFlow = () => this.setState({ view: 'home', camera: null, startedAt: null });
+  goHome = () => this.setState({ view: 'home' });
+  navHome = () => this.setState({ view: 'home' });
+  navProducts = () => this.setState({ view: 'products', detailId: null });
+  navSuppliers = () => this.setState({ view: 'suppliers' });
+  navCompare = () => this.setState({ view: 'compare' });
+  navReview = () => this.setState({ view: 'review', detailId: null, reviewId: null });
+  openCam(k) { this.setState({ camera: k }); }
+  openCardCam = () => this.setState({ camera: 'card' });
+  cancelCam = () => this.setState({ camera: null });
+  openVenueSheet = () => this.setState({ venueSheetOn: true });
+  closeVenueSheet = () => this.setState({ venueSheetOn: false });
+  pickVenue(name) {
+    const s = this.state;
+    if (name === s.venue) return this.setState({ venueSheetOn: false });
+    const hadSession = !!s.session.card;
+    this.setState({ venue: name, venueSheetOn: false, session: { card: null, count: 0, key: '' }, cardShot: null });
+    if (hadSession) this.showToast('New place — the company card was reset.');
+  }
+
+  advanceFrom(k) {
+    const s = this.state;
+    if (s.view === 'tag') return this.setState({ camera: null });
+    if (k === 'product') return this.setState({ camera: 'label' });
+    if (k === 'label') {
+      if (s.cardShot || s.session.card) return this.setState({ camera: null, view: 'tag' });
+      return this.setState({ camera: 'card' });
+    }
+    return this.setState({ camera: null, view: 'tag' });
+  }
+  snap = () => {
+    const k = this.state.camera; if (!k) return;
+    this.setState({ flash: true });
+    setTimeout(() => this.setState({ flash: false }), 320);
+    if (k === 'product') {
+      if (this.state.product.length >= 6) return this.showToast('Six product photos is plenty — tap Next.');
+      this.setState({ product: this.state.product.concat(this.PROD[Math.floor(Math.random() * this.PROD.length)]) });
+      return;
+    }
+    if (k === 'label') { this.setState({ labelShot: this.LABEL_SW }); setTimeout(() => this.advanceFrom('label'), 340); return; }
+    const n = this.state.cardN + 1;
+    this.setState({ cardShot: this.CARD_SW, cardN: n,
+      session: { card: this.CARD_SW, count: 0, key: 'Card #' + n + ' · ' + this.state.venue }, supplier: '' });
+    setTimeout(() => this.advanceFrom('card'), 340);
+  };
+  camNext = () => this.advanceFrom(this.state.camera);
+
+  toDetails = () => { if (this.state.product.length) this.setState({ view: 'tag', camera: null }); };
+  backToShoot = () => this.setState({ view: 'shoot', camera: null });
+
+  save = () => {
+    const s = this.state;
+    if (!s.category || !s.product.length) return;
+    const sess = s.session.card ? { ...s.session, count: s.session.count + 1 } : s.session;
+    const sup = s.supplier || (sess.card ? sess.key : 'No company yet');
+    const missing = ['name'].concat(s.supplier || sess.card ? [] : ['company']).concat(s.labelShot ? ['code'] : ['label photo']);
+    const rec = { id: Date.now(), name: s.category + ' — untitled', cat: s.category, rooms: s.rooms, rating: s.rating,
+      sup, venue: s.venue, st: 'Captured', time: 'Just now', photos: s.product.length, bgi: null, bg: s.product[0],
+      note: s.voiceLen ? 'Voice note · ' + this.fmt(s.voiceLen) : '', today: true, mine: true,
+      needsReview: true, missing,
+      price: s.price ? s.currency + ' ' + s.price : '' };
+    this.setState({ captures: [rec].concat(s.captures), session: sess, savedSec: this.elapsedSec(), view: 'saved', startedAt: null, camera: null });
+  };
+  nextCapture = () => this.startCapture();
+
+  showToast(msg) {
+    this.setState({ toast: msg });
+    if (this.toastT) clearTimeout(this.toastT);
+    this.toastT = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+  shareToast = () => this.showToast('The real build assembles the day pack and hands it to Share.');
+
+  onRec = () => {
+    const s = this.state;
+    if (s.rec === 'idle') this.setState({ rec: 'rec', recSec: 0 });
+    else if (s.rec === 'rec') this.setState({ rec: 'done', voiceLen: Math.max(1, s.recSec) });
+  };
+  delVoice = () => this.setState({ rec: 'idle', recSec: 0, voiceLen: 0 });
+  togglePrice = () => this.setState({ priceOpen: !this.state.priceOpen });
+  onPrice = (e) => this.setState({ price: e.target.value });
+  onQ = (e) => this.setState({ q: e.target.value });
+  toggleRoomsMore = () => this.setState({ roomsMore: !this.state.roomsMore });
+  openDetail(id) { this.setState({ detailId: id }); }
+  closeDetail = () => this.setState({ detailId: null });
+  setStatus(id, st) {
+    this.setState({ captures: this.state.captures.map(c => c.id === id ? { ...c, st } : c) });
+    this.showToast(st === 'Rejected' ? 'Marked rejected' : 'Added to the shortlist');
+  }
+  toggleCompare(id) {
+    const ids = this.state.compareIds;
+    if (ids.includes(id)) return this.setState({ compareIds: ids.filter(x => x !== id) });
+    if (ids.length >= 3) return this.showToast('Compare holds three at a time — remove one first.');
+    this.setState({ compareIds: ids.concat(id) });
+    this.showToast('Added to compare');
+  }
+  openReview(id) {
+    const c = this.state.captures.find(x => x.id === id); if (!c) return;
+    const co = this.OCR_CO[c.sup] || this.OCR_CO.default;
+    const lb = this.OCR_LB[c.cat] || this.OCR_LB.default;
+    const named = !c.name.includes('untitled');
+    this.setState({ reviewId: id, view: 'reviewItem', detailId: null,
+      rv: { company: co.company, contact: co.contact, wechat: co.wechat,
+        pname: named ? c.name : (lb.pname || c.cat + ' — '), code: lb.code, size: lb.size } });
+  }
+  confirmReview = () => {
+    const s = this.state, id = s.reviewId;
+    const cur = s.captures.find(c => c.id === id); if (!cur) return;
+    const oldSup = cur.sup;
+    const captures = s.captures.map(c => {
+      let n = { ...c };
+      if (s.rv.company && c.sup === oldSup) n.sup = s.rv.company;
+      if (c.id === id) n = { ...n, name: s.rv.pname || c.name, code: s.rv.code, size: s.rv.size,
+        st: c.st === 'Needs review' ? 'Captured' : c.st, needsReview: false, missing: [] };
+      return n;
+    });
+    const session = s.session.key === oldSup && s.rv.company ? { ...s.session, key: s.rv.company } : s.session;
+    this.setState({ captures, session, view: 'review', reviewId: null });
+    this.showToast('Record completed — company saved for every product from that ' + this.sessWord());
+  };
+  rvField(k) { return (e) => this.setState({ rv: { ...this.state.rv, [k]: e.target.value } }); }
+
+  capBg(c) { return c.bg || this.PROD[c.bgi ?? 0]; }
+  rowOf(c) {
+    const st = this.ST[c.st] || this.ST.Captured;
+    return { name: c.name, sup: c.sup, venue: c.venue, time: c.time, st: c.st, stBg: st.bg, stFg: st.fg,
+      bg: this.capBg(c), multi: c.photos > 1, count: '×' + c.photos, onOpen: () => this.openDetail(c.id) };
+  }
+
+  renderVals() {
+    const s = this.state, view = s.view;
+    const chipIdle = { bg: '#fffdf9', fg: '#201a17', bd: '1px solid #d7cbbd' };
+    const nProd = s.product.length;
+    const companyBg = s.cardShot || s.session.card;
+    const sw = this.sessWord();
+
+    const slotDefs = [
+      { k: 'product', n: '1', label: 'Product', hint: 'every face of it — next when done' },
+      { k: 'label', n: '2', label: 'Label / spec', hint: 'sticker, model no., sizes' },
+      { k: 'card', n: '3', label: 'Company', hint: 'card or signage — once per ' + sw }
+    ];
+    const slots = slotDefs.map(d => {
+      const val = d.k === 'product' ? (nProd ? s.product[0] : null) : d.k === 'label' ? s.labelShot : companyBg;
+      const reused = d.k === 'card' && !s.cardShot && s.session.card;
+      return { ...d,
+        filled: !!val, empty: !val, flex: d.k === 'product' ? '1.3' : '1',
+        bg: val || '#faf7f2', border: val ? '1px solid #d7cbbd' : '2px dashed #bcae9f',
+        thumbBg: val || 'rgba(255,255,255,.08)',
+        thumbBorder: val ? '1px solid rgba(255,255,255,.35)' : '1px dashed rgba(255,255,255,.35)',
+        multi: d.k === 'product' && nProd > 1, count: '×' + nProd,
+        overlay: d.k === 'product' ? '✓ Product · ' + nProd + (nProd > 1 ? ' photos' : ' photo')
+          : d.k === 'label' ? '✓ Label / spec'
+          : reused ? '✓ Same ' + sw + ' · ' + this.ord(s.session.count + 1) + ' product' : '✓ Company card',
+        action: d.k === 'product' ? '＋ Add more' : d.k === 'card' ? '↻ New card' : '↻ Retake',
+        open: () => this.openCam(d.k)
+      };
+    });
+
+    const catChips = this.CATS.map(name => {
+      const sel = s.category === name;
+      return { name, onTap: () => this.setState({ category: sel ? '' : name }),
+        bg: sel ? '#201a17' : chipIdle.bg, fg: sel ? '#fff' : chipIdle.fg, bd: sel ? '1px solid #201a17' : chipIdle.bd };
+    });
+    const roomsShown = s.roomsMore ? this.ROOMS_TOP.concat(this.ROOMS_MORE) : this.ROOMS_TOP;
+    const roomChips = roomsShown.map(name => {
+      const sel = s.rooms.includes(name);
+      return { name, onTap: () => this.setState({ rooms: sel ? s.rooms.filter(r => r !== name) : s.rooms.concat(name) }),
+        bg: sel ? '#6f273a' : chipIdle.bg, fg: sel ? '#fff' : chipIdle.fg, bd: sel ? '1px solid #6f273a' : chipIdle.bd };
+    });
+    const suppChips = ['Infinity Surfaces', 'Maximum / Artedomus'].map(name => {
+      const sel = s.supplier === name;
+      return { name, onTap: () => this.setState({ supplier: sel ? '' : name }),
+        bg: sel ? '#201a17' : chipIdle.bg, fg: sel ? '#fff' : chipIdle.fg, bd: sel ? '1px solid #201a17' : chipIdle.bd };
+    });
+    const curBtns = ['CNY', 'USD', 'AUD'].map(name => {
+      const sel = s.currency === name;
+      return { name, onTap: () => this.setState({ currency: name }),
+        bg: sel ? '#201a17' : chipIdle.bg, fg: sel ? '#fff' : chipIdle.fg, bd: sel ? '1px solid #201a17' : chipIdle.bd };
+    });
+    const starBtns = [1, 2, 3, 4, 5].map(n => ({ n, color: s.rating >= n ? '#9d7643' : '#cfc6b8', onTap: () => this.setState({ rating: s.rating === n ? 0 : n }) }));
+
+    const venueGroups = this.VGROUPS.map(g => ({ name: g.name, opts: g.opts.map(name => {
+      const sel = s.venue === name;
+      return { name, onTap: () => this.pickVenue(name),
+        bg: sel ? '#6f273a' : chipIdle.bg, fg: sel ? '#fff' : chipIdle.fg, bd: sel ? '1px solid #6f273a' : chipIdle.bd };
+    }) }));
+
+    const camKey = s.camera;
+    const camMeta = {
+      product: nProd ? nProd + ' taken — shutter for another face' : 'step back — get the whole product',
+      label: 'fill the frame with the spec sticker',
+      card: 'card or signage — reused for every product at this ' + sw
+    };
+    const camDef = slotDefs.find(d => d.k === camKey);
+    const done = { product: nProd > 0, label: !!s.labelShot, card: !!companyBg };
+    const camDots = slotDefs.map(d => ({
+      bg: done[d.k] ? '#c9aa78' : d.k === camKey ? 'transparent' : 'rgba(255,255,255,.22)',
+      bd: d.k === camKey ? '2px solid #fff' : '2px solid transparent'
+    }));
+    const lastShot = camKey === 'product' ? s.product[nProd - 1] : camKey === 'label' ? s.labelShot : companyBg;
+    const camNextReady = camKey === 'product' && nProd > 0;
+
+    const sumChips = [];
+    if (s.category) sumChips.push({ t: s.category, bg: '#201a17', fg: '#fff' });
+    sumChips.push({ t: '◎ ' + s.venue, bg: '#ebe3d8', fg: '#625852' });
+    s.rooms.slice(0, 3).forEach(r => sumChips.push({ t: r, bg: '#f4e6ea', fg: '#6f273a' }));
+    if (s.rating) sumChips.push({ t: '★ ' + s.rating + '/5', bg: '#f5ead8', fg: '#94601e' });
+    if (s.price) sumChips.push({ t: s.currency + ' ' + s.price, bg: '#ebe3d8', fg: '#625852' });
+    if (companyBg) sumChips.push({ t: this.ord(s.session.count) + ' product at this ' + sw, bg: '#e3efe8', fg: '#355f4b' });
+    else if (s.supplier) sumChips.push({ t: s.supplier, bg: '#e3efe8', fg: '#355f4b' });
+    if (s.voiceLen) sumChips.push({ t: '● voice ' + this.fmt(s.voiceLen), bg: '#ebe3d8', fg: '#625852' });
+
+    const ql = s.q.toLowerCase();
+    const filtered = s.captures.filter(c =>
+      (!ql || (c.name + ' ' + c.sup + ' ' + c.venue).toLowerCase().includes(ql)) &&
+      (s.catFilter === 'All' || c.cat === s.catFilter) &&
+      (s.venueFilter === 'All places' || c.venue === s.venueFilter));
+    const presentCats = ['All'].concat(this.CATS.filter(c => s.captures.some(x => x.cat === c)));
+    const filterChips = presentCats.map(name => {
+      const sel = s.catFilter === name;
+      return { name, onTap: () => this.setState({ catFilter: sel ? 'All' : name }),
+        bg: sel ? '#6f273a' : chipIdle.bg, fg: sel ? '#fff' : chipIdle.fg, bd: sel ? '1px solid #6f273a' : chipIdle.bd };
+    });
+    const presentVenues = ['All places'].concat([...new Set(s.captures.map(c => c.venue))]);
+    const venueChips = presentVenues.map(name => {
+      const sel = s.venueFilter === name;
+      return { name, onTap: () => this.setState({ venueFilter: sel ? 'All places' : name }),
+        bg: sel ? '#201a17' : chipIdle.bg, fg: sel ? '#fff' : chipIdle.fg, bd: sel ? '1px solid #201a17' : chipIdle.bd };
+    });
+
+    const bySup = {};
+    s.captures.forEach(c => { (bySup[c.sup] = bySup[c.sup] || []).push(c); });
+    const suppRows = Object.keys(bySup).map(name => {
+      const list = bySup[name];
+      const venues = [...new Set(list.map(c => c.venue))].join(', ');
+      return { name, initial: name.charAt(0), sub: list.length + (list.length > 1 ? ' products · ' : ' product · ') + venues,
+        onTap: () => this.setState({ view: 'products', q: name, catFilter: 'All', venueFilter: 'All places' }) };
+    });
+
+    const pending = s.captures.filter(c => c.needsReview);
+    const pendRows = pending.map(c => ({ name: c.name, sup: c.sup, bg: this.capBg(c),
+      missing: (c.missing && c.missing.length ? c.missing : ['name', 'company']),
+      onTap: () => this.openReview(c.id) }));
+
+    const cmp = s.compareIds.map(id => s.captures.find(c => c.id === id)).filter(Boolean);
+    const cmpCards = cmp.map(c => {
+      const st = this.ST[c.st] || this.ST.Captured;
+      return { name: c.name, sup: c.sup, venue: c.venue, bg: this.capBg(c),
+        rating: c.rating ? '★ ' + c.rating + '/5' : '—', price: c.price || '—',
+        rooms: (c.rooms || []).slice(0, 2).join(', ') || '—',
+        st: c.st, stBg: st.bg, stFg: st.fg,
+        onOpen: () => this.openDetail(c.id), onRemove: () => this.toggleCompare(c.id) };
+    });
+
+    const d = s.captures.find(c => c.id === s.detailId);
+    const dst = d ? (this.ST[d.st] || this.ST.Captured) : null;
+    const dInCmp = d ? s.compareIds.includes(d.id) : false;
+    const dPhotos = d ? Array.from({ length: d.photos }, (_, i) => ({ bg: i === 0 ? this.capBg(d) : this.PROD[((d.bgi ?? 0) + i) % 5], cap: 'product · face ' + (i + 1) }))
+      .concat([{ bg: this.LABEL_SW, cap: 'label / spec' }, { bg: this.CARD_SW, cap: 'company card' }]) : [];
+    const dChips = d ? [{ t: d.st, bg: dst.bg, fg: dst.fg }, { t: d.cat, bg: '#201a17', fg: '#fff' }, { t: '◎ ' + d.venue, bg: '#ebe3d8', fg: '#625852' }]
+      .concat(d.rooms.map(r => ({ t: r, bg: '#f4e6ea', fg: '#6f273a' })))
+      .concat(d.rating ? [{ t: '★ ' + d.rating + '/5', bg: '#f5ead8', fg: '#94601e' }] : [])
+      .concat(d.code ? [{ t: 'Code ' + d.code, bg: '#ebe3d8', fg: '#625852' }] : [])
+      .concat(d.size ? [{ t: d.size, bg: '#ebe3d8', fg: '#625852' }] : [])
+      .concat(d.price ? [{ t: d.price, bg: '#ebe3d8', fg: '#625852' }] : []) : [];
+
+    const rvC = s.captures.find(c => c.id === s.reviewId);
+
+    return {
+      isHome: view === 'home', isShoot: view === 'shoot', isTag: view === 'tag', isSaved: view === 'saved',
+      isProducts: view === 'products', isSuppliers: view === 'suppliers', isCompare: view === 'compare',
+      isReview: view === 'review', isReviewItem: view === 'reviewItem',
+      isTabView: view === 'home' || view === 'products' || view === 'suppliers' || view === 'compare',
+      homeFg: view === 'home' ? '#6f273a' : '#625852', prodFg: view === 'products' ? '#6f273a' : '#625852',
+      suppFg: view === 'suppliers' ? '#6f273a' : '#625852', cmpFg: view === 'compare' ? '#6f273a' : '#625852',
+      cameraOpen: !!camKey, flashOn: s.flash, toastOn: !!s.toast, toastMsg: s.toast,
+      venue: s.venue, venueSheetOn: s.venueSheetOn, venueGroups,
+      openVenueSheet: this.openVenueSheet, closeVenueSheet: this.closeVenueSheet,
+      slots, catChips, roomChips, suppChips, curBtns, starBtns, sumChips,
+      roomsMoreLabel: s.roomsMore ? 'Fewer rooms' : '+' + this.ROOMS_MORE.length + ' more',
+      recIdle: s.rec === 'idle', recOn: s.rec === 'rec', recDone: s.rec === 'done',
+      recTime: this.fmt(s.recSec), voiceTime: this.fmt(s.voiceLen),
+      priceOpen: s.priceOpen, priceClosed: !s.priceOpen, price: s.price, onPrice: this.onPrice,
+      hasCompany: !!companyBg, noCompany: !companyBg,
+      companyTitle: s.cardShot ? '✓ Company card captured' : '✓ Same ' + sw + ' as your last capture',
+      companySub: s.cardShot ? 'The company record is created from this card — nothing to type on the floor.'
+        : 'This will file as the ' + this.ord(s.session.count + 1) + ' product for this ' + sw + '.',
+      detailsDisabled: !nProd, detailsOpacity: nProd ? '1' : '0.45',
+      saveDisabled: !s.category, saveOpacity: s.category ? '1' : '0.45',
+      saveLabel: s.category ? 'Save capture' : 'Pick a category first',
+      camTitle: camDef ? camDef.n + ' · ' + camDef.label : '', camHint: camKey ? camMeta[camKey] : '', camDots,
+      lastThumbBg: lastShot || 'rgba(255,255,255,.06)',
+      lastThumbBorder: lastShot ? '1px solid rgba(255,255,255,.4)' : '1px dashed rgba(255,255,255,.25)',
+      camCountOn: camKey === 'product' && nProd > 0, camCount: '×' + nProd,
+      camNextLabel: camNextReady ? 'Next →' : 'Skip', camNext: this.camNext,
+      camNextBg: camNextReady ? '#c9aa78' : 'rgba(255,255,255,.10)', camNextFg: camNextReady ? '#231a15' : 'rgba(255,255,255,.75)',
+      savedTime: this.fmt(s.savedSec),
+      nextLabel: s.session.card ? '＋ Next capture · same ' + sw : '＋ Next capture',
+      barFlip: (this.props.leftHanded ?? false) ? 'row-reverse' : 'row',
+      recent: s.captures.slice(0, 3).map(c => this.rowOf(c)),
+      rows: filtered.map(c => this.rowOf(c)), noRows: !filtered.length,
+      matchCount: filtered.length, totalCount: s.captures.length,
+      todayCount: s.captures.filter(c => c.today).length,
+      shortCount: s.captures.filter(c => c.st === 'Shortlisted' || c.st === 'Preferred').length,
+      localCount: s.captures.filter(c => c.mine).length + 3,
+      q: s.q, onQ: this.onQ, filterChips, venueChips, suppRows,
+      hasPending: pending.length > 0, noPending: !pending.length, pendingCount: pending.length, pendRows,
+      cmpCount: cmp.length, cmpEmpty: !cmp.length, cmpCards, cmpBadgeOn: cmp.length > 0,
+      detailOn: !!d, dName: d ? d.name : '', dSub: d ? d.sup + ' · ' + d.venue + ' · ' + d.time : '',
+      dPhotos, dChips, dNote: d ? d.note : '', dHasNote: !!(d && d.note),
+      dNeedsReview: !!(d && d.needsReview), dOpenReview: () => this.openReview(s.detailId),
+      dShortlist: () => this.setStatus(s.detailId, 'Shortlisted'), dReject: () => this.setStatus(s.detailId, 'Rejected'),
+      dToggleCompare: () => this.toggleCompare(s.detailId),
+      dCmpLabel: dInCmp ? 'In compare — remove' : 'Add to compare',
+      dCmpBg: dInCmp ? '#201a17' : '#fffdf9', dCmpFg: dInCmp ? '#fff' : '#201a17',
+      closeDetail: this.closeDetail,
+      rvName: rvC ? rvC.name + ' · ' + rvC.sup : '',
+      cardSw: this.CARD_SW, labelSw: this.LABEL_SW,
+      rvCompany: s.rv.company, rvContact: s.rv.contact, rvWechat: s.rv.wechat,
+      rvPname: s.rv.pname, rvCode: s.rv.code, rvSize: s.rv.size,
+      onRvCompany: this.rvField('company'), onRvContact: this.rvField('contact'), onRvWechat: this.rvField('wechat'),
+      onRvPname: this.rvField('pname'), onRvCode: this.rvField('code'), onRvSize: this.rvField('size'),
+      confirmReview: this.confirmReview, navReview: this.navReview, shareToast: this.shareToast,
+      startCapture: this.startCapture, closeFlow: this.closeFlow, goHome: this.goHome,
+      navHome: this.navHome, navProducts: this.navProducts, navSuppliers: this.navSuppliers, navCompare: this.navCompare,
+      cancelCam: this.cancelCam, snap: this.snap, openCardCam: this.openCardCam,
+      toDetails: this.toDetails, backToShoot: this.backToShoot, save: this.save, nextCapture: this.nextCapture,
+      onRec: this.onRec, delVoice: this.delVoice,
+      togglePrice: this.togglePrice, toggleRoomsMore: this.toggleRoomsMore
+    };
+  }
+}
+</script>
+</body>
+</html>

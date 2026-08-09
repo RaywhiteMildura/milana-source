@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f1917">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Milana Source — standalone prototype</title>
+<style>:root {
+  --ink: #201a17;
+  --ink-soft: #625852;
+  --paper: #f4f0e9;
+  --paper-2: #ebe3d8;
+  --card: #fffdf9;
+  --line: #d7cbbd;
+  --brass: #9d7643;
+  --brass-2: #c9aa78;
+  --wine: #6f273a;
+  --wine-2: #8b3b52;
+  --green: #355f4b;
+  --amber: #94601e;
+  --red: #8b2d2d;
+  --shadow: 0 10px 30px rgba(39, 28, 20, .10);
+  --radius: 20px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; background: var(--paper); }
+body { min-height: 100vh; }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+img { max-width: 100%; }
+.hidden { display: none !important; }
+
+.shell { min-height: 100vh; padding-bottom: calc(78px + var(--safe-bottom)); }
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  padding: calc(14px + var(--safe-top)) 18px 13px;
+  background: rgba(31, 25, 23, .96); color: white;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  backdrop-filter: blur(14px);
+}
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand-mark {
+  width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.36); border-radius: 50%;
+  display: grid; place-items: center; font-family: Georgia, serif; font-weight: 700; color: var(--brass-2);
+}
+.brand-title { font-family: Georgia, serif; letter-spacing: .02em; font-size: 20px; }
+.brand-sub { font-size: 11px; color: rgba(255,255,255,.65); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.icon-btn { border: 0; background: rgba(255,255,255,.10); color: white; width: 40px; height: 40px; border-radius: 13px; }
+
+main { padding: 18px; max-width: 1120px; margin: 0 auto; }
+.hero {
+  border-radius: 28px; padding: 24px; color: white; overflow: hidden; position: relative;
+  background:
+    radial-gradient(circle at 85% 10%, rgba(201,170,120,.45), transparent 28%),
+    linear-gradient(135deg, #241c19, #4b2530 68%, #74354b);
+  box-shadow: var(--shadow);
+}
+.hero h1 { font-family: Georgia, serif; margin: 0 0 8px; font-size: clamp(30px, 7vw, 48px); line-height: 1.02; }
+.hero p { margin: 0; max-width: 650px; color: rgba(255,255,255,.80); line-height: 1.5; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+.btn {
+  border: 1px solid transparent; border-radius: 14px; min-height: 46px; padding: 0 17px;
+  font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-primary { background: var(--brass-2); color: #231a15; }
+.btn-dark { background: var(--ink); color: white; }
+.btn-light { background: white; color: var(--ink); }
+.btn-outline { border-color: var(--line); background: transparent; color: var(--ink); }
+.btn-danger { background: #f8e7e5; color: var(--red); }
+.btn-small { min-height: 36px; padding: 0 12px; border-radius: 11px; font-size: 13px; }
+.btn:disabled { opacity: .45; cursor: default; }
+
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 17px; }
+.stat strong { display: block; font-family: Georgia, serif; font-size: 29px; }
+.stat span { color: var(--ink-soft); font-size: 12px; }
+
+.section-head { display: flex; align-items: end; justify-content: space-between; gap: 10px; margin: 26px 0 12px; }
+.section-head h2 { font-family: Georgia, serif; font-size: 24px; margin: 0; }
+.section-head p { margin: 4px 0 0; color: var(--ink-soft); font-size: 13px; }
+
+.grid { display: grid; gap: 14px; }
+.cards { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 18px rgba(44,31,22,.05); }
+.card-body { padding: 16px; }
+.card h3 { margin: 0 0 5px; font-size: 17px; }
+.card p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.45; }
+.card-media { aspect-ratio: 4/3; background: linear-gradient(135deg, #ded5ca, #f5eee6); display: grid; place-items: center; color: var(--ink-soft); overflow: hidden; }
+.card-media img { width: 100%; height: 100%; object-fit: cover; }
+.card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin: 11px 0; }
+.chip { display: inline-flex; align-items: center; min-height: 26px; border-radius: 999px; padding: 3px 9px; background: var(--paper-2); color: var(--ink-soft); font-size: 11px; font-weight: 700; }
+.chip.wine { background: #f4e6ea; color: var(--wine); }
+.chip.green { background: #e3efe8; color: var(--green); }
+.chip.amber { background: #f5ead8; color: var(--amber); }
+.chip.red { background: #f6e5e3; color: var(--red); }
+.card-actions { display: flex; gap: 8px; margin-top: 13px; }
+.card-actions .btn { flex: 1; }
+
+.bottom-nav {
+  position: fixed; z-index: 30; left: 0; right: 0; bottom: 0;
+  padding: 8px 10px calc(8px + var(--safe-bottom));
+  background: rgba(255,253,249,.96); border-top: 1px solid var(--line); backdrop-filter: blur(16px);
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px;
+}
+.nav-btn { border: 0; background: transparent; color: var(--ink-soft); border-radius: 12px; min-height: 53px; font-size: 10px; display: grid; place-items: center; gap: 2px; }
+.nav-btn b { font-size: 19px; line-height: 1; }
+.nav-btn.active { color: var(--wine); background: #f7ebee; }
+.nav-btn.capture { background: var(--wine); color: white; }
+
+.form-card { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 18px; margin-bottom: 14px; }
+.form-card h2, .form-card h3 { font-family: Georgia, serif; margin: 0 0 13px; }
+.field { margin-bottom: 15px; }
+.field:last-child { margin-bottom: 0; }
+label { display: block; font-size: 12px; font-weight: 800; margin-bottom: 7px; color: #4d433e; }
+input, select, textarea {
+  width: 100%; border: 1px solid var(--line); background: #fff; color: var(--ink);
+  border-radius: 13px; padding: 12px 13px; outline: none; min-height: 46px;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--brass); box-shadow: 0 0 0 3px rgba(157,118,67,.12); }
+textarea { min-height: 100px; resize: vertical; }
+.form-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0,1fr)); }
+.pill-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill-check input { display: none; }
+.pill-check span { display: inline-flex; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 9px 12px; font-size: 12px; font-weight: 700; }
+.pill-check input:checked + span { background: var(--ink); color: white; border-color: var(--ink); }
+.rating-row { display: flex; gap: 6px; }
+.star { border: 0; background: transparent; font-size: 29px; color: #c9c0b4; padding: 0 1px; }
+.star.active { color: var(--brass); }
+.photo-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-top: 10px; }
+.photo-thumb { aspect-ratio: 1; border-radius: 13px; overflow: hidden; background: var(--paper-2); position: relative; border: 1px solid var(--line); }
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.photo-thumb button { position: absolute; right: 5px; top: 5px; width: 26px; height: 26px; border: 0; border-radius: 50%; background: rgba(31,25,23,.78); color: white; }
+.capture-box { border: 1px dashed #bcae9f; background: #faf7f2; border-radius: 16px; padding: 14px; }
+.file-label { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--line); background: white; min-height: 43px; border-radius: 12px; padding: 0 13px; font-weight: 800; font-size: 13px; }
+.file-label input { display: none; }
+
+.filterbar { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; margin-bottom: 14px; }
+.search { grid-column: 1 / -1; }
+.empty { text-align: center; padding: 42px 20px; color: var(--ink-soft); border: 1px dashed var(--line); border-radius: var(--radius); background: rgba(255,255,255,.4); }
+.empty strong { display: block; color: var(--ink); font-family: Georgia, serif; font-size: 21px; margin-bottom: 7px; }
+
+.compare-grid { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(260px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+.compare-cell { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); min-height: 160px; overflow: hidden; }
+.compare-cell .card-media { aspect-ratio: 5/4; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th, .table td { text-align: left; padding: 11px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.table th { color: var(--ink-soft); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+
+.login { min-height: 100vh; display: grid; place-items: center; padding: 24px; background:
+  radial-gradient(circle at 20% 10%, rgba(157,118,67,.24), transparent 34%),
+  radial-gradient(circle at 88% 78%, rgba(111,39,58,.28), transparent 38%),
+  #211a17; }
+.login-card { width: min(460px, 100%); background: var(--card); border-radius: 28px; padding: 26px; box-shadow: 0 30px 80px rgba(0,0,0,.3); }
+.login-card h1 { font-family: Georgia, serif; margin: 5px 0 8px; font-size: 38px; }
+.login-card .eyebrow { color: var(--wine); font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.login-note { font-size: 12px; color: var(--ink-soft); line-height: 1.5; margin-top: 13px; }
+
+.toast { position: fixed; z-index: 100; left: 50%; bottom: calc(92px + var(--safe-bottom)); transform: translateX(-50%); background: var(--ink); color: white; border-radius: 999px; padding: 11px 16px; box-shadow: var(--shadow); font-size: 13px; max-width: calc(100% - 32px); text-align: center; }
+.sync-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,.72); }
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #e0a746; }
+
+@media (min-width: 760px) {
+  .stats { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .form-grid.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .bottom-nav { width: min(720px, calc(100% - 40px)); left: 50%; right: auto; transform: translateX(-50%); bottom: 12px; border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); padding-bottom: 8px; }
+  .shell { padding-bottom: 100px; }
+  .photo-grid { grid-template-columns: repeat(6, minmax(0,1fr)); }
+}
+@media (max-width: 520px) {
+  main { padding: 14px; }
+  .hero { padding: 20px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .filterbar { grid-template-columns: 1fr; }
+  .search { grid-column: auto; }
+}
+</style>
+</head>
+<body><div id="app"></div>
+<script>const DB_NAME = 'milana-source';
+const DB_VERSION = 1;
+
+let dbPromise;
+
+function openDB() {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains('captures')) {
+        const store = db.createObjectStore('captures', { keyPath: 'id' });
+        store.createIndex('createdAt', 'createdAt');
+        store.createIndex('supplierId', 'supplierId');
+        store.createIndex('status', 'status');
+        store.createIndex('category', 'category');
+      }
+      if (!db.objectStoreNames.contains('suppliers')) {
+        const store = db.createObjectStore('suppliers', { keyPath: 'id' });
+        store.createIndex('name', 'name', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('settings')) {
+        db.createObjectStore('settings', { keyPath: 'key' });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  return dbPromise;
+}
+
+function requestToPromise(req) {
+  return new Promise((resolve, reject) => {
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function put(storeName, value) {
+  const db = await openDB();
+  const tx = db.transaction(storeName, 'readwrite');
+  tx.objectStore(storeName).put(value);
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve(value);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function get(storeName, key) {
+  const db = await openDB();
+  return requestToPromise(db.transaction(storeName).objectStore(storeName).get(key));
+}
+
+async function all(storeName) {
+  const db = await openDB();
+  return requestToPromise(db.transaction(storeName).objectStore(storeName).getAll());
+}
+
+async function remove(storeName, key) {
+  const db = await openDB();
+  const tx = db.transaction(storeName, 'readwrite');
+  tx.objectStore(storeName).delete(key);
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function clear(storeName) {
+  const db = await openDB();
+  const tx = db.transaction(storeName, 'readwrite');
+  tx.objectStore(storeName).clear();
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+const CATEGORIES = [
+  'Joinery', 'Windows & doors', 'Natural stone', 'Sintered slabs', 'Tiles',
+  'Lighting', 'Hardware', 'Bathrooms', 'Stone fabrication', 'Furniture', 'Appliances', 'Other'
+];
+const ROOMS = [
+  'Kitchen', 'Hidden pantry', 'Wine display', 'Entry', 'Formal lounge', 'Study',
+  'Main ensuite', 'Main bedroom', 'Walk-in robe', 'Laundry', 'Bedrooms', 'Pool', 'Exterior', 'General'
+];
+const VENUES = [
+  'Canton Fair Phase 1', 'Meiju', 'Huayi', 'CCIH CeramBath', 'China Ceramics City',
+  'Joinery Factory A', 'Joinery Factory B', 'Windows & Doors Factory', 'Stone Fabricator', 'Other'
+];
+const STATUSES = ['Captured', 'Needs review', 'Shortlisted', 'Preferred', 'Quote requested', 'Rejected'];
+const TRIP = 'China Sourcing · October 2026';
+
+const state = {
+  view: 'home',
+  user: null,
+  captures: [],
+  suppliers: [],
+  selectedCompare: [],
+  filters: { q: '', category: '', room: '', status: '' },
+  draftPhotos: [],
+  draftAudio: null,
+  rating: 0,
+  locked: false,
+  recorder: null,
+  audioChunks: [],
+};
+
+const app = document.querySelector('#app');
+
+function uid(prefix = 'id') {
+  return `${prefix}_${crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)}`;
+}
+function esc(value = '') {
+  return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+}
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+}
+function todayKey(iso = new Date().toISOString()) {
+  const d = new Date(iso); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+function statusClass(status) {
+  if (status === 'Preferred' || status === 'Shortlisted') return 'green';
+  if (status === 'Rejected') return 'red';
+  if (status === 'Quote requested') return 'amber';
+  return 'wine';
+}
+function supplierName(id) {
+  return state.suppliers.find(s => s.id === id)?.name || 'Supplier not entered';
+}
+function blobUrl(blob) { return blob ? URL.createObjectURL(blob) : ''; }
+function firstPhoto(item) { return item.photos?.[0]?.blob || null; }
+function toast(message) {
+  document.querySelector('.toast')?.remove();
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = message;
+  document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
+}
+
+async function init() {
+  await openDB();
+  state.user = (await get('settings', 'user'))?.value || null;
+  state.locked = Boolean(state.user?.pin);
+  state.captures = (await all('captures')).sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+  state.suppliers = (await all('suppliers')).sort((a,b) => a.name.localeCompare(b.name));
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  render();
+}
+
+function loginView() {
+  return `<div class="login"><form class="login-card" id="login-form">
+    <div class="eyebrow">Villa Milana d’Oro</div>
+    <h1>Milana Source</h1>
+    <p>Capture suppliers, products, photos, pricing and decisions without losing the thread.</p>
+    <div class="field"><label>Your name</label><input name="name" required placeholder="Damian" autocomplete="name"></div>
+    <div class="field"><label>Role</label><select name="role"><option>Owner</option><option>Builder</option><option>Designer</option><option>Advisor</option></select></div>
+    <div class="field"><label>Local PIN (optional)</label><input name="pin" inputmode="numeric" maxlength="6" placeholder="4–6 digits"></div>
+    <button class="btn btn-dark" style="width:100%">Enter project</button>
+    <p class="login-note">This first build stores information on this device for offline testing. Cloud login and shared syncing are the next activation step.</p>
+  </form></div>`;
+}
+
+
+function unlockView() {
+  return `<div class="login"><form class="login-card" id="unlock-form">
+    <div class="eyebrow">Villa Milana d’Oro</div>
+    <h1>Welcome back, ${esc(state.user?.name || '')}</h1>
+    <p>Enter the local PIN for this device.</p>
+    <div class="field"><label>PIN</label><input name="pin" inputmode="numeric" maxlength="6" required autofocus></div>
+    <button class="btn btn-dark" style="width:100%">Unlock</button>
+    <p class="login-note">This PIN protects only the local copy on this device. Shared cloud authentication is part of the next build.</p>
+  </form></div>`;
+}
+
+function topbar() {
+  const unsynced = state.captures.filter(x => x.syncStatus !== 'synced').length;
+  return `<header class="topbar">
+    <div class="brand"><div class="brand-mark">M</div><div><div class="brand-title">Milana Source</div><div class="brand-sub">${esc(TRIP)}</div></div></div>
+    <div><div class="sync-badge"><span class="sync-dot"></span>${unsynced} local</div><button class="icon-btn" data-view="settings" aria-label="Settings">⚙</button></div>
+  </header>`;
+}
+function bottomNav() {
+  const item = (view, icon, label, cls='') => `<button class="nav-btn ${state.view===view?'active':''} ${cls}" data-view="${view}"><b>${icon}</b><span>${label}</span></button>`;
+  return `<nav class="bottom-nav">${item('home','⌂','Today')}${item('products','◫','Products')}${item('capture','＋','Capture','capture')}${item('suppliers','◎','Suppliers')}${item('compare','⇄','Compare')}</nav>`;
+}
+
+function homeView() {
+  const today = state.captures.filter(x => todayKey(x.createdAt) === todayKey()).length;
+  const shortlist = state.captures.filter(x => ['Shortlisted','Preferred'].includes(x.status)).length;
+  const missing = state.captures.filter(hasMissing).length;
+  const recent = state.captures.slice(0, 6);
+  return `<main>
+    <section class="hero"><h1>Capture first.<br>Decide properly.</h1><p>Photograph the product, its label and the company. Add one voice note. Milana Source keeps the supplier, room, rating and follow-up together.</p><div class="hero-actions"><button class="btn btn-primary" data-view="capture">＋ New capture</button><button class="btn btn-light" data-view="review">Review missing info</button></div></section>
+    <section class="stats">
+      <div class="stat"><strong>${today}</strong><span>Captured today</span></div>
+      <div class="stat"><strong>${state.captures.length}</strong><span>Total products</span></div>
+      <div class="stat"><strong>${shortlist}</strong><span>Shortlisted</span></div>
+      <div class="stat"><strong>${missing}</strong><span>Missing details</span></div>
+    </section>
+    <div class="section-head"><div><h2>Recent captures</h2><p>Latest products and supplier finds</p></div>${recent.length?'<button class="btn btn-outline btn-small" data-view="products">View all</button>':''}</div>
+    ${recent.length ? `<div class="grid cards">${recent.map(captureCard).join('')}</div>` : emptyState('Nothing captured yet','Use New Capture in a showroom or factory. The first save works without internet.','capture')}
+  </main>`;
+}
+
+function captureCard(c) {
+  const media = firstPhoto(c);
+  return `<article class="card">
+    <div class="card-media">${media ? `<img src="${blobUrl(media)}" alt="">` : '<span>No product photo</span>'}</div>
+    <div class="card-body"><h3>${esc(c.productName || c.category)}</h3><p>${esc(supplierName(c.supplierId))}</p>
+      <div class="card-meta"><span class="chip ${statusClass(c.status)}">${esc(c.status)}</span><span class="chip">${esc(c.category)}</span>${(c.rooms||[]).slice(0,2).map(r=>`<span class="chip">${esc(r)}</span>`).join('')}</div>
+      <p>${c.productCode ? `Code: ${esc(c.productCode)} · ` : ''}${c.rating ? `★ ${c.rating}/5` : 'Not rated'}${c.price ? ` · ${esc(c.currency)} ${esc(c.price)}` : ''}</p>
+      <div class="card-actions"><button class="btn btn-outline btn-small" data-detail="${c.id}">Open</button><button class="btn btn-outline btn-small" data-compare="${c.id}">${state.selectedCompare.includes(c.id)?'Selected':'Compare'}</button></div>
+    </div>
+  </article>`;
+}
+
+function productsView() {
+  const f = state.filters;
+  const items = state.captures.filter(c => {
+    const q = f.q.toLowerCase();
+    const hay = `${c.productName} ${c.productCode} ${supplierName(c.supplierId)} ${c.notes}`.toLowerCase();
+    return (!q || hay.includes(q)) && (!f.category || c.category===f.category) && (!f.room || c.rooms?.includes(f.room)) && (!f.status || c.status===f.status);
+  });
+  return `<main>
+    <div class="section-head"><div><h2>Products</h2><p>${items.length} matching records</p></div><button class="btn btn-dark btn-small" data-view="capture">＋ Capture</button></div>
+    <div class="filterbar">
+      <input class="search" id="filter-q" placeholder="Search product, code, supplier or note" value="${esc(f.q)}">
+      <select id="filter-category"><option value="">All categories</option>${CATEGORIES.map(x=>`<option ${f.category===x?'selected':''}>${x}</option>`).join('')}</select>
+      <select id="filter-room"><option value="">All rooms</option>${ROOMS.map(x=>`<option ${f.room===x?'selected':''}>${x}</option>`).join('')}</select>
+      <select id="filter-status"><option value="">All statuses</option>${STATUSES.map(x=>`<option ${f.status===x?'selected':''}>${x}</option>`).join('')}</select>
+    </div>
+    ${items.length ? `<div class="grid cards">${items.map(captureCard).join('')}</div>` : emptyState('No products match','Change the filters or create a new capture.','capture')}
+  </main>`;
+}
+
+function captureView() {
+  const supplierOptions = state.suppliers.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+  return `<main>
+    <div class="section-head"><div><h2>New capture</h2><p>Designed to be completed in under a minute</p></div></div>
+    <form id="capture-form">
+      <section class="form-card"><h3>1. What is it?</h3>
+        <div class="form-grid three">
+          <div class="field"><label>Category</label><select name="category" required><option value="">Choose</option>${CATEGORIES.map(x=>`<option>${x}</option>`).join('')}</select></div>
+          <div class="field"><label>Venue / visit</label><select name="venue"><option value="">Choose</option>${VENUES.map(x=>`<option>${x}</option>`).join('')}</select></div>
+          <div class="field"><label>Status</label><select name="status">${STATUSES.map(x=>`<option>${x}</option>`).join('')}</select></div>
+        </div>
+        <div class="field"><label>Room tags</label><div class="pill-grid">${ROOMS.map(r=>`<label class="pill-check"><input type="checkbox" name="rooms" value="${r}"><span>${r}</span></label>`).join('')}</div></div>
+      </section>
+      <section class="form-card"><h3>2. Product and company</h3>
+        <div class="form-grid">
+          <div class="field"><label>Product name</label><input name="productName" placeholder="e.g. Taj Mahal slab"></div>
+          <div class="field"><label>Product code</label><input name="productCode" placeholder="Model / colour / face"></div>
+          <div class="field"><label>Existing supplier</label><select name="supplierId"><option value="">Not selected</option>${supplierOptions}</select></div>
+          <div class="field"><label>Or create supplier</label><input name="newSupplier" placeholder="Company name"></div>
+        </div>
+        <div class="form-grid three">
+          <div class="field"><label>Contact person</label><input name="contact" placeholder="Name"></div>
+          <div class="field"><label>WeChat / phone</label><input name="phone" placeholder="Number or ID"></div>
+          <div class="field"><label>Price</label><div style="display:grid;grid-template-columns:90px 1fr;gap:8px"><select name="currency"><option>USD</option><option>AUD</option><option>CNY</option></select><input name="price" inputmode="decimal" placeholder="Quoted amount"></div></div>
+        </div>
+      </section>
+      <section class="form-card"><h3>3. Photograph it properly</h3>
+        <div class="capture-box"><label>Product photos</label><label class="file-label">📷 Take / choose photos<input id="photo-input" type="file" accept="image/*" capture="environment" multiple></label><div class="photo-grid" id="photo-preview">${photoPreview()}</div></div>
+        <div class="form-grid" style="margin-top:12px">
+          <div class="capture-box"><label>Label / specification photo</label><label class="file-label">▣ Add label<input class="extra-photo" data-kind="label" type="file" accept="image/*" capture="environment"></label></div>
+          <div class="capture-box"><label>Business card / company sign</label><label class="file-label">◎ Add company<input class="extra-photo" data-kind="company" type="file" accept="image/*" capture="environment"></label></div>
+        </div>
+      </section>
+      <section class="form-card"><h3>4. Your decision note</h3>
+        <div class="field"><label>Your rating</label><div class="rating-row">${[1,2,3,4,5].map(n=>`<button type="button" class="star ${state.rating>=n?'active':''}" data-rating="${n}">★</button>`).join('')}</div></div>
+        <div class="field"><label>Fast note</label><textarea name="notes" placeholder="What stood out? Biggest concern? What must Fiona or the builder check?"></textarea></div>
+        <div class="field"><label>Voice note</label><div class="capture-box"><button type="button" id="record-audio" class="btn btn-outline">● Start voice note</button><span id="audio-status" style="margin-left:10px;color:var(--ink-soft);font-size:12px">${state.draftAudio ? 'Voice note ready' : 'No voice note'}</span>${state.draftAudio ? `<audio controls src="${blobUrl(state.draftAudio.blob)}" style="width:100%;margin-top:10px"></audio>` : ''}</div></div>
+        <div class="form-grid">
+          <div class="field"><label>Next action</label><select name="nextAction"><option value="">None yet</option><option>Request quote</option><option>Request sample</option><option>Fiona review</option><option>Builder review</option><option>Factory visit</option><option>Compare later</option></select></div>
+          <div class="field"><label>Location</label><button type="button" id="location-btn" class="btn btn-outline" style="width:100%">⌖ Add current location</button><input type="hidden" name="location"></div>
+        </div>
+      </section>
+      <button class="btn btn-dark" style="width:100%;min-height:54px">Save safely on this device</button>
+    </form>
+  </main>`;
+}
+function photoPreview() {
+  if (!state.draftPhotos.length) return '';
+  return state.draftPhotos.map((p,i)=>`<div class="photo-thumb"><img src="${blobUrl(p.blob)}" alt=""><button type="button" data-remove-photo="${i}">×</button></div>`).join('');
+}
+
+function suppliersView() {
+  return `<main><div class="section-head"><div><h2>Suppliers</h2><p>One company record, many linked products</p></div><button class="btn btn-dark btn-small" id="new-supplier-btn">＋ Supplier</button></div>
+  <div id="supplier-form-wrap"></div>
+  ${state.suppliers.length ? `<div class="grid cards">${state.suppliers.map(s=>{
+    const count=state.captures.filter(c=>c.supplierId===s.id).length;
+    return `<article class="card"><div class="card-body"><h3>${esc(s.name)}</h3><p>${esc(s.contact || 'No contact entered')}${s.phone?` · ${esc(s.phone)}`:''}</p><div class="card-meta"><span class="chip">${count} products</span>${s.category?`<span class="chip">${esc(s.category)}</span>`:''}</div><p>${esc(s.notes || 'No supplier notes yet.')}</p><div class="card-actions"><button class="btn btn-outline btn-small" data-supplier-detail="${s.id}">Open products</button></div></div></article>`;
+  }).join('')}</div>` : emptyState('No suppliers yet','Create a supplier directly or while saving a product.','capture')}</main>`;
+}
+
+function compareView() {
+  const selected = state.selectedCompare.map(id=>state.captures.find(c=>c.id===id)).filter(Boolean).slice(0,3);
+  return `<main><div class="section-head"><div><h2>Compare</h2><p>Select up to three products from Products</p></div>${selected.length?'<button class="btn btn-outline btn-small" id="clear-compare">Clear</button>':''}</div>
+  ${selected.length ? `<div class="compare-grid">${selected.map(c=>`<article class="compare-cell"><div class="card-media">${firstPhoto(c)?`<img src="${blobUrl(firstPhoto(c))}" alt="">`:'No photo'}</div><div class="card-body"><h3>${esc(c.productName || c.category)}</h3><p>${esc(supplierName(c.supplierId))}</p><table class="table"><tr><th>Category</th><td>${esc(c.category)}</td></tr><tr><th>Room</th><td>${esc((c.rooms||[]).join(', '))}</td></tr><tr><th>Rating</th><td>${c.rating?`★ ${c.rating}/5`:'—'}</td></tr><tr><th>Price</th><td>${c.price?`${esc(c.currency)} ${esc(c.price)}`:'—'}</td></tr><tr><th>Status</th><td>${esc(c.status)}</td></tr><tr><th>Notes</th><td>${esc(c.notes||'—')}</td></tr></table><button class="btn btn-outline btn-small" style="width:100%;margin-top:12px" data-detail="${c.id}">Open record</button></div></article>`).join('')}</div>` : emptyState('Nothing selected','Open Products and tap Compare on up to three records.','products')}</main>`;
+}
+
+function reviewView() {
+  const missing = state.captures.filter(hasMissing);
+  return `<main><div class="section-head"><div><h2>Missing information</h2><p>Records that may be hard to act on after the trip</p></div></div>
+  ${missing.length ? `<div class="grid cards">${missing.map(c=>`<article class="card"><div class="card-body"><h3>${esc(c.productName||c.category)}</h3><p>${esc(supplierName(c.supplierId))}</p><div class="card-meta">${missingFields(c).map(x=>`<span class="chip red">Missing ${esc(x)}</span>`).join('')}</div><button class="btn btn-outline btn-small" data-detail="${c.id}">Fix record</button></div></article>`).join('')}</div>` : emptyState('Everything is usable','No current product is missing its essential supplier, photo, category or room information.','home')}</main>`;
+}
+function hasMissing(c) { return missingFields(c).length > 0; }
+function missingFields(c) {
+  const arr=[]; if(!c.supplierId)arr.push('supplier'); if(!firstPhoto(c))arr.push('photo'); if(!c.productName)arr.push('name'); if(!(c.rooms||[]).length)arr.push('room'); if(!c.productCode)arr.push('code'); return arr;
+}
+
+function detailView(id) {
+  const c=state.captures.find(x=>x.id===id); if(!c)return homeView();
+  return `<main><div class="section-head"><div><h2>${esc(c.productName||c.category)}</h2><p>${esc(supplierName(c.supplierId))} · ${fmtDate(c.createdAt)}</p></div><button class="btn btn-outline btn-small" data-view="products">Back</button></div>
+    <section class="form-card">
+      ${c.photos?.length?`<div class="photo-grid" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))">${c.photos.map(p=>`<div class="photo-thumb" style="aspect-ratio:4/3"><img src="${blobUrl(p.blob)}" alt=""></div>`).join('')}</div>`:''}
+      ${c.audio?.blob ? `<audio controls src="${blobUrl(c.audio.blob)}" style="width:100%;margin-top:14px"></audio>` : ''}
+      <table class="table" style="margin-top:15px"><tr><th>Category</th><td>${esc(c.category)}</td></tr><tr><th>Rooms</th><td>${esc((c.rooms||[]).join(', '))}</td></tr><tr><th>Venue</th><td>${esc(c.venue||'—')}</td></tr><tr><th>Code</th><td>${esc(c.productCode||'—')}</td></tr><tr><th>Status</th><td>${esc(c.status)}</td></tr><tr><th>Rating</th><td>${c.rating?`★ ${c.rating}/5`:'—'}</td></tr><tr><th>Price</th><td>${c.price?`${esc(c.currency)} ${esc(c.price)}`:'—'}</td></tr><tr><th>Contact</th><td>${esc(c.contact||'—')} ${c.phone?`· ${esc(c.phone)}`:''}</td></tr><tr><th>Next action</th><td>${esc(c.nextAction||'—')}</td></tr><tr><th>Notes</th><td>${esc(c.notes||'—')}</td></tr></table>
+      <div class="card-actions"><button class="btn btn-dark" data-status-id="${c.id}" data-status="Shortlisted">Shortlist</button><button class="btn btn-outline" data-status-id="${c.id}" data-status="Rejected">Reject</button><button class="btn btn-danger" data-delete="${c.id}">Delete</button></div>
+    </section>
+  </main>`;
+}
+
+function settingsView() {
+  return `<main><div class="section-head"><div><h2>Settings and backup</h2><p>Current build: local-first field testing</p></div></div>
+    <section class="form-card"><h3>Signed in locally</h3><table class="table"><tr><th>Name</th><td>${esc(state.user.name)}</td></tr><tr><th>Role</th><td>${esc(state.user.role)}</td></tr><tr><th>Project</th><td>Villa Milana d’Oro</td></tr><tr><th>Cloud sync</th><td>Not activated in v0.1</td></tr></table></section>
+    <section class="form-card"><h3>Backup and transfer</h3><p style="color:var(--ink-soft);line-height:1.5">Export a full JSON backup before and after each sourcing day. CSV is useful for spreadsheets. Full multi-user cloud syncing will replace this manual step in the next build.</p><div class="hero-actions"><button class="btn btn-dark" id="export-json">Export full backup</button><button class="btn btn-outline" id="export-csv">Export CSV</button><label class="file-label">Import backup<input id="import-json" type="file" accept="application/json"></label></div></section>
+    <section class="form-card"><h3>Test controls</h3><div class="hero-actions"><button class="btn btn-outline" id="load-demo">Load sample Villa Milana records</button><button class="btn btn-danger" id="reset-data">Erase local data</button><button class="btn btn-outline" id="logout">Sign out locally</button></div></section>
+  </main>`;
+}
+
+function emptyState(title, message, target) {
+  return `<div class="empty"><strong>${esc(title)}</strong><p>${esc(message)}</p><button class="btn btn-dark btn-small" data-view="${target}">Continue</button></div>`;
+}
+
+function render() {
+  if (!state.user) { app.innerHTML = loginView(); bind(); return; }
+  if (state.locked) { app.innerHTML = unlockView(); bind(); return; }
+  let content;
+  if (state.view.startsWith('detail:')) content = detailView(state.view.split(':')[1]);
+  else content = ({home:homeView,products:productsView,capture:captureView,suppliers:suppliersView,compare:compareView,review:reviewView,settings:settingsView}[state.view]||homeView)();
+  app.innerHTML = `<div class="shell">${topbar()}${content}${bottomNav()}</div>`;
+  bind();
+}
+
+function bind() {
+  document.querySelector('#unlock-form')?.addEventListener('submit', e=>{
+    e.preventDefault(); const pin=new FormData(e.currentTarget).get('pin').trim();
+    if(pin===String(state.user.pin||'')){state.locked=false;render();}else toast('Incorrect PIN');
+  });
+  document.querySelector('#login-form')?.addEventListener('submit', async e=>{
+    e.preventDefault(); const fd=new FormData(e.currentTarget);
+    state.user={name:fd.get('name').trim(),role:fd.get('role'),pin:fd.get('pin').trim()};
+    await put('settings',{key:'user',value:state.user}); render();
+  });
+  document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>{state.view=el.dataset.view; render(); window.scrollTo(0,0);}));
+  document.querySelectorAll('[data-detail]').forEach(el=>el.addEventListener('click',()=>{state.view=`detail:${el.dataset.detail}`;render();window.scrollTo(0,0);}));
+  document.querySelectorAll('[data-compare]').forEach(el=>el.addEventListener('click',()=>toggleCompare(el.dataset.compare)));
+  bindPhotoRemoveButtons();
+  document.querySelectorAll('[data-rating]').forEach(el=>el.addEventListener('click',()=>{state.rating=Number(el.dataset.rating);refreshRating();}));
+
+  const photoInput=document.querySelector('#photo-input');
+  photoInput?.addEventListener('change', e=>addFiles(e.target.files,'product'));
+  document.querySelectorAll('.extra-photo').forEach(el=>el.addEventListener('change',e=>addFiles(e.target.files,el.dataset.kind)));
+  document.querySelector('#capture-form')?.addEventListener('submit',saveCapture);
+  document.querySelector('#location-btn')?.addEventListener('click', addLocation);
+  document.querySelector('#record-audio')?.addEventListener('click', toggleAudioRecording);
+  document.querySelector('#new-supplier-btn')?.addEventListener('click', showSupplierForm);
+  document.querySelectorAll('[data-supplier-detail]').forEach(el=>el.addEventListener('click',()=>{state.filters={q:supplierName(el.dataset.supplierDetail),category:'',room:'',status:''};state.view='products';render();}));
+
+  ['q','category','room','status'].forEach(k=>{
+    document.querySelector(`#filter-${k}`)?.addEventListener(k==='q'?'input':'change', e=>{state.filters[k]=e.target.value; if(k==='q'){clearTimeout(window.__filterTimer);window.__filterTimer=setTimeout(render,140);}else render();});
+  });
+  document.querySelector('#clear-compare')?.addEventListener('click',()=>{state.selectedCompare=[];render();});
+  document.querySelectorAll('[data-status-id]').forEach(el=>el.addEventListener('click',async()=>{const c=state.captures.find(x=>x.id===el.dataset.statusId);c.status=el.dataset.status;c.updatedAt=new Date().toISOString();await put('captures',c);render();toast(`Marked ${c.status}`);}));
+  document.querySelectorAll('[data-delete]').forEach(el=>el.addEventListener('click',async()=>{if(confirm('Delete this record?')){await remove('captures',el.dataset.delete);state.captures=state.captures.filter(x=>x.id!==el.dataset.delete);state.view='products';render();}}));
+  document.querySelector('#export-json')?.addEventListener('click',exportJSON);
+  document.querySelector('#export-csv')?.addEventListener('click',exportCSV);
+  document.querySelector('#import-json')?.addEventListener('change',importJSON);
+  document.querySelector('#load-demo')?.addEventListener('click',loadDemo);
+  document.querySelector('#reset-data')?.addEventListener('click',resetData);
+  document.querySelector('#logout')?.addEventListener('click',async()=>{await remove('settings','user');state.user=null;state.locked=false;render();});
+}
+
+function addFiles(fileList, kind='product') {
+  [...fileList].forEach(file=>state.draftPhotos.push({id:uid('media'),kind,name:file.name||`${kind}.jpg`,type:file.type||'image/jpeg',blob:file}));
+  refreshPhotoPreview();
+}
+function refreshPhotoPreview(){const el=document.querySelector('#photo-preview');if(el){el.innerHTML=photoPreview();bindPhotoRemoveButtons();}}
+function bindPhotoRemoveButtons(){document.querySelectorAll('[data-remove-photo]').forEach(el=>el.addEventListener('click',()=>{state.draftPhotos.splice(Number(el.dataset.removePhoto),1);refreshPhotoPreview();}));}
+function refreshRating(){document.querySelectorAll('[data-rating]').forEach(el=>el.classList.toggle('active',Number(el.dataset.rating)<=state.rating));}
+
+
+async function toggleAudioRecording(e) {
+  const btn=e.currentTarget;
+  const status=document.querySelector('#audio-status');
+  if(state.recorder && state.recorder.state==='recording'){
+    state.recorder.stop(); btn.textContent='● Start voice note'; if(status)status.textContent='Saving voice note…'; return;
+  }
+  if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder){toast('Voice recording is not supported in this browser');return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    state.audioChunks=[];
+    const recorder=new MediaRecorder(stream);
+    state.recorder=recorder;
+    recorder.ondataavailable=ev=>{if(ev.data?.size)state.audioChunks.push(ev.data);};
+    recorder.onstop=()=>{
+      const blob=new Blob(state.audioChunks,{type:recorder.mimeType||'audio/webm'});
+      state.draftAudio={id:uid('media'),kind:'audio',name:`voice-note-${Date.now()}.webm`,type:blob.type,blob};
+      stream.getTracks().forEach(t=>t.stop()); state.recorder=null;
+      const box=btn.closest('.capture-box');
+      if(box){box.querySelector('audio')?.remove();const a=document.createElement('audio');a.controls=true;a.src=blobUrl(blob);a.style.cssText='width:100%;margin-top:10px';box.appendChild(a);}
+      if(status)status.textContent='Voice note ready';
+    };
+    recorder.start();btn.textContent='■ Stop recording';if(status)status.textContent='Recording…';
+  }catch{toast('Microphone permission was not granted');}
+}
+
+async function addLocation(e) {
+  const btn=e.currentTarget;
+  if(!navigator.geolocation){toast('Location is not available on this device');return;}
+  btn.textContent='Finding location…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const val=`${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}`;
+    document.querySelector('[name="location"]').value=val; btn.textContent=`✓ ${val}`;
+  },()=>{btn.textContent='⌖ Add current location';toast('Location permission was not granted');},{enableHighAccuracy:true,timeout:8000});
+}
+
+async function saveCapture(e) {
+  e.preventDefault(); const fd=new FormData(e.currentTarget);
+  let supplierId=fd.get('supplierId');
+  const newSupplier=fd.get('newSupplier').trim();
+  if(newSupplier){
+    const existing=state.suppliers.find(s=>s.name.toLowerCase()===newSupplier.toLowerCase());
+    if(existing) supplierId=existing.id;
+    else { const s={id:uid('sup'),name:newSupplier,contact:fd.get('contact').trim(),phone:fd.get('phone').trim(),createdAt:new Date().toISOString()}; await put('suppliers',s);state.suppliers.push(s);supplierId=s.id; }
+  }
+  const now=new Date().toISOString();
+  const c={
+    id:uid('cap'),project:'Villa Milana d’Oro',trip:TRIP,createdAt:now,updatedAt:now,createdBy:state.user.name,role:state.user.role,
+    category:fd.get('category'),venue:fd.get('venue'),status:fd.get('status'),rooms:fd.getAll('rooms'),
+    productName:fd.get('productName').trim(),productCode:fd.get('productCode').trim(),supplierId:supplierId||'',
+    contact:fd.get('contact').trim(),phone:fd.get('phone').trim(),currency:fd.get('currency'),price:fd.get('price').trim(),
+    rating:state.rating,notes:fd.get('notes').trim(),nextAction:fd.get('nextAction'),location:fd.get('location'),
+    photos:state.draftPhotos,audio:state.draftAudio,syncStatus:'local'
+  };
+  await put('captures',c); state.captures.unshift(c); state.draftPhotos=[];state.draftAudio=null;state.rating=0;state.view='home';render();toast('Capture saved safely on this device');
+}
+
+function showSupplierForm() {
+  const wrap=document.querySelector('#supplier-form-wrap');
+  wrap.innerHTML=`<form class="form-card" id="supplier-form"><h3>New supplier</h3><div class="form-grid"><div class="field"><label>Company name</label><input name="name" required></div><div class="field"><label>Category</label><select name="category"><option value="">Choose</option>${CATEGORIES.map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Contact</label><input name="contact"></div><div class="field"><label>WeChat / phone</label><input name="phone"></div></div><div class="field"><label>Notes</label><textarea name="notes"></textarea></div><button class="btn btn-dark">Save supplier</button></form>`;
+  document.querySelector('#supplier-form').addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.currentTarget);const s={id:uid('sup'),name:fd.get('name').trim(),category:fd.get('category'),contact:fd.get('contact').trim(),phone:fd.get('phone').trim(),notes:fd.get('notes').trim(),createdAt:new Date().toISOString()};await put('suppliers',s);state.suppliers.push(s);state.suppliers.sort((a,b)=>a.name.localeCompare(b.name));render();toast('Supplier saved');});
+}
+function toggleCompare(id) {
+  if(state.selectedCompare.includes(id)) state.selectedCompare=state.selectedCompare.filter(x=>x!==id);
+  else if(state.selectedCompare.length<3) state.selectedCompare.push(id);
+  else toast('Compare supports three products at a time');
+  render();
+}
+
+async function blobToDataURL(blob) {
+  return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob);});
+}
+async function exportJSON() {
+  const captures=[];
+  for(const c of state.captures){const copy={...c,photos:[]};for(const p of c.photos||[])copy.photos.push({...p,blob:undefined,dataUrl:await blobToDataURL(p.blob)});if(c.audio?.blob)copy.audio={...c.audio,blob:undefined,dataUrl:await blobToDataURL(c.audio.blob)};captures.push(copy);}
+  download(`milana-source-backup-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({version:1,exportedAt:new Date().toISOString(),suppliers:state.suppliers,captures},null,2),'application/json');
+}
+function exportCSV() {
+  const cols=['createdAt','createdBy','category','venue','status','rooms','productName','productCode','supplier','contact','phone','currency','price','rating','nextAction','notes'];
+  const rows=[cols,...state.captures.map(c=>[c.createdAt,c.createdBy,c.category,c.venue,c.status,(c.rooms||[]).join('|'),c.productName,c.productCode,supplierName(c.supplierId),c.contact,c.phone,c.currency,c.price,c.rating,c.nextAction,c.notes])];
+  const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');download(`milana-source-${new Date().toISOString().slice(0,10)}.csv`,csv,'text/csv');
+}
+function download(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+async function dataURLToBlob(url){return fetch(url).then(r=>r.blob());}
+async function importJSON(e){
+  const file=e.target.files?.[0];if(!file)return;
+  try{const data=JSON.parse(await file.text());for(const s of data.suppliers||[])await put('suppliers',s);for(const c of data.captures||[]){c.photos=await Promise.all((c.photos||[]).map(async p=>({...p,blob:await dataURLToBlob(p.dataUrl)})));if(c.audio?.dataUrl)c.audio={...c.audio,blob:await dataURLToBlob(c.audio.dataUrl)};await put('captures',c);}state.suppliers=await all('suppliers');state.captures=(await all('captures')).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));render();toast('Backup imported');}catch(err){toast('That backup could not be imported');}
+}
+async function loadDemo(){
+  const demoSup=[{id:'sup_infinity',name:'Infinity Surfaces',category:'Sintered slabs',contact:'Showroom contact',notes:'Australian benchmark range',createdAt:new Date().toISOString()},{id:'sup_maximum',name:'Maximum / Artedomus',category:'Sintered slabs',notes:'Macchia Vecchia reference',createdAt:new Date().toISOString()}];
+  for(const s of demoSup)await put('suppliers',s);
+  const base=new Date();
+  const demo=[
+    {id:uid('cap'),productName:'OC10 Taj Mahal Satin',productCode:'OC10',category:'Sintered slabs',supplierId:'sup_infinity',rooms:['Main ensuite'],status:'Shortlisted',rating:5,notes:'Calm, pale champagne and proven in full-room applications.',venue:'Stone showroom',currency:'AUD',price:'',photos:[]},
+    {id:uid('cap'),productName:'Calacatta Viola',productCode:'MB22',category:'Sintered slabs',supplierId:'sup_infinity',rooms:['Hidden pantry'],status:'Preferred',rating:5,notes:'Hidden jewel-box pantry. Select the calmer face with generous ivory.',venue:'Stone showroom',currency:'AUD',price:'',photos:[]},
+    {id:uid('cap'),productName:'Macchia Vecchia Honed',productCode:'MV',category:'Sintered slabs',supplierId:'sup_maximum',rooms:['Kitchen'],status:'Preferred',rating:5,notes:'Subtle warm face. Main kitchen hero with restraint.',venue:'Artedomus',currency:'AUD',price:'',photos:[]}
+  ].map((x,i)=>({...x,project:'Villa Milana d’Oro',trip:TRIP,createdAt:new Date(base-i*60000).toISOString(),updatedAt:new Date().toISOString(),createdBy:state.user.name,role:state.user.role,contact:'',phone:'',nextAction:'',location:'',syncStatus:'local'}));
+  for(const c of demo)await put('captures',c);state.suppliers=await all('suppliers');state.captures=(await all('captures')).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));state.view='home';render();toast('Sample records loaded');
+}
+async function resetData(){if(!confirm('Erase all local products and suppliers on this device?'))return;await clear('captures');await clear('suppliers');state.captures=[];state.suppliers=[];state.selectedCompare=[];state.view='home';render();toast('Local project data erased');}
+
+init();
+</script>
+</body></html>
