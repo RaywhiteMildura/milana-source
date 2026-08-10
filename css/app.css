@@ -1,0 +1,112 @@
+/* Milana Source — production PWA styles.
+   All colors / sizes / radii follow the design reference (Milana Capture Flow.dc.html). */
+
+:root {
+  --ink: #201a17;
+  --ink-soft: #625852;
+  --paper: #f4f0e9;
+  --paper2: #ebe3d8;
+  --card: #fffdf9;
+  --line: #d7cbbd;
+  --brass: #9d7643;
+  --brass2: #c9aa78;
+  --wine: #6f273a;
+  --wine2: #8b3b52;
+  --green: #355f4b;
+  --green-t: #e3efe8;
+  --amber: #94601e;
+  --amber-t: #f5ead8;
+  --red: #8b2d2d;
+  --red-t: #f6e5e3;
+  --wine-t: #f4e6ea;
+  --cam: #16110f;
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; height: 100%; background: var(--ink); }
+body {
+  position: fixed; inset: 0; overflow: hidden;
+  font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  color: var(--ink);
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+}
+button { font: inherit; cursor: pointer; color: inherit; -webkit-tap-highlight-color: transparent; }
+input, textarea { font: inherit; }
+button, [role="button"] { user-select: none; -webkit-user-select: none; }
+
+#app { position: absolute; inset: 0; background: var(--paper); overflow: hidden; }
+
+.serif { font-family: Georgia, 'Times New Roman', serif; }
+.mono { font-family: ui-monospace, Menlo, monospace; }
+
+/* screens are stacked absolute columns, like the design reference */
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--paper); }
+
+/* safe-area paddings — design uses 64/60px tops inside the phone frame
+   (≈ status bar + 14/10px); production swaps the status bar for env() */
+.pt-hdr  { padding-top: calc(var(--sat) + 14px); }
+.pt-hdr2 { padding-top: calc(var(--sat) + 10px); }
+.pb-tab  { padding-bottom: calc(var(--sab) + 8px); }
+.pb-bar  { padding-bottom: calc(var(--sab) + 12px); }
+.pb-cam  { padding-bottom: calc(var(--sab) + 26px); }
+.pb-sheet{ padding-bottom: calc(var(--sab) + 22px); }
+
+/* press feedback (design: style-active transform scales) */
+.pf   { transition: transform .12s; }
+.pf1  { transition: transform .1s; }
+.p90:active { transform: scale(.9); }
+.p94:active { transform: scale(.94); }
+.p95:active { transform: scale(.95); }
+.p96:active { transform: scale(.96); }
+.p97:active { transform: scale(.97); }
+.p98:active { transform: scale(.98); }
+.p94t:active { transform: translateY(-16px) scale(.94); }
+
+/* hide horizontal scrollbars on chip rows / photo strips */
+.hscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.hscroll::-webkit-scrollbar { display: none; }
+.vscroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+/* dark header inputs */
+.hdr-input { width: 100%; box-sizing: border-box; border: 0; border-radius: 12px; padding: 12px 14px; background: rgba(255,255,255,.10); color: #fff; outline: none; font-size: 14px; }
+.hdr-input::placeholder { color: rgba(255,255,255,.5); }
+
+/* light inputs (review / price) */
+.fld { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; background: #fff; outline: none; font-size: 13.5px; color: var(--ink); }
+.fld::placeholder { color: #a99d90; }
+.fld:focus { border-color: var(--brass); }
+.fld-strong { font-size: 14px; font-weight: 700; }
+
+/* animations from the design reference */
+@keyframes msPulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+@keyframes msFlash { 0% { opacity: .95; } 100% { opacity: 0; } }
+@keyframes msPop   { 0% { transform: scale(.5); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes msRise  { 0% { transform: translateY(14px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes msSheet { 0% { transform: translateY(60%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes msSpin  { to { transform: rotate(360deg); } }
+
+.anim-pop   { animation: msPop .35s ease; }
+.anim-rise  { animation: msRise .4s ease; }
+.anim-sheet { animation: msSheet .25s ease; }
+.anim-pulse { animation: msPulse 1s infinite; }
+
+/* toast + flash live outside the app render root */
+#fx-root .toast {
+  position: fixed; left: 50%; bottom: calc(92px + var(--sab)); transform: translateX(-50%);
+  z-index: 80; background: var(--ink); color: #fff; border-radius: 999px; padding: 11px 17px;
+  font-size: 12.5px; max-width: 82%; text-align: center; box-shadow: 0 10px 30px rgba(39,28,20,.3);
+}
+#fx-root .flash {
+  position: fixed; inset: 0; z-index: 70; background: #fff;
+  animation: msFlash .3s ease forwards; pointer-events: none;
+}
+
+/* camera overlay */
+#cam-root .cam { position: fixed; inset: 0; z-index: 55; background: var(--cam); display: flex; flex-direction: column; color: #fff; }
+#cam-root video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.spin { width: 16px; height: 16px; border: 2px solid rgba(157,118,67,.25); border-top-color: var(--brass); border-radius: 50%; animation: msSpin .8s linear infinite; display: inline-block; vertical-align: -3px; }

@@ -1,5 +1,22 @@
 # Handoff: Milana Source — field sourcing app (China buying trip)
 
+## ✅ THE APP IS BUILT — how to put it on your phone
+
+The production app now lives in this folder (`index.html` plus the `css/`, `js/`, `icons/` and `vendor/` folders). To get it onto your iPhone:
+
+1. Go to **[netlify.com](https://www.netlify.com)** (free account), open **Add new site → Deploy manually**, and drag this whole folder onto the page. It gives you a link like `https://something.netlify.app`.
+2. Open that link on your iPhone in **Safari**, enter your name, then tap **Share → Add to Home Screen**. That's the app installed — icon, offline and all.
+3. Open it once on hotel wifi and leave it for a minute: it downloads the on-device OCR (about 38 MB, Chinese + English) and from then on **everything works with no signal at all** — the fair, the factory, the plane.
+
+Notes for the trip:
+- Everything (photos, voice notes, records) stays on the phone. Use **the "N local" pill (top-right of Today) → Export full backup** at the end of each day — it saves a single file with every photo inside.
+- The **Day pack** (Evening review screen) builds a PDF of the day and hands it to the iPhone share sheet — AirDrop, WeChat, email, whatever you use.
+- The camera, microphone and photos never leave the device. OCR runs on the phone itself.
+
+The sections below are the original design/build brief the app was built from, kept for reference.
+
+---
+
 ## START HERE (for Damian — the owner, not a developer)
 
 You don't need to read the rest of this file. Do this:

@@ -1,0 +1,797 @@
+/* Milana Source — app state, actions and rendering.
+   Local-first: IndexedDB on device, service worker for offline, no network required. */
+
+const S = {
+  ready: false,
+  user: null, locked: false,
+  loginTmp: { name: '', pin: '' }, loginRole: 'Owner',
+  view: 'home', camera: null,
+  venueSheetOn: false, settingsOn: false,
+  addPlaceOpen: false, newPlace: '',
+  captures: [], companies: [],
+  draft: null,
+  session: { key: '' }, cardN: 0,
+  startedAt: null, lastSaved: null,
+  venue: 'Canton Fair Phase 1', customVenues: [],
+  q: '', catFilter: 'All', venueFilter: 'All places',
+  detailId: null, compareIds: [], reviewId: null,
+  rv: { company: '', contact: '', wechat: '', pname: '', code: '', size: '' },
+  rvBusy: { card: false, label: false },
+  leftHanded: false,
+  firstUse: null,
+};
+
+function freshDraft() {
+  return {
+    product: [], label: null, card: null,
+    category: '', rooms: [], roomsMore: false, rating: 0,
+    priceOpen: false, currency: 'CNY', price: '',
+    rec: 'idle', recSec: 0, voice: null,
+    supplierKey: '',
+  };
+}
+S.draft = freshDraft();
+
+/* ── derived helpers (used by views) ─────────────────────────── */
+function firstName() { return ((S.user && S.user.name) || '').trim().split(/\s+/)[0] || 'there'; }
+
+function dayNumber() {
+  if (!S.firstUse) return 1;
+  const a = new Date(S.firstUse); a.setHours(0, 0, 0, 0);
+  const b = new Date(); b.setHours(0, 0, 0, 0);
+  return Math.max(1, Math.round((b - a) / 86400000) + 1);
+}
+
+function sessWord() {
+  const v = S.venue;
+  if (VGROUPS[1].opts.includes(v)) return 'factory';
+  if (VGROUPS[2].opts.includes(v)) return 'showroom';
+  if (VGROUPS[0].opts.includes(v)) return 'booth';
+  return 'company';
+}
+
+function companyOf(key) { return S.companies.find(c => c.key === key) || null; }
+function sessionCompany() { return S.session.key ? companyOf(S.session.key) : null; }
+function sessionCount() { return S.session.key ? S.captures.filter(c => c.companyKey === S.session.key).length : 0; }
+function supName(c) { const co = companyOf(c.companyKey); return co ? (co.name || co.key) : 'No company yet'; }
+function dispName(c) { return c.name || (c.category + ' — untitled'); }
+function displaySt(c) { return c.needsReview && c.status === 'Captured' ? 'Needs review' : c.status; }
+function elapsedSec() { return S.startedAt ? Math.max(0, Math.floor((Date.now() - S.startedAt) / 1000)) : 0; }
+
+function companyRows() {
+  const byKey = {};
+  S.captures.forEach(c => { if (c.companyKey) (byKey[c.companyKey] = byKey[c.companyKey] || []).push(c); });
+  return S.companies
+    .filter(co => co.name || byKey[co.key])
+    .map(co => {
+      const list = byKey[co.key] || [];
+      const venues = [...new Set(list.map(c => c.venue))].join(', ') || co.venue || '';
+      const name = co.name || co.key;
+      return {
+        q: name, name, initial: (name.charAt(0) || 'M').toUpperCase(), cardPhoto: co.cardPhoto,
+        sub: list.length + (list.length === 1 ? ' product' : ' products') + (venues ? ' · ' + venues : ''),
+        latest: list.length ? list[0].createdAt : (co.createdAt || ''),
+      };
+    })
+    .sort((a, b) => (b.latest || '').localeCompare(a.latest || ''));
+}
+
+/* ── fx: toast + shutter flash ───────────────────────────────── */
+const Fx = {
+  toastT: null,
+  toast(msg) {
+    const root = document.querySelector('#fx-root');
+    const old = root.querySelector('.toast'); if (old) old.remove();
+    const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+    root.appendChild(t);
+    clearTimeout(this.toastT);
+    this.toastT = setTimeout(() => t.remove(), 2400);
+  },
+  flash() {
+    const root = document.querySelector('#fx-root');
+    const f = document.createElement('div'); f.className = 'flash';
+    root.appendChild(f);
+    setTimeout(() => f.remove(), 320);
+  },
+};
+
+/* ── camera ──────────────────────────────────────────────────── */
+const Cam = {
+  stream: null, video: null, fallback: false, opening: false,
+
+  async open() {
+    if (this.stream || this.opening) { this.attach(); return; }
+    this.opening = true;
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('no camera API');
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1440 } },
+        audio: false,
+      });
+      this.fallback = false;
+    } catch (err) {
+      this.fallback = true;
+    }
+    this.opening = false;
+    this.attach();
+  },
+
+  attach() {
+    const wrap = document.querySelector('#cam-video-wrap');
+    if (!wrap) return;
+    if (this.fallback || !this.stream) {
+      const note = document.querySelector('#cam-fallback-note');
+      if (note) { note.classList.remove('hidden'); note.style.display = 'grid'; }
+      return;
+    }
+    if (!this.video) {
+      this.video = document.createElement('video');
+      this.video.setAttribute('playsinline', '');
+      this.video.muted = true;
+      this.video.autoplay = true;
+    }
+    if (this.video.srcObject !== this.stream) this.video.srcObject = this.stream;
+    if (this.video.parentElement !== wrap) wrap.appendChild(this.video);
+    this.video.play().catch(() => {});
+  },
+
+  async capture(maxDim, quality) {
+    if (!this.video || !this.video.videoWidth) return null;
+    const w = this.video.videoWidth, h = this.video.videoHeight;
+    const scale = Math.min(1, maxDim / Math.max(w, h));
+    const c = document.createElement('canvas');
+    c.width = Math.round(w * scale); c.height = Math.round(h * scale);
+    c.getContext('2d').drawImage(this.video, 0, 0, c.width, c.height);
+    return new Promise(res => c.toBlob(res, 'image/jpeg', quality));
+  },
+
+  stop() {
+    if (this.stream) this.stream.getTracks().forEach(t => t.stop());
+    this.stream = null;
+    if (this.video) this.video.srcObject = null;
+  },
+};
+
+/* ── voice notes ─────────────────────────────────────────────── */
+const Rec = {
+  mr: null, chunks: [], timer: null,
+  async toggle() {
+    const dr = S.draft;
+    if (dr.rec === 'rec') { if (this.mr && this.mr.state === 'recording') this.mr.stop(); return; }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+      Fx.toast('Voice recording is not supported in this browser'); return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.chunks = [];
+      const mr = new MediaRecorder(stream);
+      this.mr = mr;
+      mr.ondataavailable = e => { if (e.data && e.data.size) this.chunks.push(e.data); };
+      mr.onstop = () => {
+        const blob = new Blob(this.chunks, { type: mr.mimeType || 'audio/mp4' });
+        stream.getTracks().forEach(t => t.stop());
+        clearInterval(this.timer);
+        S.draft.voice = { blob, duration: Math.max(1, S.draft.recSec) };
+        S.draft.rec = 'done';
+        this.mr = null;
+        render();
+      };
+      mr.start();
+      dr.rec = 'rec'; dr.recSec = 0;
+      render();
+      this.timer = setInterval(() => {
+        S.draft.recSec += 1;
+        const el = document.querySelector('#rec-label');
+        if (el) el.textContent = 'Recording ' + fmtClock(S.draft.recSec) + ' — tap to stop';
+      }, 1000);
+    } catch (err) {
+      Fx.toast('Microphone permission was not granted');
+    }
+  },
+  reset() {
+    clearInterval(this.timer);
+    if (this.mr && this.mr.state === 'recording') { this.mr.onstop = null; this.mr.stop(); }
+    this.mr = null;
+  },
+};
+
+let _audioEl = null;
+function playBlob(blob) {
+  if (_audioEl) { _audioEl.pause(); _audioEl = null; return; }
+  _audioEl = new Audio(urlFor(blob));
+  _audioEl.onended = () => { _audioEl = null; };
+  _audioEl.play().catch(() => { _audioEl = null; Fx.toast('Could not play the voice note'); });
+}
+
+/* ── capture flow ────────────────────────────────────────────── */
+function advanceFrom(k) {
+  if (S.view === 'tag') { S.camera = null; renderAll(); return; }
+  if (k === 'product') { S.camera = 'label'; renderCam(); return; }
+  if (k === 'label') {
+    if (S.draft.card || sessionCompany()) { S.camera = null; S.view = 'tag'; renderAll(); }
+    else { S.camera = 'card'; renderCam(); }
+    return;
+  }
+  S.camera = null; S.view = 'tag'; renderAll();
+}
+
+async function handleShot(k, blob) {
+  if (!blob) return;
+  if (k === 'product') {
+    if (S.draft.product.length >= 6) { Fx.toast('Six product photos is plenty — tap Next.'); return; }
+    S.draft.product.push({ id: uid('ph'), blob });
+    renderAll();
+    return;
+  }
+  if (k === 'label') {
+    S.draft.label = { id: uid('ph'), blob };
+    renderAll();
+    setTimeout(() => advanceFrom('label'), 340);
+    return;
+  }
+  // company card — starts (or replaces) the session for this place
+  S.cardN += 1;
+  const key = 'Card #' + S.cardN + ' · ' + S.venue;
+  const co = { key, name: '', contact: '', wechat: '', cardPhoto: blob, venue: S.venue, word: sessWord(), createdAt: new Date().toISOString() };
+  S.companies.push(co);
+  S.session = { key };
+  S.draft.card = { id: uid('ph'), blob };
+  S.draft.supplierKey = '';
+  await dbPut('companies', co);
+  await settingSet('cardN', S.cardN);
+  await settingSet('session', S.session);
+  renderAll();
+  setTimeout(() => advanceFrom('card'), 340);
+}
+
+function savedChips(rec) {
+  const chips = [];
+  if (rec.category) chips.push({ t: rec.category, bg: '#201a17', fg: '#fff' });
+  chips.push({ t: '◎ ' + rec.venue, bg: '#ebe3d8', fg: '#625852' });
+  rec.rooms.slice(0, 3).forEach(r => chips.push({ t: r, bg: '#f4e6ea', fg: '#6f273a' }));
+  if (rec.rating) chips.push({ t: '★ ' + rec.rating + '/5', bg: '#f5ead8', fg: '#94601e' });
+  if (rec.price) chips.push({ t: rec.currency + ' ' + rec.price, bg: '#ebe3d8', fg: '#625852' });
+  if (rec.companyKey && rec.companyKey === S.session.key) {
+    chips.push({ t: ord(sessionCount()) + ' product at this ' + sessWord(), bg: '#e3efe8', fg: '#355f4b' });
+  } else if (rec.companyKey) {
+    const co = companyOf(rec.companyKey);
+    if (co) chips.push({ t: co.name || co.key, bg: '#e3efe8', fg: '#355f4b' });
+  }
+  if (rec.voiceNote) chips.push({ t: '● voice ' + fmtClock(rec.voiceNote.duration), bg: '#ebe3d8', fg: '#625852' });
+  return chips;
+}
+
+/* ── actions (delegated via data-act) ────────────────────────── */
+const Actions = {
+  nav(arg) {
+    S.view = arg; S.detailId = null;
+    if (arg !== 'reviewItem') S.reviewId = null;
+    renderAll();
+  },
+
+  openSettings() { S.settingsOn = true; renderAll(); },
+  closeSettings() { S.settingsOn = false; renderAll(); },
+  openVenueSheet() { S.venueSheetOn = true; S.addPlaceOpen = false; renderAll(); },
+  closeVenueSheet() { S.venueSheetOn = false; S.addPlaceOpen = false; renderAll(); },
+
+  async pickVenue(name) {
+    if (name === S.venue) { S.venueSheetOn = false; S.addPlaceOpen = false; renderAll(); return; }
+    const hadSession = !!S.session.key;
+    S.venue = name; S.venueSheetOn = false; S.addPlaceOpen = false;
+    S.session = { key: '' };
+    S.draft.card = null;
+    await settingSet('venue', name);
+    await settingSet('session', S.session);
+    renderAll();
+    if (hadSession) Fx.toast('New place — the company card was reset.');
+  },
+
+  addPlaceOpen() {
+    S.addPlaceOpen = true; S.newPlace = '';
+    renderAll();
+    const el = document.querySelector('#new-place-input');
+    if (el) el.focus();
+  },
+  async addPlaceSave() {
+    const name = S.newPlace.trim();
+    if (!name) return;
+    if (!S.customVenues.includes(name)) {
+      S.customVenues.push(name);
+      await settingSet('customVenues', S.customVenues);
+    }
+    S.newPlace = '';
+    Actions.pickVenue(name);
+  },
+
+  startCapture() {
+    Rec.reset();
+    S.draft = freshDraft();
+    S.view = 'shoot';
+    S.detailId = null; S.reviewId = null;
+    S.startedAt = Date.now();
+    S.camera = 'product';
+    renderAll();
+  },
+  closeFlow() {
+    Rec.reset();
+    S.view = 'home'; S.camera = null; S.startedAt = null;
+    S.draft = freshDraft();
+    renderAll();
+  },
+
+  openCam(arg) { S.camera = arg; renderAll(); },
+  cancelCam() { S.camera = null; renderAll(); },
+  camNext() { advanceFrom(S.camera); },
+
+  async snap() {
+    const k = S.camera;
+    if (!k) return;
+    if (Cam.fallback || !Cam.stream) {
+      const input = document.querySelector('#fallback-file');
+      if (input) input.click();
+      return;
+    }
+    Fx.flash();
+    const blob = await Cam.capture(k === 'product' ? 1600 : 2000, k === 'product' ? 0.82 : 0.87);
+    if (!blob) { Fx.toast('The camera is still starting — try again.'); return; }
+    handleShot(k, blob);
+  },
+
+  toDetails() {
+    if (!S.draft.product.length) return;
+    S.view = 'tag'; S.camera = null;
+    renderAll();
+  },
+  backToShoot() { S.view = 'shoot'; S.camera = null; renderAll(); },
+
+  pickCat(arg) { S.draft.category = S.draft.category === arg ? '' : arg; renderAll(); },
+  toggleRoom(arg) {
+    const r = S.draft.rooms;
+    S.draft.rooms = r.includes(arg) ? r.filter(x => x !== arg) : r.concat(arg);
+    renderAll();
+  },
+  toggleRoomsMore() { S.draft.roomsMore = !S.draft.roomsMore; renderAll(); },
+  setRating(arg) { const n = Number(arg); S.draft.rating = S.draft.rating === n ? 0 : n; renderAll(); },
+  togglePrice() { S.draft.priceOpen = !S.draft.priceOpen; renderAll(); },
+  setCurrency(arg) { S.draft.currency = arg; renderAll(); },
+  pickSupplier(arg) { S.draft.supplierKey = S.draft.supplierKey === arg ? '' : arg; renderAll(); },
+
+  rec() { Rec.toggle(); },
+  delVoice() { S.draft.voice = null; S.draft.rec = 'idle'; S.draft.recSec = 0; renderAll(); },
+  playVoice() { if (S.draft.voice) playBlob(S.draft.voice.blob); },
+  playVoiceOf(arg) {
+    const c = S.captures.find(x => x.id === arg);
+    if (c && c.voiceNote) playBlob(c.voiceNote.blob);
+  },
+
+  async save() {
+    const dr = S.draft;
+    if (!dr.category || !dr.product.length) return;
+    const sessionCo = dr.card || sessionCompany() ? sessionCompany() : null;
+    const companyKey = sessionCo ? S.session.key : (dr.supplierKey || '');
+    const now = new Date().toISOString();
+    const cardPhoto = dr.card || (sessionCo && sessionCo.cardPhoto ? { id: uid('ph'), blob: sessionCo.cardPhoto } : null);
+    const rec = {
+      id: uid('cap'), createdAt: now, updatedAt: now,
+      createdBy: S.user.name, role: S.user.role,
+      venue: S.venue, category: dr.category, rooms: dr.rooms.slice(), rating: dr.rating,
+      currency: dr.currency, price: dr.price.trim(), note: '',
+      voiceNote: dr.voice ? { blob: dr.voice.blob, duration: dr.voice.duration } : null,
+      photos: { product: dr.product.slice(), label: dr.label, card: cardPhoto },
+      companyKey, name: '', code: '', size: '',
+      status: 'Captured', needsReview: true,
+      missing: ['name'].concat(companyKey ? [] : ['company']).concat(dr.label ? ['code'] : ['label photo']),
+      capturedInSec: elapsedSec(), syncStatus: 'local',
+    };
+    await dbPut('captures', rec);
+    S.captures.unshift(rec);
+    S.lastSaved = {
+      venue: S.venue, sec: rec.capturedInSec, sessWord: sessWord(),
+      sessionOn: !!sessionCompany(),
+      slots: [
+        { blob: dr.product[0] ? dr.product[0].blob : null, count: dr.product.length },
+        { blob: dr.label ? dr.label.blob : null, count: 0 },
+        { blob: rec.photos.card ? rec.photos.card.blob : null, count: 0 },
+      ],
+      chips: savedChips(rec),
+    };
+    Rec.reset();
+    S.draft = freshDraft();
+    S.view = 'saved'; S.startedAt = null; S.camera = null;
+    renderAll();
+  },
+
+  openDetail(arg) { S.detailId = arg; renderAll(); },
+  closeDetail() { S.detailId = null; renderAll(); },
+
+  async setStatus(arg) {
+    const c = S.captures.find(x => x.id === S.detailId);
+    if (!c) return;
+    c.status = arg;
+    c.updatedAt = new Date().toISOString();
+    await dbPut('captures', c);
+    renderAll();
+    Fx.toast(arg === 'Rejected' ? 'Marked rejected' : 'Added to the shortlist');
+  },
+
+  async toggleCompare(arg) {
+    const ids = S.compareIds;
+    if (ids.includes(arg)) S.compareIds = ids.filter(x => x !== arg);
+    else if (ids.length >= 3) { Fx.toast('Compare holds three at a time — remove one first.'); return; }
+    else { S.compareIds = ids.concat(arg); Fx.toast('Added to compare'); }
+    await settingSet('compareIds', S.compareIds);
+    renderAll();
+  },
+
+  async deleteCapture(arg) {
+    const c = S.captures.find(x => x.id === arg);
+    if (!c) return;
+    if (!confirm('Delete this capture and its photos?')) return;
+    await dbRemove('captures', arg);
+    S.captures = S.captures.filter(x => x.id !== arg);
+    S.compareIds = S.compareIds.filter(x => x !== arg);
+    await settingSet('compareIds', S.compareIds);
+    S.detailId = null;
+    renderAll();
+    Fx.toast('Capture deleted');
+  },
+
+  openCompany(arg) {
+    S.view = 'products';
+    S.q = arg; S.catFilter = 'All'; S.venueFilter = 'All places';
+    S.detailId = null;
+    renderAll();
+  },
+
+  catFilter(arg) { S.catFilter = S.catFilter === arg ? 'All' : arg; renderAll(); },
+  venueFilter(arg) { S.venueFilter = S.venueFilter === arg ? 'All places' : arg; renderAll(); },
+
+  openReview(arg) {
+    const c = S.captures.find(x => x.id === arg);
+    if (!c) return;
+    const co = companyOf(c.companyKey);
+    S.reviewId = arg; S.view = 'reviewItem'; S.detailId = null;
+    S.rv = {
+      company: (co && co.name) || '', contact: (co && co.contact) || '', wechat: (co && co.wechat) || '',
+      pname: c.name || '', code: c.code || '', size: c.size || '',
+    };
+    S.rvBusy = { card: false, label: false };
+    renderAll();
+    runOcrPrefill(c);
+  },
+
+  async confirmReview() {
+    const c = S.captures.find(x => x.id === S.reviewId);
+    if (!c) return;
+    let co = companyOf(c.companyKey);
+    const coName = S.rv.company.trim();
+    if (!co && coName) {
+      co = { key: uid('co'), name: '', contact: '', wechat: '', cardPhoto: null, venue: c.venue, word: sessWord(), createdAt: new Date().toISOString() };
+      S.companies.push(co);
+      c.companyKey = co.key;
+    }
+    if (co) {
+      co.name = coName || co.name;
+      co.contact = S.rv.contact.trim();
+      co.wechat = S.rv.wechat.trim();
+      await dbPut('companies', co);
+    }
+    c.name = S.rv.pname.trim() || c.name;
+    c.code = S.rv.code.trim();
+    c.size = S.rv.size.trim();
+    if (c.status === 'Needs review') c.status = 'Captured';
+    c.needsReview = false;
+    c.missing = [];
+    c.updatedAt = new Date().toISOString();
+    await dbPut('captures', c);
+    S.view = 'review'; S.reviewId = null;
+    renderAll();
+    Fx.toast('Record completed — company saved for every product from that ' + ((co && co.word) || 'company'));
+  },
+
+  async exportPack(arg, el) {
+    const today = S.captures.filter(c => dayKey(c.createdAt) === dayKey());
+    const list = today.length ? today : S.captures;
+    if (!list.length) { Fx.toast('Nothing captured yet — the day pack needs at least one record.'); return; }
+    const orig = el ? el.textContent : '';
+    if (el) { el.textContent = 'Building…'; el.disabled = true; }
+    try {
+      list.forEach(c => { c._company = companyOf(c.companyKey); });
+      const blob = await DayPack.build(list, supName);
+      list.forEach(c => { delete c._company; });
+      const name = 'milana-day-pack-' + new Date().toISOString().slice(0, 10) + '.pdf';
+      const result = await DayPack.share(blob, name);
+      if (result === 'shared') Fx.toast('Day pack handed to the share sheet');
+      else if (result === 'downloaded') Fx.toast('Day pack PDF saved');
+    } catch (err) {
+      Fx.toast('The day pack could not be built — try again.');
+    } finally {
+      if (el) { el.textContent = orig; el.disabled = false; }
+    }
+  },
+
+  async toggleLeftHanded() {
+    S.leftHanded = !S.leftHanded;
+    await settingSet('leftHanded', S.leftHanded);
+    renderAll();
+  },
+
+  pickRole(arg) { S.loginRole = arg; renderAll(); },
+
+  async exportJSON() {
+    Fx.toast('Preparing the full backup…');
+    const captures = [];
+    for (const c of S.captures) {
+      const copy = { ...c, photos: { product: [], label: null, card: null }, voiceNote: null };
+      delete copy._company;
+      for (const p of c.photos.product) copy.photos.product.push({ id: p.id, dataUrl: await blobToDataURL(p.blob) });
+      if (c.photos.label) copy.photos.label = { id: c.photos.label.id, dataUrl: await blobToDataURL(c.photos.label.blob) };
+      if (c.photos.card) copy.photos.card = { id: c.photos.card.id, dataUrl: await blobToDataURL(c.photos.card.blob) };
+      if (c.voiceNote) copy.voiceNote = { duration: c.voiceNote.duration, dataUrl: await blobToDataURL(c.voiceNote.blob) };
+      captures.push(copy);
+    }
+    const companies = [];
+    for (const co of S.companies) {
+      companies.push({ ...co, cardPhoto: co.cardPhoto ? await blobToDataURL(co.cardPhoto) : null });
+    }
+    const data = {
+      app: 'milana-source', version: 2, exportedAt: new Date().toISOString(),
+      user: S.user,
+      settings: { venue: S.venue, cardN: S.cardN, session: S.session, customVenues: S.customVenues, leftHanded: S.leftHanded, firstUse: S.firstUse },
+      captures, companies,
+    };
+    downloadFile('milana-source-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(data), 'application/json');
+  },
+
+  exportCSV() {
+    const cols = ['createdAt', 'createdBy', 'venue', 'category', 'rooms', 'name', 'code', 'size', 'company', 'contact', 'wechat', 'rating', 'currency', 'price', 'status', 'needsReview', 'productPhotos', 'voiceSec', 'note'];
+    const rows = [cols].concat(S.captures.map(c => {
+      const co = companyOf(c.companyKey);
+      return [c.createdAt, c.createdBy, c.venue, c.category, (c.rooms || []).join('|'), c.name, c.code, c.size,
+        co ? (co.name || co.key) : '', co ? co.contact : '', co ? co.wechat : '',
+        c.rating, c.currency, c.price, displaySt(c), c.needsReview ? 'yes' : 'no',
+        c.photos.product.length, c.voiceNote ? c.voiceNote.duration : '', c.note];
+    }));
+    const csv = rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(',')).join('\n');
+    downloadFile('milana-source-' + new Date().toISOString().slice(0, 10) + '.csv', csv, 'text/csv');
+  },
+
+  async eraseData() {
+    if (!confirm('Erase every capture and company stored on this phone?')) return;
+    await dbClear('captures');
+    await dbClear('companies');
+    S.captures = []; S.companies = [];
+    S.compareIds = []; S.session = { key: '' }; S.cardN = 0;
+    await settingSet('compareIds', []);
+    await settingSet('session', S.session);
+    await settingSet('cardN', 0);
+    S.settingsOn = false; S.view = 'home';
+    renderAll();
+    Fx.toast('Local project data erased');
+  },
+
+  async signOut() {
+    await dbRemove('settings', 'user');
+    S.user = null; S.locked = false; S.settingsOn = false;
+    S.loginTmp = { name: '', pin: '' };
+    renderAll();
+  },
+};
+
+/* ── OCR pre-fill at review time ─────────────────────────────── */
+function renderIfReview(id) { if (S.view === 'reviewItem' && S.reviewId === id) renderAll(); }
+
+function runOcrPrefill(c) {
+  const id = c.id;
+  const cardBlob = c.photos.card && c.photos.card.blob;
+  const labelBlob = c.photos.label && c.photos.label.blob;
+  const needCard = cardBlob && !(S.rv.company && S.rv.contact && S.rv.wechat);
+  const needLabel = labelBlob && !(S.rv.pname && S.rv.code && S.rv.size);
+  if (typeof Tesseract === 'undefined') return;
+  if (needCard) {
+    S.rvBusy.card = true; renderIfReview(id);
+    OCR.readCard(cardBlob).then(res => {
+      if (S.reviewId !== id) return;
+      if (!S.rv.company && res.company) S.rv.company = res.company;
+      if (!S.rv.contact && res.contact) S.rv.contact = res.contact;
+      if (!S.rv.wechat && res.wechat) S.rv.wechat = res.wechat;
+    }).catch(() => {
+      if (S.reviewId === id) Fx.toast('Could not read the card — check the photo and type it in.');
+    }).finally(() => { if (S.reviewId === id) { S.rvBusy.card = false; renderIfReview(id); } });
+  }
+  if (needLabel) {
+    S.rvBusy.label = true; renderIfReview(id);
+    OCR.readLabel(labelBlob).then(res => {
+      if (S.reviewId !== id) return;
+      if (!S.rv.pname && res.pname) S.rv.pname = res.pname;
+      if (!S.rv.code && res.code) S.rv.code = res.code;
+      if (!S.rv.size && res.size) S.rv.size = res.size;
+    }).catch(() => {}).finally(() => { if (S.reviewId === id) { S.rvBusy.label = false; renderIfReview(id); } });
+  }
+}
+
+/* ── input handling (delegated) ──────────────────────────────── */
+let _qTimer = null;
+function onInputChange(name, value) {
+  if (name === 'q') {
+    S.q = value;
+    clearTimeout(_qTimer);
+    _qTimer = setTimeout(renderAll, 140);
+  } else if (name === 'price') {
+    S.draft.price = value;
+  } else if (name === 'newPlace') {
+    S.newPlace = value;
+  } else if (name === 'login.name') {
+    S.loginTmp.name = value;
+  } else if (name === 'login.pin') {
+    S.loginTmp.pin = value;
+  } else if (name.indexOf('rv.') === 0) {
+    S.rv[name.slice(3)] = value;
+  }
+}
+
+/* ── render ──────────────────────────────────────────────────── */
+function render() {
+  const app = document.querySelector('#app');
+  const act = document.activeElement;
+  let focusName = null, selStart = 0, selEnd = 0;
+  if (act && act.dataset && act.dataset.input) {
+    focusName = act.dataset.input;
+    try { selStart = act.selectionStart; selEnd = act.selectionEnd; } catch (e) { /* not a text input */ }
+  }
+
+  let html = '';
+  if (S.ready) {
+    if (!S.user) html = loginView();
+    else if (S.locked) html = unlockView();
+    else {
+      const tabViews = { home: homeView, products: productsView, suppliers: suppliersView, compare: compareView };
+      const flowViews = { shoot: shootView, tag: tagView, saved: savedView, review: reviewView, reviewItem: reviewItemView };
+      const fn = tabViews[S.view] || flowViews[S.view] || homeView;
+      html = fn();
+      if (tabViews[S.view]) html += tabbar();
+      if (S.detailId) html += detailOverlay();
+      if (S.venueSheetOn) html += venueSheet();
+      if (S.settingsOn) html += settingsSheet();
+    }
+  }
+  app.innerHTML = html;
+  bindForms();
+
+  if (focusName) {
+    const el = app.querySelector('[data-input="' + focusName.replace(/"/g, '') + '"]');
+    if (el) {
+      el.focus({ preventScroll: true });
+      try { el.setSelectionRange(selStart, selEnd); } catch (e) { /* not a text input */ }
+    }
+  }
+}
+
+function renderCam() {
+  const root = document.querySelector('#cam-root');
+  if (!S.camera || !S.user || S.locked) {
+    root.innerHTML = '';
+    Cam.stop();
+    return;
+  }
+  root.innerHTML = cameraHTML();
+  Cam.open();
+}
+
+function renderAll() {
+  render();
+  renderCam();
+}
+
+/* ── one-off form bindings after each render ─────────────────── */
+function bindForms() {
+  const lf = document.querySelector('#login-form');
+  if (lf && !lf._bound) {
+    lf._bound = true;
+    lf.addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const name = S.loginTmp.name.trim();
+      if (!name) return;
+      S.user = { name, role: S.loginRole, pin: S.loginTmp.pin.trim() };
+      await settingSet('user', S.user);
+      if (!S.firstUse) {
+        S.firstUse = new Date().toISOString();
+        await settingSet('firstUse', S.firstUse);
+      }
+      S.locked = false;
+      S.loginTmp = { name: '', pin: '' };
+      renderAll();
+    });
+  }
+  const uf = document.querySelector('#unlock-form');
+  if (uf && !uf._bound) {
+    uf._bound = true;
+    uf.addEventListener('submit', ev => {
+      ev.preventDefault();
+      if (S.loginTmp.pin.trim() === String(S.user.pin || '')) {
+        S.locked = false;
+        S.loginTmp = { name: '', pin: '' };
+        renderAll();
+      } else {
+        Fx.toast('Incorrect PIN');
+      }
+    });
+  }
+  const imp = document.querySelector('#import-json');
+  if (imp && !imp._bound) {
+    imp._bound = true;
+    imp.addEventListener('change', importJSON);
+  }
+}
+
+async function importJSON(e) {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (data.app !== 'milana-source') throw new Error('not a Milana backup');
+    for (const co of data.companies || []) {
+      const rec = { ...co, cardPhoto: co.cardPhoto ? await dataURLToBlob(co.cardPhoto) : null };
+      await dbPut('companies', rec);
+    }
+    for (const c of data.captures || []) {
+      const rec = { ...c, photos: { product: [], label: null, card: null }, voiceNote: null };
+      for (const p of (c.photos && c.photos.product) || []) rec.photos.product.push({ id: p.id || uid('ph'), blob: await dataURLToBlob(p.dataUrl) });
+      if (c.photos && c.photos.label) rec.photos.label = { id: c.photos.label.id || uid('ph'), blob: await dataURLToBlob(c.photos.label.dataUrl) };
+      if (c.photos && c.photos.card) rec.photos.card = { id: c.photos.card.id || uid('ph'), blob: await dataURLToBlob(c.photos.card.dataUrl) };
+      if (c.voiceNote && c.voiceNote.dataUrl) rec.voiceNote = { duration: c.voiceNote.duration, blob: await dataURLToBlob(c.voiceNote.dataUrl) };
+      await dbPut('captures', rec);
+    }
+    S.captures = (await dbAll('captures')).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    S.companies = await dbAll('companies');
+    renderAll();
+    Fx.toast('Backup imported');
+  } catch (err) {
+    Fx.toast('That backup could not be imported');
+  }
+}
+
+/* ── boot ────────────────────────────────────────────────────── */
+async function init() {
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-act]');
+    if (!el) return;
+    const act = el.dataset.act;
+    if (Actions[act]) Actions[act](el.dataset.arg, el, e);
+  });
+  document.addEventListener('input', e => {
+    const el = e.target;
+    if (el && el.dataset && el.dataset.input) onInputChange(el.dataset.input, el.value);
+  });
+  const fb = document.querySelector('#fallback-file');
+  fb.addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file || !S.camera) return;
+    const k = S.camera;
+    const blob = await downscaleImage(file, k === 'product' ? 1600 : 2000, k === 'product' ? 0.82 : 0.87);
+    handleShot(k, blob);
+  });
+
+  await openDB();
+  S.user = await settingGet('user', null);
+  S.locked = !!(S.user && S.user.pin);
+  S.venue = await settingGet('venue', 'Canton Fair Phase 1');
+  S.session = await settingGet('session', { key: '' });
+  S.cardN = await settingGet('cardN', 0);
+  S.customVenues = await settingGet('customVenues', []);
+  S.leftHanded = await settingGet('leftHanded', false);
+  S.firstUse = await settingGet('firstUse', null);
+  S.captures = (await dbAll('captures')).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  S.companies = await dbAll('companies');
+  S.compareIds = (await settingGet('compareIds', [])).filter(id => S.captures.some(c => c.id === id));
+  S.ready = true;
+  renderAll();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  }
+}
+
+init();
