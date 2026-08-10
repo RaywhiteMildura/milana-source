@@ -141,7 +141,7 @@ const DayPack = {
     }
 
     // ---- one page per capture ----
-    const ST_COLORS = { Preferred: ['#e3efe8', '#355f4b'], Shortlisted: ['#e3efe8', '#355f4b'], Captured: ['#ebe3d8', '#625852'], 'Needs review': ['#f5ead8', '#94601e'], Rejected: ['#f6e5e3', '#8b2d2d'] };
+    const ST_COLORS = { Preferred: ['#e3efe8', '#355f4b'], Shortlisted: ['#e3efe8', '#355f4b'], Captured: ['#ebe3d8', '#625852'], 'Needs review': ['#f5ead8', '#94601e'], 'Quote requested': ['#f5ead8', '#94601e'], Rejected: ['#f6e5e3', '#8b2d2d'] };
     for (const cpt of captures) {
       const { c, x } = this._page();
       x.fillStyle = '#201a17'; x.fillRect(0, 0, this.W, 250);

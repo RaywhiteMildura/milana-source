@@ -14,7 +14,9 @@ function fmtClock(sec) {
 }
 
 function ord(n) {
-  return n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : n + 'th';
+  const rem100 = n % 100, rem10 = n % 10;
+  if (rem100 >= 11 && rem100 <= 13) return n + 'th';
+  return n + (rem10 === 1 ? 'st' : rem10 === 2 ? 'nd' : rem10 === 3 ? 'rd' : 'th');
 }
 
 function dayKey(iso) {
@@ -43,6 +45,16 @@ function urlFor(blob) {
   if (!blob || !(blob instanceof Blob)) return '';
   if (!_blobUrls.has(blob)) _blobUrls.set(blob, URL.createObjectURL(blob));
   return _blobUrls.get(blob);
+}
+function revokeUrlFor(blob) {
+  if (blob && _blobUrls.has(blob)) {
+    URL.revokeObjectURL(_blobUrls.get(blob));
+    _blobUrls.delete(blob);
+  }
+}
+function revokeAllUrls() {
+  _blobUrls.forEach(url => URL.revokeObjectURL(url));
+  _blobUrls.clear();
 }
 
 /* Decode an image blob honoring EXIF orientation, downscale, re-encode as JPEG. */

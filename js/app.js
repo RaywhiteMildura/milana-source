@@ -10,7 +10,7 @@ const S = {
   addPlaceOpen: false, newPlace: '',
   captures: [], companies: [],
   draft: null,
-  session: { key: '' }, cardN: 0,
+  session: { key: '' }, cardN: 0, flowSeq: 0,
   startedAt: null, lastSaved: null,
   venue: 'Canton Fair Phase 1', customVenues: [],
   q: '', catFilter: 'All', venueFilter: 'All places',
@@ -68,7 +68,7 @@ function companyRows() {
       const venues = [...new Set(list.map(c => c.venue))].join(', ') || co.venue || '';
       const name = co.name || co.key;
       return {
-        q: name, name, initial: (name.charAt(0) || 'M').toUpperCase(), cardPhoto: co.cardPhoto,
+        q: name, name, initial: name.charAt(0) || 'M', cardPhoto: co.cardPhoto,
         sub: list.length + (list.length === 1 ? ' product' : ' products') + (venues ? ' · ' + venues : ''),
         latest: list.length ? list[0].createdAt : (co.createdAt || ''),
       };
@@ -104,10 +104,16 @@ const Cam = {
     this.opening = true;
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('no camera API');
-      this.stream = await navigator.mediaDevices.getUserMedia({
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1440 } },
         audio: false,
       });
+      if (!S.camera) { // cancelled while permission/open was pending
+        stream.getTracks().forEach(t => t.stop());
+        this.opening = false;
+        return;
+      }
+      this.stream = stream;
       this.fallback = false;
     } catch (err) {
       this.fallback = true;
@@ -154,7 +160,7 @@ const Cam = {
 
 /* ── voice notes ─────────────────────────────────────────────── */
 const Rec = {
-  mr: null, chunks: [], timer: null,
+  mr: null, chunks: [], timer: null, stream: null,
   async toggle() {
     const dr = S.draft;
     if (dr.rec === 'rec') { if (this.mr && this.mr.state === 'recording') this.mr.stop(); return; }
@@ -163,6 +169,7 @@ const Rec = {
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.stream = stream;
       this.chunks = [];
       const mr = new MediaRecorder(stream);
       this.mr = mr;
@@ -170,6 +177,7 @@ const Rec = {
       mr.onstop = () => {
         const blob = new Blob(this.chunks, { type: mr.mimeType || 'audio/mp4' });
         stream.getTracks().forEach(t => t.stop());
+        this.stream = null;
         clearInterval(this.timer);
         S.draft.voice = { blob, duration: Math.max(1, S.draft.recSec) };
         S.draft.rec = 'done';
@@ -191,6 +199,7 @@ const Rec = {
   reset() {
     clearInterval(this.timer);
     if (this.mr && this.mr.state === 'recording') { this.mr.onstop = null; this.mr.stop(); }
+    if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
     this.mr = null;
   },
 };
@@ -215,6 +224,16 @@ function advanceFrom(k) {
   S.camera = null; S.view = 'tag'; renderAll();
 }
 
+let _advancePending = false;
+function scheduleAdvance(k) {
+  const flow = S.flowSeq;
+  _advancePending = true;
+  setTimeout(() => {
+    _advancePending = false;
+    if (S.flowSeq === flow && S.camera === k) advanceFrom(k);
+  }, 340);
+}
+
 async function handleShot(k, blob) {
   if (!blob) return;
   if (k === 'product') {
@@ -223,10 +242,11 @@ async function handleShot(k, blob) {
     renderAll();
     return;
   }
+  if (_advancePending) return; // double-tap on an auto-advancing slot
   if (k === 'label') {
     S.draft.label = { id: uid('ph'), blob };
     renderAll();
-    setTimeout(() => advanceFrom('label'), 340);
+    scheduleAdvance('label');
     return;
   }
   // company card — starts (or replaces) the session for this place
@@ -241,7 +261,7 @@ async function handleShot(k, blob) {
   await settingSet('cardN', S.cardN);
   await settingSet('session', S.session);
   renderAll();
-  setTimeout(() => advanceFrom('card'), 340);
+  scheduleAdvance('card');
 }
 
 function savedChips(rec) {
@@ -277,6 +297,7 @@ const Actions = {
   async pickVenue(name) {
     if (name === S.venue) { S.venueSheetOn = false; S.addPlaceOpen = false; renderAll(); return; }
     const hadSession = !!S.session.key;
+    S.flowSeq += 1;
     S.venue = name; S.venueSheetOn = false; S.addPlaceOpen = false;
     S.session = { key: '' };
     S.draft.card = null;
@@ -305,6 +326,7 @@ const Actions = {
 
   startCapture() {
     Rec.reset();
+    S.flowSeq += 1;
     S.draft = freshDraft();
     S.view = 'shoot';
     S.detailId = null; S.reviewId = null;
@@ -314,25 +336,29 @@ const Actions = {
   },
   closeFlow() {
     Rec.reset();
+    S.flowSeq += 1;
     S.view = 'home'; S.camera = null; S.startedAt = null;
     S.draft = freshDraft();
     renderAll();
   },
 
   openCam(arg) { S.camera = arg; renderAll(); },
-  cancelCam() { S.camera = null; renderAll(); },
+  cancelCam() { S.flowSeq += 1; S.camera = null; renderAll(); },
   camNext() { advanceFrom(S.camera); },
 
   async snap() {
     const k = S.camera;
     if (!k) return;
+    if (Cam.opening) return; // live camera is about to appear — don't double-open capture UIs
     if (Cam.fallback || !Cam.stream) {
       const input = document.querySelector('#fallback-file');
       if (input) input.click();
       return;
     }
     Fx.flash();
+    const flow = S.flowSeq;
     const blob = await Cam.capture(k === 'product' ? 1600 : 2000, k === 'product' ? 0.82 : 0.87);
+    if (S.flowSeq !== flow || S.camera !== k) return; // flow changed while capturing
     if (!blob) { Fx.toast('The camera is still starting — try again.'); return; }
     handleShot(k, blob);
   },
@@ -385,6 +411,7 @@ const Actions = {
     };
     await dbPut('captures', rec);
     S.captures.unshift(rec);
+    S.flowSeq += 1;
     S.lastSaved = {
       venue: S.venue, sec: rec.capturedInSec, sessWord: sessWord(),
       sessionOn: !!sessionCompany(),
@@ -427,6 +454,10 @@ const Actions = {
     const c = S.captures.find(x => x.id === arg);
     if (!c) return;
     if (!confirm('Delete this capture and its photos?')) return;
+    c.photos.product.forEach(p => revokeUrlFor(p.blob));
+    if (c.photos.label) revokeUrlFor(c.photos.label.blob);
+    if (c.photos.card) revokeUrlFor(c.photos.card.blob);
+    if (c.voiceNote) revokeUrlFor(c.voiceNote.blob);
     await dbRemove('captures', arg);
     S.captures = S.captures.filter(x => x.id !== arg);
     S.compareIds = S.compareIds.filter(x => x !== arg);
@@ -498,7 +529,6 @@ const Actions = {
     try {
       list.forEach(c => { c._company = companyOf(c.companyKey); });
       const blob = await DayPack.build(list, supName);
-      list.forEach(c => { delete c._company; });
       const name = 'milana-day-pack-' + new Date().toISOString().slice(0, 10) + '.pdf';
       const result = await DayPack.share(blob, name);
       if (result === 'shared') Fx.toast('Day pack handed to the share sheet');
@@ -506,6 +536,7 @@ const Actions = {
     } catch (err) {
       Fx.toast('The day pack could not be built — try again.');
     } finally {
+      list.forEach(c => { delete c._company; });
       if (el) { el.textContent = orig; el.disabled = false; }
     }
   },
@@ -560,6 +591,7 @@ const Actions = {
     if (!confirm('Erase every capture and company stored on this phone?')) return;
     await dbClear('captures');
     await dbClear('companies');
+    revokeAllUrls();
     S.captures = []; S.companies = [];
     S.compareIds = []; S.session = { key: '' }; S.cardN = 0;
     await settingSet('compareIds', []);
@@ -690,9 +722,11 @@ function bindForms() {
     lf._bound = true;
     lf.addEventListener('submit', async ev => {
       ev.preventDefault();
-      const name = S.loginTmp.name.trim();
+      const form = ev.currentTarget;
+      const name = ((form.elements.name && form.elements.name.value) || S.loginTmp.name).trim();
       if (!name) return;
-      S.user = { name, role: S.loginRole, pin: S.loginTmp.pin.trim() };
+      const pin = ((form.elements.pin && form.elements.pin.value) || S.loginTmp.pin).trim();
+      S.user = { name, role: S.loginRole, pin };
       await settingSet('user', S.user);
       if (!S.firstUse) {
         S.firstUse = new Date().toISOString();
@@ -708,7 +742,9 @@ function bindForms() {
     uf._bound = true;
     uf.addEventListener('submit', ev => {
       ev.preventDefault();
-      if (S.loginTmp.pin.trim() === String(S.user.pin || '')) {
+      const form = ev.currentTarget;
+      const pin = ((form.elements.pin && form.elements.pin.value) || S.loginTmp.pin).trim();
+      if (pin === String(S.user.pin || '')) {
         S.locked = false;
         S.loginTmp = { name: '', pin: '' };
         renderAll();
@@ -745,6 +781,17 @@ async function importJSON(e) {
     }
     S.captures = (await dbAll('captures')).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     S.companies = await dbAll('companies');
+    // restore the card counter so future "Card #N · {place}" keys never collide
+    // with imported companies (backup value, or the highest N seen in the data)
+    let maxN = (data.settings && data.settings.cardN) || 0;
+    S.companies.forEach(co => {
+      const m = /^Card #(\d+) · /.exec(co.key);
+      if (m) maxN = Math.max(maxN, Number(m[1]));
+    });
+    if (maxN > S.cardN) {
+      S.cardN = maxN;
+      await settingSet('cardN', S.cardN);
+    }
     renderAll();
     Fx.toast('Backup imported');
   } catch (err) {
@@ -769,8 +816,9 @@ async function init() {
     const file = e.target.files && e.target.files[0];
     e.target.value = '';
     if (!file || !S.camera) return;
-    const k = S.camera;
+    const k = S.camera, flow = S.flowSeq;
     const blob = await downscaleImage(file, k === 'product' ? 1600 : 2000, k === 'product' ? 0.82 : 0.87);
+    if (S.flowSeq !== flow || S.camera !== k) return;
     handleShot(k, blob);
   });
 
@@ -786,12 +834,41 @@ async function init() {
   S.captures = (await dbAll('captures')).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   S.companies = await dbAll('companies');
   S.compareIds = (await settingGet('compareIds', [])).filter(id => S.captures.some(c => c.id === id));
+
+  // sweep unnamed companies left by abandoned capture flows (no records, not the live session)
+  const usedKeys = new Set(S.captures.map(c => c.companyKey));
+  const orphans = S.companies.filter(co => !co.name && !usedKeys.has(co.key) && co.key !== S.session.key);
+  for (const co of orphans) await dbRemove('companies', co.key);
+  if (orphans.length) S.companies = S.companies.filter(co => orphans.indexOf(co) === -1);
+
   S.ready = true;
   renderAll();
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(() => healOfflineAssets())
+      .catch(() => {});
   }
+}
+
+/* The heavy OCR assets are cached best-effort at SW install; if any download
+   failed there, re-fetch them on a later online launch so OCR stays available
+   fully offline. */
+async function healOfflineAssets() {
+  if (!('caches' in window) || !navigator.onLine) return;
+  try {
+    const cache = await caches.open('milana-v1');
+    const heavy = [
+      './vendor/core/tesseract-core-lstm.wasm.js',
+      './vendor/core/tesseract-core-simd-lstm.wasm.js',
+      './vendor/lang/chi_sim.traineddata.gz',
+      './vendor/lang/eng.traineddata.gz',
+    ];
+    for (const url of heavy) {
+      const hit = await cache.match(url);
+      if (!hit) await cache.add(url);
+    }
+  } catch (err) { /* retried on the next launch */ }
 }
 
 init();

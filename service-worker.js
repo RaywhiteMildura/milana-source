@@ -61,7 +61,7 @@ self.addEventListener('fetch', event => {
     if (cached) return cached;
     try {
       const res = await fetch(req);
-      if (res && res.ok) cache.put(req, res.clone());
+      if (res && res.ok) event.waitUntil(cache.put(req, res.clone()).catch(() => {}));
       return res;
     } catch (err) {
       if (req.mode === 'navigate') {

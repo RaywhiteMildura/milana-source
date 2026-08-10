@@ -41,16 +41,18 @@ function statusChip(c) {
   return `<span style="font-size:10.5px;font-weight:800;border-radius:999px;padding:5px 9px;background:${st.bg};color:${st.fg};flex-shrink:0">${esc(label)}</span>`;
 }
 
-function rowHTML(c) {
+function rowHTML(c, opts = {}) {
   const first = c.photos.product[0];
   const count = c.photos.product.length;
+  // home "Latest captures" rows show the company only, no photo-count badge (design)
+  const sub = opts.home ? supName(c) : supName(c) + ' · ' + c.venue;
   return `<div data-act="openDetail" data-arg="${c.id}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
     <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:#ebe3d8;position:relative;${first ? thumbBg(first.blob) : ''}">
-      ${count > 1 ? `<span style="position:absolute;right:3px;bottom:3px;font-size:9px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:6px;padding:2px 5px">×${count}</span>` : ''}
+      ${count > 1 && !opts.home ? `<span style="position:absolute;right:3px;bottom:3px;font-size:9px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:6px;padding:2px 5px">×${count}</span>` : ''}
     </div>
     <div style="flex:1;min-width:0">
       <div style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(dispName(c))}</div>
-      <div style="font-size:12px;color:#625852;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(supName(c))} · ${esc(c.venue)}</div>
+      <div style="font-size:12px;color:#625852;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sub)}</div>
     </div>
     ${statusChip(c)}</div>`;
 }
@@ -75,7 +77,7 @@ function homeView() {
     </header>
     <div class="vscroll" style="flex:1;padding:20px 18px ${B_BODY}">
       <button data-act="openVenueSheet" style="border:0;background:transparent;padding:2px 0;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.09em;color:#9d7643;text-transform:uppercase">Day ${dayNumber()} · at ${esc(S.venue)} <span style="font-size:9px">▾</span></button>
-      <h1 class="serif" style="font-size:27px;line-height:1.08;margin:6px 0 16px;font-weight:400">${greeting()}, ${esc(firstName())}.</h1>
+      <h1 class="serif" style="font-size:27px;line-height:1.08;margin:6px 0 16px">${greeting()}, ${esc(firstName())}.</h1>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div style="background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;padding:14px 15px">
           <strong class="serif" style="display:block;font-size:28px">${todayCount}</strong>
@@ -95,11 +97,11 @@ function homeView() {
         <span style="color:#c9aa78;font-size:18px">›</span>
       </div>` : ''}
       <div style="display:flex;align-items:baseline;justify-content:space-between;margin:22px 0 10px">
-        <h2 class="serif" style="font-size:19px;margin:0;font-weight:400">Latest captures</h2>
-        <button data-act="nav" data-arg="products" style="border:0;background:transparent;font-size:12px;color:#6f273a;font-weight:800;padding:4px">All ${S.captures.length} →</button>
+        <h2 class="serif" style="font-size:19px;margin:0">Latest captures</h2>
+        <button data-act="nav" data-arg="products" class="hit44" style="border:0;background:transparent;font-size:12px;color:#6f273a;font-weight:800;padding:4px">All ${S.captures.length} →</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:9px">
-        ${recent.length ? recent.map(rowHTML).join('') : `<div style="text-align:center;padding:40px 20px;color:#625852;border:1px dashed #d7cbbd;border-radius:18px;font-size:13px"><b style="display:block;color:#201a17;font-family:Georgia,'Times New Roman',serif;font-size:19px;font-weight:400;margin-bottom:7px">Nothing captured yet</b>Tap the ＋ button — the first save works with no signal at all.</div>`}
+        ${recent.length ? recent.map(c => rowHTML(c, { home: true })).join('') : `<div style="text-align:center;padding:40px 20px;color:#625852;border:1px dashed #d7cbbd;border-radius:18px;font-size:13px"><b style="display:block;color:#201a17;font-family:Georgia,'Times New Roman',serif;font-size:19px;margin-bottom:7px">Nothing captured yet</b>Tap the ＋ button — the first save works with no signal at all.</div>`}
       </div>
       <p style="font-size:12px;color:#625852;line-height:1.5;margin:18px 2px 0">Everything saves on this phone first — no signal needed at the fair, the factory or on the road.</p>
     </div>
@@ -130,7 +132,7 @@ function productsView() {
       <div class="hscroll" style="display:flex;gap:7px;padding-bottom:10px;margin:0 -18px;padding-left:18px;padding-right:18px">
         ${presentVenues.map(name => `<button data-act="venueFilter" data-arg="${esc(name)}" style="flex-shrink:0;min-height:34px;padding:0 12px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap;${chipStyle(S.venueFilter === name, '#201a17')}">◎ ${esc(name)}</button>`).join('')}
       </div>
-      <div style="display:flex;flex-direction:column;gap:9px">${filtered.map(rowHTML).join('')}</div>
+      <div style="display:flex;flex-direction:column;gap:9px">${filtered.map(c => rowHTML(c)).join('')}</div>
       ${filtered.length ? '' : `<div style="text-align:center;padding:40px 20px;color:#625852;border:1px dashed #d7cbbd;border-radius:18px;font-size:13px">Nothing matches — clear the search or capture it now.</div>`}
     </div>
   </div>`;
@@ -169,7 +171,7 @@ function compareView() {
     </header>
     <div class="vscroll" style="flex:1;padding:14px 18px ${B_BODY}">
       ${cmp.length ? '' : `<div style="text-align:center;padding:44px 22px;color:#625852;border:1px dashed #d7cbbd;border-radius:18px;background:rgba(255,255,255,.4)">
-        <strong class="serif" style="display:block;color:#201a17;font-size:19px;margin-bottom:7px;font-weight:400">Nothing to compare</strong>
+        <strong class="serif" style="display:block;color:#201a17;font-size:19px;margin-bottom:7px">Nothing to compare</strong>
         <p style="margin:0;font-size:13px;line-height:1.5">Open a product and tap “Add to compare” — up to three side by side.</p>
         <button data-act="nav" data-arg="products" style="margin-top:16px;min-height:46px;padding:0 18px;border:0;border-radius:13px;background:#201a17;color:#fff;font-size:14px;font-weight:800">Open products</button>
       </div>`}
@@ -179,7 +181,7 @@ function compareView() {
           const st = ST[displaySt(c)] || ST.Captured;
           return `<div style="flex-shrink:0;width:206px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;overflow:hidden;display:flex;flex-direction:column">
           <div style="height:110px;background:#ebe3d8;position:relative;${first ? thumbBg(first.blob) : ''}">
-            <button data-act="toggleCompare" data-arg="${c.id}" style="position:absolute;right:7px;top:7px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(31,25,23,.78);color:#fff;font-size:13px" aria-label="Remove">✕</button>
+            <button data-act="toggleCompare" data-arg="${c.id}" class="hit44" style="position:absolute;right:7px;top:7px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(31,25,23,.78);color:#fff;font-size:13px" aria-label="Remove">✕</button>
           </div>
           <div style="padding:12px 13px;display:flex;flex-direction:column;gap:7px;flex:1">
             <div style="font-size:14px;font-weight:800;line-height:1.25">${esc(dispName(c))}</div>
@@ -190,7 +192,7 @@ function compareView() {
             <div style="font-size:12px;display:flex;justify-content:space-between;gap:8px"><span style="color:#625852">Place</span><b style="text-align:right">${esc(c.venue)}</b></div>
             <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:6px">
               <span style="font-size:10.5px;font-weight:800;border-radius:999px;padding:5px 9px;background:${st.bg};color:${st.fg}">${esc(displaySt(c))}</span>
-              <button data-act="openDetail" data-arg="${c.id}" style="border:0;background:transparent;color:#6f273a;font-size:12px;font-weight:800;padding:6px 2px">Open →</button>
+              <button data-act="openDetail" data-arg="${c.id}" class="hit44" style="border:0;background:transparent;color:#6f273a;font-size:12px;font-weight:800;padding:6px 2px">Open →</button>
             </div>
           </div>
         </div>`; }).join('')}
@@ -356,8 +358,7 @@ function shootView() {
           <div class="serif" style="width:40px;height:40px;border-radius:50%;border:2px solid #9d7643;color:#9d7643;display:grid;place-items:center;font-size:19px;font-weight:700">${s.n}</div>
           <div style="font-size:16px;font-weight:800">${esc(s.label)}</div>
           <div class="mono" style="font-size:11.5px;color:#625852;text-align:center">${esc(s.hint)}</div>
-        </div>` : `${s.k === 'product' && s.n > 1 ? `<span style="position:absolute;right:9px;top:9px;font-size:10px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:7px;padding:3px 7px">×${s.n}</span>` : ''}
-        <div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:rgba(31,25,23,.72);color:#fff">
+        </div>` : `<div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:rgba(31,25,23,.72);color:#fff">
           <span style="font-size:13px;font-weight:700">${esc(s.overlay)}</span>
           <span style="font-size:12px;color:rgba(255,255,255,.75)">${esc(s.action)}</span>
         </div>`}
@@ -413,11 +414,11 @@ function tagView() {
         ${dr.rec === 'rec' ? `<button data-act="rec" style="width:100%;min-height:54px;border:0;border-radius:14px;background:#6f273a;color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px"><span class="anim-pulse" style="width:10px;height:10px;border-radius:50%;background:#fff"></span><span id="rec-label">Recording ${fmtClock(dr.recSec)} — tap to stop</span></button>` : ''}
         ${dr.rec === 'done' ? `<div style="display:flex;align-items:center;gap:10px;border:1px solid #d7cbbd;border-radius:14px;background:#fffdf9;padding:8px 8px 8px 15px;min-height:54px">
           <span data-act="playVoice" role="button" style="font-size:14.5px;font-weight:700;flex:1;cursor:pointer">▶ Voice note · ${fmtClock(dr.voice ? dr.voice.duration : 0)}</span>
-          <button data-act="delVoice" style="width:40px;height:40px;border:0;border-radius:11px;background:#ebe3d8;color:#625852;font-size:15px" aria-label="Delete voice note">✕</button>
+          <button data-act="delVoice" class="hit44" style="width:40px;height:40px;border:0;border-radius:11px;background:#ebe3d8;color:#625852;font-size:15px" aria-label="Delete voice note">✕</button>
         </div>` : ''}
       </div>
       <div style="margin-top:12px">
-        ${!dr.priceOpen ? `<button data-act="togglePrice" style="border:0;background:transparent;color:#6f273a;font-size:14px;font-weight:800;padding:10px 2px">＋ Add quoted price</button>`
+        ${!dr.priceOpen ? `<button data-act="togglePrice" class="hit44" style="border:0;background:transparent;color:#6f273a;font-size:14px;font-weight:800;padding:10px 2px">＋ Add quoted price</button>`
         : `<div style="display:flex;gap:8px;align-items:stretch">
             ${['CNY', 'USD', 'AUD'].map(cu => `<button data-act="setCurrency" data-arg="${cu}" style="min-width:56px;min-height:48px;border-radius:12px;font-size:13px;font-weight:800;${chipStyle(dr.currency === cu, '#201a17')}">${cu}</button>`).join('')}
             <input data-input="price" value="${esc(dr.price)}" inputmode="decimal" placeholder="Quoted amount" style="flex:1;min-width:0;border:1px solid #d7cbbd;border-radius:12px;padding:0 13px;background:#fff;color:#201a17;outline:none" />
@@ -427,7 +428,7 @@ function tagView() {
       ${companyOn ? `<div style="border:1px solid #b9d2c4;background:#e9f2ec;border-radius:14px;padding:13px 15px">
         <div style="font-size:14px;font-weight:800;color:#355f4b">${dr.card ? '✓ Company card captured' : '✓ Same ' + sw + ' as your last capture'}</div>
         <div style="font-size:12.5px;color:#4a6355;line-height:1.45;margin-top:3px">${dr.card ? 'The company record is created from this card — nothing to type on the floor.' : 'This will file as the ' + ord(sessionCount() + 1) + ' product for this ' + sw + '.'}</div>
-        <button data-act="openCam" data-arg="card" style="margin-top:9px;border:0;background:transparent;color:#355f4b;font-size:12.5px;font-weight:800;padding:4px 0;text-decoration:underline">Different company? Shoot the new card</button>
+        <button data-act="openCam" data-arg="card" class="hit44" style="margin-top:9px;border:0;background:transparent;color:#355f4b;font-size:12.5px;font-weight:800;padding:4px 0;text-decoration:underline">Different company? Shoot the new card</button>
       </div>`
       : `<div style="display:flex;flex-wrap:wrap;gap:8px">
         ${namedCos.map(co => `<button data-act="pickSupplier" data-arg="${esc(co.key)}" style="min-height:44px;padding:0 15px;border-radius:999px;font-size:13.5px;font-weight:700;${chipStyle(dr.supplierKey === co.key, '#201a17')}">${esc(co.name)}</button>`).join('')}
@@ -453,7 +454,7 @@ function savedView() {
     </header>
     <div class="vscroll" style="flex:1;padding:26px 20px 24px;text-align:center">
       <div class="anim-pop" style="width:86px;height:86px;border-radius:50%;background:#9d7643;color:#fff;font-size:38px;display:grid;place-items:center;margin:0 auto;box-shadow:0 10px 26px rgba(157,118,67,.35)">✓</div>
-      <h2 class="serif" style="font-size:25px;margin:18px 0 4px;font-weight:400">Saved on this device</h2>
+      <h2 class="serif" style="font-size:25px;margin:18px 0 4px">Saved on this device</h2>
       <p style="font-size:12.5px;color:#625852;margin:0">Captured in ${fmtClock(sv.sec)} · syncs to Villa Milana d’Oro when online.</p>
       <div class="anim-rise" style="background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;padding:14px;margin-top:22px;text-align:left">
         <div style="display:flex;gap:8px">
@@ -595,7 +596,7 @@ function loginView() {
   return `<div style="position:absolute;inset:0;display:grid;place-items:center;padding:24px;${loginBg()}">
     <form id="login-form" style="width:min(400px,100%);background:#fffdf9;border-radius:24px;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,.3)">
       <div style="color:#6f273a;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase">Villa Milana d’Oro</div>
-      <h1 class="serif" style="margin:5px 0 8px;font-size:34px;font-weight:400">Milana Source</h1>
+      <h1 class="serif" style="margin:5px 0 8px;font-size:34px">Milana Source</h1>
       <p style="font-size:13px;color:#625852;line-height:1.5;margin:0 0 16px">Shoot the product, its label and the company card. Everything else waits for the evening.</p>
       <label style="display:block;font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin-bottom:7px">YOUR NAME</label>
       <input class="fld fld-strong" name="name" data-input="login.name" value="${esc(S.loginTmp.name)}" required placeholder="Damian" autocomplete="name" style="margin-bottom:13px">
@@ -615,7 +616,7 @@ function unlockView() {
   return `<div style="position:absolute;inset:0;display:grid;place-items:center;padding:24px;${loginBg()}">
     <form id="unlock-form" style="width:min(400px,100%);background:#fffdf9;border-radius:24px;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,.3)">
       <div style="color:#6f273a;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase">Villa Milana d’Oro</div>
-      <h1 class="serif" style="margin:5px 0 8px;font-size:28px;font-weight:400">Welcome back, ${esc(firstName())}</h1>
+      <h1 class="serif" style="margin:5px 0 8px;font-size:28px">Welcome back, ${esc(firstName())}</h1>
       <p style="font-size:13px;color:#625852;line-height:1.5;margin:0 0 16px">Enter the local PIN for this device.</p>
       <input class="fld fld-strong" name="pin" data-input="login.pin" inputmode="numeric" maxlength="6" required autofocus placeholder="PIN" autocomplete="off" style="margin-bottom:16px">
       <button class="pf p98" style="width:100%;min-height:54px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:16px;font-weight:800">Unlock</button>
@@ -661,7 +662,7 @@ function cameraHTML() {
         <div style="position:absolute;right:0;top:0;width:30px;height:30px;border-right:3px solid #c9aa78;border-top:3px solid #c9aa78;border-top-right-radius:10px"></div>
         <div style="position:absolute;left:0;bottom:0;width:30px;height:30px;border-left:3px solid #c9aa78;border-bottom:3px solid #c9aa78;border-bottom-left-radius:10px"></div>
         <div style="position:absolute;right:0;bottom:0;width:30px;height:30px;border-right:3px solid #c9aa78;border-bottom:3px solid #c9aa78;border-bottom-right-radius:10px"></div>
-        <div id="cam-fallback-note" class="mono hidden" style="position:absolute;inset:0;display:none;place-items:center;color:rgba(255,255,255,.5);font-size:11.5px;text-align:center;line-height:1.6">camera not available here —<br>the shutter opens the system camera</div>
+        <div id="cam-fallback-note" class="mono hidden" style="position:absolute;inset:0;display:none;place-items:center;color:rgba(255,255,255,.4);font-size:11.5px;text-align:center;line-height:1.6">camera not available here —<br>the shutter opens the system camera</div>
       </div>
     </div>
     <div style="padding:16px 22px ${B_CAM};display:flex;align-items:center;justify-content:space-between;gap:10px;flex-direction:${barFlip};position:relative">
