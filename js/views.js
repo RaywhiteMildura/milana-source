@@ -4,11 +4,30 @@
 const CATS = ['Joinery', 'Windows & doors', 'Natural stone', 'Sintered slabs', 'Tiles', 'Lighting', 'Hardware', 'Bathrooms', 'Stone fabrication', 'Furniture', 'Appliances', 'Other'];
 const ROOMS_TOP = ['Kitchen', 'Main ensuite', 'Hidden pantry', 'Wine display', 'Main bedroom', 'Walk-in robe', 'Laundry', 'Entry'];
 const ROOMS_MORE = ['Formal lounge', 'Study', 'Bedrooms', 'Pool', 'Exterior', 'General'];
-const VGROUPS = [
-  { name: 'Fairs', opts: ['Canton Fair Phase 1', 'Canton Fair Phase 2', 'CCIH CeramBath', 'China Ceramics City'] },
-  { name: 'Factories', opts: ['Joinery Factory A', 'Joinery Factory B', 'Windows & Doors Factory', 'Stone Fabricator'] },
-  { name: 'Showrooms & markets', opts: ['Meiju', 'Huayi'] },
-  { name: 'On the road', opts: ['Hotel / evening', 'Other stop'] },
+/* Places are user-managed records: {id, name, type}. The type drives the
+   grouping in the sheet and the session word (booth / factory / showroom). */
+const PLACE_TYPES = [
+  { key: 'fair', group: 'Fairs', word: 'booth', add: 'Fair' },
+  { key: 'factory', group: 'Factories', word: 'factory', add: 'Factory' },
+  { key: 'showroom', group: 'Showrooms & markets', word: 'showroom', add: 'Showroom' },
+  { key: 'road', group: 'On the road', word: 'company', add: 'On the road' },
+  { key: 'other', group: 'Other places', word: 'company', add: 'Other' },
+];
+
+const DEFAULT_PLACES = [
+  { name: 'Canton Fair Phase 1', type: 'fair' },
+  { name: 'Canton Fair Phase 2', type: 'fair' },
+  { name: 'Canton Fair Phase 3', type: 'fair' },
+  { name: 'CCIH CeramBath', type: 'fair' },
+  { name: 'China Ceramics City', type: 'fair' },
+  { name: 'Joinery Factory A', type: 'factory' },
+  { name: 'Joinery Factory B', type: 'factory' },
+  { name: 'Windows & Doors Factory', type: 'factory' },
+  { name: 'Stone Fabricator', type: 'factory' },
+  { name: 'Meiju', type: 'showroom' },
+  { name: 'Huayi', type: 'showroom' },
+  { name: 'Hotel / evening', type: 'road' },
+  { name: 'Other stop', type: 'road' },
 ];
 const ST = {
   'Preferred':    { bg: '#e3efe8', fg: '#355f4b' },
@@ -151,7 +170,7 @@ function suppliersView() {
         <div class="serif" style="width:44px;height:44px;border:1px solid #c9aa78;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:700;color:#9d7643;flex-shrink:0;${sp.cardPhoto ? thumbBg(sp.cardThumb || sp.cardPhoto) : ''}">${sp.cardPhoto ? '' : esc(sp.initial)}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</div>
-          <div style="font-size:12px;color:#625852;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.sub)}</div>
+          <div style="font-size:12px;color:#625852;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sp.nameZh ? esc(sp.nameZh) + ' · ' : ''}${esc(sp.sub)}</div>
         </div>
         <span style="color:#9d7643;font-size:17px">›</span>
       </div>`).join('')}
@@ -240,6 +259,17 @@ function reviewView() {
   </div>`;
 }
 
+/* The characters as they were read, kept under the translated field so a wrong
+   reading can be checked — or tapped back in — instead of being lost. */
+function zhHint(field) {
+  const zh = S.rvZh[field];
+  if (!zh || zh === S.rv[field]) return '';
+  return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px">
+    <span style="font-size:12.5px;color:#625852;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(zh)}">${esc(zh)}</span>
+    <button data-act="useZh" data-arg="${field}" class="mono" style="flex-shrink:0;min-height:28px;padding:0 9px;border:1px solid rgba(157,118,67,.45);border-radius:8px;background:rgba(157,118,67,.12);color:#9d7643;font-size:10px;font-weight:700">use 中文</button>
+  </div>`;
+}
+
 /* ───────────────────────── Complete record (OCR) ───────────────────────── */
 function reviewItemView() {
   const c = S.captures.find(x => x.id === S.reviewId);
@@ -266,8 +296,14 @@ function reviewItemView() {
       <div style="display:flex;gap:12px;margin-top:9px">
         <div style="width:74px;height:96px;border-radius:11px;border:1px solid #d7cbbd;background:#ebe3d8;flex-shrink:0;${cardBlob ? thumbBg(cardBlob) : ''}"></div>
         <div style="flex:1;display:flex;flex-direction:column;gap:8px;min-width:0">
-          <input class="fld fld-strong" data-input="rv.company" value="${esc(S.rv.company)}" placeholder="Company name" />
-          <input class="fld" data-input="rv.contact" value="${esc(S.rv.contact)}" placeholder="Contact person" />
+          <div>
+            <input class="fld fld-strong" data-input="rv.company" value="${esc(S.rv.company)}" placeholder="Company name" />
+            ${zhHint('company')}
+          </div>
+          <div>
+            <input class="fld" data-input="rv.contact" value="${esc(S.rv.contact)}" placeholder="Contact person" />
+            ${zhHint('contact')}
+          </div>
           <input class="fld" data-input="rv.wechat" value="${esc(S.rv.wechat)}" placeholder="WeChat / phone" />
         </div>
       </div>
@@ -279,7 +315,10 @@ function reviewItemView() {
       <div style="display:flex;gap:12px;margin-top:9px">
         <div style="width:74px;height:96px;border-radius:11px;border:1px solid #d7cbbd;background:#ebe3d8;flex-shrink:0;${labelBlob ? thumbBg(labelBlob) : ''}"></div>
         <div style="flex:1;display:flex;flex-direction:column;gap:8px;min-width:0">
-          <input class="fld fld-strong" data-input="rv.pname" value="${esc(S.rv.pname)}" placeholder="Product name" />
+          <div>
+            <input class="fld fld-strong" data-input="rv.pname" value="${esc(S.rv.pname)}" placeholder="Product name" />
+            ${zhHint('pname')}
+          </div>
           <input class="fld" data-input="rv.code" value="${esc(S.rv.code)}" placeholder="Model / code" />
           <input class="fld" data-input="rv.size" value="${esc(S.rv.size)}" placeholder="Size / spec" />
         </div>
@@ -503,6 +542,7 @@ function detailOverlay() {
       <button data-act="closeDetail" style="width:44px;height:44px;border:0;border-radius:14px;background:rgba(255,255,255,.10);color:#fff;font-size:19px;flex-shrink:0" aria-label="Back">‹</button>
       <div style="min-width:0;flex:1">
         <div class="serif" style="font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(dispName(c))}</div>
+        ${c.nameZh ? `<div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.nameZh)}</div>` : ''}
         <div style="font-size:10.5px;color:rgba(255,255,255,.6);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(supName(c))} · ${esc(c.venue)} · ${esc(fmtTime(c.createdAt))}</div>
       </div>
     </header>
@@ -535,24 +575,41 @@ function detailOverlay() {
 
 /* ───────────────────────── Place sheet ───────────────────────── */
 function venueSheet() {
-  const groups = VGROUPS.concat(S.customVenues.length ? [{ name: 'My places', opts: S.customVenues }] : []);
+  const counts = {};
+  S.captures.forEach(c => { counts[c.venue] = (counts[c.venue] || 0) + 1; });
   return `<div style="position:fixed;inset:0;z-index:50">
     <div data-act="closeVenueSheet" style="position:absolute;inset:0;background:rgba(31,25,23,.45)"></div>
-    <div class="anim-sheet vscroll" style="position:absolute;left:0;right:0;bottom:0;background:#fffdf9;border-radius:24px 24px 0 0;padding:18px 18px ${B_SHEET};max-height:72%;box-shadow:0 -14px 40px rgba(39,28,20,.25)">
+    <div class="anim-sheet vscroll" style="position:absolute;left:0;right:0;bottom:0;background:#fffdf9;border-radius:24px 24px 0 0;padding:18px 18px ${B_SHEET};max-height:82%;box-shadow:0 -14px 40px rgba(39,28,20,.25)">
       <div style="width:38px;height:4px;border-radius:99px;background:#d7cbbd;margin:0 auto 14px"></div>
-      <div class="serif" style="font-size:20px">Where are you?</div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+        <div class="serif" style="font-size:20px">Where are you?</div>
+        <button data-act="togglePlaceEdit" class="hit44" style="border:0;background:transparent;color:#6f273a;font-size:12.5px;font-weight:800;padding:4px 2px">${S.placeEdit ? 'Done' : 'Edit places'}</button>
+      </div>
       <div style="font-size:12px;color:#625852;margin:4px 0 6px;line-height:1.45">Captures file under this place. Moving to a new place resets the company card.</div>
-      ${groups.map(g => `<div style="margin-top:14px">
-        <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">${esc(g.name)}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px">
-          ${g.opts.map(name => `<button data-act="pickVenue" data-arg="${esc(name)}" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:700;${chipStyle(S.venue === name, '#6f273a')}">${esc(name)}</button>`).join('')}
-        </div>
-      </div>`).join('')}
-      <div style="margin-top:16px">
-        ${S.addPlaceOpen ? `<div style="display:flex;gap:8px">
-          <input class="fld" data-input="newPlace" id="new-place-input" value="${esc(S.newPlace)}" placeholder="Name this place" style="flex:1" />
-          <button data-act="addPlaceSave" style="min-height:46px;padding:0 16px;border:0;border-radius:13px;background:#201a17;color:#fff;font-size:13.5px;font-weight:800">Save</button>
-        </div>`
+      ${PLACE_TYPES.map(t => {
+        const list = S.places.filter(p => p.type === t.key);
+        if (!list.length) return '';
+        return `<div style="margin-top:14px">
+          <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">${esc(t.group)}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            ${list.map(p => S.placeEdit
+              ? `<span style="display:inline-flex;align-items:center;gap:6px;min-height:46px;padding:0 8px 0 15px;border-radius:13px;font-size:13.5px;font-weight:700;background:#fffdf9;color:#201a17;border:1px solid #d7cbbd">${esc(p.name)}${counts[p.name] ? `<b style="font-size:11px;color:#625852;font-weight:700">${counts[p.name]}</b>` : ''}
+                  <button data-act="deletePlace" data-arg="${esc(p.id)}" style="width:30px;height:30px;border:0;border-radius:50%;background:#f8e7e5;color:#8b2d2d;font-size:13px;line-height:1;padding:0" aria-label="Remove ${esc(p.name)}">✕</button>
+                </span>`
+              : `<button data-act="pickVenue" data-arg="${esc(p.id)}" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:700;${chipStyle(S.venue === p.name, '#6f273a')}">${esc(p.name)}</button>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+      <div style="margin-top:18px;border-top:1px solid #ece3d6;padding-top:14px">
+        ${S.addPlaceOpen ? `<div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">Add a place</div>
+          <input class="fld fld-strong" data-input="newPlace" id="new-place-input" value="${esc(S.newPlace)}" placeholder="e.g. Joinery Factory C" />
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:9px">
+            ${PLACE_TYPES.map(t => `<button data-act="setNewPlaceType" data-arg="${t.key}" style="min-height:40px;padding:0 13px;border-radius:11px;font-size:12.5px;font-weight:700;${chipStyle(S.newPlaceType === t.key, '#201a17')}">${esc(t.add)}</button>`).join('')}
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button data-act="addPlaceSave" style="flex:1;min-height:46px;border:0;border-radius:13px;background:#6f273a;color:#fff;font-size:13.5px;font-weight:800">Save place</button>
+            <button data-act="addPlaceCancel" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:700;${chipStyle(false, '#201a17')}">Cancel</button>
+          </div>`
         : `<button data-act="addPlaceOpen" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:800;border:1px dashed #9d7643;background:transparent;color:#9d7643">＋ Add a place</button>`}
       </div>
     </div>

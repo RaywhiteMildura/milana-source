@@ -8,6 +8,10 @@ The production app now lives in this folder (`index.html` plus the `css/`, `js/`
 2. Open that link on your iPhone in **Safari**, enter your name, then tap **Share → Add to Home Screen**. That's the app installed — icon, offline and all.
 3. Open it once on hotel wifi and leave it for a minute: it downloads the on-device OCR (about 38 MB, Chinese + English) and from then on **everything works with no signal at all** — the fair, the factory, the plane.
 
+**Reading Chinese cards and labels.** At evening review the app reads each photo twice — once with the English model, once with the Chinese one — and keeps each line from the model that matches it, so English stays English. Chinese is then turned into English (trade words like 有限公司 → Co., Ltd, 岩板 → Sintered Stone, 销售经理 → Sales Manager; names become pinyin, e.g. 李小明 → Li Xiaoming). **The characters are always kept underneath** — tap **use 中文** to put the original back in the field if a reading looks wrong. Both go into the day pack and the CSV.
+
+**Your places are your own.** The place list starts with the Canton Fair halls, a few factories and showrooms, but you can add as many as you like — tap the place line, **＋ Add a place**, type the name and choose Fair / Factory / Showroom / On the road / Other. Two joineries, three stone yards, whatever the trip turns into. **Edit places** lets you remove the ones you never visit. The type is what makes the app say "same booth" at a fair and "same factory" at a factory.
+
 Notes for the trip:
 - Everything (photos, voice notes, records) stays on the phone. Use **the "N local" pill (top-right of Today) → Export full backup** at the end of each day — it saves a single file with every photo inside.
 - The **Day pack** (Evening review screen) builds a PDF of the day and hands it to the iPhone share sheet — AirDrop, WeChat, email, whatever you use.

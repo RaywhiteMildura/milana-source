@@ -188,9 +188,11 @@ const DayPack = {
       // facts
       x.font = this._sans(26);
       const facts = [];
+      if (cpt.nameZh) facts.push(['Name (中文)', cpt.nameZh]);
       if (cpt.code) facts.push(['Model / code', cpt.code]);
       if (cpt.size) facts.push(['Size / spec', cpt.size]);
       const co = cpt._company;
+      if (co && co.nameZh) facts.push(['Company (中文)', co.nameZh]);
       if (co && co.contact) facts.push(['Contact', co.contact]);
       if (co && co.wechat) facts.push(['WeChat / phone', co.wechat]);
       for (const [k, v] of facts) {

@@ -7,15 +7,16 @@ const S = {
   loginTmp: { name: '', pin: '', project: '' }, loginRole: 'Owner',
   view: 'home', camera: null,
   venueSheetOn: false, settingsOn: false,
-  addPlaceOpen: false, newPlace: '',
+  addPlaceOpen: false, newPlace: '', newPlaceType: 'factory', placeEdit: false,
   captures: [], companies: [],
   draft: null,
-  session: { key: '' }, cardN: 0, flowSeq: 0,
+  session: { key: '', venue: '' }, cardN: 0, flowSeq: 0,
   startedAt: null, lastSaved: null,
-  venue: 'Canton Fair Phase 1', customVenues: [],
+  venue: 'Canton Fair Phase 1', places: [],
   q: '', catFilter: 'All', venueFilter: 'All places',
   detailId: null, compareIds: [], reviewId: null,
   rv: { company: '', contact: '', wechat: '', pname: '', code: '', size: '' },
+  rvZh: { company: '', contact: '', pname: '' },   // characters as read, kept for checking
   rvBusy: { card: false, label: false },
   leftHanded: false, nativeCamera: false,
   projectName: '',
@@ -45,18 +46,19 @@ function dayNumber() {
   return Math.max(1, Math.round((b - a) / 86400000) + 1);
 }
 
+function placeByName(name) { return S.places.find(p => p.name === name) || null; }
+
 function sessWord() {
-  const v = S.venue;
-  if (VGROUPS[1].opts.includes(v)) return 'factory';
-  if (VGROUPS[2].opts.includes(v)) return 'showroom';
-  if (VGROUPS[0].opts.includes(v)) return 'booth';
-  return 'company';
+  const p = placeByName(S.venue);
+  const t = PLACE_TYPES.find(x => x.key === (p ? p.type : 'other'));
+  return t ? t.word : 'company';
 }
 
 function companyOf(key) { return S.companies.find(c => c.key === key) || null; }
 function sessionCompany() { return S.session.key ? companyOf(S.session.key) : null; }
 function sessionCount() { return S.session.key ? S.captures.filter(c => c.companyKey === S.session.key).length : 0; }
-function supName(c) { const co = companyOf(c.companyKey); return co ? (co.name || co.key) : 'No company yet'; }
+function coName(co) { return co ? (co.name || co.label || co.key) : ''; }
+function supName(c) { const co = companyOf(c.companyKey); return co ? coName(co) : 'No company yet'; }
 function dispName(c) { return c.name || (c.category + ' — untitled'); }
 function displaySt(c) { return c.needsReview && c.status === 'Captured' ? 'Needs review' : c.status; }
 function elapsedSec() { return S.startedAt ? Math.max(0, Math.floor((Date.now() - S.startedAt) / 1000)) : 0; }
@@ -69,9 +71,10 @@ function companyRows() {
     .map(co => {
       const list = byKey[co.key] || [];
       const venues = [...new Set(list.map(c => c.venue))].join(', ') || co.venue || '';
-      const name = co.name || co.key;
+      const name = coName(co);
       return {
-        q: name, name, initial: name.charAt(0) || 'M', cardPhoto: co.cardPhoto,
+        q: name, name, nameZh: co.nameZh || '', initial: name.charAt(0) || 'M',
+        cardPhoto: co.cardPhoto, cardThumb: co.cardThumb,
         sub: list.length + (list.length === 1 ? ' product' : ' products') + (venues ? ' · ' + venues : ''),
         latest: list.length ? list[0].createdAt : (co.createdAt || ''),
       };
@@ -258,10 +261,15 @@ async function handleShot(k, blob) {
   }
   // company card — starts (or replaces) the session for this place
   S.cardN += 1;
-  const key = 'Card #' + S.cardN + ' · ' + S.venue;
-  const co = { key, name: '', contact: '', wechat: '', cardPhoto: blob, cardThumb: photo.thumb, venue: S.venue, word: sessWord(), createdAt: new Date().toISOString() };
+  const key = uid('co');
+  const co = {
+    key, label: 'Card #' + S.cardN + ' · ' + S.venue,
+    name: '', nameZh: '', contact: '', contactZh: '', wechat: '',
+    cardPhoto: blob, cardThumb: photo.thumb,
+    venue: S.venue, word: sessWord(), createdAt: new Date().toISOString(),
+  };
   S.companies.push(co);
-  S.session = { key };
+  S.session = { key, venue: S.venue };
   S.draft.card = photo;
   S.draft.supplierKey = '';
   await dbPut('companies', co);
@@ -282,7 +290,7 @@ function savedChips(rec) {
     chips.push({ t: ord(sessionCount()) + ' product at this ' + sessWord(), bg: '#e3efe8', fg: '#355f4b' });
   } else if (rec.companyKey) {
     const co = companyOf(rec.companyKey);
-    if (co) chips.push({ t: co.name || co.key, bg: '#e3efe8', fg: '#355f4b' });
+    if (co) chips.push({ t: coName(co), bg: '#e3efe8', fg: '#355f4b' });
   }
   if (rec.voiceNote) chips.push({ t: '● voice ' + fmtClock(rec.voiceNote.duration), bg: '#ebe3d8', fg: '#625852' });
   return chips;
@@ -293,20 +301,30 @@ const Actions = {
   nav(arg) {
     S.view = arg; S.detailId = null;
     if (arg !== 'reviewItem') S.reviewId = null;
+    // leaving the review section entirely — hand the OCR models' memory back
+    if (arg !== 'review' && arg !== 'reviewItem') OCR.release();
     renderAll();
+  },
+
+  /* "use the characters instead" — swap the original Chinese into the field */
+  useZh(arg) {
+    if (S.rvZh[arg]) { S.rv[arg] = S.rvZh[arg]; renderAll(); }
   },
 
   openSettings() { S.settingsOn = true; renderAll(); },
   closeSettings() { S.settingsOn = false; renderAll(); },
-  openVenueSheet() { S.venueSheetOn = true; S.addPlaceOpen = false; renderAll(); },
-  closeVenueSheet() { S.venueSheetOn = false; S.addPlaceOpen = false; renderAll(); },
+  openVenueSheet() { S.venueSheetOn = true; S.addPlaceOpen = false; S.placeEdit = false; renderAll(); },
+  closeVenueSheet() { S.venueSheetOn = false; S.addPlaceOpen = false; S.placeEdit = false; renderAll(); },
+  togglePlaceEdit() { S.placeEdit = !S.placeEdit; S.addPlaceOpen = false; renderAll(); },
 
-  async pickVenue(name) {
+  async pickVenue(arg) {
+    const place = S.places.find(p => p.id === arg) || placeByName(arg);
+    const name = place ? place.name : arg;
     if (name === S.venue) { S.venueSheetOn = false; S.addPlaceOpen = false; renderAll(); return; }
     const hadSession = !!S.session.key;
     S.flowSeq += 1;
-    S.venue = name; S.venueSheetOn = false; S.addPlaceOpen = false;
-    S.session = { key: '' };
+    S.venue = name; S.venueSheetOn = false; S.addPlaceOpen = false; S.placeEdit = false;
+    S.session = { key: '', venue: '' };
     S.draft.card = null;
     await settingSet('venue', name);
     await settingSet('session', S.session);
@@ -315,20 +333,43 @@ const Actions = {
   },
 
   addPlaceOpen() {
-    S.addPlaceOpen = true; S.newPlace = '';
+    S.addPlaceOpen = true; S.placeEdit = false; S.newPlace = '';
     renderAll();
     const el = document.querySelector('#new-place-input');
     if (el) el.focus();
   },
+  addPlaceCancel() { S.addPlaceOpen = false; S.newPlace = ''; renderAll(); },
+  setNewPlaceType(arg) { S.newPlaceType = arg; renderAll(); },
+
   async addPlaceSave() {
     const name = S.newPlace.trim();
-    if (!name) return;
-    if (!S.customVenues.includes(name)) {
-      S.customVenues.push(name);
-      await settingSet('customVenues', S.customVenues);
+    if (!name) { Fx.toast('Give the place a name first'); return; }
+    const existing = placeByName(name);
+    if (!existing) {
+      S.places.push({ id: uid('pl'), name, type: S.newPlaceType || 'other' });
+      await settingSet('places', S.places);
     }
-    S.newPlace = '';
+    S.newPlace = ''; S.addPlaceOpen = false;
     Actions.pickVenue(name);
+  },
+
+  async deletePlace(arg) {
+    const p = S.places.find(x => x.id === arg);
+    if (!p) return;
+    const used = S.captures.filter(c => c.venue === p.name).length;
+    const msg = used
+      ? 'Remove “' + p.name + '” from the list? ' + used + (used === 1 ? ' capture stays' : ' captures stay') + ' filed under it.'
+      : 'Remove “' + p.name + '” from the list?';
+    if (!confirm(msg)) return;
+    S.places = S.places.filter(x => x.id !== arg);
+    await settingSet('places', S.places);
+    if (S.venue === p.name && S.places.length) {
+      S.venue = S.places[0].name;
+      S.session = { key: '', venue: '' };
+      await settingSet('venue', S.venue);
+      await settingSet('session', S.session);
+    }
+    renderAll();
   },
 
   startCapture() {
@@ -355,7 +396,7 @@ const Actions = {
   // "↻ New booth / new card": break the company session and shoot the new card in one tap
   async newBooth() {
     S.flowSeq += 1;
-    S.session = { key: '' };
+    S.session = { key: '', venue: '' };
     S.draft.card = null;
     S.draft.supplierKey = '';
     await settingSet('session', S.session);
@@ -522,7 +563,7 @@ const Actions = {
         await dbRemove('companies', co.key);
         S.companies = S.companies.filter(x => x.key !== co.key);
         if (S.session.key === co.key) {
-          S.session = { key: '' };
+          S.session = { key: '', venue: '' };
           await settingSet('session', S.session);
         }
       }
@@ -550,6 +591,9 @@ const Actions = {
       company: (co && co.name) || '', contact: (co && co.contact) || '', wechat: (co && co.wechat) || '',
       pname: c.name || '', code: c.code || '', size: c.size || '',
     };
+    S.rvZh = {
+      company: (co && co.nameZh) || '', contact: (co && co.contactZh) || '', pname: c.nameZh || '',
+    };
     S.rvBusy = { card: false, label: false };
     renderAll();
     runOcrPrefill(c);
@@ -567,11 +611,14 @@ const Actions = {
     }
     if (co) {
       co.name = coName || co.name;
+      co.nameZh = S.rvZh.company || co.nameZh || '';
       co.contact = S.rv.contact.trim();
+      co.contactZh = S.rvZh.contact || co.contactZh || '';
       co.wechat = S.rv.wechat.trim();
       await dbPut('companies', co);
     }
     c.name = S.rv.pname.trim() || c.name;
+    c.nameZh = S.rvZh.pname || c.nameZh || '';
     c.code = S.rv.code.trim();
     c.size = S.rv.size.trim();
     if (c.status === 'Needs review') c.status = 'Captured';
@@ -632,18 +679,22 @@ const Actions = {
     const data = {
       app: 'milana-source', version: 2, exportedAt: new Date().toISOString(),
       user: S.user,
-      settings: { venue: S.venue, cardN: S.cardN, session: S.session, customVenues: S.customVenues, leftHanded: S.leftHanded, nativeCamera: S.nativeCamera, projectName: S.projectName, firstUse: S.firstUse },
+      settings: { venue: S.venue, cardN: S.cardN, session: S.session, places: S.places, leftHanded: S.leftHanded, nativeCamera: S.nativeCamera, projectName: S.projectName, firstUse: S.firstUse },
       captures, companies,
     };
     downloadFile('milana-source-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(data), 'application/json');
   },
 
   exportCSV() {
-    const cols = ['createdAt', 'createdBy', 'venue', 'category', 'rooms', 'name', 'code', 'size', 'company', 'contact', 'wechat', 'rating', 'currency', 'price', 'status', 'needsReview', 'productPhotos', 'voiceSec', 'note'];
+    const cols = ['createdAt', 'createdBy', 'project', 'venue', 'category', 'rooms', 'name', 'name_zh', 'code', 'size',
+      'company', 'company_zh', 'contact', 'contact_zh', 'wechat', 'rating', 'currency', 'price', 'status',
+      'needsReview', 'productPhotos', 'voiceSec', 'note'];
     const rows = [cols].concat(S.captures.map(c => {
       const co = companyOf(c.companyKey);
-      return [c.createdAt, c.createdBy, c.venue, c.category, (c.rooms || []).join('|'), c.name, c.code, c.size,
-        co ? (co.name || co.key) : '', co ? co.contact : '', co ? co.wechat : '',
+      return [c.createdAt, c.createdBy, projName(), c.venue, c.category, (c.rooms || []).join('|'),
+        c.name, c.nameZh || '', c.code, c.size,
+        co ? coName(co) : '', co ? (co.nameZh || '') : '', co ? co.contact : '', co ? (co.contactZh || '') : '',
+        co ? co.wechat : '',
         c.rating, c.currency, c.price, displaySt(c), c.needsReview ? 'yes' : 'no',
         c.photos.product.length, c.voiceNote ? c.voiceNote.duration : '', c.note];
     }));
@@ -662,7 +713,7 @@ const Actions = {
     await dbClear('companies');
     revokeAllUrls();
     S.captures = []; S.companies = [];
-    S.compareIds = []; S.session = { key: '' }; S.cardN = 0;
+    S.compareIds = []; S.session = { key: '', venue: '' }; S.cardN = 0;
     await settingSet('compareIds', []);
     await settingSet('session', S.session);
     await settingSet('cardN', 0);
@@ -693,9 +744,11 @@ function runOcrPrefill(c) {
     S.rvBusy.card = true; renderIfReview(id);
     OCR.readCard(cardBlob).then(res => {
       if (S.reviewId !== id) return;
-      if (!S.rv.company && res.company) S.rv.company = res.company;
-      if (!S.rv.contact && res.contact) S.rv.contact = res.contact;
-      if (!S.rv.wechat && res.wechat) S.rv.wechat = res.wechat;
+      if (!S.rv.company && res.company.value) S.rv.company = res.company.value;
+      if (!S.rv.contact && res.contact.value) S.rv.contact = res.contact.value;
+      if (!S.rv.wechat && res.wechat.value) S.rv.wechat = res.wechat.value;
+      if (!S.rvZh.company && res.company.zh) S.rvZh.company = res.company.zh;
+      if (!S.rvZh.contact && res.contact.zh) S.rvZh.contact = res.contact.zh;
     }).catch(() => {
       if (S.reviewId === id) Fx.toast('Could not read the card — check the photo and type it in.');
     }).finally(() => { if (S.reviewId === id) { S.rvBusy.card = false; renderIfReview(id); } });
@@ -704,9 +757,10 @@ function runOcrPrefill(c) {
     S.rvBusy.label = true; renderIfReview(id);
     OCR.readLabel(labelBlob).then(res => {
       if (S.reviewId !== id) return;
-      if (!S.rv.pname && res.pname) S.rv.pname = res.pname;
-      if (!S.rv.code && res.code) S.rv.code = res.code;
-      if (!S.rv.size && res.size) S.rv.size = res.size;
+      if (!S.rv.pname && res.pname.value) S.rv.pname = res.pname.value;
+      if (!S.rv.code && res.code.value) S.rv.code = res.code.value;
+      if (!S.rv.size && res.size.value) S.rv.size = res.size.value;
+      if (!S.rvZh.pname && res.pname.zh) S.rvZh.pname = res.pname.zh;
     }).catch(() => {}).finally(() => { if (S.reviewId === id) { S.rvBusy.label = false; renderIfReview(id); } });
   }
 }
@@ -876,9 +930,14 @@ async function importJSON(e) {
     // with imported companies (backup value, or the highest N seen in the data)
     let maxN = (data.settings && data.settings.cardN) || 0;
     S.companies.forEach(co => {
-      const m = /^Card #(\d+) · /.exec(co.key);
+      const m = /^Card #(\d+) · /.exec(co.label || co.key || '');
       if (m) maxN = Math.max(maxN, Number(m[1]));
     });
+    // merge any places the backup knows about that this device doesn't
+    for (const p of (data.settings && data.settings.places) || []) {
+      if (p && p.name && !placeByName(p.name)) S.places.push({ id: uid('pl'), name: p.name, type: p.type || 'other' });
+    }
+    await settingSet('places', S.places);
     if (maxN > S.cardN) {
       S.cardN = maxN;
       await settingSet('cardN', S.cardN);
@@ -917,15 +976,23 @@ async function init() {
   S.venue = await settingGet('venue', 'Canton Fair Phase 1');
   S.session = await settingGet('session', { key: '' });
   S.cardN = await settingGet('cardN', 0);
-  S.customVenues = await settingGet('customVenues', []);
+  // places: seed the defaults once, then they are entirely the user's list
+  S.places = await settingGet('places', null);
+  if (!Array.isArray(S.places) || !S.places.length) {
+    const legacy = await settingGet('customVenues', []);
+    S.places = DEFAULT_PLACES.map(p => ({ id: uid('pl'), name: p.name, type: p.type }))
+      .concat(legacy.map(name => ({ id: uid('pl'), name, type: 'other' })));
+    await settingSet('places', S.places);
+  }
+  if (!placeByName(S.venue) && S.places.length) S.venue = S.places[0].name;
   S.leftHanded = await settingGet('leftHanded', false);
   S.nativeCamera = await settingGet('nativeCamera', false);
   S.projectName = await settingGet('projectName', '');
   S.firstUse = await settingGet('firstUse', null);
 
   // a session must never outlive its venue — clear any stale carry-over
-  if (S.session.key && !S.session.key.endsWith('· ' + S.venue)) {
-    S.session = { key: '' };
+  if (S.session.key && S.session.venue !== S.venue) {
+    S.session = { key: '', venue: '' };
     await settingSet('session', S.session);
   }
   S.captures = (await dbAll('captures')).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -954,7 +1021,7 @@ async function init() {
 async function healOfflineAssets() {
   if (!('caches' in window) || !navigator.onLine) return;
   try {
-    const cache = await caches.open('milana-v3');
+    const cache = await caches.open('milana-v4');
     const heavy = [
       './vendor/core/tesseract-core-lstm.wasm.js',
       './vendor/core/tesseract-core-simd-lstm.wasm.js',
