@@ -121,7 +121,7 @@ const DayPack = {
       x.fillStyle = '#ffffff'; x.font = this._serif(64);
       x.fillText('Milana Source — Day pack', this.M, 230);
       x.fillStyle = 'rgba(255,255,255,.7)'; x.font = this._sans(26);
-      x.fillText(dateStr + ' · Villa Milana d’Oro · China sourcing trip', this.M, 320);
+      x.fillText(dateStr + ' · ' + projName() + ' · China sourcing trip', this.M, 320);
 
       let y = 500;
       x.fillStyle = '#201a17'; x.font = this._serif(40);

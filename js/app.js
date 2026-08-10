@@ -4,7 +4,7 @@
 const S = {
   ready: false,
   user: null, locked: false,
-  loginTmp: { name: '', pin: '' }, loginRole: 'Owner',
+  loginTmp: { name: '', pin: '', project: '' }, loginRole: 'Owner',
   view: 'home', camera: null,
   venueSheetOn: false, settingsOn: false,
   addPlaceOpen: false, newPlace: '',
@@ -17,9 +17,12 @@ const S = {
   detailId: null, compareIds: [], reviewId: null,
   rv: { company: '', contact: '', wechat: '', pname: '', code: '', size: '' },
   rvBusy: { card: false, label: false },
-  leftHanded: false,
+  leftHanded: false, nativeCamera: false,
+  projectName: '',
   firstUse: null,
 };
+
+function projName() { return S.projectName || 'My project'; }
 
 function freshDraft() {
   return {
@@ -100,12 +103,13 @@ const Cam = {
   stream: null, video: null, fallback: false, opening: false,
 
   async open() {
+    if (S.nativeCamera) { this.stop(); this.fallback = true; this.attach(); return; }
     if (this.stream || this.opening) { this.attach(); return; }
     this.opening = true;
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('no camera API');
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1440 } },
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 4096 }, height: { ideal: 3072 } },
         audio: false,
       });
       if (!S.camera) { // cancelled while permission/open was pending
@@ -141,13 +145,12 @@ const Cam = {
     this.video.play().catch(() => {});
   },
 
-  async capture(maxDim, quality) {
+  // full stream resolution — photos are stored unscaled; thumbnails are derived
+  async capture(quality = 0.92) {
     if (!this.video || !this.video.videoWidth) return null;
-    const w = this.video.videoWidth, h = this.video.videoHeight;
-    const scale = Math.min(1, maxDim / Math.max(w, h));
     const c = document.createElement('canvas');
-    c.width = Math.round(w * scale); c.height = Math.round(h * scale);
-    c.getContext('2d').drawImage(this.video, 0, 0, c.width, c.height);
+    c.width = this.video.videoWidth; c.height = this.video.videoHeight;
+    c.getContext('2d').drawImage(this.video, 0, 0);
     return new Promise(res => c.toBlob(res, 'image/jpeg', quality));
   },
 
@@ -236,15 +239,18 @@ function scheduleAdvance(k) {
 
 async function handleShot(k, blob) {
   if (!blob) return;
+  if (k !== 'product' && _advancePending) return; // double-tap on an auto-advancing slot
+  const flow = S.flowSeq;
+  const photo = await makePhoto(blob);
+  if (S.flowSeq !== flow || S.camera !== k) return; // flow changed while deriving the thumb
   if (k === 'product') {
     if (S.draft.product.length >= 6) { Fx.toast('Six product photos is plenty — tap Next.'); return; }
-    S.draft.product.push({ id: uid('ph'), blob });
+    S.draft.product.push(photo);
     renderAll();
     return;
   }
-  if (_advancePending) return; // double-tap on an auto-advancing slot
   if (k === 'label') {
-    S.draft.label = { id: uid('ph'), blob };
+    S.draft.label = photo;
     renderAll();
     scheduleAdvance('label');
     return;
@@ -252,10 +258,10 @@ async function handleShot(k, blob) {
   // company card — starts (or replaces) the session for this place
   S.cardN += 1;
   const key = 'Card #' + S.cardN + ' · ' + S.venue;
-  const co = { key, name: '', contact: '', wechat: '', cardPhoto: blob, venue: S.venue, word: sessWord(), createdAt: new Date().toISOString() };
+  const co = { key, name: '', contact: '', wechat: '', cardPhoto: blob, cardThumb: photo.thumb, venue: S.venue, word: sessWord(), createdAt: new Date().toISOString() };
   S.companies.push(co);
   S.session = { key };
-  S.draft.card = { id: uid('ph'), blob };
+  S.draft.card = photo;
   S.draft.supplierKey = '';
   await dbPut('companies', co);
   await settingSet('cardN', S.cardN);
@@ -344,6 +350,50 @@ const Actions = {
 
   openCam(arg) { S.camera = arg; renderAll(); },
   cancelCam() { S.flowSeq += 1; S.camera = null; renderAll(); },
+
+  // "↻ New booth / new card": break the company session and shoot the new card in one tap
+  async newBooth() {
+    S.flowSeq += 1;
+    S.session = { key: '' };
+    S.draft.card = null;
+    S.draft.supplierKey = '';
+    await settingSet('session', S.session);
+    S.camera = 'card';
+    renderAll();
+  },
+
+  async sharePhoto(arg) {
+    const [capId, idxStr] = String(arg).split('@');
+    const c = S.captures.find(x => x.id === capId);
+    if (!c) return;
+    const all = c.photos.product
+      .map((p, i) => ({ p, name: 'face-' + (i + 1) }))
+      .concat(c.photos.label ? [{ p: c.photos.label, name: 'label' }] : [])
+      .concat(c.photos.card ? [{ p: c.photos.card, name: 'company-card' }] : []);
+    const entry = all[Number(idxStr)];
+    if (!entry) return;
+    const base = (dispName(c) || 'photo').replace(/[^\w一-鿿-]+/g, '-').slice(0, 40);
+    const type = entry.p.blob.type || 'image/jpeg';
+    const ext = type.includes('png') ? '.png' : type.includes('heic') || type.includes('heif') ? '.heic' : '.jpg';
+    const file = new File([entry.p.blob], base + '-' + entry.name + ext, { type });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+    }
+    downloadFile(file.name, entry.p.blob, type);
+    Fx.toast('Photo saved as a download');
+  },
+
+  async toggleNativeCamera() {
+    S.nativeCamera = !S.nativeCamera;
+    await settingSet('nativeCamera', S.nativeCamera);
+    if (S.nativeCamera) Cam.stop();
+    renderAll();
+  },
   camNext() { advanceFrom(S.camera); },
 
   async snap() {
@@ -357,7 +407,7 @@ const Actions = {
     }
     Fx.flash();
     const flow = S.flowSeq;
-    const blob = await Cam.capture(k === 'product' ? 1600 : 2000, k === 'product' ? 0.82 : 0.87);
+    const blob = await Cam.capture();
     if (S.flowSeq !== flow || S.camera !== k) return; // flow changed while capturing
     if (!blob) { Fx.toast('The camera is still starting — try again.'); return; }
     handleShot(k, blob);
@@ -396,7 +446,7 @@ const Actions = {
     const sessionCo = dr.card || sessionCompany() ? sessionCompany() : null;
     const companyKey = sessionCo ? S.session.key : (dr.supplierKey || '');
     const now = new Date().toISOString();
-    const cardPhoto = dr.card || (sessionCo && sessionCo.cardPhoto ? { id: uid('ph'), blob: sessionCo.cardPhoto } : null);
+    const cardPhoto = dr.card || (sessionCo && sessionCo.cardPhoto ? { id: uid('ph'), blob: sessionCo.cardPhoto, thumb: sessionCo.cardThumb || null } : null);
     const rec = {
       id: uid('cap'), createdAt: now, updatedAt: now,
       createdBy: S.user.name, role: S.user.role,
@@ -416,9 +466,9 @@ const Actions = {
       venue: S.venue, sec: rec.capturedInSec, sessWord: sessWord(),
       sessionOn: !!sessionCompany(),
       slots: [
-        { blob: dr.product[0] ? dr.product[0].blob : null, count: dr.product.length },
-        { blob: dr.label ? dr.label.blob : null, count: 0 },
-        { blob: rec.photos.card ? rec.photos.card.blob : null, count: 0 },
+        { blob: photoThumb(dr.product[0]), count: dr.product.length },
+        { blob: photoThumb(dr.label), count: 0 },
+        { blob: photoThumb(rec.photos.card), count: 0 },
       ],
       chips: savedChips(rec),
     };
@@ -454,15 +504,28 @@ const Actions = {
     const c = S.captures.find(x => x.id === arg);
     if (!c) return;
     if (!confirm('Delete this capture and its photos?')) return;
-    c.photos.product.forEach(p => revokeUrlFor(p.blob));
-    if (c.photos.label) revokeUrlFor(c.photos.label.blob);
-    if (c.photos.card) revokeUrlFor(c.photos.card.blob);
+    c.photos.product.forEach(p => { revokeUrlFor(p.blob); revokeUrlFor(p.thumb); });
+    if (c.photos.label) { revokeUrlFor(c.photos.label.blob); revokeUrlFor(c.photos.label.thumb); }
+    if (c.photos.card) { revokeUrlFor(c.photos.card.blob); revokeUrlFor(c.photos.card.thumb); }
     if (c.voiceNote) revokeUrlFor(c.voiceNote.blob);
     await dbRemove('captures', arg);
     S.captures = S.captures.filter(x => x.id !== arg);
     S.compareIds = S.compareIds.filter(x => x !== arg);
     await settingSet('compareIds', S.compareIds);
     S.detailId = null;
+    // if that was the company's last product, offer to drop the company record too
+    const co = companyOf(c.companyKey);
+    if (co && !S.captures.some(x => x.companyKey === co.key)) {
+      if (confirm('That was the last product from “' + (co.name || co.key) + '”. Delete the company record too?')) {
+        revokeUrlFor(co.cardPhoto); revokeUrlFor(co.cardThumb);
+        await dbRemove('companies', co.key);
+        S.companies = S.companies.filter(x => x.key !== co.key);
+        if (S.session.key === co.key) {
+          S.session = { key: '' };
+          await settingSet('session', S.session);
+        }
+      }
+    }
     renderAll();
     Fx.toast('Capture deleted');
   },
@@ -563,12 +626,12 @@ const Actions = {
     }
     const companies = [];
     for (const co of S.companies) {
-      companies.push({ ...co, cardPhoto: co.cardPhoto ? await blobToDataURL(co.cardPhoto) : null });
+      companies.push({ ...co, cardThumb: undefined, cardPhoto: co.cardPhoto ? await blobToDataURL(co.cardPhoto) : null });
     }
     const data = {
       app: 'milana-source', version: 2, exportedAt: new Date().toISOString(),
       user: S.user,
-      settings: { venue: S.venue, cardN: S.cardN, session: S.session, customVenues: S.customVenues, leftHanded: S.leftHanded, firstUse: S.firstUse },
+      settings: { venue: S.venue, cardN: S.cardN, session: S.session, customVenues: S.customVenues, leftHanded: S.leftHanded, nativeCamera: S.nativeCamera, projectName: S.projectName, firstUse: S.firstUse },
       captures, companies,
     };
     downloadFile('milana-source-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(data), 'application/json');
@@ -588,7 +651,12 @@ const Actions = {
   },
 
   async eraseData() {
-    if (!confirm('Erase every capture and company stored on this phone?')) return;
+    if (!confirm('Clear ALL data — every capture, photo, voice note and company stored on this phone?')) return;
+    if (S.user && S.user.pin) {
+      const pin = prompt('Enter your PIN to confirm:');
+      if (pin === null) return;
+      if (pin.trim() !== String(S.user.pin)) { Fx.toast('Wrong PIN — nothing was deleted.'); return; }
+    }
     await dbClear('captures');
     await dbClear('companies');
     revokeAllUrls();
@@ -657,6 +725,12 @@ function onInputChange(name, value) {
     S.loginTmp.name = value;
   } else if (name === 'login.pin') {
     S.loginTmp.pin = value;
+  } else if (name === 'login.project') {
+    S.loginTmp.project = value;
+  } else if (name === 'projectName') {
+    S.projectName = value.trim();
+    clearTimeout(window.__projTimer);
+    window.__projTimer = setTimeout(() => settingSet('projectName', S.projectName), 400);
   } else if (name.indexOf('rv.') === 0) {
     S.rv[name.slice(3)] = value;
   }
@@ -726,8 +800,13 @@ function bindForms() {
       const name = ((form.elements.name && form.elements.name.value) || S.loginTmp.name).trim();
       if (!name) return;
       const pin = ((form.elements.pin && form.elements.pin.value) || S.loginTmp.pin).trim();
+      const project = ((form.elements.project && form.elements.project.value) || S.loginTmp.project).trim();
       S.user = { name, role: S.loginRole, pin };
       await settingSet('user', S.user);
+      if (project) {
+        S.projectName = project;
+        await settingSet('projectName', project);
+      }
       if (!S.firstUse) {
         S.firstUse = new Date().toISOString();
         await settingSet('firstUse', S.firstUse);
@@ -767,17 +846,28 @@ async function importJSON(e) {
   try {
     const data = JSON.parse(await file.text());
     if (data.app !== 'milana-source') throw new Error('not a Milana backup');
+    const revive = async (p) => {
+      const blob = await dataURLToBlob(p.dataUrl);
+      const thumb = await downscaleImage(blob, 480, 0.72);
+      return { id: p.id || uid('ph'), blob, thumb: thumb === blob ? null : thumb };
+    };
     for (const co of data.companies || []) {
-      const rec = { ...co, cardPhoto: co.cardPhoto ? await dataURLToBlob(co.cardPhoto) : null };
+      const cardPhoto = co.cardPhoto ? await dataURLToBlob(co.cardPhoto) : null;
+      const cardThumb = cardPhoto ? await downscaleImage(cardPhoto, 480, 0.72) : null;
+      const rec = { ...co, cardPhoto, cardThumb: cardThumb === cardPhoto ? null : cardThumb };
       await dbPut('companies', rec);
     }
     for (const c of data.captures || []) {
       const rec = { ...c, photos: { product: [], label: null, card: null }, voiceNote: null };
-      for (const p of (c.photos && c.photos.product) || []) rec.photos.product.push({ id: p.id || uid('ph'), blob: await dataURLToBlob(p.dataUrl) });
-      if (c.photos && c.photos.label) rec.photos.label = { id: c.photos.label.id || uid('ph'), blob: await dataURLToBlob(c.photos.label.dataUrl) };
-      if (c.photos && c.photos.card) rec.photos.card = { id: c.photos.card.id || uid('ph'), blob: await dataURLToBlob(c.photos.card.dataUrl) };
+      for (const p of (c.photos && c.photos.product) || []) rec.photos.product.push(await revive(p));
+      if (c.photos && c.photos.label) rec.photos.label = await revive(c.photos.label);
+      if (c.photos && c.photos.card) rec.photos.card = await revive(c.photos.card);
       if (c.voiceNote && c.voiceNote.dataUrl) rec.voiceNote = { duration: c.voiceNote.duration, blob: await dataURLToBlob(c.voiceNote.dataUrl) };
       await dbPut('captures', rec);
+    }
+    if (data.settings && data.settings.projectName && !S.projectName) {
+      S.projectName = data.settings.projectName;
+      await settingSet('projectName', S.projectName);
     }
     S.captures = (await dbAll('captures')).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     S.companies = await dbAll('companies');
@@ -812,14 +902,12 @@ async function init() {
     if (el && el.dataset && el.dataset.input) onInputChange(el.dataset.input, el.value);
   });
   const fb = document.querySelector('#fallback-file');
-  fb.addEventListener('change', async e => {
+  fb.addEventListener('change', e => {
     const file = e.target.files && e.target.files[0];
     e.target.value = '';
     if (!file || !S.camera) return;
-    const k = S.camera, flow = S.flowSeq;
-    const blob = await downscaleImage(file, k === 'product' ? 1600 : 2000, k === 'product' ? 0.82 : 0.87);
-    if (S.flowSeq !== flow || S.camera !== k) return;
-    handleShot(k, blob);
+    // native-camera shots are stored exactly as the camera app produced them
+    handleShot(S.camera, file);
   });
 
   await openDB();
@@ -830,7 +918,15 @@ async function init() {
   S.cardN = await settingGet('cardN', 0);
   S.customVenues = await settingGet('customVenues', []);
   S.leftHanded = await settingGet('leftHanded', false);
+  S.nativeCamera = await settingGet('nativeCamera', false);
+  S.projectName = await settingGet('projectName', '');
   S.firstUse = await settingGet('firstUse', null);
+
+  // a session must never outlive its venue — clear any stale carry-over
+  if (S.session.key && !S.session.key.endsWith('· ' + S.venue)) {
+    S.session = { key: '' };
+    await settingSet('session', S.session);
+  }
   S.captures = (await dbAll('captures')).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   S.companies = await dbAll('companies');
   S.compareIds = (await settingGet('compareIds', [])).filter(id => S.captures.some(c => c.id === id));
@@ -857,7 +953,7 @@ async function init() {
 async function healOfflineAssets() {
   if (!('caches' in window) || !navigator.onLine) return;
   try {
-    const cache = await caches.open('milana-v1');
+    const cache = await caches.open('milana-v2');
     const heavy = [
       './vendor/core/tesseract-core-lstm.wasm.js',
       './vendor/core/tesseract-core-simd-lstm.wasm.js',

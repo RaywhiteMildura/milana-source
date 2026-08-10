@@ -47,7 +47,7 @@ function rowHTML(c, opts = {}) {
   // home "Latest captures" rows show the company only, no photo-count badge (design)
   const sub = opts.home ? supName(c) : supName(c) + ' · ' + c.venue;
   return `<div data-act="openDetail" data-arg="${c.id}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
-    <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:#ebe3d8;position:relative;${first ? thumbBg(first.blob) : ''}">
+    <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:#ebe3d8;position:relative;${thumbBg(photoThumb(first))}">
       ${count > 1 && !opts.home ? `<span style="position:absolute;right:3px;bottom:3px;font-size:9px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:6px;padding:2px 5px">×${count}</span>` : ''}
     </div>
     <div style="flex:1;min-width:0">
@@ -148,7 +148,7 @@ function suppliersView() {
     </header>
     <div class="vscroll" style="flex:1;padding:14px 18px ${B_BODY};display:flex;flex-direction:column;gap:9px">
       ${rows.map(sp => `<div data-act="openCompany" data-arg="${esc(sp.q)}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:12px;cursor:pointer">
-        <div class="serif" style="width:44px;height:44px;border:1px solid #c9aa78;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:700;color:#9d7643;flex-shrink:0;${sp.cardPhoto ? thumbBg(sp.cardPhoto) : ''}">${sp.cardPhoto ? '' : esc(sp.initial)}</div>
+        <div class="serif" style="width:44px;height:44px;border:1px solid #c9aa78;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:700;color:#9d7643;flex-shrink:0;${sp.cardPhoto ? thumbBg(sp.cardThumb || sp.cardPhoto) : ''}">${sp.cardPhoto ? '' : esc(sp.initial)}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</div>
           <div style="font-size:12px;color:#625852;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.sub)}</div>
@@ -180,7 +180,7 @@ function compareView() {
           const first = c.photos.product[0];
           const st = ST[displaySt(c)] || ST.Captured;
           return `<div style="flex-shrink:0;width:206px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;overflow:hidden;display:flex;flex-direction:column">
-          <div style="height:110px;background:#ebe3d8;position:relative;${first ? thumbBg(first.blob) : ''}">
+          <div style="height:110px;background:#ebe3d8;position:relative;${thumbBg(photoThumb(first))}">
             <button data-act="toggleCompare" data-arg="${c.id}" class="hit44" style="position:absolute;right:7px;top:7px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(31,25,23,.78);color:#fff;font-size:13px" aria-label="Remove">✕</button>
           </div>
           <div style="padding:12px 13px;display:flex;flex-direction:column;gap:7px;flex:1">
@@ -227,7 +227,7 @@ function reviewView() {
       ${pending.map(c => {
         const first = c.photos.product[0];
         return `<div data-act="openReview" data-arg="${c.id}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
-        <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:#ebe3d8;${first ? thumbBg(first.blob) : ''}"></div>
+        <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:#ebe3d8;${thumbBg(photoThumb(first))}"></div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(dispName(c))}</div>
           <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap">
@@ -244,8 +244,8 @@ function reviewView() {
 function reviewItemView() {
   const c = S.captures.find(x => x.id === S.reviewId);
   if (!c) return reviewView();
-  const cardBlob = c.photos.card && c.photos.card.blob;
-  const labelBlob = c.photos.label && c.photos.label.blob;
+  const cardBlob = photoThumb(c.photos.card);
+  const labelBlob = photoThumb(c.photos.label);
   const tag = (busy, has) => busy
     ? `<span class="mono" style="font-size:10px;color:#9d7643;background:rgba(157,118,67,.12);border-radius:6px;padding:3px 6px"><span class="spin" style="width:9px;height:9px;border-width:1.5px;vertical-align:-1px"></span> reading…</span>`
     : has ? `<span class="mono" style="font-size:10px;color:#9d7643;background:rgba(157,118,67,.12);border-radius:6px;padding:3px 6px">read on device</span>`
@@ -320,19 +320,21 @@ function slotDefs() {
 
 function slotState(d) {
   const dr = S.draft;
-  const sessionCard = sessionCompany() ? sessionCompany().cardPhoto : null;
-  const blob = d.k === 'product' ? (dr.product[0] ? dr.product[0].blob : null)
-    : d.k === 'label' ? (dr.label ? dr.label.blob : null)
-    : (dr.card ? dr.card.blob : sessionCard);
+  const co = sessionCompany();
+  const sessionCard = co ? (co.cardThumb || co.cardPhoto) : null;
+  const blob = d.k === 'product' ? photoThumb(dr.product[0])
+    : d.k === 'label' ? photoThumb(dr.label)
+    : (dr.card ? photoThumb(dr.card) : sessionCard);
   const reused = d.k === 'card' && !dr.card && sessionCard;
   const n = dr.product.length;
   const sw = sessWord();
   return {
-    ...d, blob, filled: !!blob, reused, n,
+    ...d, blob, filled: !!blob, reused, nProd: n,
     overlay: d.k === 'product' ? '✓ Product · ' + n + (n > 1 ? ' photos' : ' photo')
       : d.k === 'label' ? '✓ Label / spec'
       : reused ? '✓ Same ' + sw + ' · ' + ord(sessionCount() + 1) + ' product' : '✓ Company card',
-    action: d.k === 'product' ? '＋ Add more' : d.k === 'card' ? '↻ New card' : '↻ Retake',
+    action: d.k === 'product' ? '＋ Add more'
+      : d.k === 'card' ? (reused ? '↻ New ' + sw + ' / new card' : '↻ New card') : '↻ Retake',
   };
 }
 
@@ -358,9 +360,11 @@ function shootView() {
           <div class="serif" style="width:40px;height:40px;border-radius:50%;border:2px solid #9d7643;color:#9d7643;display:grid;place-items:center;font-size:19px;font-weight:700">${s.n}</div>
           <div style="font-size:16px;font-weight:800">${esc(s.label)}</div>
           <div class="mono" style="font-size:11.5px;color:#625852;text-align:center">${esc(s.hint)}</div>
-        </div>` : `<div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:rgba(31,25,23,.72);color:#fff">
-          <span style="font-size:13px;font-weight:700">${esc(s.overlay)}</span>
-          <span style="font-size:12px;color:rgba(255,255,255,.75)">${esc(s.action)}</span>
+        </div>` : `<div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:${s.reused ? '5px 5px 5px 13px' : '9px 13px'};background:rgba(31,25,23,.72);color:#fff">
+          <span style="font-size:13px;font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.overlay)}</span>
+          ${s.reused
+            ? `<button data-act="newBooth" style="flex-shrink:0;min-height:38px;padding:0 12px;border:1px solid rgba(201,170,120,.6);border-radius:10px;background:rgba(201,170,120,.16);color:#c9aa78;font-size:12px;font-weight:800;white-space:nowrap">${esc(s.action)}</button>`
+            : `<span style="font-size:12px;color:rgba(255,255,255,.75);flex-shrink:0">${esc(s.action)}</span>`}
         </div>`}
       </div>`).join('')}
     </div>
@@ -391,7 +395,7 @@ function tagView() {
       <div style="display:flex;gap:8px;margin-top:10px">
         ${slots.map(s => `<div data-act="openCam" data-arg="${s.k}" role="button" style="flex:1;height:46px;border-radius:10px;border:${s.filled ? '1px solid rgba(255,255,255,.35)' : '1px dashed rgba(255,255,255,.35)'};background:rgba(255,255,255,.08);display:grid;place-items:center;cursor:pointer;position:relative;${s.blob ? thumbBg(s.blob) : ''}">
           ${!s.filled ? `<span style="font-size:10px;color:rgba(255,255,255,.55);font-weight:700">+ ${esc(s.label)}</span>` : ''}
-          ${s.k === 'product' && s.n > 1 ? `<span style="position:absolute;right:4px;bottom:4px;font-size:9px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:6px;padding:2px 5px">×${s.n}</span>` : ''}
+          ${s.k === 'product' && s.nProd > 1 ? `<span style="position:absolute;right:4px;bottom:4px;font-size:9px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:6px;padding:2px 5px">×${s.nProd}</span>` : ''}
         </div>`).join('')}
       </div>
     </header>
@@ -428,7 +432,7 @@ function tagView() {
       ${companyOn ? `<div style="border:1px solid #b9d2c4;background:#e9f2ec;border-radius:14px;padding:13px 15px">
         <div style="font-size:14px;font-weight:800;color:#355f4b">${dr.card ? '✓ Company card captured' : '✓ Same ' + sw + ' as your last capture'}</div>
         <div style="font-size:12.5px;color:#4a6355;line-height:1.45;margin-top:3px">${dr.card ? 'The company record is created from this card — nothing to type on the floor.' : 'This will file as the ' + ord(sessionCount() + 1) + ' product for this ' + sw + '.'}</div>
-        <button data-act="openCam" data-arg="card" class="hit44" style="margin-top:9px;border:0;background:transparent;color:#355f4b;font-size:12.5px;font-weight:800;padding:4px 0;text-decoration:underline">Different company? Shoot the new card</button>
+        <button data-act="newBooth" class="hit44" style="margin-top:9px;border:0;background:transparent;color:#355f4b;font-size:12.5px;font-weight:800;padding:4px 0;text-decoration:underline">Different company? Shoot the new card</button>
       </div>`
       : `<div style="display:flex;flex-wrap:wrap;gap:8px">
         ${namedCos.map(co => `<button data-act="pickSupplier" data-arg="${esc(co.key)}" style="min-height:44px;padding:0 15px;border-radius:999px;font-size:13.5px;font-weight:700;${chipStyle(dr.supplierKey === co.key, '#201a17')}">${esc(co.name)}</button>`).join('')}
@@ -455,7 +459,7 @@ function savedView() {
     <div class="vscroll" style="flex:1;padding:26px 20px 24px;text-align:center">
       <div class="anim-pop" style="width:86px;height:86px;border-radius:50%;background:#9d7643;color:#fff;font-size:38px;display:grid;place-items:center;margin:0 auto;box-shadow:0 10px 26px rgba(157,118,67,.35)">✓</div>
       <h2 class="serif" style="font-size:25px;margin:18px 0 4px">Saved on this device</h2>
-      <p style="font-size:12.5px;color:#625852;margin:0">Captured in ${fmtClock(sv.sec)} · syncs to Villa Milana d’Oro when online.</p>
+      <p style="font-size:12.5px;color:#625852;margin:0">Captured in ${fmtClock(sv.sec)} · syncs to ${esc(projName())} when online.</p>
       <div class="anim-rise" style="background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;padding:14px;margin-top:22px;text-align:left">
         <div style="display:flex;gap:8px">
           ${sv.slots.map(s => `<div style="flex:1;height:64px;border-radius:11px;border:${s.blob ? '1px solid #d7cbbd' : '2px dashed #bcae9f'};background:${s.blob ? '#ebe3d8' : '#faf7f2'};display:grid;place-items:center;position:relative;${s.blob ? thumbBg(s.blob) : ''}">
@@ -491,9 +495,9 @@ function detailOverlay() {
   if (c.code) chips.push({ t: 'Code ' + c.code, bg: '#ebe3d8', fg: '#625852' });
   if (c.size) chips.push({ t: c.size, bg: '#ebe3d8', fg: '#625852' });
   if (c.price) chips.push({ t: c.currency + ' ' + c.price, bg: '#ebe3d8', fg: '#625852' });
-  const photos = c.photos.product.map((p, i) => ({ blob: p.blob, cap: 'product · face ' + (i + 1) }));
-  if (c.photos.label) photos.push({ blob: c.photos.label.blob, cap: 'label / spec' });
-  if (c.photos.card) photos.push({ blob: c.photos.card.blob, cap: 'company card' });
+  const photos = c.photos.product.map((p, i) => ({ blob: photoThumb(p), cap: 'product · face ' + (i + 1) }));
+  if (c.photos.label) photos.push({ blob: photoThumb(c.photos.label), cap: 'label / spec' });
+  if (c.photos.card) photos.push({ blob: photoThumb(c.photos.card), cap: 'company card' });
   return `<div class="screen" style="z-index:30">
     <header style="background:#201a17;color:#fff;padding:${T60} 14px 14px;display:flex;align-items:center;gap:10px">
       <button data-act="closeDetail" style="width:44px;height:44px;border:0;border-radius:14px;background:rgba(255,255,255,.10);color:#fff;font-size:19px;flex-shrink:0" aria-label="Back">‹</button>
@@ -505,8 +509,10 @@ function detailOverlay() {
     <div class="vscroll" style="flex:1;padding:16px 18px calc(var(--sab) + 24px)">
       ${c.needsReview ? `<button data-act="openReview" data-arg="${c.id}" style="width:100%;margin-bottom:12px;min-height:50px;border:1px solid #e5cfa9;border-radius:14px;background:#f9efdd;color:#94601e;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px">▣ Complete this record — read card &amp; label →</button>` : ''}
       <div class="hscroll" style="display:flex;gap:8px;padding-bottom:6px">
-        ${photos.map(ph => `<div style="flex-shrink:0;width:128px">
-          <div style="height:108px;border-radius:13px;border:1px solid #d7cbbd;background:#ebe3d8;${thumbBg(ph.blob)}"></div>
+        ${photos.map((ph, i) => `<div style="flex-shrink:0;width:128px">
+          <div style="height:108px;border-radius:13px;border:1px solid #d7cbbd;background:#ebe3d8;position:relative;${thumbBg(ph.blob)}">
+            <button data-act="sharePhoto" data-arg="${c.id}@${i}" class="hit44" style="position:absolute;right:6px;top:6px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(31,25,23,.78);color:#fff;font-size:14px;line-height:1;padding:0" aria-label="Save to Photos">⇪</button>
+          </div>
           <div class="mono" style="font-size:10px;color:#625852;font-weight:700;margin-top:4px;text-align:center">${esc(ph.cap)}</div>
         </div>`).join('')}
       </div>
@@ -561,10 +567,19 @@ function settingsSheet() {
     <div class="anim-sheet vscroll" style="position:absolute;left:0;right:0;bottom:0;background:#fffdf9;border-radius:24px 24px 0 0;padding:18px 18px ${B_SHEET};max-height:82%;box-shadow:0 -14px 40px rgba(39,28,20,.25)">
       <div style="width:38px;height:4px;border-radius:99px;background:#d7cbbd;margin:0 auto 14px"></div>
       <div class="serif" style="font-size:20px">Settings &amp; backup</div>
-      <div style="font-size:12px;color:#625852;margin:4px 0 6px;line-height:1.45">Signed in on this device as <b>${esc(u.name)}</b> · ${esc(u.role)} · Villa Milana d’Oro. Records stay on the phone; cloud sync is the next activation step.</div>
+      <div style="font-size:12px;color:#625852;margin:4px 0 6px;line-height:1.45">Signed in on this device as <b>${esc(u.name)}</b> · ${esc(u.role)} · ${esc(projName())}. Records stay on the phone; cloud sync is the next activation step.</div>
       <div style="margin-top:14px">
-        <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">Ergonomics</div>
-        <button data-act="toggleLeftHanded" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:700;${chipStyle(S.leftHanded, '#6f273a')}">${S.leftHanded ? '✓ ' : ''}Left-handed mode</button>
+        <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">Project</div>
+        <input class="fld fld-strong" data-input="projectName" value="${esc(S.projectName)}" placeholder="My project" />
+        <div style="font-size:11.5px;color:#625852;margin-top:6px;line-height:1.45">Used on the saved screen, the day pack and exports.</div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">Camera &amp; ergonomics</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <button data-act="toggleLeftHanded" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:700;${chipStyle(S.leftHanded, '#6f273a')}">${S.leftHanded ? '✓ ' : ''}Left-handed mode</button>
+          <button data-act="toggleNativeCamera" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:700;${chipStyle(S.nativeCamera, '#6f273a')}">${S.nativeCamera ? '✓ ' : ''}Use native camera</button>
+        </div>
+        <div style="font-size:11.5px;color:#625852;margin-top:6px;line-height:1.45">Native camera: the shutter opens the iPhone camera app, so shots come back at full sensor quality.</div>
       </div>
       <div style="margin-top:16px">
         <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">Backup &amp; transfer</div>
@@ -579,8 +594,9 @@ function settingsSheet() {
         <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">Device</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">
           <button data-act="signOut" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:700;${chipStyle(false, '#201a17')}">Sign out on this device</button>
-          <button data-act="eraseData" style="min-height:46px;padding:0 15px;border-radius:13px;border:1px solid #e0c4c0;background:#f8e7e5;color:#8b2d2d;font-size:13.5px;font-weight:800">Erase local data</button>
+          <button data-act="eraseData" style="min-height:46px;padding:0 15px;border-radius:13px;border:1px solid #e0c4c0;background:#f8e7e5;color:#8b2d2d;font-size:13.5px;font-weight:800">Clear all data</button>
         </div>
+        <div style="font-size:11.5px;color:#625852;margin-top:6px;line-height:1.45">Clear all data wipes every capture and company on this phone${S.user && S.user.pin ? ' — it asks for your PIN first' : ''}. Good for clearing test records before the trip.</div>
         <div class="mono" style="font-size:10.5px;color:#9d7643;margin-top:12px">Milana Source v1.0 · offline-first · OCR on device</div>
       </div>
     </div>
@@ -595,11 +611,13 @@ function loginBg() {
 function loginView() {
   return `<div style="position:absolute;inset:0;display:grid;place-items:center;padding:24px;${loginBg()}">
     <form id="login-form" style="width:min(400px,100%);background:#fffdf9;border-radius:24px;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,.3)">
-      <div style="color:#6f273a;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase">Villa Milana d’Oro</div>
+      <div style="color:#6f273a;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase">Your sourcing project</div>
       <h1 class="serif" style="margin:5px 0 8px;font-size:34px">Milana Source</h1>
       <p style="font-size:13px;color:#625852;line-height:1.5;margin:0 0 16px">Shoot the product, its label and the company card. Everything else waits for the evening.</p>
       <label style="display:block;font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin-bottom:7px">YOUR NAME</label>
       <input class="fld fld-strong" name="name" data-input="login.name" value="${esc(S.loginTmp.name)}" required placeholder="Damian" autocomplete="name" style="margin-bottom:13px">
+      <label style="display:block;font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin-bottom:7px">PROJECT NAME</label>
+      <input class="fld fld-strong" name="project" data-input="login.project" value="${esc(S.loginTmp.project)}" placeholder="My project" autocomplete="off" style="margin-bottom:13px">
       <label style="display:block;font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin-bottom:7px">ROLE</label>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:13px">
         ${['Owner', 'Builder', 'Designer', 'Advisor'].map(r => `<button type="button" data-act="pickRole" data-arg="${r}" style="min-height:44px;padding:0 15px;border-radius:999px;font-size:13.5px;font-weight:700;${chipStyle(S.loginRole === r, '#201a17')}">${r}</button>`).join('')}
@@ -615,7 +633,7 @@ function loginView() {
 function unlockView() {
   return `<div style="position:absolute;inset:0;display:grid;place-items:center;padding:24px;${loginBg()}">
     <form id="unlock-form" style="width:min(400px,100%);background:#fffdf9;border-radius:24px;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,.3)">
-      <div style="color:#6f273a;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase">Villa Milana d’Oro</div>
+      <div style="color:#6f273a;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase">${esc(projName())}</div>
       <h1 class="serif" style="margin:5px 0 8px;font-size:28px">Welcome back, ${esc(firstName())}</h1>
       <p style="font-size:13px;color:#625852;line-height:1.5;margin:0 0 16px">Enter the local PIN for this device.</p>
       <input class="fld fld-strong" name="pin" data-input="login.pin" inputmode="numeric" maxlength="6" required autofocus placeholder="PIN" autocomplete="off" style="margin-bottom:16px">
@@ -640,14 +658,14 @@ function cameraHTML() {
     label: 'fill the frame with the spec sticker',
     card: 'card or signage — reused for every product at this ' + sw,
   };
-  const lastShot = k === 'product' ? (nProd ? dr.product[nProd - 1] : null) : k === 'label' ? dr.label : (dr.card || sessionCard);
+  const lastShotRaw = k === 'product' ? (nProd ? dr.product[nProd - 1] : null) : k === 'label' ? dr.label : dr.card;
+  const lastShotBlob = lastShotRaw ? photoThumb(lastShotRaw)
+    : k === 'card' && sessionCompany() ? (sessionCompany().cardThumb || sessionCompany().cardPhoto) : null;
   const nextReady = k === 'product' && nProd > 0;
-  const barFlip = S.leftHanded ? 'row-reverse' : 'row';
-  return `<div class="cam">
+  return `<div class="cam${S.leftHanded ? ' flip' : ''}">
     <div id="cam-video-wrap" style="position:absolute;inset:0;overflow:hidden"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,17,15,.72),transparent 22%,transparent 70%,rgba(22,17,15,.78));pointer-events:none"></div>
-    <div style="padding:${T60} 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:relative">
-      <button data-act="cancelCam" style="min-height:44px;padding:0 12px;border:0;border-radius:13px;background:rgba(255,255,255,.10);color:#fff;font-size:14px;font-weight:700">Cancel</button>
+    <div class="cam-top">
+      <button data-act="cancelCam" style="min-height:44px;padding:0 12px;border:0;border-radius:13px;background:rgba(255,255,255,.10);color:#fff;font-size:14px;font-weight:700;text-shadow:none">Cancel</button>
       <div style="text-align:center">
         <div style="font-size:15px;font-weight:800">${def ? def.n + ' · ' + esc(def.label) : ''}</div>
         <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">${esc(camMeta[k] || '')}</div>
@@ -656,25 +674,25 @@ function cameraHTML() {
         ${defs.map(d => `<span style="width:8px;height:8px;border-radius:50%;background:${done[d.k] ? '#c9aa78' : d.k === k ? 'transparent' : 'rgba(255,255,255,.22)'};border:${d.k === k ? '2px solid #fff' : '2px solid transparent'}"></span>`).join('')}
       </div>
     </div>
-    <div style="flex:1;position:relative;display:grid;place-items:center;pointer-events:none">
-      <div style="position:relative;width:82%;aspect-ratio:4/3">
+    <div class="cam-mid">
+      <div class="cam-guide">
         <div style="position:absolute;left:0;top:0;width:30px;height:30px;border-left:3px solid #c9aa78;border-top:3px solid #c9aa78;border-top-left-radius:10px"></div>
         <div style="position:absolute;right:0;top:0;width:30px;height:30px;border-right:3px solid #c9aa78;border-top:3px solid #c9aa78;border-top-right-radius:10px"></div>
         <div style="position:absolute;left:0;bottom:0;width:30px;height:30px;border-left:3px solid #c9aa78;border-bottom:3px solid #c9aa78;border-bottom-left-radius:10px"></div>
         <div style="position:absolute;right:0;bottom:0;width:30px;height:30px;border-right:3px solid #c9aa78;border-bottom:3px solid #c9aa78;border-bottom-right-radius:10px"></div>
-        <div id="cam-fallback-note" class="mono hidden" style="position:absolute;inset:0;display:none;place-items:center;color:rgba(255,255,255,.4);font-size:11.5px;text-align:center;line-height:1.6">camera not available here —<br>the shutter opens the system camera</div>
+        <div id="cam-fallback-note" class="mono hidden" style="position:absolute;inset:0;display:none;place-items:center;color:rgba(255,255,255,.4);font-size:11.5px;text-align:center;line-height:1.6">${S.nativeCamera ? 'native camera on —<br>the shutter opens the iPhone camera' : 'camera not available here —<br>the shutter opens the system camera'}</div>
       </div>
     </div>
-    <div style="padding:16px 22px ${B_CAM};display:flex;align-items:center;justify-content:space-between;gap:10px;flex-direction:${barFlip};position:relative">
-      <div style="width:84px;display:flex;justify-content:flex-start">
-        <div style="width:48px;height:48px;border-radius:11px;border:${lastShot ? '1px solid rgba(255,255,255,.4)' : '1px dashed rgba(255,255,255,.25)'};background:rgba(255,255,255,.06);position:relative;${lastShot ? thumbBg(lastShot.blob || lastShot) : ''}">
+    <div class="cam-ctrl">
+      <div class="cam-side cam-side-a">
+        <div style="width:48px;height:48px;border-radius:11px;border:${lastShotBlob ? '1px solid rgba(255,255,255,.4)' : '1px dashed rgba(255,255,255,.25)'};background:rgba(255,255,255,.06);position:relative;${lastShotBlob ? thumbBg(lastShotBlob) : ''}">
           ${k === 'product' && nProd > 0 ? `<span style="position:absolute;right:-6px;top:-6px;font-size:10px;font-weight:800;background:#c9aa78;color:#231a15;border-radius:999px;padding:3px 7px">×${nProd}</span>` : ''}
         </div>
       </div>
       <button data-act="snap" class="pf1 p90" style="width:78px;height:78px;border-radius:50%;border:4px solid #fff;background:transparent;display:grid;place-items:center;flex-shrink:0" aria-label="Shutter">
         <span style="width:60px;height:60px;border-radius:50%;background:#fff;display:block;pointer-events:none"></span>
       </button>
-      <div style="width:84px;display:flex;justify-content:flex-end">
+      <div class="cam-side cam-side-b">
         <button data-act="camNext" class="pf1 p95" style="min-height:48px;padding:0 14px;border:0;border-radius:999px;background:${nextReady ? '#c9aa78' : 'rgba(255,255,255,.10)'};color:${nextReady ? '#231a15' : 'rgba(255,255,255,.75)'};font-size:14px;font-weight:800;white-space:nowrap">${nextReady ? 'Next →' : 'Skip'}</button>
       </div>
     </div>

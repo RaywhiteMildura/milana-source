@@ -81,6 +81,16 @@ async function downscaleImage(blob, maxDim = 1600, quality = 0.82) {
   }
 }
 
+/* Photos are stored at full resolution; a small derived thumbnail keeps
+   lists and slots cheap to render. */
+async function makePhoto(blob) {
+  const thumb = await downscaleImage(blob, 480, 0.72);
+  return { id: uid('ph'), blob, thumb: thumb === blob ? null : thumb };
+}
+function photoThumb(p) {
+  return p ? (p.thumb || p.blob) : null;
+}
+
 function blobToDataURL(blob) {
   return new Promise((resolve, reject) => {
     const r = new FileReader();

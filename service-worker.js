@@ -3,7 +3,9 @@
    chi_sim/eng language data, ~38 MB) are cached best-effort at install and
    again on first use, so a flaky first load never blocks the app itself. */
 
-const CACHE = 'milana-v1';
+// Bump this on every deploy so installed phones pick up the update.
+// (js/app.js healOfflineAssets opens the same cache name — keep them in sync.)
+const CACHE = 'milana-v2';
 
 const CORE = [
   './',
