@@ -131,7 +131,7 @@ const Cam = {
     if (!wrap) return;
     if (this.fallback || !this.stream) {
       const note = document.querySelector('#cam-fallback-note');
-      if (note) { note.classList.remove('hidden'); note.style.display = 'grid'; }
+      if (note) { note.classList.remove('hidden'); note.style.display = 'block'; }
       return;
     }
     if (!this.video) {
@@ -145,12 +145,13 @@ const Cam = {
     this.video.play().catch(() => {});
   },
 
-  // full stream resolution — photos are stored unscaled; thumbnails are derived
+  // The whole native video frame at full stream resolution — the on-screen
+  // corner marks are a framing hint, never a crop. Thumbnails are derived later.
   async capture(quality = 0.92) {
     if (!this.video || !this.video.videoWidth) return null;
     const c = document.createElement('canvas');
     c.width = this.video.videoWidth; c.height = this.video.videoHeight;
-    c.getContext('2d').drawImage(this.video, 0, 0);
+    c.getContext('2d').drawImage(this.video, 0, 0, c.width, c.height);
     return new Promise(res => c.toBlob(res, 'image/jpeg', quality));
   },
 
@@ -953,7 +954,7 @@ async function init() {
 async function healOfflineAssets() {
   if (!('caches' in window) || !navigator.onLine) return;
   try {
-    const cache = await caches.open('milana-v2');
+    const cache = await caches.open('milana-v3');
     const heavy = [
       './vendor/core/tesseract-core-lstm.wasm.js',
       './vendor/core/tesseract-core-simd-lstm.wasm.js',

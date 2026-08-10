@@ -665,7 +665,7 @@ function cameraHTML() {
   return `<div class="cam${S.leftHanded ? ' flip' : ''}">
     <div id="cam-video-wrap" style="position:absolute;inset:0;overflow:hidden"></div>
     <div class="cam-top">
-      <button data-act="cancelCam" style="min-height:44px;padding:0 12px;border:0;border-radius:13px;background:rgba(255,255,255,.10);color:#fff;font-size:14px;font-weight:700;text-shadow:none">Cancel</button>
+      <button data-act="cancelCam" style="min-height:44px;padding:0 12px;border:0;border-radius:13px;background:rgba(255,255,255,.14);color:#fff;font-size:14px;font-weight:700">Cancel</button>
       <div style="text-align:center">
         <div style="font-size:15px;font-weight:800">${def ? def.n + ' · ' + esc(def.label) : ''}</div>
         <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">${esc(camMeta[k] || '')}</div>
@@ -674,14 +674,9 @@ function cameraHTML() {
         ${defs.map(d => `<span style="width:8px;height:8px;border-radius:50%;background:${done[d.k] ? '#c9aa78' : d.k === k ? 'transparent' : 'rgba(255,255,255,.22)'};border:${d.k === k ? '2px solid #fff' : '2px solid transparent'}"></span>`).join('')}
       </div>
     </div>
-    <div class="cam-mid">
-      <div class="cam-guide">
-        <div style="position:absolute;left:0;top:0;width:30px;height:30px;border-left:3px solid #c9aa78;border-top:3px solid #c9aa78;border-top-left-radius:10px"></div>
-        <div style="position:absolute;right:0;top:0;width:30px;height:30px;border-right:3px solid #c9aa78;border-top:3px solid #c9aa78;border-top-right-radius:10px"></div>
-        <div style="position:absolute;left:0;bottom:0;width:30px;height:30px;border-left:3px solid #c9aa78;border-bottom:3px solid #c9aa78;border-bottom-left-radius:10px"></div>
-        <div style="position:absolute;right:0;bottom:0;width:30px;height:30px;border-right:3px solid #c9aa78;border-bottom:3px solid #c9aa78;border-bottom-right-radius:10px"></div>
-        <div id="cam-fallback-note" class="mono hidden" style="position:absolute;inset:0;display:none;place-items:center;color:rgba(255,255,255,.4);font-size:11.5px;text-align:center;line-height:1.6">${S.nativeCamera ? 'native camera on —<br>the shutter opens the iPhone camera' : 'camera not available here —<br>the shutter opens the system camera'}</div>
-      </div>
+    <div class="cam-marks"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+    <div class="cam-note">
+      <div id="cam-fallback-note" class="mono hidden" style="display:none;color:rgba(255,255,255,.55);font-size:11.5px;text-align:center;line-height:1.6;background:rgba(22,17,15,.55);border-radius:12px;padding:10px 14px">${S.nativeCamera ? 'native camera on —<br>the shutter opens the iPhone camera' : 'camera not available here —<br>the shutter opens the system camera'}</div>
     </div>
     <div class="cam-ctrl">
       <div class="cam-side cam-side-a">

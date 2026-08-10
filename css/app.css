@@ -107,41 +107,64 @@ button, [role="button"] { user-select: none; -webkit-user-select: none; }
   animation: msFlash .3s ease forwards; pointer-events: none;
 }
 
-/* camera overlay — column in portrait, controls move to a side rail in landscape */
-#cam-root .cam { position: fixed; inset: 0; z-index: 55; background: var(--cam); display: flex; flex-direction: column; color: #fff; }
-#cam-root video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* camera overlay — the live preview fills the screen edge to edge in both
+   orientations; the chrome floats over it on translucent bars. The capture is
+   always the full native video frame, never the marked area. */
+#cam-root .cam { position: fixed; inset: 0; z-index: 55; background: var(--cam); color: #fff; overflow: hidden; }
+#cam-root video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .cam-top {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+  background: rgba(22,17,15,.55);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   padding: calc(var(--sat) + 10px) calc(var(--sar) + 16px) 10px calc(var(--sal) + 16px);
-  display: flex; align-items: center; justify-content: space-between; gap: 8px; position: relative; z-index: 2;
-  text-shadow: 0 1px 8px rgba(22,17,15,.8);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
-.cam-mid { flex: 1; min-height: 0; position: relative; display: grid; place-items: center; pointer-events: none; }
-.cam-guide { position: relative; width: 82%; max-width: 100%; max-height: 82%; aspect-ratio: 4/3; }
 .cam-ctrl {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  background: rgba(22,17,15,.55);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   padding: 16px calc(var(--sar) + 22px) calc(var(--sab) + 26px) calc(var(--sal) + 22px);
-  display: flex; align-items: center; justify-content: space-between; gap: 10px; position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
 .cam.flip .cam-ctrl { flex-direction: row-reverse; }
 .cam-side { width: 84px; display: flex; align-items: center; }
 .cam-side-a { justify-content: flex-start; }
 .cam-side-b { justify-content: flex-end; }
 
+/* faint corner marks — a framing hint only, not a crop boundary */
+.cam-marks {
+  position: absolute; z-index: 2; pointer-events: none;
+  top: calc(var(--sat) + 86px); bottom: calc(var(--sab) + 136px);
+  left: calc(var(--sal) + 18px); right: calc(var(--sar) + 18px);
+}
+.cam-marks i { position: absolute; width: 22px; height: 22px; border: 0 solid rgba(201,170,120,.45); }
+.cam-marks .tl { left: 0; top: 0; border-left-width: 2px; border-top-width: 2px; border-top-left-radius: 8px; }
+.cam-marks .tr { right: 0; top: 0; border-right-width: 2px; border-top-width: 2px; border-top-right-radius: 8px; }
+.cam-marks .bl { left: 0; bottom: 0; border-left-width: 2px; border-bottom-width: 2px; border-bottom-left-radius: 8px; }
+.cam-marks .br { right: 0; bottom: 0; border-right-width: 2px; border-bottom-width: 2px; border-bottom-right-radius: 8px; }
+
+.cam-note { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 0 34px; pointer-events: none; }
+
 @media (orientation: landscape) and (max-height: 500px) {
-  #cam-root .cam { flex-direction: row; }
-  .cam-top {
-    position: absolute; top: 0; left: 0; right: 0; z-index: 3;
-    padding: calc(var(--sat) + 8px) calc(var(--sar) + 128px) 8px calc(var(--sal) + 16px);
-  }
-  .cam.flip .cam-top { padding-left: calc(var(--sal) + 128px); padding-right: calc(var(--sar) + 16px); }
-  .cam-mid { order: 1; height: 100%; }
-  .cam-guide { max-height: 62%; width: auto; height: 62%; }
+  .cam-top { padding-right: calc(var(--sar) + 128px); padding-top: calc(var(--sat) + 8px); padding-bottom: 8px; }
+  .cam.flip .cam-top { padding-right: calc(var(--sar) + 16px); padding-left: calc(var(--sal) + 128px); }
   .cam-ctrl {
-    order: 2; flex-direction: column-reverse; height: 100%; width: auto;
+    left: auto; right: 0; top: 0; bottom: 0; width: 112px;
+    flex-direction: column-reverse;
     padding: calc(var(--sat) + 10px) calc(var(--sar) + 14px) calc(var(--sab) + 14px) 14px;
   }
-  .cam.flip .cam-ctrl { order: 0; flex-direction: column-reverse; padding-left: calc(var(--sal) + 14px); padding-right: 14px; }
+  .cam.flip .cam-ctrl {
+    left: 0; right: auto; flex-direction: column-reverse;
+    padding-left: calc(var(--sal) + 14px); padding-right: 14px;
+  }
   .cam-side { width: auto; min-height: 48px; justify-content: center; }
+  .cam-marks {
+    top: calc(var(--sat) + 66px); bottom: calc(var(--sab) + 18px);
+    left: calc(var(--sal) + 18px); right: calc(var(--sar) + 126px);
+  }
+  .cam.flip .cam-marks { left: calc(var(--sal) + 126px); right: calc(var(--sar) + 18px); }
+  .cam-note { padding: 0 130px; }
 }
 
 .spin { width: 16px; height: 16px; border: 2px solid rgba(157,118,67,.25); border-top-color: var(--brass); border-radius: 50%; animation: msSpin .8s linear infinite; display: inline-block; vertical-align: -3px; }
