@@ -5,7 +5,7 @@
 
 // Bump this on every deploy so installed phones pick up the update.
 // (js/app.js healOfflineAssets opens the same cache name — keep them in sync.)
-const CACHE = 'milana-v5';
+const CACHE = 'milana-v6';
 
 const CORE = [
   './',

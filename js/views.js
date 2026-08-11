@@ -92,7 +92,10 @@ function homeView() {
           <div style="font-size:10.5px;color:rgba(255,255,255,.62);white-space:nowrap">China Sourcing · October 2026</div>
         </div>
       </div>
-      <button data-act="openSettings" style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.72);background:rgba(255,255,255,.08);border:0;border-radius:999px;padding:6px 11px"><span style="width:7px;height:7px;border-radius:50%;background:#e0a746"></span>${localCount} local</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <button data-act="openSettings" style="display:flex;align-items:center;gap:6px;min-height:36px;font-size:11px;color:rgba(255,255,255,.72);background:rgba(255,255,255,.08);border:0;border-radius:999px;padding:0 11px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;background:#e0a746"></span>${localCount} local</button>
+        <button data-act="openSettings" style="width:44px;height:44px;flex-shrink:0;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:rgba(255,255,255,.72);font-size:18px;line-height:1;padding:0;display:grid;place-items:center" aria-label="Settings">⚙</button>
+      </div>
     </header>
     <div class="vscroll" style="flex:1;padding:20px 18px ${B_BODY}">
       <button data-act="openVenueSheet" style="border:0;background:transparent;padding:2px 0;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.09em;color:#9d7643;text-transform:uppercase">Day ${dayNumber()} · at ${esc(S.venue)} <span style="font-size:9px">▾</span></button>

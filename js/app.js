@@ -1105,7 +1105,7 @@ async function init() {
 async function healOfflineAssets() {
   if (!('caches' in window) || !navigator.onLine) return;
   try {
-    const cache = await caches.open('milana-v5');
+    const cache = await caches.open('milana-v6');
     const heavy = [
       './vendor/core/tesseract-core-lstm.wasm.js',
       './vendor/core/tesseract-core-simd-lstm.wasm.js',
