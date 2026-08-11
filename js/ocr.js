@@ -113,8 +113,58 @@ const OCR = {
     })).filter(l => l.text.length > 1);
   },
 
-  /* Run both models and keep, for each physical line, the reading from the
-     model that matches that line's script. */
+  /* Confidence floors. Measured on real photos: genuine printed text reads at
+     80–97, while text invented out of blur, grain or a wood grain texture
+     reads under 35. The Chinese floor sits higher because a hallucinated
+     Chinese line is the worse failure — it gets transliterated into
+     confident-looking nonsense, whereas a dropped line just leaves the field
+     blank for the user to type. */
+  MIN_CONF_LATIN: 50,
+  MIN_CONF_CJK: 58,
+
+  /* Structural noise test, independent of confidence. Invented text has a
+     shape real lines don't: isolated single glyphs, Latin letters sprinkled
+     through Chinese, one character repeated over and over, or more
+     punctuation than content. */
+  _noise(text) {
+    const t = String(text || '').trim();
+    if (t.length < 2) return true;
+    const chars = [...t];
+    let letters = 0, cjk = 0, digits = 0;
+    const seen = {};
+    let topRepeat = 0;
+    for (const ch of chars) {
+      if (ZH.CJK.test(ch)) {
+        cjk++;
+        seen[ch] = (seen[ch] || 0) + 1;
+        if (seen[ch] > topRepeat) topRepeat = seen[ch];
+      } else if (/[A-Za-z]/.test(ch)) letters++;
+      else if (/\d/.test(ch)) digits++;
+    }
+    const meaningful = letters + cjk + digits;
+    if (!meaningful) return true;
+    // more punctuation and stray symbols than actual content
+    if (meaningful / chars.length < 0.55) return true;
+
+    const tokens = t.split(/\s+/).filter(Boolean);
+    // a scatter of loose single glyphs is a texture being read, not a line
+    if (tokens.length >= 4) {
+      const singles = tokens.filter(tk => [...tk].length === 1).length;
+      if (singles / tokens.length > 0.5) return true;
+    }
+    if (cjk) {
+      // Latin letters threaded through Chinese — the Chinese model chewing
+      // on Latin text or on noise
+      if (letters >= cjk * 0.4) return true;
+      // one character stamped over and over ("沥 沥 沥 …"). Needs a long line
+      // and a lot of repeats: 板 twice in 岩板 大板 is ordinary Chinese.
+      if (cjk >= 6 && topRepeat >= 4 && topRepeat / cjk > 0.4) return true;
+    }
+    return false;
+  },
+
+  /* Run both models and keep, for each physical line, the best reading that
+     is confident enough and structurally looks like text. */
   async readLines(blob) {
     const image = await this.preprocess(blob);
     const [eng, chi] = await Promise.all([
@@ -122,12 +172,25 @@ const OCR = {
       this._pass('chi_sim', image).catch(() => []),
     ]);
 
-    const keep = [];
-    // Latin lines only from the English model, CJK lines only from the Chinese model
-    eng.forEach(l => { if (ZH.scriptOf(l.text) !== 'cjk' && l.conf >= 30) keep.push(l); });
-    chi.forEach(l => { if (ZH.scriptOf(l.text) === 'cjk') keep.push(l); });
+    const keep = [...eng, ...chi].filter(l => {
+      if (this._noise(l.text)) return false;
+      const cjk = ZH.scriptOf(l.text) === 'cjk';
+      // only the Chinese model may assert Chinese
+      if (cjk && l.lang !== 'chi_sim') return false;
+      return l.conf >= (cjk ? this.MIN_CONF_CJK : this.MIN_CONF_LATIN);
+    });
 
-    // same physical line picked up by both models → keep the stronger reading
+    /* Same physical line read by both models → keep the stronger reading.
+       A reading scores higher when it comes from the model trained on its
+       script; Latin carries a further edge so a Chinese guess has to beat an
+       English reading clearly, not merely tie it. */
+    const score = x => {
+      const s = ZH.scriptOf(x.text);
+      return x.conf
+        + (s === 'cjk' && x.lang === 'chi_sim' ? 15 : 0)
+        + (s !== 'cjk' && x.lang === 'eng' ? 15 : 0)
+        + (s !== 'cjk' ? 8 : 0);
+    };
     keep.sort((a, b) => a.y0 - b.y0);
     const merged = [];
     for (const l of keep) {
@@ -137,9 +200,18 @@ const OCR = {
         return overlap / height > 0.6;
       });
       if (!clash) { merged.push(l); continue; }
-      const score = x => x.conf + (ZH.scriptOf(x.text) === 'cjk' && x.lang === 'chi_sim' ? 15 : 0)
-        + (ZH.scriptOf(x.text) === 'latin' && x.lang === 'eng' ? 15 : 0);
       if (score(l) > score(clash)) merged[merged.indexOf(clash)] = l;
+    }
+
+    /* Whole-photo sanity check: a genuinely bilingual card carries at least
+       one strong Chinese line. A page of English with a stray Chinese line
+       left over is the model guessing — drop it. */
+    const weigh = pred => merged.filter(pred).reduce((n, l) => n + [...l.text].length, 0);
+    const latinWeight = weigh(l => ZH.scriptOf(l.text) !== 'cjk');
+    const cjkWeight = weigh(l => ZH.scriptOf(l.text) === 'cjk');
+    const strongCJK = merged.some(l => ZH.scriptOf(l.text) === 'cjk' && l.conf >= 75);
+    if (cjkWeight && !strongCJK && latinWeight >= cjkWeight * 5) {
+      return merged.filter(l => ZH.scriptOf(l.text) !== 'cjk');
     }
     return merged;
   },
@@ -153,7 +225,8 @@ const OCR = {
 
   NOISE: /^(www\.|https?:|e-?mail|mail[:：]|add(ress)?[:：]|tel[:：]?$|fax|邮箱|地址|电话|传真|网址)/i,
   CO_ZH: /(有限公司|公司|集团|工厂|实业|建材|陶瓷|石材|门窗|家具|家私|木业|卫浴|灯饰|五金|铝业|厂$)/,
-  CO_EN: /(co\.?\s*,?\s*ltd|company|corp|limited|industr|group|factory|ceramics|stone|furniture|lighting|hardware|building material)/i,
+  CO_EN: /(co\.?\s*,?\s*ltd|company|corp|limited|industr|group|factory|enterprise|international|manufactur|trading|import|export|supplies|materials|works|studio|gallery|interiors|ceramics|tiles?|stone|marble|granite|quartz|slabs?|joinery|timber|cabinet|kitchens?|bath|doors?|windows?|glass|steel|alumini?um|metal|furniture|lighting|hardware|flooring|building material)/i,
+  URL: /(https?:\/\/|www\.|\.com|\.cn|\.net|\.au)/i,
   ROLE: /(manager|director|sales|export|president|chairman|engineer|designer|经理|总监|销售|业务|外贸|工程师|设计师|主管|董事长|总裁)/i,
   // OCR often mangles the label itself ("WecChat", "Wechot") — stay loose
   WECHAT: /(w[a-z]{0,3}chat|weixin|微信(?:号|ID)?|wxid|whats\s?app)\s*[:：]?\s*([A-Za-z0-9_@.\-]{3,})/i,
@@ -198,10 +271,12 @@ const OCR = {
       }
     }
 
-    // last resorts
-    if (!out.company.value && texts.length) {
-      const longest = texts.reduce((a, b) => (b.length > a.length ? b : a));
-      out.company = this._field(longest);
+    // last resort: the longest line that could plausibly be a name — an email
+    // address, a web address or a phone number is never the company name
+    if (!out.company.value) {
+      const cands = texts.filter(t => !this.NOISE.test(t) && !this.URL.test(t)
+        && !this.EMAIL.test(t) && !this.PHONE.test(t) && t !== out.contact.value);
+      if (cands.length) out.company = this._field(cands.reduce((a, b) => (b.length > a.length ? b : a)).trim());
     }
     if (!out.contact.value) {
       const cand = texts.find(t => t !== out.company.zh && t !== out.company.value
