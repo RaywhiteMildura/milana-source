@@ -195,6 +195,7 @@ const DayPack = {
       if (co && co.nameZh) facts.push(['Company (中文)', co.nameZh]);
       if (co && co.contact) facts.push(['Contact', co.contact]);
       if (co && co.wechat) facts.push(['WeChat / phone', co.wechat]);
+      if (co && co.website) facts.push(['Website', co.website]);
       for (const [k, v] of facts) {
         x.fillStyle = '#625852'; x.fillText(k, this.M, y);
         x.fillStyle = '#201a17'; x.font = this._sans(26, 700);
@@ -205,6 +206,17 @@ const DayPack = {
       if (cpt.note) {
         y += 16;
         y = this._text(x, cpt.note, this.M, y, { font: this._sans(26), color: '#3d3530', max: 5 });
+      }
+      if (co && co.notes) {
+        y += 16;
+        y = this._text(x, 'Lookup notes: ' + co.notes, this.M, y, { font: this._sans(24), color: '#3d3530', max: 4 });
+      }
+      if (co && co.bio) {
+        y += 20;
+        x.fillStyle = '#94601e'; x.font = this._sans(20, 700);
+        x.fillText('AI LOOKUP — VERIFY YOURSELF', this.M, y);
+        y += 36;
+        y = this._text(x, co.bio, this.M, y, { font: this._sans(24), color: '#3d3530', max: 8 });
       }
       if (cpt.voiceNote) {
         x.fillStyle = '#9d7643'; x.font = this._sans(22, 700);

@@ -166,7 +166,7 @@ function suppliersView() {
       <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">One record per company — booth, factory or showroom</div>
     </header>
     <div class="vscroll" style="flex:1;padding:14px 18px ${B_BODY};display:flex;flex-direction:column;gap:9px">
-      ${rows.map(sp => `<div data-act="openCompany" data-arg="${esc(sp.q)}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:12px;cursor:pointer">
+      ${rows.map(sp => `<div data-act="openCompany" data-arg="${esc(sp.key)}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:12px;cursor:pointer">
         <div class="serif" style="width:44px;height:44px;border:1px solid #c9aa78;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:700;color:#9d7643;flex-shrink:0;${sp.cardPhoto ? thumbBg(sp.cardThumb || sp.cardPhoto) : ''}">${sp.cardPhoto ? '' : esc(sp.initial)}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sp.name)}</div>
@@ -323,10 +323,55 @@ function reviewItemView() {
           <input class="fld" data-input="rv.size" value="${esc(S.rv.size)}" placeholder="Size / spec" />
         </div>
       </div>
+      ${S.rv.company.trim() ? lookupSectionHTML({
+        name: S.rv.company.trim(), website: S.rv.website, notes: S.rv.notes, bio: S.rv.bio,
+        pending: S.rvLookupPending, prefix: 'rv', fetchArg: 'rv',
+      }) : ''}
     </div>
     <div style="background:rgba(255,253,249,.97);border-top:1px solid #d7cbbd;padding:10px 16px ${B_BAR}">
       <button data-act="confirmReview" class="pf p98" style="width:100%;min-height:58px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:17px;font-weight:800">✓ Confirm record</button>
     </div>
+  </div>`;
+}
+
+/* ───────────────────────── Company lookup (shared section) ─────────────────
+   Rendered on the Complete Record screen (prefix 'rv' — saved on confirm) and
+   the company detail view (prefix 'co' — saved as you type). */
+function lookupAiHTML(o) {
+  if (S.bioBusy) {
+    return `<div style="margin-top:10px"><button disabled style="min-height:46px;padding:0 15px;border-radius:13px;border:1px solid rgba(157,118,67,.5);background:rgba(157,118,67,.10);color:#9d7643;font-size:13.5px;font-weight:800"><span class="spin" style="width:12px;height:12px;border-width:2px;vertical-align:-2px"></span> Looking up…</button></div>`;
+  }
+  if (o.bio) {
+    return `<div style="margin-top:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px">
+        <span class="mono" style="font-size:10px;color:#94601e;background:#f5ead8;border-radius:6px;padding:3px 6px">AI lookup — verify yourself</span>
+        ${S.aiKey ? `<button data-act="fetchBio" data-arg="${esc(o.fetchArg)}" class="hit44" style="border:0;background:transparent;color:#9d7643;font-size:11.5px;font-weight:800;padding:2px">↻ Fetch again</button>` : ''}
+      </div>
+      <textarea class="fld" data-input="${o.prefix}.bio" rows="6" style="resize:none;line-height:1.5">${esc(o.bio)}</textarea>
+    </div>`;
+  }
+  if (!S.aiKey) {
+    return `<div style="font-size:11.5px;color:#625852;margin-top:10px;line-height:1.45">Optional: save an AI lookup API key in Settings and a “Fetch company bio” button appears here.</div>`;
+  }
+  if (o.pending) {
+    return `<div style="margin-top:10px;display:flex;align-items:center;gap:10px;border:1px solid #e5cfa9;background:#f9efdd;border-radius:13px;padding:10px 13px">
+      <span style="flex:1;font-size:12.5px;color:#94601e;font-weight:700;line-height:1.4">Lookup pending — it didn’t go through last time.</span>
+      <button data-act="fetchBio" data-arg="${esc(o.fetchArg)}" style="flex-shrink:0;min-height:40px;padding:0 14px;border:0;border-radius:11px;background:#94601e;color:#fff;font-size:12.5px;font-weight:800">Retry</button>
+    </div>`;
+  }
+  return `<div style="margin-top:10px"><button data-act="fetchBio" data-arg="${esc(o.fetchArg)}" style="min-height:46px;padding:0 15px;border-radius:13px;border:1px solid rgba(157,118,67,.5);background:rgba(157,118,67,.10);color:#9d7643;font-size:13.5px;font-weight:800">✦ Fetch company bio</button></div>`;
+}
+
+function lookupSectionHTML(o) {
+  return `<div style="margin-top:22px">
+    <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852">LOOK UP COMPANY</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:9px">
+      ${Lookup.searchUrls(o.name).map(l => `<button data-act="openSearch" data-arg="${esc(l.url)}" style="min-height:44px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:700;background:#fffdf9;color:#201a17;border:1px solid #d7cbbd">${esc(l.label)} ↗</button>`).join('')}
+    </div>
+    <div style="font-size:11.5px;color:#625852;margin-top:7px;line-height:1.45">Each opens a ready-made search in a new tab — Bing works in mainland China. Paste what you find below.</div>
+    <input class="fld" data-input="${o.prefix}.website" value="${esc(o.website)}" inputmode="url" autocapitalize="off" autocomplete="off" placeholder="Website" style="margin-top:10px" />
+    <textarea class="fld" data-input="${o.prefix}.notes" rows="3" placeholder="Notes from your lookup" style="margin-top:8px;resize:none;line-height:1.5">${esc(o.notes)}</textarea>
+    ${lookupAiHTML(o)}
   </div>`;
 }
 
@@ -573,6 +618,40 @@ function detailOverlay() {
   </div>`;
 }
 
+/* ───────────────────────── Company detail (overlay) ───────────────────────── */
+function companyOverlay() {
+  const co = companyOf(S.companyKey);
+  if (!co) return '';
+  const list = S.captures.filter(c => c.companyKey === co.key);
+  const card = co.cardThumb || co.cardPhoto;
+  const facts = [];
+  if (co.contact) facts.push(['Contact', co.contact + (co.contactZh && co.contactZh !== co.contact ? ' · ' + co.contactZh : '')]);
+  if (co.wechat) facts.push(['WeChat / phone', co.wechat]);
+  if (co.venue) facts.push(['Met at', co.venue]);
+  return `<div class="screen" style="z-index:32">
+    <header style="background:#201a17;color:#fff;padding:${T60} 14px 14px;display:flex;align-items:center;gap:10px">
+      <button data-act="closeCompany" style="width:44px;height:44px;border:0;border-radius:14px;background:rgba(255,255,255,.10);color:#fff;font-size:19px;flex-shrink:0" aria-label="Back">‹</button>
+      <div style="min-width:0;flex:1">
+        <div class="serif" style="font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(coName(co))}</div>
+        ${co.nameZh && co.nameZh !== co.name ? `<div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(co.nameZh)}</div>` : ''}
+        <div style="font-size:10.5px;color:rgba(255,255,255,.6);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${list.length}${list.length === 1 ? ' product' : ' products'}${co.venue ? ' · ' + esc(co.venue) : ''}</div>
+      </div>
+    </header>
+    <div class="vscroll" style="flex:1;padding:16px 18px calc(var(--sab) + 24px)">
+      ${card ? `<div style="height:190px;border-radius:16px;border:1px solid #d7cbbd;background:#ebe3d8;${thumbBg(card)}"></div>
+      <div class="mono" style="font-size:10px;color:#625852;font-weight:700;margin-top:5px">company card</div>` : ''}
+      ${facts.length ? `<div style="margin-top:${card ? '14px' : '0'};background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:6px 15px">
+        ${facts.map(([k, v], i) => `<div style="display:flex;gap:12px;padding:9px 0;border-bottom:${i === facts.length - 1 ? '0' : '1px solid #ece3d6'};font-size:13px"><span style="color:#625852;flex-shrink:0;width:104px">${esc(k)}</span><b style="min-width:0;overflow-wrap:anywhere">${esc(v)}</b></div>`).join('')}
+      </div>` : ''}
+      ${lookupSectionHTML({
+        name: coName(co), website: co.website || '', notes: co.notes || '', bio: co.bio || '',
+        pending: !!co.lookupPending, prefix: 'co', fetchArg: co.key,
+      })}
+      <button data-act="openCompanyProducts" data-arg="${esc(co.key)}" style="width:100%;margin-top:22px;min-height:52px;border:0;border-radius:14px;background:#201a17;color:#fff;font-size:15px;font-weight:800">◫ Open ${list.length ? 'the ' + list.length : ''} product${list.length === 1 ? '' : 's'} →</button>
+    </div>
+  </div>`;
+}
+
 /* ───────────────────────── Place sheet ───────────────────────── */
 function venueSheet() {
   const counts = {};
@@ -646,6 +725,11 @@ function settingsSheet() {
           <label style="min-height:46px;padding:12px 15px;border-radius:13px;font-size:13.5px;font-weight:700;${chipStyle(false, '#201a17')};display:inline-flex;align-items:center;cursor:pointer">Import backup<input id="import-json" type="file" accept="application/json" style="display:none"></label>
         </div>
         <div style="font-size:11.5px;color:#625852;margin-top:8px;line-height:1.45">Export a full backup before and after each sourcing day — it carries every photo and voice note.</div>
+      </div>
+      <div style="margin-top:16px">
+        <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">AI lookup</div>
+        <input class="fld mono" data-input="aiKey" value="${esc(S.aiKey)}" placeholder="AI lookup API key (sk-ant-…)" autocomplete="off" autocapitalize="off" spellcheck="false" style="font-size:12px" />
+        <div style="font-size:11.5px;color:#625852;margin-top:6px;line-height:1.45">Optional. With an Anthropic API key saved, company records get a “Fetch company bio” button — a short web-researched bio you verify yourself. The key stays on this phone and is never exported.</div>
       </div>
       <div style="margin-top:16px">
         <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">Device</div>

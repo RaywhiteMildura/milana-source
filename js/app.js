@@ -14,10 +14,12 @@ const S = {
   startedAt: null, lastSaved: null,
   venue: 'Canton Fair Phase 1', places: [],
   q: '', catFilter: 'All', venueFilter: 'All places',
-  detailId: null, compareIds: [], reviewId: null,
-  rv: { company: '', contact: '', wechat: '', pname: '', code: '', size: '' },
+  detailId: null, compareIds: [], reviewId: null, companyKey: null,
+  rv: { company: '', contact: '', wechat: '', pname: '', code: '', size: '', website: '', notes: '', bio: '' },
   rvZh: { company: '', contact: '', pname: '' },   // characters as read, kept for checking
   rvBusy: { card: false, label: false },
+  rvBioAt: '', rvLookupPending: false, bioBusy: false,
+  aiKey: '',
   leftHanded: false, nativeCamera: false,
   projectName: '',
   firstUse: null,
@@ -73,7 +75,7 @@ function companyRows() {
       const venues = [...new Set(list.map(c => c.venue))].join(', ') || co.venue || '';
       const name = coName(co);
       return {
-        q: name, name, nameZh: co.nameZh || '', initial: name.charAt(0) || 'M',
+        key: co.key, name, nameZh: co.nameZh || '', initial: name.charAt(0) || 'M',
         cardPhoto: co.cardPhoto, cardThumb: co.cardThumb,
         sub: list.length + (list.length === 1 ? ' product' : ' products') + (venues ? ' · ' + venues : ''),
         latest: list.length ? list[0].createdAt : (co.createdAt || ''),
@@ -299,7 +301,7 @@ function savedChips(rec) {
 /* ── actions (delegated via data-act) ────────────────────────── */
 const Actions = {
   nav(arg) {
-    S.view = arg; S.detailId = null;
+    S.view = arg; S.detailId = null; S.companyKey = null;
     if (arg !== 'reviewItem') S.reviewId = null;
     // leaving the review section entirely — hand the OCR models' memory back
     if (arg !== 'review' && arg !== 'reviewItem') OCR.release();
@@ -572,11 +574,62 @@ const Actions = {
     Fx.toast('Capture deleted');
   },
 
-  openCompany(arg) {
+  openCompany(arg) { S.companyKey = arg; S.detailId = null; renderAll(); },
+  closeCompany() { S.companyKey = null; renderAll(); },
+
+  openCompanyProducts(arg) {
+    const co = companyOf(arg);
+    S.companyKey = null; S.detailId = null;
     S.view = 'products';
-    S.q = arg; S.catFilter = 'All'; S.venueFilter = 'All places';
-    S.detailId = null;
+    S.q = co ? coName(co) : ''; S.catFilter = 'All'; S.venueFilter = 'All places';
     renderAll();
+  },
+
+  /* Level 1 lookup: open a pre-filled search in a new tab (Bing, not Google —
+     Google is blocked in mainland China). */
+  openSearch(arg) {
+    if (!arg) return;
+    window.open(arg, '_blank', 'noopener');
+  },
+
+  /* Level 2 lookup: fetch a short company bio via the Claude API.
+     arg is 'rv' (Complete Record screen) or a company key. Offline or failed
+     calls set a "lookup pending" flag so the retry button appears. */
+  async fetchBio(arg) {
+    if (S.bioBusy) return;
+    if (!S.aiKey) { Fx.toast('Add your AI lookup API key in Settings first.'); return; }
+    const isRv = arg === 'rv';
+    const cap = isRv ? S.captures.find(x => x.id === S.reviewId) : null;
+    const co = isRv ? (cap ? companyOf(cap.companyKey) : null) : companyOf(arg);
+    const info = isRv
+      ? { name: S.rv.company.trim(), nameZh: S.rvZh.company, contact: S.rv.contact.trim(), wechat: S.rv.wechat.trim(), venue: (cap && cap.venue) || S.venue }
+      : (co ? { name: coName(co), nameZh: co.nameZh, contact: co.contact, wechat: co.wechat, venue: co.venue } : null);
+    if (!info || !info.name) { Fx.toast('Confirm the company name first.'); return; }
+    const markPending = async (pending) => {
+      if (isRv) S.rvLookupPending = pending;
+      if (co) { co.lookupPending = pending; await dbPut('companies', co); }
+    };
+    if (!navigator.onLine) {
+      await markPending(true);
+      renderAll();
+      Fx.toast('No signal — the lookup is queued. Retry when online.');
+      return;
+    }
+    S.bioBusy = true;
+    renderAll();
+    try {
+      const text = await Lookup.fetchBio(S.aiKey, info);
+      const at = new Date().toISOString();
+      if (isRv) { S.rv.bio = text; S.rvBioAt = at; S.rvLookupPending = false; }
+      if (co) { co.bio = text; co.bioAt = at; co.lookupPending = false; await dbPut('companies', co); }
+      Fx.toast('Bio fetched — AI lookup, verify it yourself.');
+    } catch (err) {
+      await markPending(true);
+      Fx.toast((err && err.message) ? String(err.message).slice(0, 140) : 'The lookup failed — try again.');
+    } finally {
+      S.bioBusy = false;
+      renderAll();
+    }
   },
 
   catFilter(arg) { S.catFilter = S.catFilter === arg ? 'All' : arg; renderAll(); },
@@ -590,11 +643,14 @@ const Actions = {
     S.rv = {
       company: (co && co.name) || '', contact: (co && co.contact) || '', wechat: (co && co.wechat) || '',
       pname: c.name || '', code: c.code || '', size: c.size || '',
+      website: (co && co.website) || '', notes: (co && co.notes) || '', bio: (co && co.bio) || '',
     };
     S.rvZh = {
       company: (co && co.nameZh) || '', contact: (co && co.contactZh) || '', pname: c.nameZh || '',
     };
     S.rvBusy = { card: false, label: false };
+    S.rvBioAt = (co && co.bioAt) || '';
+    S.rvLookupPending = !!(co && co.lookupPending);
     renderAll();
     runOcrPrefill(c);
   },
@@ -615,6 +671,11 @@ const Actions = {
       co.contact = S.rv.contact.trim();
       co.contactZh = S.rvZh.contact || co.contactZh || '';
       co.wechat = S.rv.wechat.trim();
+      co.website = (S.rv.website || '').trim();
+      co.notes = (S.rv.notes || '').trim();
+      co.bio = (S.rv.bio || '').trim();
+      co.bioAt = S.rvBioAt || co.bioAt || '';
+      co.lookupPending = S.rvLookupPending;
       await dbPut('companies', co);
     }
     c.name = S.rv.pname.trim() || c.name;
@@ -687,14 +748,15 @@ const Actions = {
 
   exportCSV() {
     const cols = ['createdAt', 'createdBy', 'project', 'venue', 'category', 'rooms', 'name', 'name_zh', 'code', 'size',
-      'company', 'company_zh', 'contact', 'contact_zh', 'wechat', 'rating', 'currency', 'price', 'status',
+      'company', 'company_zh', 'contact', 'contact_zh', 'wechat', 'website', 'company_notes', 'company_bio',
+      'rating', 'currency', 'price', 'status',
       'needsReview', 'productPhotos', 'voiceSec', 'note'];
     const rows = [cols].concat(S.captures.map(c => {
       const co = companyOf(c.companyKey);
       return [c.createdAt, c.createdBy, projName(), c.venue, c.category, (c.rooms || []).join('|'),
         c.name, c.nameZh || '', c.code, c.size,
         co ? coName(co) : '', co ? (co.nameZh || '') : '', co ? co.contact : '', co ? (co.contactZh || '') : '',
-        co ? co.wechat : '',
+        co ? co.wechat : '', co ? (co.website || '') : '', co ? (co.notes || '') : '', co ? (co.bio || '') : '',
         c.rating, c.currency, c.price, displaySt(c), c.needsReview ? 'yes' : 'no',
         c.photos.product.length, c.voiceNote ? c.voiceNote.duration : '', c.note];
     }));
@@ -786,8 +848,28 @@ function onInputChange(name, value) {
     S.projectName = value.trim();
     clearTimeout(window.__projTimer);
     window.__projTimer = setTimeout(() => settingSet('projectName', S.projectName), 400);
+  } else if (name === 'aiKey') {
+    S.aiKey = value.trim();
+    clearTimeout(window.__aiKeyTimer);
+    window.__aiKeyTimer = setTimeout(() => settingSet('aiKey', S.aiKey), 400);
+  } else if (name.indexOf('co.') === 0) {
+    // website / notes / bio typed straight onto an open company record
+    const co = companyOf(S.companyKey);
+    if (co) {
+      co[name.slice(3)] = value;
+      clearTimeout(window.__coTimer);
+      window.__coTimer = setTimeout(() => {
+        co.updatedAt = new Date().toISOString();
+        dbPut('companies', co);
+      }, 400);
+    }
   } else if (name.indexOf('rv.') === 0) {
     S.rv[name.slice(3)] = value;
+    if (name === 'rv.company') {
+      // the "Look up company" section appears once a name is present
+      clearTimeout(window.__rvCoTimer);
+      window.__rvCoTimer = setTimeout(() => { if (S.view === 'reviewItem') render(); }, 350);
+    }
   }
 }
 
@@ -812,6 +894,7 @@ function render() {
       html = fn();
       if (tabViews[S.view]) html += tabbar();
       if (S.detailId) html += detailOverlay();
+      if (S.companyKey) html += companyOverlay();
       if (S.venueSheetOn) html += venueSheet();
       if (S.settingsOn) html += settingsSheet();
     }
@@ -987,6 +1070,7 @@ async function init() {
   if (!placeByName(S.venue) && S.places.length) S.venue = S.places[0].name;
   S.leftHanded = await settingGet('leftHanded', false);
   S.nativeCamera = await settingGet('nativeCamera', false);
+  S.aiKey = await settingGet('aiKey', '');
   S.projectName = await settingGet('projectName', '');
   S.firstUse = await settingGet('firstUse', null);
 
@@ -1021,7 +1105,7 @@ async function init() {
 async function healOfflineAssets() {
   if (!('caches' in window) || !navigator.onLine) return;
   try {
-    const cache = await caches.open('milana-v4');
+    const cache = await caches.open('milana-v5');
     const heavy = [
       './vendor/core/tesseract-core-lstm.wasm.js',
       './vendor/core/tesseract-core-simd-lstm.wasm.js',
