@@ -18,6 +18,7 @@ const S = {
   rv: { company: '', contact: '', wechat: '', pname: '', code: '', size: '', website: '', notes: '', bio: '' },
   rvZh: { company: '', contact: '', pname: '' },   // characters as read, kept for checking
   rvBusy: { card: false, label: false },
+  rvLines: { card: [], label: [] },   // every line read, offered as tap-to-use
   rvBioAt: '', rvLookupPending: false, bioBusy: false,
   aiKey: '',
   leftHanded: false, nativeCamera: false,
@@ -311,6 +312,22 @@ const Actions = {
   /* "use the characters instead" — swap the original Chinese into the field */
   useZh(arg) {
     if (S.rvZh[arg]) { S.rv[arg] = S.rvZh[arg]; renderAll(); }
+  },
+
+  /* Tap a raw OCR line to use it: it fills the first empty field of its
+     section, or replaces the main field when all are filled. Chinese lines
+     are translated on the way in, characters kept beside the field. */
+  useLine(arg) {
+    const at = arg.lastIndexOf('@');
+    const grp = arg.slice(0, at);
+    const text = (S.rvLines[grp] || [])[+arg.slice(at + 1)];
+    if (!text) return;
+    const fields = grp === 'card' ? ['company', 'contact', 'wechat'] : ['pname', 'code', 'size'];
+    const target = fields.find(f => !S.rv[f].trim()) || fields[0];
+    const pair = ZH.pair(text, { person: target === 'contact' });
+    S.rv[target] = pair.value;
+    if (pair.zh && (target === 'company' || target === 'contact' || target === 'pname')) S.rvZh[target] = pair.zh;
+    renderAll();
   },
 
   openSettings() { S.settingsOn = true; renderAll(); },
@@ -649,6 +666,7 @@ const Actions = {
       company: (co && co.nameZh) || '', contact: (co && co.contactZh) || '', pname: c.nameZh || '',
     };
     S.rvBusy = { card: false, label: false };
+    S.rvLines = { card: [], label: [] };
     S.rvBioAt = (co && co.bioAt) || '';
     S.rvLookupPending = !!(co && co.lookupPending);
     renderAll();
@@ -804,8 +822,10 @@ function runOcrPrefill(c) {
   if (typeof Tesseract === 'undefined') return;
   if (needCard) {
     S.rvBusy.card = true; renderIfReview(id);
-    OCR.readCard(cardBlob).then(res => {
+    OCR.readLines(cardBlob).then(lines => {
       if (S.reviewId !== id) return;
+      S.rvLines.card = lines.map(l => l.text);
+      const res = OCR.parseCard(lines);
       if (!S.rv.company && res.company.value) S.rv.company = res.company.value;
       if (!S.rv.contact && res.contact.value) S.rv.contact = res.contact.value;
       if (!S.rv.wechat && res.wechat.value) S.rv.wechat = res.wechat.value;
@@ -817,8 +837,10 @@ function runOcrPrefill(c) {
   }
   if (needLabel) {
     S.rvBusy.label = true; renderIfReview(id);
-    OCR.readLabel(labelBlob).then(res => {
+    OCR.readLines(labelBlob).then(lines => {
       if (S.reviewId !== id) return;
+      S.rvLines.label = lines.map(l => l.text);
+      const res = OCR.parseLabel(lines);
       if (!S.rv.pname && res.pname.value) S.rv.pname = res.pname.value;
       if (!S.rv.code && res.code.value) S.rv.code = res.code.value;
       if (!S.rv.size && res.size.value) S.rv.size = res.size.value;
@@ -1105,7 +1127,7 @@ async function init() {
 async function healOfflineAssets() {
   if (!('caches' in window) || !navigator.onLine) return;
   try {
-    const cache = await caches.open('milana-v7');
+    const cache = await caches.open('milana-v8');
     const heavy = [
       './vendor/core/tesseract-core-lstm.wasm.js',
       './vendor/core/tesseract-core-simd-lstm.wasm.js',

@@ -21,17 +21,18 @@ const Lookup = {
       info.nameZh && info.nameZh !== info.name ? 'Chinese name: ' + info.nameZh : '',
       info.contact ? 'Contact person: ' + info.contact : '',
       info.wechat ? 'WeChat / phone: ' + info.wechat : '',
-      info.venue ? 'Met at: ' + info.venue + ' (China sourcing trip)' : '',
+      info.venue ? 'Met / found at: ' + info.venue : '',
     ].filter(Boolean).join('\n');
-    return 'You are helping a home builder vet a Chinese building-products supplier met on a sourcing trip. Research the company below with web search.\n\n'
+    return 'You are helping a home builder vet a building-products supplier. Research the company below with web search. '
+      + 'Do not assume where the company is based — it may be in Australia, China or anywhere else; work that out from what you find.\n\n'
       + details + '\n\n'
       + 'Reply in plain text, no markdown, under 180 words, covering:\n'
       + '1. A 2-3 sentence bio of the company.\n'
       + '2. Main products.\n'
       + '3. Website, if you find an official site or storefront.\n'
-      + '4. Verified-supplier signals (Alibaba verified/Gold Supplier years, certifications).\n'
+      + '4. Trust signals (verified-supplier status, certifications, reviews, years trading).\n'
       + '5. Anything a buyer should check before ordering.\n'
-      + 'If you cannot find the company, say so plainly rather than guessing.';
+      + 'If you cannot find the company, or several companies share the name, say so plainly rather than guessing.';
   },
 
   /* One Claude API call (claude-haiku, web search on). Throws with a

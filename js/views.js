@@ -262,6 +262,19 @@ function reviewView() {
   </div>`;
 }
 
+/* Every line the OCR read, offered as tap-to-use chips — when the guessed
+   field is wrong or partial, the right line is one tap away, not a retype. */
+function readLineChips(grp) {
+  const arr = S.rvLines[grp] || [];
+  if (!arr.length) return '';
+  return `<div style="margin-top:10px">
+    <div class="mono" style="font-size:10px;color:#625852;margin-bottom:6px">everything read from the photo — tap a line to use it</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${arr.slice(0, 12).map((t, i) => `<button data-act="useLine" data-arg="${grp}@${i}" class="mono" style="max-width:100%;min-height:34px;padding:6px 10px;border:1px solid #d7cbbd;border-radius:9px;background:#fffdf9;color:#3d3530;font-size:11px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t)}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
 /* The characters as they were read, kept under the translated field so a wrong
    reading can be checked — or tapped back in — instead of being lost. */
 function zhHint(field) {
@@ -310,6 +323,7 @@ function reviewItemView() {
           <input class="fld" data-input="rv.wechat" value="${esc(S.rv.wechat)}" placeholder="WeChat / phone" />
         </div>
       </div>
+      ${readLineChips('card')}
       <div class="mono" style="font-size:11px;color:#94601e;margin-top:8px;line-height:1.45">check the characters against the card photo before confirming</div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:20px">
         <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852">FROM THE LABEL</div>
@@ -326,6 +340,7 @@ function reviewItemView() {
           <input class="fld" data-input="rv.size" value="${esc(S.rv.size)}" placeholder="Size / spec" />
         </div>
       </div>
+      ${readLineChips('label')}
       ${S.rv.company.trim() ? lookupSectionHTML({
         name: S.rv.company.trim(), website: S.rv.website, notes: S.rv.notes, bio: S.rv.bio,
         pending: S.rvLookupPending, prefix: 'rv', fetchArg: 'rv',
