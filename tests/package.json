@@ -1,0 +1,16 @@
+{
+  "name": "milana-source-tests",
+  "private": true,
+  "description": "Playwright end-to-end and OCR tests for Milana Source. Run: npm install && npm test (needs Chromium; see README).",
+  "scripts": {
+    "serve": "cd .. && python3 -m http.server 8123 --bind 127.0.0.1",
+    "test": "node e2e.js",
+    "test:ocr": "node ocr.js",
+    "test:labels": "node labels.js",
+    "verify:zip": "node verify-zip.js"
+  },
+  "devDependencies": {
+    "playwright-core": "1.56.1",
+    "@fontsource/noto-sans-sc": "5.2.9"
+  }
+}
