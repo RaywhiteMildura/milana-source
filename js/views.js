@@ -89,7 +89,7 @@ function rowHTML(c, opts = {}) {
   const count = c.photos.product.length;
   // home "Latest captures" rows show the company only, no photo-count badge (design)
   const sub = opts.home ? supName(c) : supName(c) + ' · ' + c.venue;
-  return `<div data-act="openDetail" data-arg="${c.id}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
+  return `<div data-act="openDetail" data-arg="${esc(c.id)}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
     <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:#ebe3d8;position:relative;${thumbBg(photoThumb(first))}">
       ${count > 1 && !opts.home ? `<span style="position:absolute;right:3px;bottom:3px;font-size:9px;font-weight:800;background:rgba(31,25,23,.75);color:#fff;border-radius:6px;padding:2px 5px">×${count}</span>` : ''}
     </div>
@@ -165,7 +165,7 @@ function homeView() {
       </div>
     </header>
     <div class="vscroll" style="flex:1;padding:20px 18px ${B_BODY}">
-      <button data-act="openVenueSheet" style="border:0;background:transparent;padding:2px 0;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.09em;color:#9d7643;text-transform:uppercase;text-align:left">${esc(tripDayLabel())} · at ${esc(S.venue)} <span style="font-size:9px">▾</span></button>
+      <button data-act="openVenueSheet" style="border:0;background:transparent;min-height:44px;padding:8px 0;margin:-10px 0 -6px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.09em;color:#9d7643;text-transform:uppercase;text-align:left">${esc(tripDayLabel())} · at ${esc(S.venue)} <span style="font-size:9px">▾</span></button>
       <h1 class="serif" style="font-size:27px;line-height:1.08;margin:6px 0 16px">${greeting()}, ${esc(firstName())}.</h1>
       ${draftBanner()}
       ${installBanner()}
@@ -265,19 +265,19 @@ function compareView() {
           const st = ST[displaySt(c)] || ST.Captured;
           return `<div style="flex-shrink:0;width:206px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;overflow:hidden;display:flex;flex-direction:column">
           <div data-act="viewPhoto" data-arg="${c.id}@0" role="button" style="height:110px;background:#ebe3d8;position:relative;${thumbBg(photoThumb(first))}">
-            <button data-act="toggleCompare" data-arg="${c.id}" class="hit44" style="position:absolute;right:7px;top:7px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(31,25,23,.78);color:#fff;font-size:13px" aria-label="Remove">✕</button>
+            <button data-act="toggleCompare" data-arg="${esc(c.id)}" class="hit44" style="position:absolute;right:7px;top:7px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(31,25,23,.78);color:#fff;font-size:13px" aria-label="Remove">✕</button>
           </div>
           <div style="padding:12px 13px;display:flex;flex-direction:column;gap:7px;flex:1">
             <div style="font-size:14px;font-weight:800;line-height:1.25">${esc(dispName(c))}</div>
             <div style="font-size:11.5px;color:#625852">${esc(supName(c))}</div>
             <div style="border-top:1px solid #ece3d6;padding-top:7px;font-size:12px;display:flex;justify-content:space-between"><span style="color:#625852">Rating</span><b style="color:#9d7643">${c.rating ? '★ ' + c.rating + '/5' : '—'}</b></div>
-            <div style="font-size:12px;display:flex;justify-content:space-between"><span style="color:#625852">Price</span><b>${c.price ? esc(c.currency + ' ' + c.price) : '—'}</b></div>
+            <div style="font-size:12px;display:flex;justify-content:space-between"><span style="color:#625852">Price</span><b>${c.price ? esc(priceLabel(c)) : '—'}</b></div>
             <div style="font-size:12px;display:flex;justify-content:space-between;gap:8px"><span style="color:#625852">Size</span><b style="text-align:right">${esc(c.size || '—')}</b></div>
             <div style="font-size:12px;display:flex;justify-content:space-between;gap:8px"><span style="color:#625852">Rooms</span><b style="text-align:right">${esc((c.rooms || []).slice(0, 2).join(', ') || '—')}</b></div>
             <div style="font-size:12px;display:flex;justify-content:space-between;gap:8px"><span style="color:#625852">Place</span><b style="text-align:right">${esc(c.venue)}</b></div>
             <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:6px">
               <span style="font-size:10.5px;font-weight:800;border-radius:999px;padding:5px 9px;background:${st.bg};color:${st.fg}">${esc(displaySt(c))}</span>
-              <button data-act="openDetail" data-arg="${c.id}" class="hit44" style="border:0;background:transparent;color:#6f273a;font-size:12px;font-weight:800;padding:6px 2px">Open →</button>
+              <button data-act="openDetail" data-arg="${esc(c.id)}" class="hit44" style="border:0;background:transparent;color:#6f273a;font-size:12px;font-weight:800;padding:6px 2px">Open →</button>
             </div>
           </div>
         </div>`; }).join('')}
@@ -287,6 +287,21 @@ function compareView() {
 }
 
 /* ───────────────────────── Evening review (list) ───────────────────────── */
+/* The evening ritual lives on the review screen, so the backup state and
+   the button for it sit right there — not only inside Settings. */
+function backupLine() {
+  if (!S.captures.length) return '';
+  const st = backupStatus();
+  const todayN = S.captures.filter(c => dayKey(c.createdAt) === dayKey()).length;
+  const busy = S.backupBusy;
+  return `<div style="display:flex;align-items:center;gap:10px;background:${st.warn ? '#f9efdd' : '#e9f2ec'};border:1px solid ${st.warn ? '#e5cfa9' : '#b9d2c4'};border-radius:16px;padding:10px 13px">
+    <span style="flex:1;min-width:0;font-size:12.5px;font-weight:800;color:${st.warn ? '#94601e' : '#355f4b'}">${esc(st.text)}<div style="font-size:11px;font-weight:400;color:#625852;margin-top:1px">Photos live on this phone only until they are backed up.</div></span>
+    ${busy ? `<span class="mono" style="font-size:11px;color:#625852;flex-shrink:0">${esc(busy.label)} ${busy.done}/${busy.total}</span>`
+      : S.backupReady ? `<button data-act="shareBackup" style="flex-shrink:0;min-height:44px;padding:0 13px;border:0;border-radius:12px;background:#355f4b;color:#fff;font-size:12.5px;font-weight:800">⇪ Save it</button>`
+      : `<button data-act="exportBackup" data-arg="${todayN ? 'today' : 'all'}" style="flex-shrink:0;min-height:44px;padding:0 13px;border:0;border-radius:12px;background:#201a17;color:#fff;font-size:12.5px;font-weight:800">Back up ${todayN ? 'today' : 'all'}</button>`}
+  </div>`;
+}
+
 function dayPackCard() {
   const days = packDays();
   if (!days.length) return '';
@@ -297,7 +312,7 @@ function dayPackCard() {
   const pages = list.length + 1;
   return `<div style="background:#fffdf9;border:1px solid #d7cbbd;border-radius:18px;padding:14px 15px">
     <div style="font-size:14px;font-weight:800">Day pack</div>
-    <div style="font-size:12px;color:#625852;margin-top:3px;line-height:1.45">One tidy PDF for Fiona and the builder — photos, notes and quotes together.</div>
+    <div style="font-size:12px;color:#625852;margin-top:3px;line-height:1.45">One tidy PDF for the team — photos, notes and quotes together.</div>
     <div class="hscroll" style="display:flex;gap:6px;margin:11px -15px 0;padding:0 15px 4px">
       ${days.map(d => `<button data-act="setPackDay" data-arg="${esc(d.key)}" style="flex-shrink:0;min-height:36px;padding:0 12px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;${chipStyle(sel === d.key, '#201a17')}">${esc(d.label)} · ${d.count}</button>`).join('')}
     </div>
@@ -329,11 +344,12 @@ function reviewView() {
       </div>
     </header>
     <div class="vscroll" style="flex:1;padding:14px 18px calc(var(--sab) + 30px);display:flex;flex-direction:column;gap:9px">
+      ${backupLine()}
       ${dayPackCard()}
       ${pending.length ? '' : `<div style="text-align:center;padding:36px 20px;color:#625852;border:1px dashed #d7cbbd;border-radius:18px;font-size:13px"><b style="color:#355f4b">✓ All records complete.</b><br>Every capture has a name and a company. Open a product to edit it later.</div>`}
       ${pending.map(c => {
         const first = c.photos.product[0];
-        return `<div data-act="openReview" data-arg="${c.id}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
+        return `<div data-act="openReview" data-arg="${esc(c.id)}" role="button" style="display:flex;align-items:center;gap:12px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:16px;padding:10px 12px;cursor:pointer">
         <div style="width:52px;height:52px;border-radius:11px;flex-shrink:0;background:#ebe3d8;${thumbBg(photoThumb(first))}"></div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(dispName(c))}</div>
@@ -358,7 +374,7 @@ function readLineChips(grp) {
   return `<div style="margin-top:10px">
     <div class="mono" style="font-size:10px;color:#625852;margin-bottom:6px">everything read from the photo — tap a line to put it in <b style="color:#9d7643">${target ? esc(FIELD_LABEL[target]) : 'a field (tap the field first)'}</b></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
-      ${arr.slice(0, 12).map((t, i) => `<button data-act="useLine" data-arg="${grp}@${i}" class="mono" style="max-width:100%;min-height:34px;padding:6px 10px;border:1px solid #d7cbbd;border-radius:9px;background:#fffdf9;color:#3d3530;font-size:11px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t)}</button>`).join('')}
+      ${arr.slice(0, 40).map((t, i) => `<button data-act="useLine" data-arg="${grp}@${i}" class="mono" style="max-width:100%;min-height:40px;padding:8px 12px;border:1px solid #d7cbbd;border-radius:9px;background:#fffdf9;color:#3d3530;font-size:11px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t)}</button>`).join('')}
     </div>
   </div>`;
 }
@@ -367,7 +383,7 @@ function readLineChips(grp) {
    reading can be checked — or tapped back in — instead of being lost. */
 function zhHint(field) {
   const zh = S.rvZh[field];
-  const btn = (act, label) => `<button data-act="${act}" data-arg="${field}" class="mono" style="flex-shrink:0;min-height:28px;padding:0 9px;border:1px solid rgba(157,118,67,.45);border-radius:8px;background:rgba(157,118,67,.12);color:#9d7643;font-size:10px;font-weight:700">${label}</button>`;
+  const btn = (act, label) => `<button data-act="${act}" data-arg="${field}" class="mono hit44" style="flex-shrink:0;min-height:36px;padding:0 11px;border:1px solid rgba(157,118,67,.45);border-radius:9px;background:rgba(157,118,67,.12);color:#9d7643;font-size:10.5px;font-weight:700">${label}</button>`;
   if (zh && zh === S.rv[field] && S.rvEn[field] !== undefined) {
     // the characters are in the field — offer the English back
     return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px">
@@ -402,6 +418,14 @@ function reviewItemView() {
     : S.rvRead[grp] === 'fail' ? okTag('could not read it — type it in', true)
     : S.rvRead[grp] === 'unavailable' ? okTag('reader not downloaded yet — type it in', true)
     : okTag('read on device');
+  const co = companyOf(c.companyKey);
+  const others = co ? S.captures.filter(x => x.companyKey === co.key && x.id !== c.id).length : 0;
+  const typed = S.rv.company.trim();
+  const renames = !!(co && co.name && typed && typed.toLowerCase() !== co.name.toLowerCase() && others > 0);
+  const confirmLabel = busy
+    ? '<span class="spin" style="width:14px;height:14px;border-width:2px;border-top-color:#fff;vertical-align:-2px"></span> Reading the photos…'
+    : renames ? '✓ Save — renames company for all ' + (others + 1)
+    : c.needsReview ? '✓ Confirm record' : '✓ Save changes';
   const photoBox = (blob, arg) => blob
     ? `<div data-act="viewPhoto" data-arg="${arg}" role="button" aria-label="View photo" style="width:74px;height:96px;border-radius:11px;border:1px solid #d7cbbd;background:#ebe3d8;flex-shrink:0;position:relative;cursor:pointer;${thumbBg(blob)}"><span style="position:absolute;right:4px;bottom:4px;width:20px;height:20px;border-radius:6px;background:rgba(31,25,23,.72);color:#fff;font-size:11px;display:grid;place-items:center">⤢</span></div>`
     : `<div style="width:74px;height:96px;border-radius:11px;border:1px solid #d7cbbd;background:#ebe3d8;flex-shrink:0"></div>`;
@@ -433,6 +457,12 @@ function reviewItemView() {
         </div>
       </div>
       ${readLineChips('card')}
+      ${others > 0 ? `<div style="margin-top:10px;border:1px solid ${renames ? '#e5cfa9' : '#d7cbbd'};background:${renames ? '#f9efdd' : '#fffdf9'};border-radius:13px;padding:10px 12px">
+        <div style="font-size:12px;color:${renames ? '#94601e' : '#625852'};line-height:1.45">${renames
+          ? `<b>Renames this company for all ${others + 1} products</b> filed under “${esc(co.name)}”. If only this product is from someone else, move it instead:`
+          : `This company covers <b>${others + 1} products</b> from the same ${esc(co.word || 'booth')} — changes here apply to all of them.`}</div>
+        <button data-act="splitCompany" class="hit44" style="margin-top:8px;min-height:44px;padding:0 12px;border:1px solid #d7cbbd;border-radius:12px;background:#fffdf9;color:#6f273a;font-size:12.5px;font-weight:800">This product is from a different company</button>
+      </div>` : ''}
       <div class="mono" style="font-size:11px;color:#94601e;margin-top:8px;line-height:1.45">tap the card photo to enlarge it and check the characters before confirming</div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:20px">
         <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852">FROM THE LABEL</div>
@@ -451,14 +481,14 @@ function reviewItemView() {
       </div>
       ${readLineChips('label')}
       <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin-top:20px">NOTES</div>
-      <textarea class="fld" data-input="rv.note" rows="3" placeholder="Anything Fiona or the builder should know — finish, lead time, minimum order…" style="margin-top:9px;resize:none;line-height:1.5">${esc(S.rv.note || '')}</textarea>
+      <textarea class="fld" data-input="rv.note" rows="3" placeholder="Anything the team should know — finish, lead time, minimum order…" style="margin-top:9px;resize:none;line-height:1.5">${esc(S.rv.note || '')}</textarea>
       ${S.rv.company.trim() ? lookupSectionHTML({
         name: S.rv.company.trim(), nameZh: S.rvZh.company, website: S.rv.website, notes: S.rv.notes, bio: S.rv.bio,
         pending: S.rvLookupPending, prefix: 'rv', fetchArg: 'rv',
       }) : ''}
     </div>
     <div style="background:rgba(255,253,249,.97);border-top:1px solid #d7cbbd;padding:10px 16px ${B_BAR}">
-      <button data-act="confirmReview" ${busy ? 'disabled' : ''} class="pf p98" style="width:100%;min-height:58px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:17px;font-weight:800;opacity:${busy ? '.55' : '1'}">${busy ? '<span class="spin" style="width:14px;height:14px;border-width:2px;border-top-color:#fff;vertical-align:-2px"></span> Reading the photos…' : (c.needsReview ? '✓ Confirm record' : '✓ Save changes')}</button>
+      <button data-act="confirmReview" ${busy ? 'disabled' : ''} class="pf p98" style="width:100%;min-height:58px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:17px;font-weight:800;opacity:${busy ? '.55' : '1'}">${confirmLabel}</button>
     </div>
   </div>`;
 }
@@ -491,6 +521,16 @@ function lookupAiHTML(o) {
   return `<div style="margin-top:10px"><button data-act="fetchBio" data-arg="${esc(o.fetchArg)}" style="min-height:46px;padding:0 15px;border-radius:13px;border:1px solid rgba(157,118,67,.5);background:rgba(157,118,67,.10);color:#9d7643;font-size:13.5px;font-weight:800">✦ Fetch company bio</button></div>`;
 }
 
+/* A typed website becomes a link only when it is plainly a web address —
+   never a javascript: or data: string pasted by mistake. */
+function websiteHref(w) {
+  const s = String(w || '').trim();
+  if (!s) return '';
+  if (/^https?:\/\/[^\s/]+\.[^\s]+$/i.test(s)) return s;
+  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/[^\s]*)?$/i.test(s)) return 'https://' + s;
+  return '';
+}
+
 function lookupSectionHTML(o) {
   return `<div style="margin-top:22px">
     <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852">LOOK UP COMPANY</div>
@@ -499,6 +539,7 @@ function lookupSectionHTML(o) {
     </div>
     <div style="font-size:11.5px;color:#625852;margin-top:7px;line-height:1.45">Each opens a ready-made search — Bing works in mainland China; 1688 and image search use the Chinese name. Paste what you find below.</div>
     <input class="fld" data-input="${o.prefix}.website" value="${esc(o.website)}" inputmode="url" autocapitalize="off" autocomplete="off" placeholder="Website" style="margin-top:10px" />
+    ${websiteHref(o.website) ? `<a href="${esc(websiteHref(o.website))}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;min-height:40px;margin-top:4px;color:#6f273a;font-size:12.5px;font-weight:800;text-decoration:none">Open ${esc(String(o.website).trim().replace(/^https?:\/\//i, '').replace(/\/$/, ''))} ↗</a>` : ''}
     <textarea class="fld" data-input="${o.prefix}.notes" rows="3" placeholder="Notes from your lookup" style="margin-top:8px;resize:none;line-height:1.5">${esc(o.notes)}</textarea>
     ${lookupAiHTML(o)}
   </div>`;
@@ -641,6 +682,9 @@ function tagView() {
         : `<div style="display:flex;gap:8px;align-items:stretch">
             ${['CNY', 'USD', 'AUD'].map(cu => `<button data-act="setCurrency" data-arg="${cu}" style="min-width:56px;min-height:48px;border-radius:12px;font-size:13px;font-weight:800;${chipStyle(dr.currency === cu, '#201a17')}">${cu}</button>`).join('')}
             <input data-input="price" value="${esc(dr.price)}" inputmode="decimal" placeholder="Quoted amount" style="flex:1;min-width:0;border:1px solid #d7cbbd;border-radius:12px;padding:0 13px;background:#fff;color:#201a17;outline:none;font-size:16px" />
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+            ${['per m²', 'per piece', 'per set', 'per m', 'per slab', 'per box'].map(u => `<button data-act="setUnit" data-arg="${esc(u)}" style="min-height:44px;padding:0 13px;border-radius:999px;font-size:12.5px;font-weight:700;${chipStyle(dr.unit === u, '#201a17')}">${esc(u)}</button>`).join('')}
           </div>`}
       </div>
       <div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin:22px 0 9px">COMPANY</div>
@@ -690,6 +734,7 @@ function savedView() {
     </div>
     <div style="padding:10px 16px ${B_BAR};display:flex;flex-direction:column;gap:8px">
       <button data-act="startCapture" class="pf p98" style="width:100%;min-height:58px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:17px;font-weight:800">${sv.sessionOn ? '＋ Next capture · same ' + sw : '＋ Next capture'}</button>
+      ${sv.sessionOn ? `<button data-act="newBoothCapture" class="pf1 p96" style="width:100%;min-height:50px;border:1px solid #d7cbbd;border-radius:16px;background:#fffdf9;color:#201a17;font-size:14.5px;font-weight:800">↻ Different ${esc(sw)} — new card</button>` : ''}
       <button data-act="nav" data-arg="home" style="width:100%;min-height:48px;border:0;background:transparent;color:#625852;font-size:14px;font-weight:700">Back to today</button>
     </div>
   </div>`;
@@ -709,7 +754,7 @@ function detailOverlay() {
   if (c.rating) chips.push({ t: '★ ' + c.rating + '/5', bg: '#f5ead8', fg: '#94601e' });
   if (c.code) chips.push({ t: 'Code ' + c.code, bg: '#ebe3d8', fg: '#625852' });
   if (c.size) chips.push({ t: c.size, bg: '#ebe3d8', fg: '#625852' });
-  if (c.price) chips.push({ t: c.currency + ' ' + c.price, bg: '#ebe3d8', fg: '#625852' });
+  if (c.price) chips.push({ t: priceLabel(c), bg: '#ebe3d8', fg: '#625852' });
   const photos = c.photos.product.map((p, i) => ({ blob: photoThumb(p), cap: 'product · face ' + (i + 1) }));
   if (c.photos.label) photos.push({ blob: photoThumb(c.photos.label), cap: 'label / spec' });
   const cardP = cardPhotoOf(c);
@@ -726,8 +771,8 @@ function detailOverlay() {
     </header>
     <div class="vscroll" style="flex:1;padding:16px 18px calc(var(--sab) + 24px)">
       ${c.needsReview
-        ? `<button data-act="openReview" data-arg="${c.id}" style="width:100%;margin-bottom:12px;min-height:50px;border:1px solid #e5cfa9;border-radius:14px;background:#f9efdd;color:#94601e;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px">▣ Complete this record — read card &amp; label →</button>`
-        : `<button data-act="openReview" data-arg="${c.id}" style="width:100%;margin-bottom:12px;min-height:46px;border:1px solid #d7cbbd;border-radius:14px;background:#fffdf9;color:#201a17;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px">✎ Edit name, code, company, notes</button>`}
+        ? `<button data-act="openReview" data-arg="${esc(c.id)}" style="width:100%;margin-bottom:12px;min-height:50px;border:1px solid #e5cfa9;border-radius:14px;background:#f9efdd;color:#94601e;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px">▣ Complete this record — read card &amp; label →</button>`
+        : `<button data-act="openReview" data-arg="${esc(c.id)}" style="width:100%;margin-bottom:12px;min-height:46px;border:1px solid #d7cbbd;border-radius:14px;background:#fffdf9;color:#201a17;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px">✎ Edit name, code, company, notes</button>`}
       <div class="hscroll" style="display:flex;gap:8px;padding-bottom:6px">
         ${photos.map((ph, i) => `<div style="flex-shrink:0;width:128px">
           <div data-act="viewPhoto" data-arg="${c.id}@${i}" role="button" aria-label="View photo" style="height:108px;border-radius:13px;border:1px solid #d7cbbd;background:#ebe3d8;position:relative;cursor:pointer;${thumbBg(ph.blob)}">
@@ -741,7 +786,7 @@ function detailOverlay() {
       </div>
       ${c.note ? `<div style="margin-top:14px;background:#fffdf9;border:1px solid #d7cbbd;border-radius:14px;padding:13px 15px;font-size:13.5px;line-height:1.5;color:#3d3530;white-space:pre-wrap">${esc(c.note)}</div>` : ''}
       ${c.voiceNote ? `<div style="margin-top:14px;display:flex;align-items:center;gap:10px;border:1px solid #d7cbbd;border-radius:14px;background:#fffdf9;padding:8px 8px 8px 15px;min-height:54px">
-        <span data-act="playVoiceOf" data-arg="${c.id}" role="button" style="font-size:14.5px;font-weight:700;flex:1;cursor:pointer" id="voice-row-${c.id}">▶ Voice note · ${fmtClock(c.voiceNote.duration)}</span>
+        <span data-act="playVoiceOf" data-arg="${esc(c.id)}" role="button" style="font-size:14.5px;font-weight:700;flex:1;cursor:pointer" id="voice-row-${c.id}">▶ Voice note · ${fmtClock(c.voiceNote.duration)}</span>
       </div>` : ''}
       <div style="display:flex;gap:10px;margin-top:16px">
         ${c.status === 'Preferred'
@@ -751,8 +796,8 @@ function detailOverlay() {
             : `<button data-act="setStatus" data-arg="Shortlisted" class="pf1 p97" style="flex:1;min-height:52px;border:0;border-radius:14px;background:#201a17;color:#fff;font-size:15px;font-weight:800">★ Shortlist</button>`}
         <button data-act="setStatus" data-arg="${c.status === 'Rejected' ? 'Captured' : 'Rejected'}" class="pf1 p97" style="flex:1;min-height:52px;border:1px solid #e0c4c0;border-radius:14px;background:#f8e7e5;color:#8b2d2d;font-size:15px;font-weight:800">${c.status === 'Rejected' ? 'Un-reject' : 'Reject'}</button>
       </div>
-      <button data-act="toggleCompare" data-arg="${c.id}" style="width:100%;margin-top:10px;min-height:52px;border:1px solid #d7cbbd;border-radius:14px;background:${inCmp ? '#201a17' : '#fffdf9'};color:${inCmp ? '#fff' : '#201a17'};font-size:15px;font-weight:800">⇄ ${inCmp ? 'In compare — remove' : 'Add to compare'}</button>
-      <button data-act="deleteCapture" data-arg="${c.id}" style="width:100%;margin-top:18px;min-height:44px;border:0;background:transparent;color:#8b2d2d;font-size:12.5px;font-weight:700">Delete this capture</button>
+      <button data-act="toggleCompare" data-arg="${esc(c.id)}" style="width:100%;margin-top:10px;min-height:52px;border:1px solid #d7cbbd;border-radius:14px;background:${inCmp ? '#201a17' : '#fffdf9'};color:${inCmp ? '#fff' : '#201a17'};font-size:15px;font-weight:800">⇄ ${inCmp ? 'In compare — remove' : 'Add to compare'}</button>
+      <button data-act="deleteCapture" data-arg="${esc(c.id)}" style="width:100%;margin-top:18px;min-height:44px;border:0;background:transparent;color:#8b2d2d;font-size:12.5px;font-weight:700">Delete this capture</button>
     </div>
   </div>`;
 }
@@ -832,7 +877,7 @@ function venueSheet() {
           <div style="display:flex;flex-wrap:wrap;gap:8px">
             ${list.map(p => S.placeEdit
               ? `<span style="display:inline-flex;align-items:center;gap:6px;min-height:46px;padding:0 8px 0 15px;border-radius:13px;font-size:13.5px;font-weight:700;background:#fffdf9;color:#201a17;border:1px solid #d7cbbd">${esc(p.name)}${counts[p.name] ? `<b style="font-size:11px;color:#625852;font-weight:700">${counts[p.name]}</b>` : ''}
-                  <button data-act="deletePlace" data-arg="${esc(p.id)}" style="width:30px;height:30px;border:0;border-radius:50%;background:#f8e7e5;color:#8b2d2d;font-size:13px;line-height:1;padding:0" aria-label="Remove ${esc(p.name)}">✕</button>
+                  <button data-act="deletePlace" data-arg="${esc(p.id)}" class="hit44" style="width:36px;height:36px;border:0;border-radius:50%;background:#f8e7e5;color:#8b2d2d;font-size:13px;line-height:1;padding:0" aria-label="Remove ${esc(p.name)}">✕</button>
                 </span>`
               : `<button data-act="pickVenue" data-arg="${esc(p.id)}" style="min-height:46px;padding:0 15px;border-radius:13px;font-size:13.5px;font-weight:700;${chipStyle(S.venue === p.name, '#6f273a')}">${esc(p.name)}</button>`).join('')}
           </div>
@@ -894,6 +939,7 @@ function settingsSheet() {
 
       <div style="margin-top:16px">
         <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">Backup &amp; transfer</div>
+        <div style="font-size:13px;font-weight:800;color:${backupStatus().warn ? '#94601e' : '#355f4b'};margin-bottom:8px">${esc(backupStatus().text)}</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">
           ${busy
             ? `<button disabled style="min-height:46px;padding:0 15px;border-radius:13px;background:#201a17;color:#fff;border:0;font-size:13.5px;font-weight:800;opacity:.75"><span class="spin" style="width:12px;height:12px;border-width:2px;border-top-color:#fff;vertical-align:-2px"></span> ${esc(busy.label)} ${busy.done} / ${busy.total}</button>`
@@ -930,8 +976,11 @@ function settingsSheet() {
 
       <div style="margin-top:16px">
         <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#9d7643;text-transform:uppercase;margin-bottom:8px">AI lookup</div>
-        <input class="fld mono" data-input="aiKey" value="${esc(S.aiKey)}" placeholder="AI lookup API key (sk-ant-…)" autocomplete="off" autocapitalize="off" spellcheck="false" style="font-size:16px" />
-        <div style="font-size:11.5px;color:#625852;margin-top:6px;line-height:1.45">Optional. With an Anthropic API key saved, company records get a “Fetch company bio” button — a short web-researched bio you verify yourself. The key stays on this phone and is never exported or backed up.</div>
+        <div style="display:flex;gap:8px;align-items:stretch">
+          <input class="fld mono" type="${S.aiKeyShown ? 'text' : 'password'}" data-input="aiKey" value="${esc(S.aiKey)}" placeholder="AI lookup API key (sk-ant-…)" autocomplete="off" autocapitalize="off" spellcheck="false" style="font-size:16px;flex:1;min-width:0" />
+          <button data-act="toggleAiKeyShown" type="button" style="flex-shrink:0;min-width:56px;min-height:44px;border-radius:12px;font-size:12px;font-weight:800;${chipStyle(S.aiKeyShown, '#201a17')}">${S.aiKeyShown ? 'Hide' : 'Show'}</button>
+        </div>
+        <div style="font-size:11.5px;color:#625852;margin-top:6px;line-height:1.45">Optional. With an Anthropic API key saved, company records get a “Fetch company bio” button — a short web-researched bio you verify yourself. The key stays on this phone and is never exported or backed up. <b>In mainland China the lookup service needs roaming data or a VPN</b> — the Bing, Alibaba and 1688 buttons work on any network.</div>
       </div>
 
       <div style="margin-top:16px">
@@ -941,7 +990,7 @@ function settingsSheet() {
           <button data-act="eraseData" style="min-height:46px;padding:0 15px;border-radius:13px;border:1px solid #e0c4c0;background:#f8e7e5;color:#8b2d2d;font-size:13.5px;font-weight:800">Clear all data</button>
         </div>
         <div style="font-size:11.5px;color:#625852;margin-top:6px;line-height:1.45">Clear all data wipes every capture and company on this phone${S.user && S.user.pin ? ' — it asks for your PIN first' : ''}. Back up first if anything matters.</div>
-        <div class="mono" style="font-size:10.5px;color:#9d7643;margin-top:12px">Milana Source v1.1 · offline-first · reading on device</div>
+        <div class="mono" style="font-size:10.5px;color:#9d7643;margin-top:12px">Milana Source v1.2 · offline-first · reading on device</div>
       </div>
     </div>
   </div>`;
@@ -972,7 +1021,7 @@ function loginView() {
         ${['Owner', 'Builder', 'Designer', 'Advisor'].map(r => `<button type="button" data-act="pickRole" data-arg="${r}" style="min-height:44px;padding:0 15px;border-radius:999px;font-size:13.5px;font-weight:700;${chipStyle(S.loginRole === r, '#201a17')}">${r}</button>`).join('')}
       </div>
       <label style="display:block;font-size:11px;font-weight:800;letter-spacing:.08em;color:#625852;margin-bottom:7px">LOCAL PIN (OPTIONAL)</label>
-      <input class="fld" name="pin" data-input="login.pin" value="${esc(S.loginTmp.pin)}" inputmode="numeric" maxlength="6" placeholder="4–6 digits" autocomplete="off" style="margin-bottom:6px;font-size:16px">
+      <input class="fld" type="password" name="pin" data-input="login.pin" value="${esc(S.loginTmp.pin)}" inputmode="numeric" maxlength="6" placeholder="4–6 digits" autocomplete="off" style="margin-bottom:6px;font-size:16px">
       <div class="mono" style="font-size:10.5px;color:#94601e;line-height:1.45;margin-bottom:16px">A forgotten PIN can only be cleared by erasing this phone's records — write it down.</div>
       <button class="pf p98" style="width:100%;min-height:54px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:16px;font-weight:800">Enter the project</button>
       <p style="font-size:11.5px;color:#625852;line-height:1.5;margin:13px 0 0">Everything is stored on this phone only. Each person who installs the app has their own records.</p>
@@ -986,7 +1035,7 @@ function unlockView() {
       <div style="color:#6f273a;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase">${esc(projName())}</div>
       <h1 class="serif" style="margin:5px 0 8px;font-size:28px">Welcome back, ${esc(firstName())}</h1>
       <p style="font-size:13px;color:#625852;line-height:1.5;margin:0 0 16px">Enter the local PIN for this device.</p>
-      <input class="fld fld-strong" name="pin" data-input="login.pin" inputmode="numeric" maxlength="6" required autofocus placeholder="PIN" autocomplete="off" style="margin-bottom:16px;font-size:16px">
+      <input class="fld fld-strong" type="password" name="pin" data-input="login.pin" inputmode="numeric" maxlength="6" required autofocus placeholder="PIN" autocomplete="off" style="margin-bottom:16px;font-size:16px">
       <button class="pf p98" style="width:100%;min-height:54px;border:0;border-radius:16px;background:#6f273a;color:#fff;font-size:16px;font-weight:800">Unlock</button>
       <button type="button" data-act="forgotPin" class="hit44" style="width:100%;margin-top:10px;border:0;background:transparent;color:#625852;font-size:12px;font-weight:700;padding:8px">Forgot the PIN?</button>
     </form>

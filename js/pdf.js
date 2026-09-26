@@ -201,10 +201,15 @@ const DayPack = {
     for (const cpt of captures) {
       const name = cpt.name || (cpt.category + ' — untitled');
       let { c, x } = this._page();
+      // the band grows with a two-line name so the subtitle never prints over it
+      let headerH = 250;
       const header = (continued) => {
-        x.fillStyle = '#201a17'; x.fillRect(0, 0, this.W, continued ? 150 : 250);
-        const hy = this._text(x, name + (continued ? '  (continued)' : ''), this.M, continued ? 44 : 70, { font: this._serif(continued ? 40 : 52), color: '#ffffff', max: continued ? 1 : 2 });
-        if (!continued) this._text(x, supName(cpt) + ' · ' + cpt.venue + ' · ' + fmtTime(cpt.createdAt), this.M, Math.min(hy + 8, 186), { font: this._sans(26), color: 'rgba(255,255,255,.72)', max: 1 });
+        const font = this._serif(continued ? 40 : 52);
+        const nameH = continued ? 0 : this._measure(x, name, font, this.W - 2 * this.M, 1.2, 2);
+        headerH = continued ? 150 : Math.max(250, 70 + nameH + 74);
+        x.fillStyle = '#201a17'; x.fillRect(0, 0, this.W, headerH);
+        const hy = this._text(x, name + (continued ? '  (continued)' : ''), this.M, continued ? 44 : 70, { font, color: '#ffffff', max: continued ? 1 : 2 });
+        if (!continued) this._text(x, supName(cpt) + ' · ' + cpt.venue + ' · ' + fmtDateTime(cpt.createdAt), this.M, hy + 10, { font: this._sans(26), color: 'rgba(255,255,255,.72)', max: 1 });
       };
       header(false);
 
@@ -214,7 +219,7 @@ const DayPack = {
       const labelImg = await this._img(cpt.photos.label && photoThumb(cpt.photos.label));
       const cardP = cpt.photos.card || (typeof cardPhotoOf === 'function' ? cardPhotoOf(cpt) : null);
       const cardImg = await this._img(cardP && photoThumb(cardP));
-      let y = 300;
+      let y = headerH + 50;
       this._cover(x, heroImg, this.M, y, 700, 540, 22);
       this._cover(x, labelImg, this.M + 724, y, 348, 260, 18);
       x.fillStyle = '#625852'; x.font = this._sans(20, 700);
@@ -236,12 +241,15 @@ const DayPack = {
       y += extras.length ? 730 : 600;
 
       // chips (wrapping)
-      const st = ST_COLORS[cpt.needsReview ? 'Needs review' : cpt.status] || ST_COLORS.Captured;
-      const chips = [{ t: cpt.needsReview ? 'Needs review' : cpt.status, bg: st[0], fg: st[1] },
+      // the same status the app shows: a shortlisted record is Shortlisted
+      // even while its name is still to be confirmed
+      const stLabel = cpt.needsReview && cpt.status === 'Captured' ? 'Needs review' : cpt.status;
+      const st = ST_COLORS[stLabel] || ST_COLORS.Captured;
+      const chips = [{ t: stLabel, bg: st[0], fg: st[1] },
         { t: cpt.category, bg: '#201a17', fg: '#ffffff' }, { t: '◎ ' + cpt.venue, bg: '#ebe3d8', fg: '#625852' }];
       if (cpt.rating) chips.push({ t: '★ ' + cpt.rating + '/5', bg: '#f5ead8', fg: '#94601e' });
       (cpt.rooms || []).forEach(r => chips.push({ t: r, bg: '#f4e6ea', fg: '#6f273a' }));
-      if (cpt.price) chips.push({ t: cpt.currency + ' ' + cpt.price, bg: '#ebe3d8', fg: '#625852' });
+      if (cpt.price) chips.push({ t: cpt.currency + ' ' + cpt.price + (cpt.unit ? ' ' + cpt.unit : ''), bg: '#ebe3d8', fg: '#625852' });
       y = this._chips(x, chips, y) + 20;
 
       // text blocks, budgeted: anything that will not fit goes to a
@@ -258,7 +266,7 @@ const DayPack = {
       if (cpt.nameZh) facts.push(['Name (中文)', cpt.nameZh]);
       if (cpt.code) facts.push(['Model / code', cpt.code]);
       if (cpt.size) facts.push(['Size / spec', cpt.size]);
-      const co = cpt._company;
+      const co = opts.companyOf ? opts.companyOf(cpt) : (cpt._company || null);
       if (co && co.nameZh) facts.push(['Company (中文)', co.nameZh]);
       if (co && co.contact) facts.push(['Contact', co.contact]);
       if (co && co.wechat) facts.push(['WeChat / phone', co.wechat]);

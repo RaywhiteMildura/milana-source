@@ -42,7 +42,7 @@ function freshDraft() {
   return {
     product: [], label: null, card: null,
     category: '', rooms: [], roomsMore: false, rating: 0,
-    priceOpen: false, currency: 'CNY', price: '',
+    priceOpen: false, currency: 'CNY', price: '', unit: '',
     rec: 'idle', recSec: 0, voice: null,
     supplierKey: '',
   };
@@ -71,7 +71,7 @@ let _draftDirty = false;
 function draftMeta(dr = S.draft) {
   return {
     category: dr.category, rooms: dr.rooms, rating: dr.rating,
-    priceOpen: dr.priceOpen, currency: dr.currency, price: dr.price,
+    priceOpen: dr.priceOpen, currency: dr.currency, price: dr.price, unit: dr.unit || '',
     supplierKey: dr.supplierKey,
   };
 }
@@ -106,6 +106,61 @@ function flushDraft() { if (_draftDirty) writeDraftNow(); }
 function clearDraftStore() {
   clearTimeout(_draftTimer); _draftTimer = null; _draftDirty = false;
   return dbBatch([{ store: 'settings', type: 'delete', key: 'draft' }, { store: 'settings', type: 'delete', key: 'draftMeta' }]).catch(() => {});
+}
+
+/* Typed settings and company fields coalesce for 400 ms before they are
+   written. iOS freezes timers the moment the app is hidden, so every deferred
+   write is registered here and flushed on hide — a name typed and then a
+   switch to WeChat never loses the last word. */
+const Pending = new Map();
+function defer(key, fn, ms = 400) {
+  const p = Pending.get(key);
+  if (p) clearTimeout(p.t);
+  Pending.set(key, { fn, t: setTimeout(() => { Pending.delete(key); fn(); }, ms) });
+}
+function flushPending() {
+  for (const [k, p] of [...Pending]) {
+    clearTimeout(p.t);
+    Pending.delete(k);
+    try { p.fn(); } catch (e) { /* reported by the writer */ }
+  }
+}
+
+/* The Complete-record screen is edited for minutes and its "Look up company"
+   buttons deliberately leave the app — iOS may evict it meanwhile. The typed
+   fields are kept as a draft keyed by record id until Confirm. */
+function persistRvDraft() {
+  if (S.view !== 'reviewItem' || !S.reviewId) return;
+  const id = S.reviewId;
+  defer('rvDraft', () => {
+    if (S.reviewId !== id) return;
+    settingSet('rvDraft', { id, at: new Date().toISOString(), rv: S.rv, rvZh: S.rvZh, rvEn: S.rvEn, bioAt: S.rvBioAt, pending: S.rvLookupPending }).catch(() => {});
+  });
+}
+function clearRvDraft() {
+  const p = Pending.get('rvDraft');
+  if (p) { clearTimeout(p.t); Pending.delete('rvDraft'); }
+  return settingRemove('rvDraft').catch(() => {});
+}
+
+/* "Never backed up" / "Last backup: 3 days ago" — shown where the owner is
+   each evening, so the one phone holding the trip is never left unbacked. */
+function backupStatus() {
+  const n = S.captures.length;
+  if (!S.lastBackupAt) return { text: n ? 'Never backed up' : 'Nothing to back up yet', warn: n > 0 };
+  const a = new Date(S.lastBackupAt); a.setHours(0, 0, 0, 0);
+  const b = new Date(); b.setHours(0, 0, 0, 0);
+  const d = Math.round((b - a) / 86400000);
+  const newer = S.captures.some(c => String(c.updatedAt || c.createdAt) > S.lastBackupAt);
+  return {
+    text: d <= 0 ? 'Last backup: today' : d === 1 ? 'Last backup: yesterday' : 'Last backup: ' + d + ' days ago',
+    warn: d > 1 || (d === 1 && newer),
+  };
+}
+
+/* "CNY 180 per m²" — a quote without a unit is unusable for costing. */
+function priceLabel(r) {
+  return r.currency + ' ' + r.price + (r.unit ? ' ' + r.unit : '');
 }
 
 /* Any failure the user needs to know about lands here — never silent. */
@@ -504,7 +559,7 @@ function savedChips(rec) {
   chips.push({ t: '◎ ' + rec.venue, bg: '#ebe3d8', fg: '#625852' });
   rec.rooms.slice(0, 3).forEach(r => chips.push({ t: r, bg: '#f4e6ea', fg: '#6f273a' }));
   if (rec.rating) chips.push({ t: '★ ' + rec.rating + '/5', bg: '#f5ead8', fg: '#94601e' });
-  if (rec.price) chips.push({ t: rec.currency + ' ' + rec.price, bg: '#ebe3d8', fg: '#625852' });
+  if (rec.price) chips.push({ t: priceLabel(rec), bg: '#ebe3d8', fg: '#625852' });
   if (rec.companyKey && rec.companyKey === S.session.key) {
     chips.push({ t: ord(sessionCount()) + ' product at this ' + sessWord(), bg: '#e3efe8', fg: '#355f4b' });
   } else if (rec.companyKey) {
@@ -520,7 +575,9 @@ const Actions = {
   nav(arg) {
     // a new version that took over mid-session applies once we are back on
     // Today with nothing in progress
-    if (S.updateReady && arg === 'home' && !draftPhotoCount()) { flushDraft(); location.reload(); return; }
+    if (S.updateReady && arg === 'home' && !draftPhotoCount()) { flushDraft(); flushPending(); location.reload(); return; }
+    // leaving a record on purpose drops its unsaved-edit draft
+    if (S.view === 'reviewItem' && arg !== 'reviewItem') clearRvDraft();
     S.view = arg; S.detailId = null; S.companyKey = null; S.viewPhoto = null;
     if (arg !== 'reviewItem') S.reviewId = null;
     // leaving the review section entirely — hand the OCR models' memory back;
@@ -671,6 +728,8 @@ const Actions = {
   },
 
   startCapture() {
+    // last night's final booth never claims this morning's first product
+    expireStaleSession();
     // an unfinished capture with photos is never thrown away by accident
     if (S.view !== 'shoot' && S.view !== 'tag' && draftPhotoCount()) {
       const n = draftPhotoCount();
@@ -782,7 +841,7 @@ const Actions = {
   async snap() {
     const k = S.camera;
     if (!k) return;
-    if (Cam.opening) return; // live camera is about to appear — don't double-open capture UIs
+    if (Cam.opening) { Fx.toast('The camera is still starting — one second.', { ms: 1200 }); return; }
     // a double-tap on the shutter is one shot, not two photos (or two company
     // records); moving on to the next slot is never held up
     if (Cam.lastShotK === k && Date.now() - Cam.lastShotAt < 350) return;
@@ -850,7 +909,7 @@ const Actions = {
       id: uid('cap'), createdAt: now, updatedAt: now,
       createdBy: S.user.name, role: S.user.role,
       venue: S.venue, category: dr.category, rooms: dr.rooms.slice(), rating: dr.rating,
-      currency: dr.currency, price: dr.price.trim(), note: '',
+      currency: dr.currency, price: dr.price.trim(), unit: dr.price.trim() ? (dr.unit || '') : '', note: '',
       voiceNote: dr.voice ? { blob: dr.voice.blob, duration: dr.voice.duration } : null,
       photos: { product: dr.product.slice(), label: dr.label, card: dr.card || null },
       companyKey, name: '', code: '', size: '',
@@ -1000,7 +1059,7 @@ const Actions = {
     try {
       const text = await Lookup.fetchBio(S.aiKey, info);
       const at = new Date().toISOString();
-      if (isRv && onRecord()) { S.rv.bio = text; S.rvBioAt = at; S.rvLookupPending = false; }
+      if (isRv && onRecord()) { S.rv.bio = text; S.rvBioAt = at; S.rvLookupPending = false; persistRvDraft(); }
       if (co) { co.bio = text; co.bioAt = at; co.lookupPending = false; await dbPut('companies', co); }
       Fx.toast('Bio fetched — AI lookup, verify it yourself.');
     } catch (err) {
@@ -1015,11 +1074,12 @@ const Actions = {
   catFilter(arg) { S.catFilter = S.catFilter === arg ? 'All' : arg; renderAll(); },
   venueFilter(arg) { S.venueFilter = S.venueFilter === arg ? 'All places' : arg; renderAll(); },
 
-  openReview(arg) {
+  async openReview(arg) {
     const c = S.captures.find(x => x.id === arg);
     if (!c) return;
     const co = companyOf(c.companyKey);
     S.reviewId = arg; S.view = 'reviewItem'; S.detailId = null;
+    S.rvRenderPending = false;
     S.rv = {
       company: (co && co.name) || '', contact: (co && co.contact) || '', wechat: (co && co.wechat) || '',
       pname: c.name || '', code: c.code || '', size: c.size || '',
@@ -1037,8 +1097,76 @@ const Actions = {
     S.rvBioAt = (co && co.bioAt) || '';
     S.rvLookupPending = !!(co && co.lookupPending);
     renderAll();
+    // edits typed last time this record was open (and lost to a suspend or
+    // a trip out to Bing) come back before the photos are read
+    let restored = false;
+    try {
+      const d = await settingGet('rvDraft', null);
+      if (d && d.id === arg && S.reviewId === arg && d.rv) {
+        S.rv = { ...S.rv, ...d.rv };
+        S.rvZh = { ...S.rvZh, ...(d.rvZh || {}) };
+        S.rvEn = d.rvEn || {};
+        if (d.bioAt) S.rvBioAt = d.bioAt;
+        if (d.pending) S.rvLookupPending = true;
+        restored = true;
+      } else if (d && d.id !== arg) {
+        clearRvDraft();
+      }
+    } catch (e) { /* no draft */ }
+    if (S.reviewId !== arg) return;
+    if (restored) { renderAll(); Fx.toast('Restored your unsaved edits to this record.'); }
     runOcrPrefill(c);
   },
+
+  /* The product was filed under the wrong company (a forgotten "New booth").
+     It moves to a fresh company of its own — the booth it came from keeps
+     its name, contact and WeChat untouched. */
+  async splitCompany() {
+    const c = S.captures.find(x => x.id === S.reviewId);
+    if (!c) return;
+    const old = companyOf(c.companyKey);
+    const co = { key: uid('co'), label: 'Card #' + (S.cardN + 1) + ' · ' + c.venue, name: '', nameZh: '', contact: '', contactZh: '', wechat: '',
+      cardPhoto: c.photos.card ? c.photos.card.blob : null, cardThumb: c.photos.card ? c.photos.card.thumb : null,
+      venue: c.venue, word: (old && old.word) || sessWord(), createdAt: new Date().toISOString() };
+    const prevKey = c.companyKey;
+    c.companyKey = co.key;
+    c.updatedAt = new Date().toISOString();
+    try {
+      await dbBatch([
+        { store: 'companies', type: 'put', value: co },
+        { store: 'captures', type: 'put', value: c },
+        { store: 'settings', type: 'put', value: { key: 'cardN', value: S.cardN + 1 } },
+      ]);
+    } catch (err) {
+      c.companyKey = prevKey;
+      reportError(err, 'The company change');
+      return;
+    }
+    S.cardN += 1;
+    S.companies.push(co);
+    if (S.session.key === prevKey && S.captures.filter(x => x.companyKey === prevKey).length === 0) {
+      S.session = { key: '', venue: '' };
+      settingSet('session', S.session).catch(() => {});
+    }
+    S.rv.company = ''; S.rv.contact = ''; S.rv.wechat = ''; S.rv.website = ''; S.rv.notes = ''; S.rv.bio = '';
+    S.rvZh.company = ''; S.rvZh.contact = '';
+    S.rvBioAt = ''; S.rvLookupPending = false;
+    S.rvLines.card = [];
+    persistRvDraft();
+    renderAll();
+    Fx.toast('Moved to its own company — type or read the right name below. ' + coName(old) + ' is unchanged.');
+  },
+
+  /* From the Saved screen: the next product is from a different booth. */
+  async newBoothCapture() {
+    S.session = { key: '', venue: '' };
+    S.sessionUndo = null;
+    await settingSet('session', S.session);
+    Actions.startCapture();
+  },
+
+  setUnit(arg) { S.draft.unit = S.draft.unit === arg ? '' : arg; persistDraft(); renderAll(); },
+  toggleAiKeyShown() { S.aiKeyShown = !S.aiKeyShown; render(); },
 
   async confirmReview() {
     const c = S.captures.find(x => x.id === S.reviewId);
@@ -1088,9 +1216,13 @@ const Actions = {
       return;
     }
     if (newCo) S.companies.push(co);
+    clearRvDraft();
     S.view = 'review'; S.reviewId = null;
     renderAll();
-    Fx.toast(wasComplete ? 'Record updated' : 'Record completed — company saved for every product from that ' + ((co && co.word) || 'company'));
+    const shared = co ? S.captures.filter(x => x.companyKey === co.key).length : 0;
+    Fx.toast(wasComplete ? 'Record updated' : shared > 1
+      ? 'Record completed — the company details now cover all ' + shared + ' products from that ' + ((co && co.word) || 'company')
+      : 'Record completed');
   },
 
   /* Day pack: choose a day (and shortlist-only), build once with progress,
@@ -1111,7 +1243,6 @@ const Actions = {
     S.packBusy = { done: 0, total: list.length }; S.pack = null;
     renderAll();
     try {
-      list.forEach(c => { c._company = companyOf(c.companyKey); });
       const { blob, pages } = await DayPack.build(list, supName, {
         title, dateStr,
         companyOf: c => companyOf(c.companyKey),
@@ -1192,7 +1323,7 @@ const Actions = {
   exportCSV() {
     const cols = ['createdAt', 'createdBy', 'project', 'venue', 'category', 'rooms', 'name', 'name_zh', 'code', 'size',
       'company', 'company_zh', 'contact', 'contact_zh', 'wechat', 'website', 'company_notes', 'company_bio',
-      'rating', 'currency', 'price', 'status',
+      'rating', 'currency', 'price', 'unit', 'status',
       'needsReview', 'productPhotos', 'voiceSec', 'note'];
     const rows = [cols].concat(S.captures.map(c => {
       const co = companyOf(c.companyKey);
@@ -1200,12 +1331,20 @@ const Actions = {
         c.name, c.nameZh || '', c.code, c.size,
         co ? coName(co) : '', co ? (co.nameZh || '') : '', co ? co.contact : '', co ? (co.contactZh || '') : '',
         co ? co.wechat : '', co ? (co.website || '') : '', co ? (co.notes || '') : '', co ? (co.bio || '') : '',
-        c.rating, c.currency, c.price, displaySt(c), c.needsReview ? 'yes' : 'no',
+        c.rating, c.currency, c.price, c.unit || '', displaySt(c), c.needsReview ? 'yes' : 'no',
         c.photos.product.length, c.voiceNote ? c.voiceNote.duration : '', c.note];
     }));
+    // a cell starting with = + - @ would run as a formula in Excel, and
+    // "+86 138…" becomes 8.6E+12 — such cells are written as text literals
+    const cell = v => {
+      const s = String(v ?? '');
+      const risky = /^[=+\-@\t\r]/.test(s) || /^\+?\d[\d\s-]{9,}$/.test(s);
+      if (risky) return '"=""' + s.replace(/"/g, '') + '"""';
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
     // the BOM makes Excel open the Chinese columns correctly
-    const csv = '﻿' + rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(',')).join('\r\n');
-    shareOrDownload('milana-source-' + ymd(new Date()) + '.csv', new Blob([csv], { type: 'text/csv' }), 'text/csv')
+    const csv = '﻿' + rows.map(r => r.map(cell).join(',')).join('\r\n');
+    shareOrDownload('milana-source-' + ymd(new Date()) + '.csv', new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'text/csv;charset=utf-8')
       .then(r => { if (r === 'downloaded') Fx.toast('CSV saved to your Downloads folder'); else if (r === 'failed') Fx.toast('Could not open the share sheet — try again.'); });
   },
 
@@ -1257,7 +1396,40 @@ const Actions = {
 };
 
 /* ── OCR pre-fill at review time ─────────────────────────────── */
-function renderIfReview(id) { if (S.view === 'reviewItem' && S.reviewId === id) renderAll(); }
+function isRvInputFocused() {
+  const a = document.activeElement;
+  return !!(a && a.dataset && a.dataset.input && a.dataset.input.indexOf('rv.') === 0);
+}
+/* An OCR result arriving while the owner is typing must not rebuild the
+   field under the keyboard: the other fields are filled in place and the
+   full render waits for the field to be left. */
+function renderIfReview(id) {
+  if (S.view !== 'reviewItem' || S.reviewId !== id) return;
+  if (!isRvInputFocused()) { renderAll(); return; }
+  document.querySelectorAll('[data-input^="rv."]').forEach(el => {
+    if (el === document.activeElement) return;
+    const k = el.dataset.input.slice(3);
+    if (S.rv[k] !== undefined && el.value !== S.rv[k]) el.value = S.rv[k];
+  });
+  S.rvRenderPending = true;
+}
+
+/* Drop the booth session when it started on another day (or its company is
+   gone). Used at boot and before every new capture. */
+function expireStaleSession() {
+  if (!S.session.key) return;
+  const sco = companyOf(S.session.key);
+  const startedAt = S.session.at || (sco && sco.createdAt);
+  if (!sco || (startedAt && dayKey(startedAt) !== dayKey())) {
+    S.session = { key: '', venue: '' };
+    S.sessionUndo = null;
+    settingSet('session', S.session).catch(() => {});
+  }
+}
+
+/* The same company card is read once per booth, not once per product:
+   the lines from the first read are reused for every later record. */
+const _cardLinesCache = new Map();
 
 /* Card first, then label — one photo through the pipeline at a time, because
    two full-size preprocess runs side by side exceed what iOS grants a page. */
@@ -1275,7 +1447,12 @@ async function runOcrPrefill(c) {
   renderIfReview(id);
   if (needCard) {
     try {
-      const lines = await OCR.readLines(cardBlob, { isCancelled: gone });
+      const cacheKey = c.companyKey && !c.photos.card ? c.companyKey + '|' + cardBlob.size : '';
+      let lines = cacheKey ? _cardLinesCache.get(cacheKey) : null;
+      if (!lines) {
+        lines = await OCR.readLines(cardBlob, { isCancelled: gone });
+        if (cacheKey && lines.length) _cardLinesCache.set(cacheKey, lines);
+      }
       if (gone()) return;
       S.rvLines.card = lines.map(l => l.text);
       S.rvRead.card = lines.length ? 'ok' : 'none';
@@ -1330,30 +1507,27 @@ function onInputChange(name, value) {
     S.loginTmp.project = value;
   } else if (name === 'projectName') {
     S.projectName = value.trim();
-    clearTimeout(window.__projTimer);
-    window.__projTimer = setTimeout(() => settingSet('projectName', S.projectName), 400);
+    defer('projectName', () => settingSet('projectName', S.projectName).catch(err => reportError(err, 'The project name')));
   } else if (name === 'aiKey') {
     S.aiKey = value.trim();
-    clearTimeout(window.__aiKeyTimer);
-    window.__aiKeyTimer = setTimeout(() => settingSet('aiKey', S.aiKey), 400);
+    defer('aiKey', () => settingSet('aiKey', S.aiKey).catch(err => reportError(err, 'The API key')));
   } else if (name === 'tripStart') {
     S.tripStart = /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null;
     S.pack = null;
-    clearTimeout(window.__tripTimer);
-    window.__tripTimer = setTimeout(() => settingSet('tripStart', S.tripStart), 400);
+    defer('tripStart', () => settingSet('tripStart', S.tripStart).catch(err => reportError(err, 'The trip start')));
   } else if (name.indexOf('co.') === 0) {
     // name / contact / website / notes / bio typed straight onto an open company record
     const co = companyOf(S.companyKey);
     if (co) {
       co[name.slice(3)] = value;
-      clearTimeout(window.__coTimer);
-      window.__coTimer = setTimeout(() => {
+      defer('co:' + co.key, () => {
         co.updatedAt = new Date().toISOString();
         dbPut('companies', co).catch(err => reportError(err, 'The company'));
-      }, 400);
+      });
     }
   } else if (name.indexOf('rv.') === 0) {
     S.rv[name.slice(3)] = value;
+    persistRvDraft();
     if (name === 'rv.company') {
       // the "Look up company" section appears once a name is present
       clearTimeout(window.__rvCoTimer);
@@ -1479,22 +1653,31 @@ async function importBackup(e) {
   const files = e.target.files ? [...e.target.files] : [];
   e.target.value = '';
   if (!files.length) return;
+  if (S.backupBusy) { Fx.toast('Still working on the last file — a moment.'); return; }
   S.backupBusy = { label: 'Importing', done: 0, total: 0 };
   render();
+  /* whatever landed — even from a file that failed half-way — is shown at
+     once, not after a relaunch */
+  const reloadLists = async () => {
+    try {
+      S.captures = (await dbAll('captures')).filter(c => c && typeof c.id === 'string' && c.photos && Array.isArray(c.photos.product))
+        .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+      S.companies = (await dbAll('companies')).filter(co => co && typeof co.key === 'string');
+      // restore the card counter so future "Card #N · {place}" labels never collide
+      let maxN = S.cardN;
+      S.companies.forEach(co => { const m = /^Card #(\d+) · /.exec(co.label || ''); if (m) maxN = Math.max(maxN, Number(m[1])); });
+      if (maxN > S.cardN) { S.cardN = maxN; await settingSet('cardN', S.cardN); }
+      S.pack = null;
+    } catch (err) { /* lists stay as they were */ }
+  };
   try {
     const sum = await Backup.importFiles(files, p => { S.backupBusy = p; render(); });
-    S.captures = (await dbAll('captures')).filter(c => c && typeof c.id === 'string' && c.photos && Array.isArray(c.photos.product))
-      .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
-    S.companies = (await dbAll('companies')).filter(co => co && typeof co.key === 'string');
-    // restore the card counter so future "Card #N · {place}" labels never collide
-    let maxN = S.cardN;
-    S.companies.forEach(co => { const m = /^Card #(\d+) · /.exec(co.label || ''); if (m) maxN = Math.max(maxN, Number(m[1])); });
-    if (maxN > S.cardN) { S.cardN = maxN; await settingSet('cardN', S.cardN); }
-    S.pack = null;
+    await reloadLists();
     const msg = sum.captures + (sum.captures === 1 ? ' capture' : ' captures') + ', ' + sum.companies + (sum.companies === 1 ? ' company' : ' companies') + ' imported'
       + (sum.skipped ? ' · ' + sum.skipped + ' skipped' : '') + (sum.notes.length ? ' · ' + sum.notes[0] : '');
     Fx.toast(msg, { sticky: !!(sum.skipped || sum.notes.length) });
   } catch (err) {
+    await reloadLists();
     reportError(err, 'The import');
   } finally {
     S.backupBusy = null;
@@ -1538,15 +1721,23 @@ function bindGlobalListeners() {
     e.target.value = '';
     if (!file || !S.camera) return;
     // native-camera shots are stored exactly as the camera app produced them
-    handleShot(S.camera, file).catch(err => reportError(err, 'That photo'));
+    const k = S.camera;
+    handleShot(k, file).then(() => {
+      if (k === 'product' && S.camera === 'product') Fx.toast('Photo ' + S.draft.product.length + ' added — shutter for another face, or Next.', { ms: 1800 });
+    }).catch(err => reportError(err, 'That photo'));
   });
   // the camera must not run in the background, and must come back on return;
   // a draft change still waiting on its debounce is written before we go
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { flushDraft(); Cam.stop(); }
+    if (document.hidden) { flushDraft(); flushPending(); Cam.stop(); }
     else if (S.camera && S.ready) renderCam();
   });
-  window.addEventListener('pagehide', flushDraft);
+  window.addEventListener('pagehide', () => { flushDraft(); flushPending(); });
+  // a re-render held back while a review field was being typed in happens
+  // once the field is left
+  document.addEventListener('focusout', () => {
+    if (S.rvRenderPending) { S.rvRenderPending = false; setTimeout(() => { if (S.view === 'reviewItem' && !isRvInputFocused()) renderAll(); }, 60); }
+  });
   window.addEventListener('error', e => { if (e && e.error) reportError(e.error, 'Something'); });
   window.addEventListener('unhandledrejection', e => { reportError(e.reason, 'Something'); });
 }
@@ -1649,14 +1840,7 @@ async function bootData() {
 
     // a booth session never outlives its day — the first capture next
     // morning must not file under last night's final booth
-    if (S.session.key) {
-      const sco = companyOf(S.session.key);
-      const startedAt = S.session.at || (sco && sco.createdAt);
-      if (!sco || (startedAt && dayKey(startedAt) !== dayKey())) {
-        S.session = { key: '', venue: '' };
-        await settingSet('session', S.session);
-      }
-    }
+    expireStaleSession();
 
     // sweep unnamed companies left by abandoned capture flows (no records, not the live session)
     const usedKeys = new Set(S.captures.map(c => c.companyKey));

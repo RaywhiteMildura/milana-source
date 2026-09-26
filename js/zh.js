@@ -12,7 +12,8 @@ const ZH = {
     // ── company suffixes / legal forms ──
     '股份有限公司': 'Co., Ltd', '有限责任公司': 'Co., Ltd', '有限公司': 'Co., Ltd',
     '集团有限公司': 'Group Co., Ltd', '集团': 'Group', '公司': 'Company',
-    '实业': 'Industrial', '贸易': 'Trading', '进出口': 'Import & Export',
+    '实业': 'Industrial', '国际贸易': 'International Trading', '贸易': 'Trading', '进出口': 'Import & Export',
+    '国际': 'International',
     '科技': 'Technology', '工贸': 'Industry & Trade', '商行': 'Trading Firm',
     '工厂': 'Factory', '制造': 'Manufacturing', '厂': 'Factory',
     '销售部': 'Sales Department', '事业部': 'Division', '分公司': 'Branch',
@@ -21,7 +22,7 @@ const ZH = {
     // ── trades / product categories ──
     '建筑材料': 'Building Materials', '建材': 'Building Materials',
     '装饰材料': 'Decorative Materials', '装饰': 'Decoration', '装修': 'Renovation',
-    '陶瓷': 'Ceramics', '瓷砖': 'Tiles', '岩板': 'Sintered Stone', '大板': 'Large Slab',
+    '陶瓷': 'Ceramics', '瓷砖': 'Tiles', '瓷片': 'Ceramic Wall Tiles', '岩板': 'Sintered Stone', '大板': 'Large Slab',
     '微晶石': 'Crystallised Stone', '通体': 'Full Body',
     '石材': 'Stone', '大理石': 'Marble', '花岗岩': 'Granite', '石英石': 'Quartz',
     '人造石': 'Engineered Stone', '天然石': 'Natural Stone', '荒料': 'Block',

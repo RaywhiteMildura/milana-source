@@ -49,7 +49,13 @@ const Lookup = {
   TIMEOUT_MS: 30000,
   _inflight: null,
   cancel() { if (this._inflight) { try { this._inflight.abort(); } catch (e) { /* done */ } } },
+  /* Where the service is not reachable at all (mainland-China networks block
+     it) the owner needs to hear "roaming or VPN", not a raw network error. */
+  UNREACHABLE: 'The lookup service could not be reached from this network — in mainland China it needs roaming data or a VPN. The Bing, Alibaba and 1688 buttons still work.',
   async _call(apiKey, messages, ac) {
+    // a smart quote or a space pasted along with the key is the usual cause
+    // of an "invalid header" failure that looks like a network problem
+    if (!/^[\x21-\x7e]+$/.test(apiKey)) throw new Error('The API key contains a character that cannot be sent (a space or a curly quote, usually) — re-paste it in Settings.');
     const timer = setTimeout(() => ac.abort(), this.TIMEOUT_MS);
     let res;
     try {
@@ -71,8 +77,8 @@ const Lookup = {
       });
     } catch (err) {
       clearTimeout(timer);
-      if (err && err.name === 'AbortError') throw new Error('The lookup timed out — this network may not reach the lookup service. Try again on roaming data or a VPN.');
-      throw new Error('No connection to the lookup service — try again when you have signal.');
+      if (err && err.name === 'AbortError') throw new Error('The lookup timed out — ' + this.UNREACHABLE);
+      throw new Error(navigator.onLine === false ? 'No signal — try again when you are back online.' : this.UNREACHABLE);
     }
     clearTimeout(timer);
     if (!res.ok) {
@@ -81,13 +87,26 @@ const Lookup = {
         const err = await res.json();
         if (err && err.error && err.error.message) msg = err.error.message;
       } catch (e) { /* keep the status message */ }
+      if (res.status === 400) msg = 'The lookup request was rejected: ' + String(msg).slice(0, 100);
       if (res.status === 401) msg = 'The API key was not accepted — check it in Settings.';
-      if (res.status === 403) msg = 'This API key is not allowed to be used from a browser — create a key without that restriction.';
+      if (res.status === 403) msg = 'The lookup service is not available from this network or region, or the key is not allowed in a browser — try roaming data or a VPN, and check the key.';
       if (res.status === 429) msg = 'The lookup service is rate-limited — try again in a minute.';
       if (res.status >= 500) msg = 'The lookup service had a hiccup — try again.';
       throw new Error(msg);
     }
     return res.json();
+  },
+
+  /* The answer, without the "I'll research this company…" preamble that
+     precedes the searches: keep the text written after the last search
+     result when there is any, else everything. */
+  _answerText(content) {
+    const blocks = Array.isArray(content) ? content : [];
+    let lastSearch = -1;
+    blocks.forEach((b, i) => { if (b && (b.type === 'web_search_tool_result' || b.type === 'server_tool_use')) lastSearch = i; });
+    const after = blocks.slice(lastSearch + 1).filter(b => b && b.type === 'text').map(b => b.text).join('').trim();
+    if (after) return after;
+    return blocks.filter(b => b && b.type === 'text').map(b => b.text).join('').trim();
   },
   async fetchBio(apiKey, info) {
     const ac = new AbortController();
@@ -101,11 +120,7 @@ const Lookup = {
         messages.push({ role: 'assistant', content: data.content });
         data = await this._call(apiKey, messages, ac);
       }
-      const text = (data.content || [])
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('')
-        .trim();
+      const text = this._answerText(data.content);
       if (!text) throw new Error('The lookup came back empty — try again.');
       return data.stop_reason === 'max_tokens' ? text + ' …' : text;
     } finally {

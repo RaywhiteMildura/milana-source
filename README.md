@@ -24,6 +24,11 @@ Notes for the trip:
 - In the camera, **✕ last** removes a blurry product photo without starting over. A double-tap on the shutter is one photo, not two.
 - **↻ New booth / new card** then **Cancel** puts the previous booth back — nothing is lost by backing out.
 - The company card is stored once per company; every later product from the same booth shows and exports that same card.
+- **Forgot to tap New booth?** Open the product → Complete record → **This product is from a different company**. It moves to its own company; the booth it came from keeps its name and WeChat. Typing a different name over a shared company warns you first that all its products get renamed.
+- After **Save**, the Saved screen offers **Different booth — new card** as well as **Next capture · same booth**.
+- A quoted price can carry a unit (per m², per piece, per set…) so the builder can cost it. It goes into the day pack and the CSV.
+- The evening review screen shows **Never backed up / Last backup: today** with a Back up button, so the phone holding the trip is never left unbacked. Half-typed edits on a record are kept if the app is closed mid-way and restored when it is reopened.
+- The AI company lookup cannot reach its service from mainland-China wifi or SIMs; it needs roaming data or a VPN. The Bing, Alibaba and 1688 buttons work on any network.
 - If the phone runs out of space, Save tells you plainly and keeps the photos — back up, clear old days, then Save again.
 - The PIN is optional. If it is forgotten, **Forgot the PIN?** on the unlock screen erases the phone's records (it asks twice) — so write the PIN down, or skip it.
 - The camera, microphone and photos never leave the device. Reading runs on the phone itself; the only thing that ever uses the network is the optional AI company lookup, with your own key.

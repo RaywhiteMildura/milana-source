@@ -74,14 +74,15 @@ button, [role="button"] { user-select: none; -webkit-user-select: none; }
 .vscroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
 /* dark header inputs */
-.hdr-input { width: 100%; box-sizing: border-box; border: 0; border-radius: 12px; padding: 12px 14px; background: rgba(255,255,255,.10); color: #fff; outline: none; font-size: 14px; }
+/* 16px in every text field: readable for Chinese, and iOS never zooms in on focus */
+.hdr-input { width: 100%; box-sizing: border-box; border: 0; border-radius: 12px; padding: 12px 14px; background: rgba(255,255,255,.10); color: #fff; outline: none; font-size: 16px; }
 .hdr-input::placeholder { color: rgba(255,255,255,.5); }
 
 /* light inputs (review / price) */
-.fld { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; background: #fff; outline: none; font-size: 13.5px; color: var(--ink); }
+.fld { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; background: #fff; outline: none; font-size: 16px; color: var(--ink); }
 .fld::placeholder { color: #a99d90; }
 .fld:focus { border-color: var(--brass); }
-.fld-strong { font-size: 14px; font-weight: 700; }
+.fld-strong { font-size: 16px; font-weight: 700; }
 
 /* animations from the design reference */
 @keyframes msPulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }

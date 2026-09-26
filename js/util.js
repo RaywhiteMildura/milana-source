@@ -34,6 +34,14 @@ function fmtTime(iso) {
   return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 }
 
+/* An absolute date and time for documents that outlive "Yesterday". */
+function fmtDateTime(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+    + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
 function greeting() {
   const h = new Date().getHours();
   return h < 12 ? 'Morning' : h < 18 ? 'Afternoon' : 'Evening';

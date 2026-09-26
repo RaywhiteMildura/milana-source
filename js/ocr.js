@@ -45,12 +45,17 @@ const OCR = {
   /* True when a read failed because the model files are not on the phone
      (first use without signal), rather than because of the photo. */
   modelsMissing(err) {
+    if (err && err.code === 'ocr-unavailable') return true;
     const m = String(err && (err.message || err) || '');
-    return /fetch|network|load|404|traineddata|wasm|NetworkError|Failed to/i.test(m);
+    return /fetch|network|load|404|traineddata|wasm|NetworkError|Failed to|not on this phone/i.test(m);
   },
 
-  /* Free both models — called when the review section is left. */
+  /* Free both models — called when the review section is left. A read that
+     is still running sees the generation change and stops instead of
+     respawning a 20 MB model into the void. */
+  _gen: 0,
   async release() {
+    this._gen += 1;
     const pending = Object.values(this._workers).filter(Boolean);
     this._workers = {};
     for (const p of pending) {
@@ -300,10 +305,13 @@ const OCR = {
      line's edges — never from the middle. */
   _tidy(text) {
     let s = String(text).replace(/\s+/g, ' ').trim();
-    s = s.replace(/^[^\w一-鿿(#$]+\s*/, '').replace(/\s*[^\w一-鿿)%.°"']+$/, '');
+    // currency marks lead prices; a trailing unit mark (², ³) is content
+    s = s.replace(/^[^\w一-鿿(#$¥€£]+\s*/, '').replace(/\s*[^\w一-鿿)%.°²³"']+$/, '');
     const tokens = s.split(' ');
-    while (tokens.length > 2 && /^[A-Za-z]$/.test(tokens[0])) tokens.shift();
-    while (tokens.length > 2 && /^[A-Za-z0-9]$/.test(tokens[tokens.length - 1])) tokens.pop();
+    // a lone letter at the edge is glare — but "Grade A" / "Type B" are not
+    while (tokens.length > 2 && /^[a-z]$/.test(tokens[0])) tokens.shift();
+    while (tokens.length >= 2 && /^[A-Za-z]$/.test(tokens[tokens.length - 1])
+      && !/^(grade|class|type|group|size|no\.?|model|series|vitamin|hall|block|zone|area)$/i.test(tokens[tokens.length - 2])) tokens.pop();
     return tokens.join(' ').trim();
   },
 
@@ -391,8 +399,17 @@ const OCR = {
     }
     const meaningful = letters + cjk + digits;
     if (!meaningful) return true;
-    // more punctuation and stray symbols than actual content
-    if (meaningful / chars.length < 0.55) return true;
+    // more punctuation and stray symbols than actual content — measured over
+    // the glyphs, not the spaces, and the punctuation that belongs to a
+    // price or a dimension ("¥ 128.00 / m²", "1.2 × 2.4 m") counts as content
+    const compact = chars.filter(ch => !/\s/.test(ch));
+    const hasDigit = digits > 0;
+    let content = 0;
+    for (const ch of compact) {
+      if (ZH.CJK.test(ch) || /[A-Za-z0-9]/.test(ch)) content++;
+      else if (hasDigit && /[.,:\/%°²³¥$€£×xX\-+~]/.test(ch)) content++;
+    }
+    if (content / Math.max(1, compact.length) < 0.55) return true;
 
     const tokens = t.split(/\s+/).filter(Boolean);
     // a scatter of loose single glyphs is a texture being read, not a line
@@ -402,8 +419,14 @@ const OCR = {
     }
     if (cjk) {
       // Latin letters threaded through Chinese — the Chinese model chewing
-      // on Latin text or on noise
-      if (letters >= cjk * 0.4) return true;
+      // on Latin text or on noise. A bilingual line ("Taj Mahal 岩板 柔光",
+      // "岩板 CALACATTA 800×800") has real Latin words; garbage has runs
+      // like "卜OSHAN 川NLAN" with no vowels and no digits.
+      if (letters >= cjk * 0.4) {
+        const runs = t.match(/[A-Za-z][A-Za-z0-9\-]*/g) || [];
+        const wordish = runs.filter(r => /\d/.test(r) || (/[aeiouyAEIOUY]/.test(r) && r.length >= 2) || /^[A-Z]{2,}$/.test(r) && /[AEIOUY]/.test(r));
+        if (!runs.length || wordish.length < runs.length * 0.6) return true;
+      }
       // one character stamped over and over ("沥 沥 沥 …"). Needs a long line
       // and a lot of repeats: 板 twice in 岩板 大板 is ordinary Chinese.
       if (cjk >= 6 && topRepeat >= 4 && topRepeat / cjk > 0.4) return true;
@@ -416,31 +439,47 @@ const OCR = {
      variant recovers what shadows, glare and dark labels hide. Each physical
      row keeps its best reading — so a line only one variant caught still
      makes it through, instead of a wholesale winner dropping it. */
-  async readLines(blob) {
+  async readLines(blob, opts = {}) {
+    const gen = this._gen;
+    // stop between passes when the record was left (or the models released)
+    const stop = () => gen !== this._gen || (opts.isCancelled && opts.isCancelled());
     // one variant at a time — two 2800px pipelines side by side is more canvas
     // memory than an iPhone will grant
     const gentle = await this.preprocess(blob);
+    if (stop()) return [];
     const flat = await this.preprocess(blob, { target: 2800, mode: 'flat', binarize: true });
+    if (stop()) return [];
+    // a pass that failed because a model could not be loaded (first use with
+    // no signal) is remembered — so an empty result is reported honestly
+    const fails = [];
+    const pass = (lang, img, psm) => stop() ? Promise.resolve([]) : this._passN(lang, img, psm).catch(err => { fails.push(err); return []; });
     // per-language chains (a language's passes share one worker and change
     // psm, so they run in sequence; the two languages run side by side)
     const cjkOnly = ls => ls.filter(l => ZH.scriptOf(l.text) === 'cjk');
     const engChain = (async () => {
       // auto layout reads clean rows; sparse mode catches the display type
       // auto layout throws away as "graphics" — each covers the other
-      const a = await this._passN('eng', gentle, '3').catch(() => []);
-      const b = await this._passN('eng', flat, '3').catch(() => []);
-      const c = await this._passN('eng', flat, '11').catch(() => []);
+      const a = await pass('eng', gentle, '3');
+      const b = await pass('eng', flat, '3');
+      const c = await pass('eng', flat, '11');
       return [...a, ...b, ...c];
     })();
     const chiChain = (async () => {
-      const a = await this._passN('chi_sim', gentle, '3').catch(() => []);
+      const a = await pass('chi_sim', gentle, '3');
       // a second Chinese pass only when the first saw Chinese but read it
       // poorly — an English-only photo never pays for it
       if (!cjkOnly(a).length || this._strength(cjkOnly(a)) >= 60) return a;
-      const b = await this._passN('chi_sim', flat, '3').catch(() => []);
+      const b = await pass('chi_sim', flat, '3');
       return [...a, ...b];
     })();
     const [engAll, chiAll] = await Promise.all([engChain, chiChain]);
+    if (stop()) return [];
+    if (!engAll.length && !chiAll.length && fails.length) {
+      const err = fails.find(e => this.modelsMissing(e)) || fails[0];
+      const out = new Error(this.modelsMissing(err) ? 'The reading models are not on this phone yet — open the app on wifi for a minute.' : String(err && err.message || 'The reader failed'));
+      out.code = this.modelsMissing(err) ? 'ocr-unavailable' : 'ocr-failed';
+      throw out;
+    }
 
     const keep = [...engAll, ...chiAll].filter(l => {
       if (this._noise(l.text)) return false;
@@ -453,6 +492,9 @@ const OCR = {
       // to a higher bar, and very short fragments to near-certainty
       if (l.psm === '11' && l.conf < 60) return false;
       if (l.text.replace(/[^A-Za-z0-9]/g, '').length <= 3 && l.conf < 90) return false;
+      // one short lowercase word on its own ("wenn") is texture read as a
+      // word unless the model is sure of it
+      if (/^[a-z]{1,5}$/.test(l.text.trim()) && l.conf < 75) return false;
       return l.conf >= 70 || this._wordish(l.text);
     });
 
@@ -659,13 +701,20 @@ const OCR = {
       }
     }
 
-    // wechat / phone
+    // wechat / phone: an explicit WeChat id first ("WeChat: same as mobile"
+    // is a pointer, not an id), then the mobile number — the one WeChat is
+    // bound to — before any landline or fax
     for (const t of texts) {
       const m = t.match(this.WECHAT);
-      if (m) { out.wechat = { value: m[2].trim(), zh: '' }; break; }
+      if (m && !/^(same|as|see|mobile|phone|tel|号码)/i.test(m[2].trim())) { out.wechat = { value: m[2].trim(), zh: '' }; break; }
+    }
+    if (!out.wechat.value) {
+      const mobile = texts.map(t => t.match(/(?:\+?86[\s-]?)?1[3-9]\d[\s-]?\d{4}[\s-]?\d{4}\b/)).find(Boolean);
+      if (mobile) out.wechat = { value: mobile[0].trim(), zh: '' };
     }
     if (!out.wechat.value) {
       for (const t of texts) {
+        if (/^\s*fax/i.test(t) || /传真/.test(t)) continue;
         const p = t.match(this.PHONE);
         if (p && p[1].replace(/\D/g, '').length >= 8) { out.wechat = { value: p[1].trim(), zh: '' }; break; }
       }
@@ -698,7 +747,9 @@ const OCR = {
     const items = this._items(lines);
     const texts = items.map(l => l.text);
     const out = { pname: { value: '', zh: '' }, code: { value: '', zh: '' }, size: { value: '', zh: '' } };
-    const sizeRe = /(\d{2,5}(?:\.\d+)?\s*[×xX*✕]\s*\d{2,5}(?:\.\d+)?(?:\s*[×xX*✕]\s*\d{1,4}(?:\.\d+)?)?\s*(?:mm|cm|m)?|\d{1,4}(?:\.\d+)?\s*(?:mm|cm|ml|mg|kg|g|litres?|liters?|l)\b)/i;
+    // "600 x 1200 Xx 9mm" (a misread ×), "800x800 Matt" (the M of Matt is
+    // not metres), "Batch 2024-05-12 kg" (a date, not 12 kg)
+    const sizeRe = /(\d{1,5}(?:\.\d+)?\s*(?:[×xX*✕]{1,2}|Xx|xX)\s*\d{1,5}(?:\.\d+)?(?:\s*(?:[×xX*✕]{1,2}|Xx|xX)\s*\d{1,4}(?:\.\d+)?)?(?:\s*(?:mm|cm|m)(?![a-z]))?|(?<![\d.\-\/])\d{1,4}(?:\.\d+)?\s*(?:mm|cm|ml|mg|kg|g|litres?|liters?|l)(?![a-z]))/i;
     const codeRe = /\b([A-Z]{1,5}[-_ ]?\d{2,6}[A-Z0-9-]*)\b/g;
     // things shaped like a model code that never are: standards, dates,
     // phone/fax labels, batch and quantity fields
@@ -715,7 +766,7 @@ const OCR = {
       // common OCR confusions inside sizes: 500m1 / 500mI → 500ml
       const s = t.replace(/(\d)\s*m[1iI]\b/g, '$1ml').match(sizeRe);
       if (s) {
-        out.size = { value: s[1].replace(/\s*[xX*✕×]\s*/g, ' × ').replace(/\s+/g, ' ').trim(), zh: '' };
+        out.size = { value: s[1].replace(/\s*(?:[xX*✕×]{1,2}|Xx|xX)\s*/g, ' × ').replace(/\s+/g, ' ').trim(), zh: '' };
         break;
       }
     }

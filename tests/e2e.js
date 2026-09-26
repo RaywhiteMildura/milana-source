@@ -173,11 +173,18 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   check(/out of storage/i.test(quota.toast) && quota.sticky, 'storage-full save shows a sticky, plain-language message: ' + quota.toast.slice(0, 60));
   await S(() => { window.dbBatch = window.__realBatch; console.error = window.__ce; document.querySelectorAll('.toast').forEach(t => t.remove()); });
 
+  // a quoted price carries its unit
+  await tap('[data-act="togglePrice"]', 'add price');
+  await page.fill('[data-input="price"]', '180');
+  await tap('[data-act="setUnit"][data-arg="per m²"]', 'unit');
   await tap('[data-act="save"]', 'save');
   await page.waitForFunction(() => S.view === 'saved', null, { timeout: 8000 });
   const savedTxt = await S(() => document.body.innerText);
   check(savedTxt.includes('Casa Verde'), 'saved screen shows the custom project name');
+  check(savedTxt.includes('CNY 180 per m²'), 'saved screen shows the quote with its unit');
   check(await S(() => S.captures.length === 1 && !!S.session.key && S.companies.length === 1), 'capture saved with a company session started');
+  check(await S(() => S.captures[0].unit === 'per m²' && S.captures[0].price === '180'), 'quoted price saved with its unit');
+  check(await page.locator('[data-act="newBoothCapture"]').count() === 1, 'Saved offers a different-booth capture while a session is on');
   check(await S(async () => (await settingGet('draft', null)) === null), 'saving clears the persisted draft');
   await shot('06-saved');
 
@@ -295,10 +302,14 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   section('review + OCR');
   await tap('[data-act="nav"][data-arg="review"]', 'review');
   await page.waitForFunction(() => S.view === 'review', null, { timeout: 8000 });
-  check(await S(() => !document.querySelector('.toast')), 'opening the review list raises no error toast');
+  check(await S(() => ![...document.querySelectorAll('.toast')].some(t => /could not|did not go through|not saved|failed/i.test(t.textContent))), 'opening the review list raises no error toast');
+  check((await S(() => document.body.innerText)).includes('Never backed up'), 'review screen says this phone has never been backed up');
+  check(await page.locator('[data-act="exportBackup"]').count() >= 1, 'review screen offers Back up today');
+  check(await S(() => { const b = document.querySelector('[data-act="nav"][data-arg="home"]'); return !!b; }), 'review header has a back button');
   await shot('11-review-list');
   await page.locator('[data-act="openReview"]').first().click();
   await page.waitForSelector('text=FROM THE COMPANY CARD', { timeout: 8000 });
+  check(await S(() => getComputedStyle(document.querySelector('.fld')).fontSize === '16px'), 'review fields are 16px (readable, no iOS zoom)');
   await page.waitForFunction(() => !S.rvBusy.card && !S.rvBusy.label, null, { timeout: 240000 });
 
   // OCR on a rendered bilingual card: English must stay English, Chinese kept
@@ -352,9 +363,12 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
           'Drum volume 64 litres', 'Made in Germany 2026'].forEach((t, i) => x.fillText(t, 60, 90 + i * 52));
       }, 900, 420, { blur: 1.6, rot: -3.5 }),
       texture: draw(x => {
+        // seeded so the texture is the same every run
+        let seed = 7;
+        const rnd = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
         for (let i = 0; i < 240; i++) {
-          x.fillStyle = 'rgba(' + (90 + Math.random() * 70 | 0) + ',70,50,.5)';
-          x.fillRect(Math.random() * 900, Math.random() * 500, 4 + Math.random() * 90, 3 + Math.random() * 26);
+          x.fillStyle = 'rgba(' + (90 + rnd() * 70 | 0) + ',70,50,.5)';
+          x.fillRect(rnd() * 900, rnd() * 500, 4 + rnd() * 90, 3 + rnd() * 26);
         }
       }, 900, 500, { blur: 0.8 }),
       cleanEnglish: draw(x => {
@@ -497,16 +511,27 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
 
   section('CSV carries the lookup columns');
   const csv = await S(async () => {
+    const co = S.companies.find(c => c.name);
+    if (co) co.wechat = '+86 138 0000 0000';
     let out = null;
     const orig = window.shareOrDownload;
-    window.shareOrDownload = async (name, blob) => { out = await blob.text(); return 'downloaded'; };
+    window.shareOrDownload = async (name, blob) => {
+      const bytes = new Uint8Array(await blob.arrayBuffer());
+      window.__csvBom = bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF;
+      out = await blob.text();
+      return 'downloaded';
+    };
     Actions.exportCSV();
     await new Promise(r => setTimeout(r, 300));
     window.shareOrDownload = orig;
     return out;
   });
+  const csvBom = await S(() => window.__csvBom);
   check(!!csv && csv.includes('"website","company_notes","company_bio"'), 'CSV header has website / notes / bio columns');
+  check(!!csv && csv.includes('"price","unit","status"'), 'CSV header has the price unit column');
   check(!!csv && csv.includes('wanlistone.example.cn'), 'CSV rows carry the saved website');
+  check(!!csv && csv.includes('"=""+86 138 0000 0000"""'), 'a phone number is written as a text literal, never a formula or 8.6E+12');
+  check(!!csv && csvBom === true && csv.includes('\r\n'), 'CSV has the Excel BOM and CRLF rows');
 
   section('compare tray');
   await page.locator('[data-act="openDetail"]').first().click();
@@ -587,6 +612,7 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   await tap('[data-act="shareBackup"]', 'save backup');
   await page.waitForFunction(() => !S.backupReady, null, { timeout: 5000 });
   check(await S(() => !!S.lastBackupAt), 'backup marked as saved');
+  check((await S(() => document.body.innerText)).includes('Last backup: today'), 'Settings shows the backup as done today');
   await closeSheet('settingsOn');
   await tap('[data-act="openSettings"]', 'settings');
   await tap('[data-act="eraseData"]', 'clear all data'); // confirm auto-accepted, no PIN
@@ -615,10 +641,44 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   await tap('[data-act="openReview"]', 'edit');
   await page.waitForFunction(() => S.view === 'reviewItem', null, { timeout: 5000 });
   await page.waitForFunction(() => !S.rvBusy.card && !S.rvBusy.label, null, { timeout: 240000 });
+  const editId = await S(() => S.reviewId);
+  const sharedN = await S(() => { const c = S.captures.find(x => x.id === S.reviewId); return S.captures.filter(x => x.companyKey === c.companyKey).length; });
+  check(sharedN > 1, "the record under edit shares its company with other products (" + sharedN + ")");
+  check(await page.locator('[data-act="splitCompany"]').count() === 1, 'shared company: "This product is from a different company" is offered');
+
+  // renaming a shared company is announced before it happens
+  const oldCoName = await S(() => coName(companyOf(S.captures.find(x => x.id === S.reviewId).companyKey)));
+  await page.fill('[data-input="rv.company"]', 'Somebody Else Ltd');
+  await sleep(600);
+  check((await S(() => document.body.innerText)).includes('Renames this company for all'), 'typing a different name warns that all products get renamed');
+  await page.fill('[data-input="rv.company"]', oldCoName);
+  await sleep(500);
+
+  // typed edits survive a suspend: written as a draft, restored on reopen
   await page.fill('[data-input="rv.code"]', 'FW-45');
+  await sleep(700);
+  check(await S(async () => { const d = await settingGet('rvDraft', null); return !!(d && d.id === S.reviewId && d.rv.code === 'FW-45'); }), 'review edits are written as a draft within a moment');
+  await S(() => { S.view = 'home'; S.reviewId = null; renderAll(); }); // the app evicted mid-edit
+  await page.evaluate(id => Actions.openReview(id), editId);
+  await page.waitForFunction(() => S.view === 'reviewItem' && S.rv.code === 'FW-45', null, { timeout: 8000 });
+  check(true, 'reopening the record restores the unsaved edit');
+  check((await S(() => document.body.innerText)).includes('Restored your unsaved edits'), 'restore is announced');
+  await page.waitForFunction(() => !S.rvBusy.card && !S.rvBusy.label, null, { timeout: 240000 });
+
+  // this product was from a different booth: split it off without touching the others
+  const before3 = await S(() => ({ cos: S.companies.length, key: S.captures.find(x => x.id === S.reviewId).companyKey }));
+  await tap('[data-act="splitCompany"]', 'split');
+  // the record's key moves first and the new company lands when the write commits — wait for the whole thing
+  await page.waitForFunction(b => S.captures.find(x => x.id === S.reviewId).companyKey !== b.key && S.companies.length === b.cos + 1 && S.rv.company === '', before3, { timeout: 8000 });
+  const after3 = await S(() => ({ cos: S.companies.length, company: S.rv.company, oldName: coName(companyOf(S.captures.find(x => x.companyKey !== S.captures.find(y => y.id === S.reviewId).companyKey && x.companyKey).companyKey)) }));
+  check(after3.cos === before3.cos + 1 && after3.company === '', 'split created a fresh company and cleared the company fields');
+  check(after3.oldName === oldCoName, 'the original company kept its name (' + after3.oldName + ')');
+  await page.fill('[data-input="rv.company"]', 'Split Booth Co');
   await tap('[data-act="confirmReview"]', 'save changes');
   await page.waitForFunction(() => S.view === 'review', null, { timeout: 8000 });
   check(await S(() => S.captures.some(c => c.code === 'FW-45')), 'edited code saved on the completed record');
+  check(await page.evaluate(id => coName(companyOf(S.captures.find(x => x.id === id).companyKey)) === 'Split Booth Co', editId), 'split product now files under its own company');
+  check(await S(async () => (await settingGet('rvDraft', null)) === null), 'confirming clears the review draft');
   await tap('[data-act="nav"][data-arg="home"]', 'home');
 
   section('service worker + offline');
