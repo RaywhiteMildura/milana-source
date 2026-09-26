@@ -11,6 +11,9 @@ const { launch, URL } = require('./harness');
   await page.waitForSelector('#login-form');
 
   const cases = await page.evaluate(async () => {
+    // deterministic "sensor noise" so a run is reproducible, not a coin flip
+    let seed = 20261012;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
     function shot(draw, w, h, o = {}) {
       const c = document.createElement('canvas');
       c.width = w; c.height = h;
@@ -34,7 +37,7 @@ const { launch, URL } = require('./harness');
       const img = x.getImageData(0, 0, w, h), d = img.data;
       const amp = o.noise == null ? 26 : o.noise;
       for (let i = 0; i < d.length; i += 4) {
-        const n = (Math.random() * amp * 2) - amp;
+        const n = (rnd() * amp * 2) - amp;
         d[i] += n; d[i + 1] += n; d[i + 2] += n;
       }
       x.putImageData(img, 0, 0);
@@ -98,8 +101,8 @@ const { launch, URL } = require('./harness');
     // 7. texture-only control — must still read as nothing
     imgs['texture-control'] = shot((x, w, h) => {
       for (let i = 0; i < 260; i++) {
-        x.fillStyle = 'rgba(' + (90 + Math.random() * 70 | 0) + ',' + (70 + Math.random() * 55 | 0) + ',50,.5)';
-        x.fillRect(Math.random() * w, Math.random() * h, 4 + Math.random() * 90, 3 + Math.random() * 26);
+        x.fillStyle = 'rgba(' + (90 + rnd() * 70 | 0) + ',' + (70 + rnd() * 55 | 0) + ',50,.5)';
+        x.fillRect(rnd() * w, rnd() * h, 4 + rnd() * 90, 3 + rnd() * 26);
       }
     }, 900, 500, { blur: 0.8, noise: 34 });
 
