@@ -57,11 +57,15 @@ function revokeAllUrls() {
   _blobUrls.clear();
 }
 
-/* Decode an image blob honoring EXIF orientation, downscale, re-encode as JPEG. */
+/* Decode an image blob honoring EXIF orientation, downscale, re-encode as JPEG.
+   The scratch canvas and decoded bitmap are released explicitly: iOS caps
+   total canvas memory, and a 12 MP decode per shot left to the collector
+   exhausts it within a few taps. */
 async function downscaleImage(blob, maxDim = 1600, quality = 0.82) {
   const url = URL.createObjectURL(blob);
+  const img = new Image();
+  let canvas = null;
   try {
-    const img = new Image();
     img.decoding = 'async';
     img.src = url;
     await (img.decode ? img.decode() : new Promise((res, rej) => { img.onload = res; img.onerror = rej; }));
@@ -69,14 +73,18 @@ async function downscaleImage(blob, maxDim = 1600, quality = 0.82) {
     if (!w || !h) return blob;
     const scale = Math.min(1, maxDim / Math.max(w, h));
     const cw = Math.round(w * scale), ch = Math.round(h * scale);
-    const canvas = document.createElement('canvas');
+    canvas = document.createElement('canvas');
     canvas.width = cw; canvas.height = ch;
-    canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return blob;
+    ctx.drawImage(img, 0, 0, cw, ch);
     const out = await new Promise(res => canvas.toBlob(res, 'image/jpeg', quality));
     return out || blob;
   } catch (err) {
     return blob;
   } finally {
+    if (canvas) { canvas.width = canvas.height = 0; }
+    img.src = '';
     URL.revokeObjectURL(url);
   }
 }
@@ -111,6 +119,33 @@ function downloadFile(name, content, type) {
   a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+/* Hand a file to the user the way this device can actually receive it: the
+   share sheet where files can be shared (Save to Files, AirDrop, WeChat —
+   the only route that works in an installed iPhone app, where a[download]
+   does nothing), otherwise a plain download. Must be called from a tap. */
+async function shareOrDownload(name, blob, type) {
+  const file = new File([blob], name, { type: type || blob.type || 'application/octet-stream' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: name });
+      return 'shared';
+    } catch (err) {
+      if (err && err.name === 'AbortError') return 'cancelled';
+      return 'failed';
+    }
+  }
+  downloadFile(name, blob, file.type);
+  return 'downloaded';
+}
+
+function fmtBytes(n) {
+  n = Number(n) || 0;
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(0) + ' KB';
+  if (n < 1024 * 1024 * 1024) return (n / 1024 / 1024).toFixed(n < 10 * 1024 * 1024 ? 1 : 0) + ' MB';
+  return (n / 1024 / 1024 / 1024).toFixed(2) + ' GB';
 }
 
 /* thumb style helper — real photo or empty */

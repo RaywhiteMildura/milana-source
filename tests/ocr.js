@@ -33,6 +33,25 @@ const { URL, launch, loadCJKFont, makeReporter } = require('./harness');
   check(zh.latin.en === 'Foshan Jinlan Co., Ltd' && !zh.latin.translated, 'Latin text passes through untouched');
   check(JSON.stringify(zh.script) === '["latin","cjk","neutral"]', 'script detection');
 
+  section('card / label parsing rules (no OCR)');
+  const rules = await page.evaluate(() => ({
+    wechatId: OCR.parseCard(['Shenzhen Brightway Lighting Co., Ltd', 'Amy Chen  Sales Manager', 'WeChat ID: brightway_amy', 'Tel: 0755-2233 4455']).wechat.value,
+    wechatWa: OCR.parseCard(['Foshan Lido Ceramics Co., Ltd', 'Kevin Wu | Export Manager', 'WeChat/WhatsApp: +86 135 0000 1234']).wechat.value,
+    wx: OCR.parseCard(['佛山市金兰木业有限公司', '李小明 销售经理', '微信号：jinlan_lee88']).wechat.value,
+    contactWa: OCR.parseCard(['Foshan Lido Ceramics Co., Ltd', 'Kevin Wu | Export Manager', 'WeChat/WhatsApp: +86 135 0000 1234']).contact.value,
+    iso: OCR.parseLabel(['CALACATTA GOLD', 'ISO 9001 certified', 'Made in China 2024-05', 'Model: TX-2040', 'Size: 1200 x 600 mm']),
+    noLabel: OCR.parseLabel(['Aqua Shield Sealer', 'ISO 9001', 'AS 3740', 'Batch 2023-11', 'AQS-500 · 5 L']),
+    delCo: OCR.parseCard(['Tel: 0755-2233 4455', 'sales@acme.com']).company.value,
+  }));
+  check(rules.wechatId === 'brightway_amy', '"WeChat ID:" form found — ' + rules.wechatId);
+  check(/135 0000 1234/.test(rules.wechatWa), '"WeChat/WhatsApp:" number found — ' + rules.wechatWa);
+  check(rules.wx === 'jinlan_lee88', '微信号 form found — ' + rules.wx);
+  check(rules.contactWa === 'Kevin Wu', 'contact stripped of role and separator — ' + rules.contactWa);
+  check(rules.iso.code.value === 'TX-2040', 'labelled model wins over ISO 9001 / a date — ' + rules.iso.code.value);
+  check(rules.iso.size.value === '1200 × 600 mm', 'size read beside standards — ' + rules.iso.size.value);
+  check(rules.noLabel.code.value === 'AQS-500', 'standards and batch dates are not model codes — ' + rules.noLabel.code.value);
+  check(rules.delCo === '', 'a card with only a phone and an email gets no company guess');
+
   const makeImg = kind => page.evaluate(async (kind) => {
     const c = document.createElement('canvas');
     c.width = 1400; c.height = 850;

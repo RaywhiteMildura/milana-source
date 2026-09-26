@@ -2,20 +2,31 @@
 
 ## ✅ THE APP IS BUILT — how to put it on your phone
 
-The production app now lives in this folder (`index.html` plus the `css/`, `js/`, `icons/` and `vendor/` folders). To get it onto your iPhone:
+The production app lives in this folder (`index.html` plus the `css/`, `js/`, `icons/` and `vendor/` folders; `tests/` holds its automated tests). To get it onto your iPhone:
 
-1. Go to **[netlify.com](https://www.netlify.com)** (free account), open **Add new site → Deploy manually**, and drag this whole folder onto the page. It gives you a link like `https://something.netlify.app`.
-2. Open that link on your iPhone in **Safari**, enter your name, then tap **Share → Add to Home Screen**. That's the app installed — icon, offline and all.
-3. Open it once on hotel wifi and leave it for a minute: it downloads the on-device OCR (about 38 MB, Chinese + English) and from then on **everything works with no signal at all** — the fair, the factory, the plane.
+1. Go to **[netlify.com](https://www.netlify.com)** (free account), open **Add new site → Deploy manually**, and drag this whole folder onto the page. It gives you a link like `https://something.netlify.app`. **To update later, drag the folder onto that same site's Deploys tab** — a new site means a new address, and the phone's records are tied to the address.
+2. Open that link on your iPhone in **Safari** and **install it before you capture anything**: tap **Share → Add to Home Screen**, then always open Milana from that icon. (Captures made in a Safari tab do not move into the installed app, and Safari deletes data from sites it hasn't opened in 7 days — the installed app is safe from both.)
+3. Open it once on hotel wifi and leave it for a minute: it downloads the on-device reading models (about 38 MB, Chinese + English). **⚙ Settings → Trip readiness** shows when they are in. From then on **everything works with no signal at all** — the fair, the factory, the plane.
 
-**Reading Chinese cards and labels.** At evening review the app reads each photo twice — once with the English model, once with the Chinese one — and keeps each line from the model that matches it, so English stays English. Chinese is then turned into English (trade words like 有限公司 → Co., Ltd, 岩板 → Sintered Stone, 销售经理 → Sales Manager; names become pinyin, e.g. 李小明 → Li Xiaoming). **The characters are always kept underneath** — tap **use 中文** to put the original back in the field if a reading looks wrong. Both go into the day pack and the CSV.
+**Every evening, back up.** ⚙ Settings → **Back up today** packs the day's photos and records into one `.milana` file (a few hundred MB at full photo quality) → **Save it** → choose **Save to Files** or AirDrop it to a laptop. Nothing is uploaded anywhere by the app itself; that file is your copy. **Import backup** puts files back — on this phone after a mishap, or onto the builder's or designer's phone.
 
-**Your places are your own.** The place list starts with the Canton Fair halls, a few factories and showrooms, but you can add as many as you like — tap the place line, **＋ Add a place**, type the name and choose Fair / Factory / Showroom / On the road / Other. Two joineries, three stone yards, whatever the trip turns into. **Edit places** lets you remove the ones you never visit. The type is what makes the app say "same booth" at a fair and "same factory" at a factory.
+**The Day pack** (Today → the review card, or Evening review) builds one PDF for a chosen day — or Shortlisted only — then **Share PDF** hands it to WeChat, AirDrop, Mail or Files. Photos, names, codes, sizes, quotes, notes, company details and any lookup research go in.
+
+**Reading Chinese cards and labels.** At evening review the app reads each photo several ways — once with the English model, once with the Chinese one, over two versions of the image (one flattens shadows and glare) — and keeps each line from the model that matches it, so English stays English. Chinese is then turned into English (trade words like 有限公司 → Co., Ltd, 岩板 → Sintered Stone, 销售经理 → Sales Manager; names become pinyin, e.g. 李小明 → Li Xiaoming). **The characters are always kept underneath** — tap **use 中文** to put the original back in the field if a reading looks wrong. Every line it read is shown as a chip: tap the field you want, then the chip. Tap any photo to see it full screen. Both languages go into the day pack and the CSV.
+
+**Editing later.** Open any product → **Edit name, code, company, notes**. Companies tab → a company → its name, contact and WeChat can be corrected there too, and the search buttons (Bing, Alibaba, 1688 — Bing because Google is blocked in China) open ready-made searches for it.
+
+**Your places are your own.** The place list starts with the Canton Fair halls, a few factories and showrooms, but you can add as many as you like — tap the place line, **＋ Add a place**, type the name and choose Fair / Factory / Showroom / On the road / Other. **Edit places** lets you remove the ones you never visit. The type is what makes the app say "same booth" at a fair and "same factory" at a factory.
 
 Notes for the trip:
-- Everything (photos, voice notes, records) stays on the phone. Use **the "N local" pill (top-right of Today) → Export full backup** at the end of each day — it saves a single file with every photo inside.
-- The **Day pack** (Evening review screen) builds a PDF of the day and hands it to the iPhone share sheet — AirDrop, WeChat, email, whatever you use.
-- The camera, microphone and photos never leave the device. OCR runs on the phone itself.
+- Everything (photos, voice notes, records) stays on the phone. There is no cloud sync — the backup file is the copy. Set **Trip starts** in Settings so Today shows "Day 3" correctly.
+- An unfinished capture is kept if the app is closed or the phone reloads it — every photo and every tag the moment it is taken or tapped; Today offers **Resume**.
+- In the camera, **✕ last** removes a blurry product photo without starting over. A double-tap on the shutter is one photo, not two.
+- **↻ New booth / new card** then **Cancel** puts the previous booth back — nothing is lost by backing out.
+- The company card is stored once per company; every later product from the same booth shows and exports that same card.
+- If the phone runs out of space, Save tells you plainly and keeps the photos — back up, clear old days, then Save again.
+- The PIN is optional. If it is forgotten, **Forgot the PIN?** on the unlock screen erases the phone's records (it asks twice) — so write the PIN down, or skip it.
+- The camera, microphone and photos never leave the device. Reading runs on the phone itself; the only thing that ever uses the network is the optional AI company lookup, with your own key.
 
 The sections below are the original design/build brief the app was built from, kept for reference.
 

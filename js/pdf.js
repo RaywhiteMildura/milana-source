@@ -1,9 +1,17 @@
-/* Day-pack export — one tidy PDF of the day's captures (photos, tags, quotes, notes).
+/* Day-pack export — one tidy PDF of a day's captures (photos, tags, quotes, notes).
    Pages are composed on <canvas> (so Chinese text renders with system fonts) and
-   embedded into a PDF via vendored jsPDF. Shared through the system share sheet. */
+   embedded into a PDF via vendored jsPDF, then handed to the share sheet.
+
+   Built for a phone: ONE page canvas is reused for every page (iOS caps total
+   canvas memory), small slots draw from the stored 480px thumbnails, only the
+   hero decodes the full photo — resized on decode where the browser allows —
+   and every bitmap is released as soon as it is drawn. Text is budgeted
+   against the page: what does not fit continues on an extra page instead of
+   being drawn off the bottom. */
 
 const DayPack = {
   W: 1240, H: 1754, M: 84, // A4 @150dpi-ish
+  _canvas: null,
 
   _jspdfPromise: null,
   _jspdf() {
@@ -21,9 +29,11 @@ const DayPack = {
   },
 
   _page() {
-    const c = document.createElement('canvas');
-    c.width = this.W; c.height = this.H;
+    const c = this._canvas || (this._canvas = document.createElement('canvas'));
+    if (c.width !== this.W || c.height !== this.H) { c.width = this.W; c.height = this.H; }
     const x = c.getContext('2d');
+    if (!x) throw new Error('The phone is short of drawing memory — close other apps and try again.');
+    x.setTransform(1, 0, 0, 1, 0, 0);
     x.fillStyle = '#f4f0e9'; x.fillRect(0, 0, this.W, this.H);
     return { c, x };
   },
@@ -46,6 +56,16 @@ const DayPack = {
       out.push(line.trimEnd());
     }
     return out;
+  },
+
+  /* Height a block of text will take, so the page budget can be checked
+     before drawing. */
+  _measure(x, text, font, maxWidth, lineH = 1.35, max = 0) {
+    x.font = font;
+    let lines = this._wrap(x, text, maxWidth);
+    if (max && lines.length > max) lines = lines.slice(0, max);
+    const px = parseInt(font.match(/(\d+)px/)[1], 10);
+    return lines.length * px * lineH;
   },
 
   _text(x, text, tx, ty, { font, color = '#201a17', maxWidth = this.W - 2 * this.M, lineH = 1.35, max = 0 } = {}) {
@@ -78,23 +98,47 @@ const DayPack = {
     return w;
   },
 
-  async _img(blob) {
+  /* A row of chips that wraps onto new lines instead of running off the page. */
+  _chips(x, chips, cy) {
+    let px = this.M, py = cy;
+    x.font = this._sans(22, 700);
+    for (const ch of chips) {
+      const w = x.measureText(ch.t).width + 40;
+      if (px > this.M && px + w > this.W - this.M) { px = this.M; py += 60; }
+      this._chip(x, ch.t, px, py, ch.bg, ch.fg);
+      px += w + 14;
+    }
+    return py + 66;
+  },
+
+  /* Decode for drawing. maxW asks the browser to resize on decode (no 12 MP
+     bitmap ever exists); the plain Image path is the fallback. */
+  async _img(blob, maxW) {
     if (!blob) return null;
+    if (typeof createImageBitmap === 'function') {
+      try { return await createImageBitmap(blob, maxW ? { resizeWidth: maxW, resizeQuality: 'high' } : {}); } catch (e) { /* fall through */ }
+    }
+    const url = URL.createObjectURL(blob);
     try {
       const img = new Image();
-      img.src = urlFor(blob);
+      img.src = url;
       await (img.decode ? img.decode() : new Promise((res, rej) => { img.onload = res; img.onerror = rej; }));
       return img;
-    } catch (err) { return null; }
+    } catch (err) { return null; } finally { URL.revokeObjectURL(url); }
+  },
+  _release(img) {
+    if (!img) return;
+    try { if (img.close) img.close(); else img.src = ''; } catch (e) { /* already gone */ }
   },
 
   _cover(x, img, dx, dy, dw, dh, r) {
     this._rr(x, dx, dy, dw, dh, r);
     x.save(); x.clip();
     if (img) {
-      const s = Math.max(dw / img.naturalWidth, dh / img.naturalHeight);
+      const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+      const s = Math.max(dw / iw, dh / ih);
       const sw = dw / s, sh = dh / s;
-      x.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) / 2, sw, sh, dx, dy, dw, dh);
+      x.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, dx, dy, dw, dh);
     } else {
       x.fillStyle = '#ebe3d8'; x.fillRect(dx, dy, dw, dh);
       x.fillStyle = '#a2937f'; x.font = this._sans(20, 700);
@@ -105,10 +149,21 @@ const DayPack = {
     x.strokeStyle = '#d7cbbd'; x.lineWidth = 2; x.stroke();
   },
 
-  async build(captures, supName) {
+  /* captures: the records to include (each may carry _company);
+     opts.title — "Day 3 · 14 Oct"; opts.dateStr — long date for the cover;
+     opts.onProgress(done, total). Returns {blob, pages}. */
+  async build(captures, supName, opts = {}) {
     const { jsPDF } = await this._jspdf();
     const pdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
-    const dateStr = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const dateStr = opts.dateStr || new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const title = opts.title || '';
+    let pages = 0;
+    const commit = (c) => {
+      if (pages > 0) pdf.addPage();
+      pdf.addImage(c.toDataURL('image/jpeg', 0.85), 'JPEG', 0, 0, 595.28, 841.89);
+      pages++;
+    };
+    const yieldUI = () => new Promise(r => setTimeout(r, 0));
 
     // ---- cover page ----
     {
@@ -121,7 +176,7 @@ const DayPack = {
       x.fillStyle = '#ffffff'; x.font = this._serif(64);
       x.fillText('Milana Source — Day pack', this.M, 230);
       x.fillStyle = 'rgba(255,255,255,.7)'; x.font = this._sans(26);
-      x.fillText(dateStr + ' · ' + projName() + ' · China sourcing trip', this.M, 320);
+      x.fillText([title, dateStr, projName()].filter(Boolean).join(' · '), this.M, 320, this.W - 2 * this.M);
 
       let y = 500;
       x.fillStyle = '#201a17'; x.font = this._serif(40);
@@ -137,23 +192,28 @@ const DayPack = {
       }
       x.fillStyle = '#9d7643'; x.font = this._sans(22);
       x.fillText('Captured with Milana Source · photos, tags and quotes together · one page per product', this.M, this.H - 100);
-      pdf.addImage(c.toDataURL('image/jpeg', 0.85), 'JPEG', 0, 0, 595.28, 841.89);
+      commit(c);
     }
 
     // ---- one page per capture ----
     const ST_COLORS = { Preferred: ['#e3efe8', '#355f4b'], Shortlisted: ['#e3efe8', '#355f4b'], Captured: ['#ebe3d8', '#625852'], 'Needs review': ['#f5ead8', '#94601e'], 'Quote requested': ['#f5ead8', '#94601e'], Rejected: ['#f6e5e3', '#8b2d2d'] };
+    let done = 0;
     for (const cpt of captures) {
-      const { c, x } = this._page();
-      x.fillStyle = '#201a17'; x.fillRect(0, 0, this.W, 250);
       const name = cpt.name || (cpt.category + ' — untitled');
-      x.fillStyle = '#fff';
-      let hy = this._text(x, name, this.M, 70, { font: this._serif(52), color: '#ffffff', max: 2 });
-      this._text(x, supName(cpt) + ' · ' + cpt.venue + ' · ' + fmtTime(cpt.createdAt), this.M, Math.min(hy + 8, 186), { font: this._sans(26), color: 'rgba(255,255,255,.72)', max: 1 });
+      let { c, x } = this._page();
+      const header = (continued) => {
+        x.fillStyle = '#201a17'; x.fillRect(0, 0, this.W, continued ? 150 : 250);
+        const hy = this._text(x, name + (continued ? '  (continued)' : ''), this.M, continued ? 44 : 70, { font: this._serif(continued ? 40 : 52), color: '#ffffff', max: continued ? 1 : 2 });
+        if (!continued) this._text(x, supName(cpt) + ' · ' + cpt.venue + ' · ' + fmtTime(cpt.createdAt), this.M, Math.min(hy + 8, 186), { font: this._sans(26), color: 'rgba(255,255,255,.72)', max: 1 });
+      };
+      header(false);
 
       // photos: product hero + label/card column
-      const heroImg = await this._img(cpt.photos.product[0] && cpt.photos.product[0].blob);
-      const labelImg = await this._img(cpt.photos.label && cpt.photos.label.blob);
-      const cardImg = await this._img(cpt.photos.card && cpt.photos.card.blob);
+      const hero = cpt.photos.product[0];
+      const heroImg = await this._img(hero && hero.blob, 1400);
+      const labelImg = await this._img(cpt.photos.label && photoThumb(cpt.photos.label));
+      const cardP = cpt.photos.card || (typeof cardPhotoOf === 'function' ? cardPhotoOf(cpt) : null);
+      const cardImg = await this._img(cardP && photoThumb(cardP));
       let y = 300;
       this._cover(x, heroImg, this.M, y, 700, 540, 22);
       this._cover(x, labelImg, this.M + 724, y, 348, 260, 18);
@@ -161,32 +221,39 @@ const DayPack = {
       x.fillText('label / spec', this.M + 724, y + 268);
       this._cover(x, cardImg, this.M + 724, y + 306, 348, 200, 18);
       x.fillText('company card', this.M + 724, y + 514);
+      this._release(heroImg); this._release(labelImg); this._release(cardImg);
       // extra product faces
       const extras = cpt.photos.product.slice(1, 5);
       if (extras.length) {
         let ex = this.M;
         for (const p of extras) {
-          const img = await this._img(p.blob);
+          const img = await this._img(photoThumb(p));
           this._cover(x, img, ex, y + 564, 166, 124, 14);
+          this._release(img);
           ex += 178;
         }
       }
       y += extras.length ? 730 : 600;
 
-      // chips
-      let cx2 = this.M;
+      // chips (wrapping)
       const st = ST_COLORS[cpt.needsReview ? 'Needs review' : cpt.status] || ST_COLORS.Captured;
-      cx2 += this._chip(x, cpt.needsReview ? 'Needs review' : cpt.status, cx2, y, st[0], st[1]) + 14;
-      cx2 += this._chip(x, cpt.category, cx2, y, '#201a17', '#ffffff') + 14;
-      cx2 += this._chip(x, '◎ ' + cpt.venue, cx2, y, '#ebe3d8', '#625852') + 14;
-      if (cpt.rating) cx2 += this._chip(x, '★ ' + cpt.rating + '/5', cx2, y, '#f5ead8', '#94601e') + 14;
-      let y2 = y + 66, cx3 = this.M;
-      for (const r of (cpt.rooms || [])) cx3 += this._chip(x, r, cx3, y2, '#f4e6ea', '#6f273a') + 14;
-      if (cpt.price) cx3 += this._chip(x, cpt.currency + ' ' + cpt.price, cx3, y2, '#ebe3d8', '#625852') + 14;
-      y = y2 + 100;
+      const chips = [{ t: cpt.needsReview ? 'Needs review' : cpt.status, bg: st[0], fg: st[1] },
+        { t: cpt.category, bg: '#201a17', fg: '#ffffff' }, { t: '◎ ' + cpt.venue, bg: '#ebe3d8', fg: '#625852' }];
+      if (cpt.rating) chips.push({ t: '★ ' + cpt.rating + '/5', bg: '#f5ead8', fg: '#94601e' });
+      (cpt.rooms || []).forEach(r => chips.push({ t: r, bg: '#f4e6ea', fg: '#6f273a' }));
+      if (cpt.price) chips.push({ t: cpt.currency + ' ' + cpt.price, bg: '#ebe3d8', fg: '#625852' });
+      y = this._chips(x, chips, y) + 20;
 
-      // facts
-      x.font = this._sans(26);
+      // text blocks, budgeted: anything that will not fit goes to a
+      // continuation page rather than off the bottom
+      const bottom = this.H - this.M;
+      const ensure = (need) => {
+        if (y + need <= bottom) return;
+        commit(c);
+        ({ c, x } = this._page());
+        header(true);
+        y = 190;
+      };
       const facts = [];
       if (cpt.nameZh) facts.push(['Name (中文)', cpt.nameZh]);
       if (cpt.code) facts.push(['Model / code', cpt.code]);
@@ -197,50 +264,41 @@ const DayPack = {
       if (co && co.wechat) facts.push(['WeChat / phone', co.wechat]);
       if (co && co.website) facts.push(['Website', co.website]);
       for (const [k, v] of facts) {
-        x.fillStyle = '#625852'; x.fillText(k, this.M, y);
+        ensure(48);
+        x.font = this._sans(26); x.fillStyle = '#625852'; x.textBaseline = 'top'; x.fillText(k, this.M, y);
         x.fillStyle = '#201a17'; x.font = this._sans(26, 700);
         x.fillText(String(v), this.M + 320, y, this.W - this.M * 2 - 320);
-        x.font = this._sans(26);
         y += 48;
       }
-      if (cpt.note) {
+      const block = (label, text, font, color, max) => {
+        if (!text) return;
+        const need = (label ? 36 : 0) + this._measure(x, text, font, this.W - 2 * this.M, 1.35, max) + 16;
+        ensure(Math.min(need, bottom - 190));
         y += 16;
-        y = this._text(x, cpt.note, this.M, y, { font: this._sans(26), color: '#3d3530', max: 5 });
-      }
-      if (co && co.notes) {
-        y += 16;
-        y = this._text(x, 'Lookup notes: ' + co.notes, this.M, y, { font: this._sans(24), color: '#3d3530', max: 4 });
-      }
-      if (co && co.bio) {
-        y += 20;
-        x.fillStyle = '#94601e'; x.font = this._sans(20, 700);
-        x.fillText('AI LOOKUP — VERIFY YOURSELF', this.M, y);
-        y += 36;
-        y = this._text(x, co.bio, this.M, y, { font: this._sans(24), color: '#3d3530', max: 8 });
-      }
+        if (label) { x.fillStyle = '#94601e'; x.font = this._sans(20, 700); x.textBaseline = 'top'; x.fillText(label, this.M, y); y += 36; }
+        y = this._text(x, text, this.M, y, { font, color, max });
+      };
+      block('', cpt.note, this._sans(26), '#3d3530', 12);
+      block('LOOKUP NOTES', co && co.notes, this._sans(24), '#3d3530', 10);
+      block('AI LOOKUP — VERIFY YOURSELF', co && co.bio, this._sans(24), '#3d3530', 14);
       if (cpt.voiceNote) {
-        x.fillStyle = '#9d7643'; x.font = this._sans(22, 700);
+        ensure(40);
+        x.fillStyle = '#9d7643'; x.font = this._sans(22, 700); x.textBaseline = 'top';
         x.fillText('● voice note ' + fmtClock(cpt.voiceNote.duration) + ' — on the phone record', this.M, y + 16);
       }
-
-      pdf.addPage();
-      pdf.addImage(c.toDataURL('image/jpeg', 0.85), 'JPEG', 0, 0, 595.28, 841.89);
+      commit(c);
+      done++;
+      if (opts.onProgress) opts.onProgress(done, captures.length);
+      await yieldUI();
     }
 
-    return pdf.output('blob');
+    const blob = pdf.output('blob');
+    if (this._canvas) { this._canvas.width = this._canvas.height = 0; }
+    return { blob, pages };
   },
 
+  /* Kept for callers that only want the file. */
   async share(blob, filename) {
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: filename });
-        return 'shared';
-      } catch (err) {
-        if (err && err.name === 'AbortError') return 'cancelled';
-      }
-    }
-    downloadFile(filename, blob, 'application/pdf');
-    return 'downloaded';
+    return shareOrDownload(filename, blob, 'application/pdf');
   },
 };

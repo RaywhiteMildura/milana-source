@@ -34,6 +34,21 @@ const OCR = {
     return this._workers[lang];
   },
 
+  /* Start loading both models in the background so the first record opened
+     does not wait on them; a failure here stays quiet and surfaces when a
+     photo is actually read. */
+  warm() {
+    if (typeof Tesseract === 'undefined') return;
+    ['eng', 'chi_sim'].forEach(lang => { try { this._worker(lang).catch(() => {}); } catch (e) { /* surfaces on read */ } });
+  },
+
+  /* True when a read failed because the model files are not on the phone
+     (first use without signal), rather than because of the photo. */
+  modelsMissing(err) {
+    const m = String(err && (err.message || err) || '');
+    return /fetch|network|load|404|traineddata|wasm|NetworkError|Failed to/i.test(m);
+  },
+
   /* Free both models — called when the review section is left. */
   async release() {
     const pending = Object.values(this._workers).filter(Boolean);
@@ -59,6 +74,7 @@ const OCR = {
      handheld photo is never square. */
   async preprocess(blob, opts = {}) {
     const target = opts.target || 2200;
+    const scratch = [];
     try {
       const bmp = await createImageBitmap(blob);
       const longEdge = Math.max(bmp.width, bmp.height);
@@ -66,8 +82,10 @@ const OCR = {
       const w = Math.max(1, Math.round(bmp.width * scale));
       const h = Math.max(1, Math.round(bmp.height * scale));
       const c = document.createElement('canvas');
+      scratch.push(c);
       c.width = w; c.height = h;
       const x = c.getContext('2d', { willReadFrequently: true });
+      if (!x) throw new Error('canvas memory');
       x.drawImage(bmp, 0, 0, w, h);
       bmp.close && bmp.close();
 
@@ -81,19 +99,21 @@ const OCR = {
 
       const hist = new Uint32Array(256);
       if (opts.mode === 'flat') {
-        // polarity: compare against a rough average to see whether strokes
-        // are darker or lighter than their surroundings; flip to dark-on-light
-        x.putImageData(img, 0, 0); // (still colour; only used downscaled)
+        // polarity: compare against a rough local average to see whether
+        // strokes are darker or lighter than their surroundings; flip to
+        // dark-on-light. The average comes from a 1/28-scale copy read once —
+        // never a second full-size canvas (iOS caps canvas memory).
         const sw = Math.max(1, Math.round(w / 28)), sh = Math.max(1, Math.round(h / 28));
         const s1 = document.createElement('canvas'); s1.width = sw; s1.height = sh;
-        s1.getContext('2d').drawImage(c, 0, 0, sw, sh);
-        const bc = document.createElement('canvas'); bc.width = w; bc.height = h;
-        const bx = bc.getContext('2d', { willReadFrequently: true });
-        bx.drawImage(s1, 0, 0, w, h);
-        const avg = bx.getImageData(0, 0, w, h).data;
+        scratch.push(s1);
+        const sx = s1.getContext('2d', { willReadFrequently: true });
+        sx.drawImage(c, 0, 0, sw, sh);
+        const small = sx.getImageData(0, 0, sw, sh).data;
         let dark = 0, light = 0;
         for (let p = 0; p < g.length; p++) {
-          const diff = g[p] - (avg[p * 4] * 0.299 + avg[p * 4 + 1] * 0.587 + avg[p * 4 + 2] * 0.114);
+          const px = p % w, py = (p / w) | 0;
+          const si = (((py * sh / h) | 0) * sw + ((px * sw / w) | 0)) * 4;
+          const diff = g[p] - (small[si] * 0.299 + small[si + 1] * 0.587 + small[si + 2] * 0.114);
           if (diff < -26) dark++;
           else if (diff > 26) light++;
         }
@@ -189,18 +209,26 @@ const OCR = {
       let out = c;
       if (Math.abs(angle) >= 0.7) {
         const c2 = document.createElement('canvas');
+        scratch.push(c2);
         c2.width = w; c2.height = h;
         const x2 = c2.getContext('2d');
-        x2.fillStyle = 'rgb(' + [thr >= 0 ? 255 : bgVal, thr >= 0 ? 255 : bgVal, thr >= 0 ? 255 : bgVal].join(',') + ')';
-        x2.fillRect(0, 0, w, h);
-        x2.translate(w / 2, h / 2);
-        x2.rotate(-angle * Math.PI / 180);
-        x2.drawImage(c, -w / 2, -h / 2);
-        out = c2;
+        if (x2) {
+          x2.fillStyle = 'rgb(' + [thr >= 0 ? 255 : bgVal, thr >= 0 ? 255 : bgVal, thr >= 0 ? 255 : bgVal].join(',') + ')';
+          x2.fillRect(0, 0, w, h);
+          x2.translate(w / 2, h / 2);
+          x2.rotate(-angle * Math.PI / 180);
+          x2.drawImage(c, -w / 2, -h / 2);
+          out = c2;
+        }
       }
       return await new Promise(res => out.toBlob(b => res(b || blob), 'image/png'));
     } catch (err) {
-      return blob;
+      // never hand the recogniser a raw 12 MP photo — a plain downscale is
+      // the safe floor
+      try { return await downscaleImage(blob, 1600, 0.9); } catch (e) { return blob; }
+    } finally {
+      // give the canvas memory back now, not when the collector gets round to it
+      scratch.forEach(cv => { try { cv.width = cv.height = 0; } catch (e) { /* detached */ } });
     }
   },
 
@@ -389,10 +417,10 @@ const OCR = {
      row keeps its best reading — so a line only one variant caught still
      makes it through, instead of a wholesale winner dropping it. */
   async readLines(blob) {
-    const [gentle, flat] = await Promise.all([
-      this.preprocess(blob),
-      this.preprocess(blob, { target: 2800, mode: 'flat', binarize: true }),
-    ]);
+    // one variant at a time — two 2800px pipelines side by side is more canvas
+    // memory than an iPhone will grant
+    const gentle = await this.preprocess(blob);
+    const flat = await this.preprocess(blob, { target: 2800, mode: 'flat', binarize: true });
     // per-language chains (a language's passes share one worker and change
     // psm, so they run in sequence; the two languages run side by side)
     const cjkOnly = ls => ls.filter(l => ZH.scriptOf(l.text) === 'cjk');
@@ -504,13 +532,17 @@ const OCR = {
 
     /* Whole-photo sanity check: a genuinely bilingual card carries at least
        one strong Chinese line. A page of English with a stray Chinese line
-       left over is the model guessing — drop it. */
-    const weigh = pred => merged.filter(pred).reduce((n, l) => n + [...l.text].length, 0);
+       left over is the model guessing — drop it. One hanzi is a word, so it
+       weighs as much as three Latin letters; and a line the trade glossary
+       recognises (有限公司, 经理 …) is never a hallucination, whatever its
+       confidence. */
+    const corroborated = l => this.CO_ZH.test(l.text) || this.ROLE_ZH.test(l.text) || ZH.translate(l.text).translated;
+    const weigh = pred => merged.filter(pred).reduce((n, l) => n + [...l.text].length * (ZH.scriptOf(l.text) === 'cjk' ? 3 : 1), 0);
     const latinWeight = weigh(l => ZH.scriptOf(l.text) !== 'cjk');
     const cjkWeight = weigh(l => ZH.scriptOf(l.text) === 'cjk');
-    const strongCJK = merged.some(l => ZH.scriptOf(l.text) === 'cjk' && l.conf >= 75);
+    const strongCJK = merged.some(l => ZH.scriptOf(l.text) === 'cjk' && (l.conf >= 65 || corroborated(l)));
     if (cjkWeight && !strongCJK && latinWeight >= cjkWeight * 5) {
-      return merged.filter(l => ZH.scriptOf(l.text) !== 'cjk');
+      return merged.filter(l => ZH.scriptOf(l.text) !== 'cjk' || corroborated(l));
     }
     return merged;
   },
@@ -526,9 +558,13 @@ const OCR = {
   CO_ZH: /(有限公司|公司|集团|工厂|实业|建材|陶瓷|石材|门窗|家具|家私|木业|卫浴|灯饰|五金|铝业|厂$)/,
   CO_EN: /(co\.?\s*,?\s*ltd|company|corp|limited|industr|group|factory|enterprise|international|manufactur|trading|import|export|supplies|materials|works|studio|gallery|interiors|ceramics|tiles?|stone|marble|granite|quartz|slabs?|joinery|timber|cabinet|kitchens?|bath|doors?|windows?|glass|steel|alumini?um|metal|furniture|lighting|hardware|flooring|building material)/i,
   URL: /(https?:\/\/|www\.|\.com|\.cn|\.net|\.au)/i,
-  ROLE: /(manager|director|sales|export|president|chairman|engineer|designer|经理|总监|销售|业务|外贸|工程师|设计师|主管|董事长|总裁)/i,
+  // English role words need word boundaries: "sales@…" and "Export Ltd" are
+  // not titles. Chinese titles are matched as substrings, as usual.
+  ROLE_EN: /\b(general manager|managing director|sales manager|export manager|sales director|marketing director|account manager|manager|director|sales|export|president|chairman|chairwoman|engineer|designer|ceo|cfo|founder|representative|supervisor|assistant|consultant|owner)\b/i,
+  ROLE_ZH: /(总经理|副总经理|销售总监|营销总监|外贸经理|出口经理|销售经理|业务经理|客户经理|区域经理|项目经理|厂长|经理|总监|主管|业务员|销售|外贸|业务|工程师|设计师|董事长|总裁|助理|顾问|先生|女士|小姐)/,
   // OCR often mangles the label itself ("WecChat", "Wechot") — stay loose
-  WECHAT: /(w[a-z]{0,3}chat|weixin|微信(?:号|ID)?|wxid|whats\s?app)\s*[:：]?\s*([A-Za-z0-9_@.\-]{3,})/i,
+  // "WeChat: id", "WeChat ID: id", "WeChat/WhatsApp: +86…", "微信号：id", "WX: id"
+  WECHAT: /(w[a-z]{0,3}chat(?:\s*(?:id|no\.?|号))?(?:\s*[\/&|]\s*whats\s?app)?|weixin|微信(?:号|ID)?|wxid|wx|whats\s?app)\s*[:：]?\s*(\+?[A-Za-z0-9_@.\-][A-Za-z0-9_@.\- ]{2,}[A-Za-z0-9_])/i,
   PHONE: /((?:\+?86[\s-]?)?1[3-9]\d{9}|\+?\d[\d\s\-()]{7,}\d)/,
   EMAIL: /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/,
 
@@ -537,6 +573,21 @@ const OCR = {
     if (!text) return { value: '', zh: '' };
     const t = ZH.pair(text, opts);
     return { value: t.value, zh: ZH.hasCJK(text) ? text : '' };
+  },
+
+  /* "李小明 销售经理" → "李小明"; "John Li, Sales Manager" → "John Li". The
+     Contact field is who the owner will WeChat and put on the order — a title
+     or an email address in it is wrong. */
+  personName(text) {
+    return String(text || '')
+      .replace(this.ROLE_EN, ' ').replace(new RegExp(this.ROLE_ZH.source, 'g'), ' ')
+      .replace(/[|,，/·•:：()（）-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  },
+  _nameShape(t) {
+    const s = String(t || '').trim();
+    if (!s) return false;
+    if (ZH.scriptOf(s) === 'cjk') { const n = [...s.replace(/\s/g, '')].length; return n >= 2 && n <= 4; }
+    return /^[A-Za-z][A-Za-z .·'’-]{2,27}$/.test(s) && !this.CO_EN.test(s);
   },
 
   /* Normalise lines (objects from readLines, or plain strings) into
@@ -580,9 +631,33 @@ const OCR = {
       };
     }
 
-    // contact: a line carrying a role, minus the role word itself if it is the whole line
-    const roleLine = texts.find(t => this.ROLE.test(t) && t.length <= 42 && t !== (out.company.zh || out.company.value));
-    if (roleLine) out.contact = this._field(roleLine.trim(), { person: true });
+    // contact: the line carrying a title, with the title words stripped off;
+    // when the title stands alone, the person is the line just above (or
+    // below) it. Never an email, phone, web address or the company line.
+    const isCo = t => t === out.company.zh || t === out.company.value;
+    const skip = t => this.NOISE.test(t) || this.EMAIL.test(t) || this.URL.test(t) || this.PHONE.test(t) || this.WECHAT.test(t);
+    // ("Export Manager" is a title, not the "export" of an export company —
+    // company words are tested after the title is stripped)
+    const roleIdx = items.findIndex(l => (this.ROLE_EN.test(l.text) || this.ROLE_ZH.test(l.text))
+      && l.text.length <= 42 && !isCo(l.text) && !skip(l.text) && !this.CO_EN.test(this.personName(l.text)));
+    if (roleIdx >= 0) {
+      const roleText = items[roleIdx].text;
+      let name = this.personName(roleText);
+      // a misread title ("外贸经埕") survives the strip and drags the name
+      // over the length limit: the name is then the token that looks like one
+      if (!this._nameShape(name)) {
+        const tok = roleText.split(/[\s|,，/·•:：()（）-]+/).map(t => this.personName(t)).find(t => this._nameShape(t) && !this.ROLE_EN.test(t) && !this.ROLE_ZH.test(t));
+        if (tok) name = tok;
+      }
+      if (this._nameShape(name)) out.contact = this._field(name, { person: true });
+      else {
+        const near = [roleIdx - 1, roleIdx - 2, roleIdx + 1].filter(j => j >= 0 && j < items.length);
+        for (const j of near) {
+          const t = items[j].text.trim();
+          if (!isCo(t) && !skip(t) && this._nameShape(t)) { out.contact = this._field(t, { person: true }); break; }
+        }
+      }
+    }
 
     // wechat / phone
     for (const t of texts) {
@@ -611,8 +686,8 @@ const OCR = {
     }
     if (!out.contact.value) {
       const cand = texts.find(t => t !== out.company.zh && t !== out.company.value
-        && !this.NOISE.test(t) && !this.PHONE.test(t) && !this.EMAIL.test(t)
-        && (/^[A-Za-z .·'-]{3,28}$/.test(t) || (ZH.scriptOf(t) === 'cjk' && t.length >= 2 && t.length <= 8)));
+        && !this.NOISE.test(t) && !this.PHONE.test(t) && !this.EMAIL.test(t) && !this.URL.test(t) && !this.WECHAT.test(t)
+        && this._nameShape(t));
       if (cand) out.contact = this._field(cand.trim(), { person: true });
     }
     return out;
@@ -624,7 +699,17 @@ const OCR = {
     const texts = items.map(l => l.text);
     const out = { pname: { value: '', zh: '' }, code: { value: '', zh: '' }, size: { value: '', zh: '' } };
     const sizeRe = /(\d{2,5}(?:\.\d+)?\s*[×xX*✕]\s*\d{2,5}(?:\.\d+)?(?:\s*[×xX*✕]\s*\d{1,4}(?:\.\d+)?)?\s*(?:mm|cm|m)?|\d{1,4}(?:\.\d+)?\s*(?:mm|cm|ml|mg|kg|g|litres?|liters?|l)\b)/i;
-    const codeRe = /\b([A-Z]{1,5}[-_ ]?\d{2,6}[A-Z0-9-]*)\b/;
+    const codeRe = /\b([A-Z]{1,5}[-_ ]?\d{2,6}[A-Z0-9-]*)\b/g;
+    // things shaped like a model code that never are: standards, dates,
+    // phone/fax labels, batch and quantity fields
+    const notCode = /^(ISO|GB|GBT|EN|AS|NZS|ASTM|DIN|BS|JIS|IEC|ANSI|UL|CE|IP|CLASS|TEL|FAX|NO|QTY|PCS|LOT|EXP|MFG|MFD|BATCH|PO|SN|IPX|ROHS|AAA|AA|UV|LED|AC|DC|V|W|HZ|KW|KG|MM|CM|ML|L|G|M)$/i;
+    const codeOk = (raw) => {
+      const letters = (raw.match(/^[A-Z]+/) || [''])[0];
+      if (notCode.test(letters)) return false;
+      const digits = raw.replace(/^[A-Z]+[-_ ]?/, '');
+      if (/^(19|20)\d{2}[-\/.]\d{1,2}([-\/.]\d{1,2})?$/.test(digits)) return false; // a date (2024-05)
+      return true;
+    };
 
     for (const t of texts) {
       // common OCR confusions inside sizes: 500m1 / 500mI → 500ml
@@ -634,10 +719,17 @@ const OCR = {
         break;
       }
     }
-    for (const t of texts) {
-      const stripped = t.replace(sizeRe, ' ');
-      const c = stripped.match(codeRe);
-      if (c) { out.code = { value: c[1].trim(), zh: '' }; break; }
+    // a labelled code wins ("Model: TX-2040"); otherwise the first plausible
+    // code-shaped token on any line
+    const labelledCode = texts.map(t => t.match(/(?:model|item|art(?:icle)?|code|sku|型号|货号|款号|编号)\s*(?:no\.?|number|#)?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_\/.]{1,24})/i)).find(m => m && /\d/.test(m[1]) && codeOk(m[1].toUpperCase()));
+    if (labelledCode) out.code = { value: labelledCode[1].trim(), zh: '' };
+    if (!out.code.value) {
+      outer: for (const t of texts) {
+        const stripped = t.replace(sizeRe, ' ');
+        for (const m of stripped.matchAll(codeRe)) {
+          if (codeOk(m[1])) { out.code = { value: m[1].trim(), zh: '' }; break outer; }
+        }
+      }
     }
 
     // product name: prefer a labelled line (品名 / 名称 / Product), else the

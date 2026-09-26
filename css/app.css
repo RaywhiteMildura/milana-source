@@ -172,3 +172,8 @@ button, [role="button"] { user-select: none; -webkit-user-select: none; }
 /* invisible tap-area expansion so small controls still meet the ≥44px rule */
 .hit44 { position: relative; }
 .hit44::after { content: ''; position: absolute; inset: -8px; }
+
+/* a storage problem stays on screen until it is tapped away */
+.toast.toast-sticky { background: #8b2d2d; color: #fff; cursor: pointer; padding-right: 18px; }
+/* the review field a tapped OCR line will land in */
+.fld[data-target] { border-color: var(--brass); box-shadow: 0 0 0 2px rgba(157,118,67,.18); }

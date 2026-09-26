@@ -53,6 +53,7 @@ const ZH = {
 
     // ── card labels ──
     '联系人': 'Contact', '姓名': 'Name', '手机号码': 'Mobile', '手机': 'Mobile',
+    '先生': 'Mr', '女士': 'Ms', '小姐': 'Ms',
     '电话': 'Tel', '座机': 'Landline', '传真': 'Fax', '邮箱': 'Email',
     '电子邮箱': 'Email', '邮编': 'Postcode', '地址': 'Address', '厂址': 'Factory Address',
     '网址': 'Website', '微信': 'WeChat', '微信号': 'WeChat ID', '公众号': 'WeChat Official',
@@ -127,15 +128,22 @@ const ZH = {
      names (person:true) — 金兰 is a brand, 金 as a surname would break it. */
   SURNAMES: ('王李张刘陈杨黄赵周吴徐孙朱马胡郭林何高梁郑罗宋谢唐韩曹许邓萧冯曾程蔡彭潘袁于董余苏'
     + '叶吕魏蒋田杜丁沈姜范江傅钟卢汪戴崔任陆廖姚方金邱夏谭韦贾邹石熊孟秦阎薛侯雷白龙段郝孔邵史毛'
-    + '常万顾赖武康贺严尹钱施牛洪龚').split(''),
+    + '常万顾赖武康贺严尹钱施牛洪龚肖温莫蓝覃麦简甄冼区欧岑符麻黎').split(''),
   SURNAMES2: ['欧阳', '司马', '上官', '诸葛', '司徒', '夏侯'],
 
   _cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; },
 
-  _syllables(run) {
+  /* One pinyin syllable per character. ü is a real syllable (吕 lü, 铝 lü,
+     女 nü) — it must not be filtered out or every later syllable shifts off
+     its character. surname:'head' makes pinyin-pro read 曾/单/解 the way a
+     surname is read (Zeng, Shan, Xie), not the common-word way. */
+  _syllables(run, opts = {}) {
     try {
       if (typeof pinyinPro === 'undefined') return [];
-      return pinyinPro.pinyin(run, { toneType: 'none', type: 'array' }).filter(p => /^[a-z]+$/i.test(p));
+      const o = { toneType: 'none', type: 'array', nonZh: 'removed' };
+      if (opts.surname) o.surname = 'head';
+      const parts = pinyinPro.pinyin(run, o);
+      return (Array.isArray(parts) ? parts : []).map(p => String(p).replace(/v/g, 'ü')).filter(p => /^[a-zü]+$/i.test(p));
     } catch (err) { return []; }
   },
 
@@ -144,10 +152,12 @@ const ZH = {
     return parts.length ? this._cap(parts.join('')) : '';
   },
 
-  /* "李小明" → "Li Xiaoming" (surname kept as its own word) */
+  /* "李小明" → "Li Xiaoming" (surname kept as its own word). The split is only
+     trusted when the syllables line up one per character. */
   _pinyinName(run) {
-    const parts = this._syllables(run);
+    const parts = this._syllables(run, { surname: true });
     if (!parts.length) return '';
+    if (parts.length !== run.length) return this._cap(parts.join(''));
     if (run.length >= 3 && run.length <= 4 && this.SURNAMES2.includes(run.slice(0, 2)) && parts.length > 2) {
       return this._cap(parts.slice(0, 2).join('')) + ' ' + this._cap(parts.slice(2).join(''));
     }
@@ -186,6 +196,9 @@ const ZH = {
       }
       let matched = null;
       for (let len = Math.min(this._maxLen, src.length - i); len >= 1; len--) {
+        // inside a person's name the one-character address words (区 市 省
+        // 路 号 …) are parts of the name, never "District" or "Road"
+        if (opts.person && len === 1) break;
         const slice = src.slice(i, i + len);
         if (this.TERMS[slice]) { matched = { slice, en: this.TERMS[slice] }; break; }
       }

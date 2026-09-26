@@ -5,14 +5,21 @@
    company bio is fetched via the Claude API (web search enabled). */
 
 const Lookup = {
-  searchUrls(name) {
-    const q = encodeURIComponent(name);
-    return [
-      { label: '🔎 Bing search', url: 'https://www.bing.com/search?q=' + q },
-      { label: '🖼 Bing images', url: 'https://www.bing.com/images/search?q=' + q },
-      { label: 'Alibaba suppliers', url: 'https://www.alibaba.com/trade/search?SearchText=' + q },
-      { label: '1688.com', url: 'https://s.1688.com/company/company_search.htm?keywords=' + q },
+  /* Pre-filled searches. 1688 and image search are indexed under the Chinese
+     characters — a pinyin rendering finds nothing there — so those use the
+     Chinese name whenever the card had one; Alibaba and Bing web use the
+     English. */
+  searchUrls(name, nameZh) {
+    const en = encodeURIComponent(name || '');
+    const zh = encodeURIComponent(nameZh || name || '');
+    const out = [
+      { label: '🔎 Bing search', url: 'https://www.bing.com/search?q=' + en },
+      { label: '🖼 Bing images', url: 'https://www.bing.com/images/search?q=' + zh },
+      { label: 'Alibaba suppliers', url: 'https://www.alibaba.com/trade/search?SearchText=' + en },
+      { label: '1688.com', url: 'https://s.1688.com/company/company_search.htm?keywords=' + zh },
     ];
+    if (nameZh && nameZh !== name) out.splice(1, 0, { label: '🔎 Bing 中文', url: 'https://www.bing.com/search?q=' + zh });
+    return out;
   },
 
   _prompt(info) {
@@ -36,12 +43,19 @@ const Lookup = {
   },
 
   /* One Claude API call (claude-haiku, web search on). Throws with a
-     human-readable message on any failure so the caller can queue a retry. */
-  async fetchBio(apiKey, info) {
+     human-readable message on any failure so the caller can queue a retry.
+     A 30 s timeout: on networks where the host is blackholed the request
+     would otherwise hang forever with the button stuck on "Looking up…". */
+  TIMEOUT_MS: 30000,
+  _inflight: null,
+  cancel() { if (this._inflight) { try { this._inflight.abort(); } catch (e) { /* done */ } } },
+  async _call(apiKey, messages, ac) {
+    const timer = setTimeout(() => ac.abort(), this.TIMEOUT_MS);
     let res;
     try {
       res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
+        signal: ac.signal,
         headers: {
           'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
@@ -52,12 +66,15 @@ const Lookup = {
           model: 'claude-haiku-4-5',
           max_tokens: 1024,
           tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 5 }],
-          messages: [{ role: 'user', content: this._prompt(info) }],
+          messages,
         }),
       });
     } catch (err) {
-      throw new Error('No connection to the lookup service — it will retry.');
+      clearTimeout(timer);
+      if (err && err.name === 'AbortError') throw new Error('The lookup timed out — this network may not reach the lookup service. Try again on roaming data or a VPN.');
+      throw new Error('No connection to the lookup service — try again when you have signal.');
     }
+    clearTimeout(timer);
     if (!res.ok) {
       let msg = 'The lookup failed (HTTP ' + res.status + ').';
       try {
@@ -65,17 +82,34 @@ const Lookup = {
         if (err && err.error && err.error.message) msg = err.error.message;
       } catch (e) { /* keep the status message */ }
       if (res.status === 401) msg = 'The API key was not accepted — check it in Settings.';
+      if (res.status === 403) msg = 'This API key is not allowed to be used from a browser — create a key without that restriction.';
       if (res.status === 429) msg = 'The lookup service is rate-limited — try again in a minute.';
       if (res.status >= 500) msg = 'The lookup service had a hiccup — try again.';
       throw new Error(msg);
     }
-    const data = await res.json();
-    const text = (data.content || [])
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim();
-    if (!text) throw new Error('The lookup came back empty — try again.');
-    return text;
+    return res.json();
+  },
+  async fetchBio(apiKey, info) {
+    const ac = new AbortController();
+    this._inflight = ac;
+    const messages = [{ role: 'user', content: this._prompt(info) }];
+    try {
+      let data = await this._call(apiKey, messages, ac);
+      // a long search can be handed back mid-way ("pause_turn"): send the
+      // partial turn back so the answer is finished, a couple of times at most
+      for (let i = 0; i < 2 && data && data.stop_reason === 'pause_turn' && Array.isArray(data.content); i++) {
+        messages.push({ role: 'assistant', content: data.content });
+        data = await this._call(apiKey, messages, ac);
+      }
+      const text = (data.content || [])
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('')
+        .trim();
+      if (!text) throw new Error('The lookup came back empty — try again.');
+      return data.stop_reason === 'max_tokens' ? text + ' …' : text;
+    } finally {
+      this._inflight = null;
+    }
   },
 };

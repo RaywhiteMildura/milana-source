@@ -143,11 +143,42 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   await tap('[data-act="pickCat"][data-arg="Tiles"]', 'category');
   await tap('[data-act="toggleRoom"][data-arg="Kitchen"]', 'room');
   await tap('[data-act="setRating"][data-arg="4"]', 'rating');
+
+  // the in-progress capture is persisted: a reload must bring it back intact
+  // (waitForFunction treats a returned Promise as truthy — poll from Node instead)
+  let storedOk = false;
+  for (let i = 0; i < 50 && !storedOk; i++) {
+    storedOk = await S(async () => { const d = await settingGet('draft', null); const m = await settingGet('draftMeta', null); return !!(d && d.product && d.product.length === 2 && d.label && d.card && m && m.category === 'Tiles' && m.rating === 4 && m.rooms && m.rooms.includes('Kitchen')); });
+    if (!storedOk) await sleep(100);
+  }
+  check(storedOk, 'photos and tags are in storage within a moment of the last tap');
+  await page.reload();
+  await page.waitForSelector('text=Latest captures', { timeout: 10000 });
+  const restored = await S(() => ({ resume: S.draftResume, n: S.draft.product.length, cat: S.draft.category, rating: S.draft.rating, rooms: S.draft.rooms, label: !!S.draft.label, card: !!S.draft.card }));
+  check(restored.resume && restored.n === 2 && restored.cat === 'Tiles' && restored.rating === 4 && restored.label && restored.card,
+    'unfinished capture survives a reload with its photos and tags: ' + JSON.stringify(restored));
+  check(await page.locator('[data-act="resumeDraft"]').count() === 1, 'Today offers to resume the unfinished capture');
+  await tap('[data-act="resumeDraft"]', 'resume');
+  await page.waitForFunction(() => S.view === 'shoot', null, { timeout: 5000 });
+  await tap('[data-act="toDetails"]', 'tag it');
+  await page.waitForFunction(() => S.view === 'tag', null, { timeout: 5000 });
+
+  // a storage failure on save must be loud and must keep the draft
+  // (the app logs the failure with console.error by design — expected here)
+  await S(() => { window.__realBatch = dbBatch; window.__ce = console.error; console.error = () => {}; window.dbBatch = async () => { const e = new Error('quota'); e.name = 'QuotaExceededError'; throw e; }; });
+  await tap('[data-act="save"]', 'save with storage full');
+  await sleep(500);
+  const quota = await S(() => ({ view: S.view, n: S.draft.product.length, caps: S.captures.length, toast: (document.querySelector('.toast') || {}).textContent || '', sticky: !!document.querySelector('.toast-sticky') }));
+  check(quota.view === 'tag' && quota.n === 2 && quota.caps === 0, 'storage-full save keeps the draft and its photos');
+  check(/out of storage/i.test(quota.toast) && quota.sticky, 'storage-full save shows a sticky, plain-language message: ' + quota.toast.slice(0, 60));
+  await S(() => { window.dbBatch = window.__realBatch; console.error = window.__ce; document.querySelectorAll('.toast').forEach(t => t.remove()); });
+
   await tap('[data-act="save"]', 'save');
   await page.waitForFunction(() => S.view === 'saved', null, { timeout: 8000 });
   const savedTxt = await S(() => document.body.innerText);
   check(savedTxt.includes('Casa Verde'), 'saved screen shows the custom project name');
   check(await S(() => S.captures.length === 1 && !!S.session.key && S.companies.length === 1), 'capture saved with a company session started');
+  check(await S(async () => (await settingGet('draft', null)) === null), 'saving clears the persisted draft');
   await shot('06-saved');
 
   section('capture 2: same booth (session skip)');
@@ -183,6 +214,8 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   const nb = await S(() => ({ key: S.session.key, cam: S.camera }));
   check(nb.key === '' && nb.cam === 'card', 'newBooth cleared the session and opened the card camera');
   await tap('[data-act="cancelCam"]', 'cancel');
+  await page.waitForFunction(() => !S.camera, null, { timeout: 5000 });
+  check(await S(() => S.session.key) === sessBefore, 'cancelling the new-booth camera puts the previous booth back');
   await tap('[data-act="closeFlow"]', 'abandon this capture');
   await page.waitForFunction(() => S.view === 'home', null, { timeout: 5000 });
 
@@ -195,8 +228,7 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   await tap('[data-act="camNext"]', 'next');
   await page.waitForFunction(() => S.camera === 'label', null, { timeout: 8000 });
   await tap('[data-act="snap"]', 'label');
-  await page.waitForFunction(() => S.camera === 'card', null, { timeout: 8000 });
-  await tap('[data-act="snap"]', 'card');
+  // the booth was put back when the new-card camera was cancelled: straight to Tag it
   await page.waitForFunction(() => S.view === 'tag' && !S.camera, null, { timeout: 8000 });
   await tap('[data-act="pickCat"][data-arg="Joinery"]', 'category');
   await tap('[data-act="save"]', 'save');
@@ -262,7 +294,8 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
 
   section('review + OCR');
   await tap('[data-act="nav"][data-arg="review"]', 'review');
-  await page.waitForSelector('text=Evening review', { timeout: 8000 });
+  await page.waitForFunction(() => S.view === 'review', null, { timeout: 8000 });
+  check(await S(() => !document.querySelector('.toast')), 'opening the review list raises no error toast');
   await shot('11-review-list');
   await page.locator('[data-act="openReview"]').first().click();
   await page.waitForSelector('text=FROM THE COMPANY CARD', { timeout: 8000 });
@@ -282,7 +315,7 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
     x.fillText('Tel: +86 592 5566 778', 60, 470);
     const blob = await new Promise(r => c.toBlob(r, 'image/png'));
     const lines = await OCR.readLines(blob);
-    return { fields: OCR.parseCard(lines), langs: lines.map(l => l.lang + ':' + ZH.scriptOf(l.text)) };
+    return { fields: OCR.parseCard(lines), langs: lines.map(l => l.lang + ':' + ZH.scriptOf(l.text)), texts: lines.map(l => l.text) };
   });
   const wrongScript = ocr.langs.filter(l => l === 'eng:cjk' || l === 'chi_sim:latin');
   check(wrongScript.length === 0, 'no line came from the wrong-script model: ' + JSON.stringify(ocr.langs));
@@ -290,7 +323,7 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   check(/[一-鿿]/.test(ocr.fields.company.zh) && /有限公司$/.test(ocr.fields.company.zh),
     'Chinese company kept alongside for checking: ' + ocr.fields.company.zh);
   check(/wanli-stone-mark/.test(ocr.fields.wechat.value), 'WeChat id read over the phone number: ' + ocr.fields.wechat.value);
-  check(/^Zhou /.test(ocr.fields.contact.value), 'contact transliterated with surname split: ' + ocr.fields.contact.value);
+  check(/^Zhou /.test(ocr.fields.contact.value), 'contact transliterated with surname split: ' + ocr.fields.contact.value + '  (read: ' + JSON.stringify(ocr.texts) + ')');
 
   // English-only photos must never come back as Chinese
   const enOnly = await S(async () => {
@@ -366,8 +399,8 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   await shot('12-complete-record-bilingual');
 
   section('company lookup: level 1 links');
-  await page.waitForSelector('[data-act="openSearch"]', { timeout: 5000 });
-  const links = await S(() => [...document.querySelectorAll('[data-act="openSearch"]')].map(el => el.dataset.arg));
+  await page.waitForSelector('a[data-search]', { timeout: 5000 });
+  const links = await S(() => [...document.querySelectorAll('a[data-search]')].map(el => el.getAttribute('href')));
   check(links.length === 4, 'four search links on the Complete Record screen');
   check(links.some(u => u.startsWith('https://www.bing.com/search?q=')) &&
         links.some(u => u.startsWith('https://www.bing.com/images/search?q=')) &&
@@ -424,10 +457,19 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
 
   await page.fill('[data-input="rv.company"]', 'Foshan Jinlan Joinery Co., Ltd');
   await page.fill('[data-input="rv.pname"]', 'Fluted walnut veneer door');
+  await page.fill('[data-input="rv.note"]', 'Ask about a 45mm leaf and the lead time.');
+  // the card photo opens full screen for checking characters
+  await tap('[data-act="viewPhoto"][data-arg="rv@card"]', 'enlarge card photo');
+  check(await S(() => !!S.viewPhoto && !!document.querySelector('[data-act="closePhoto"]')), 'card photo opens full screen');
+  await tap('[data-act="zoomPhoto"]', 'zoom');
+  check(await S(() => S.viewPhoto && S.viewPhoto.zoom > 1), 'tap zooms the photo');
+  await tap('[data-act="closePhoto"]', 'close photo');
+  check(await S(() => !S.viewPhoto), 'photo viewer closes');
   await tap('[data-act="confirmReview"]', 'confirm');
   await page.waitForFunction(() => S.view === 'review', null, { timeout: 8000 });
   check(await S(() => { const co = S.companies.find(c => c.name === 'Foshan Jinlan Joinery Co., Ltd'); return !!co && co.nameZh === '厦门万利石材有限公司'; }),
     'confirmed record stored the English name and the characters');
+  check(await S(() => S.captures.some(c => c.name === 'Fluted walnut veneer door' && c.note === 'Ask about a 45mm leaf and the lead time.')), 'product note saved with the record');
   check(await S(() => {
     const co = S.companies.find(c => c.name === 'Foshan Jinlan Joinery Co., Ltd');
     return !!co && co.website === 'https://wanlistone.example.cn' && co.notes.includes('CeramBath') && co.bio.includes('Wanli') && !!co.bioAt && !co.lookupPending;
@@ -440,7 +482,7 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   await page.locator('[data-act="openCompany"]:has-text("Foshan Jinlan")').first().click();
   await page.waitForFunction(() => !!S.companyKey, null, { timeout: 5000 });
   await shot('15-company-detail');
-  check(await page.locator('[data-act="openSearch"]').count() === 4, 'company detail view has the four search links');
+  check(await page.locator('a[data-search]').count() >= 4, 'company detail view has the search links');
   check(await S(() => { const el = document.querySelector('[data-input="co.website"]'); return !!el && el.value === 'https://wanlistone.example.cn'; }), 'company detail shows the saved website');
   check(await page.locator('text=AI lookup — verify yourself').count() > 0, 'bio shown on the company detail view');
   await page.fill('[data-input="co.notes"]', 'Updated from the company view');
@@ -454,12 +496,13 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   await shot('16-products');
 
   section('CSV carries the lookup columns');
-  const csv = await S(() => {
+  const csv = await S(async () => {
     let out = null;
-    const orig = window.downloadFile;
-    window.downloadFile = (name, data) => { out = data; };
+    const orig = window.shareOrDownload;
+    window.shareOrDownload = async (name, blob) => { out = await blob.text(); return 'downloaded'; };
     Actions.exportCSV();
-    window.downloadFile = orig;
+    await new Promise(r => setTimeout(r, 300));
+    window.shareOrDownload = orig;
     return out;
   });
   check(!!csv && csv.includes('"website","company_notes","company_bio"'), 'CSV header has website / notes / bio columns');
@@ -501,11 +544,82 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
   const pdfInfo = await S(async () => {
     const list = S.captures.slice();
     list.forEach(c => { c._company = companyOf(c.companyKey); });
-    const blob = await DayPack.build(list, supName);
+    const { blob, pages } = await DayPack.build(list, supName, { title: 'Test day' });
     list.forEach(c => { delete c._company; });
-    return { size: blob.size, type: blob.type };
+    return { size: blob.size, type: blob.type, pages, n: list.length };
   });
   check(pdfInfo.size > 10000 && pdfInfo.type === 'application/pdf', 'day pack PDF built (' + pdfInfo.size + ' bytes)');
+  check(pdfInfo.pages >= pdfInfo.n + 1, 'one page per capture plus a cover (' + pdfInfo.pages + ' pages for ' + pdfInfo.n + ')');
+
+  section('day pack: choose a day, build, then share from a fresh tap');
+  await tap('[data-act="nav"][data-arg="home"]', 'home');
+  check(await page.locator('[data-act="nav"][data-arg="review"]').count() >= 1, 'review / day pack stays reachable from Today');
+  await tap('[data-act="nav"][data-arg="review"]', 'review');
+  await page.waitForSelector('[data-act="buildPack"]', { timeout: 5000 });
+  check(await page.locator('[data-act="setPackDay"]').count() >= 1, 'day pack offers a day to choose');
+  await tap('[data-act="togglePackShort"]', 'shortlisted only');
+  check(await S(() => S.packShortOnly === true), 'shortlist-only scope toggles');
+  await tap('[data-act="togglePackShort"]', 'all captures again');
+  let shared = null;
+  await S(() => { navigator.share = async (d) => { window.__shared = { n: d.files.length, name: d.files[0].name, type: d.files[0].type, size: d.files[0].size }; }; navigator.canShare = () => true; });
+  await tap('[data-act="buildPack"]', 'build PDF');
+  await page.waitForFunction(() => !!S.pack && !S.packBusy, null, { timeout: 120000 });
+  check(await S(() => S.pack.pages >= 2 && /milana-day-pack-\d{4}-\d{2}-\d{2}\.pdf/.test(S.pack.name)), 'PDF built and named after the selected day: ' + await S(() => S.pack.name));
+  await shot('20-day-pack-ready');
+  await tap('[data-act="sharePack"]', 'share PDF');
+  await sleep(300);
+  shared = await S(() => window.__shared);
+  check(shared && shared.type === 'application/pdf' && shared.size > 10000, 'share sheet receives the PDF file from the second tap');
+
+  section('backup: pack today, save, wipe, import — everything comes back');
+  const before2 = await S(() => ({ caps: S.captures.length, cos: S.companies.length, names: S.captures.map(c => c.name).sort() }));
+  await tap('[data-act="nav"][data-arg="home"]', 'home');
+  await tap('[data-act="openSettings"]', 'settings');
+  await page.waitForSelector('[data-act="exportBackup"][data-arg="today"]', { timeout: 5000 });
+  check(await page.locator('text=Trip readiness').count() === 1, 'settings shows a trip-readiness checklist');
+  check(await page.locator('text=nothing is uploaded').count() >= 1, 'settings copy is honest about there being no sync');
+  await tap('[data-act="exportBackup"][data-arg="today"]', 'back up today');
+  await page.waitForFunction(() => !!S.backupReady && !S.backupBusy, null, { timeout: 60000 });
+  const bk = await S(() => ({ n: S.backupReady.files.length, name: S.backupReady.files[0].name, bytes: S.backupReady.bytes }));
+  check(bk.n === 1 && /\.milana$/.test(bk.name) && bk.bytes > 1000, 'backup packed into a .milana file (' + bk.name + ', ' + bk.bytes + ' bytes)');
+  // keep the file in-page so it can be re-imported after a wipe
+  await S(() => { window.__backupFile = S.backupReady.files[0]; navigator.share = async () => {}; });
+  await tap('[data-act="shareBackup"]', 'save backup');
+  await page.waitForFunction(() => !S.backupReady, null, { timeout: 5000 });
+  check(await S(() => !!S.lastBackupAt), 'backup marked as saved');
+  await closeSheet('settingsOn');
+  await tap('[data-act="openSettings"]', 'settings');
+  await tap('[data-act="eraseData"]', 'clear all data'); // confirm auto-accepted, no PIN
+  await page.waitForFunction(() => S.captures.length === 0, null, { timeout: 8000 });
+  check(await S(() => S.captures.length === 0 && S.companies.length === 0), 'clear all data wiped captures and companies');
+  // clearing closes the sheet and returns to Today — import lives in Settings
+  await tap('[data-act="openSettings"]', 'settings after the wipe');
+  await page.waitForFunction(() => S.settingsOn && !!document.querySelector('#import-json'), null, { timeout: 5000 });
+  await S(async () => {
+    const dt = new DataTransfer(); dt.items.add(window.__backupFile);
+    const inp = document.querySelector('#import-json'); inp.files = dt.files; inp.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await page.waitForFunction(n => S.captures.length === n && !S.backupBusy, before2.caps, { timeout: 60000 });
+  const after2 = await S(() => ({ caps: S.captures.length, cos: S.companies.length, names: S.captures.map(c => c.name).sort(),
+    photosOk: S.captures.every(c => c.photos.product.length && c.photos.product.every(p => p.blob && p.blob.size > 0 && p.thumb)) }));
+  check(after2.caps === before2.caps && JSON.stringify(after2.names) === JSON.stringify(before2.names), 'import restored every capture (' + after2.caps + ')');
+  check(after2.cos >= 1, 'import restored the companies (' + after2.cos + ')');
+  check(after2.photosOk, 'imported photos are real blobs with fresh thumbnails');
+  await closeSheet('settingsOn');
+
+  section('edit a completed record later');
+  await tap('[data-act="nav"][data-arg="products"]', 'products');
+  await page.locator('[data-act="openDetail"]').first().click();
+  await page.waitForFunction(() => !!S.detailId, null, { timeout: 5000 });
+  check(await page.locator('[data-act="openReview"]').count() === 1, 'a completed record still offers Edit');
+  await tap('[data-act="openReview"]', 'edit');
+  await page.waitForFunction(() => S.view === 'reviewItem', null, { timeout: 5000 });
+  await page.waitForFunction(() => !S.rvBusy.card && !S.rvBusy.label, null, { timeout: 240000 });
+  await page.fill('[data-input="rv.code"]', 'FW-45');
+  await tap('[data-act="confirmReview"]', 'save changes');
+  await page.waitForFunction(() => S.view === 'review', null, { timeout: 8000 });
+  check(await S(() => S.captures.some(c => c.code === 'FW-45')), 'edited code saved on the completed record');
+  await tap('[data-act="nav"][data-arg="home"]', 'home');
 
   section('service worker + offline');
   const cacheName = swCacheName();
