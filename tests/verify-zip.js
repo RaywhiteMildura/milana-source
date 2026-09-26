@@ -53,16 +53,26 @@ const URL = process.env.ZIP_URL || 'http://127.0.0.1:8129/index.html';
   console.log((cacheOk ? 'PASS' : 'FAIL') + ': service worker cache = ' + JSON.stringify(sw.keys) + ' (expected ' + want + ') with ' + sw.n + ' assets');
   if (!cacheOk) bad.push('cache not ' + want + ': ' + JSON.stringify(sw.keys));
 
+  // the 38 MB reader models are fetched by the worker AFTER install (so the
+  // app itself installs in seconds) — give them up to two minutes to land
   const heavy = await page.evaluate(async (name) => {
-    const c = await caches.open(name);
     const files = ['./vendor/lang/chi_sim.traineddata.gz', './vendor/lang/eng.traineddata.gz',
       './vendor/core/tesseract-core-lstm.wasm.js', './vendor/core/tesseract-core-simd-lstm.wasm.js'];
-    const out = {};
-    for (const u of files) out[u.split('/').pop()] = !!(await c.match(u));
+    let out = {};
+    for (let i = 0; i < 120; i++) {
+      const c = await caches.open(name);
+      out = {};
+      for (const u of files) out[u.split('/').pop()] = !!(await c.match(u));
+      if (Object.values(out).every(Boolean)) break;
+      await new Promise(r => setTimeout(r, 1000));
+    }
     return out;
   }, want);
   const heavyOk = Object.values(heavy).every(Boolean);
-  console.log((heavyOk ? 'PASS' : 'FAIL') + ': offline OCR assets cached ' + JSON.stringify(heavy));
+  console.log((heavyOk ? 'PASS' : 'FAIL') + ': offline OCR assets cached after install ' + JSON.stringify(heavy));
+  const readiness = await page.evaluate(() => ({ ready: S.ocrReady, missing: S.ocrMissing }));
+  console.log((readiness.ready ? 'PASS' : 'FAIL') + ': app reports the offline reader as ready in Trip readiness ' + JSON.stringify(readiness));
+  if (!readiness.ready) bad.push('S.ocrReady not set after the models were cached');
   if (!heavyOk) bad.push('OCR assets not fully cached');
 
   await ctx.setOffline(true);
