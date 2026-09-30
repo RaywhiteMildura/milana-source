@@ -990,7 +990,7 @@ function settingsSheet() {
           <button data-act="eraseData" style="min-height:46px;padding:0 15px;border-radius:13px;border:1px solid #e0c4c0;background:#f8e7e5;color:#8b2d2d;font-size:13.5px;font-weight:800">Clear all data</button>
         </div>
         <div style="font-size:11.5px;color:#625852;margin-top:6px;line-height:1.45">Clear all data wipes every capture and company on this phone${S.user && S.user.pin ? ' — it asks for your PIN first' : ''}. Back up first if anything matters.</div>
-        <div class="mono" style="font-size:10.5px;color:#9d7643;margin-top:12px">Milana Source v1.2 · offline-first · reading on device</div>
+        <div class="mono" style="font-size:10.5px;color:#9d7643;margin-top:12px">Milana Source v1.2.1 · updates arrive on their own · reading on device</div>
       </div>
     </div>
   </div>`;
