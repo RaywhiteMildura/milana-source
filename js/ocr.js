@@ -495,6 +495,9 @@ const OCR = {
       // one short lowercase word on its own ("wenn") is texture read as a
       // word unless the model is sure of it
       if (/^[a-z]{1,5}$/.test(l.text.trim()) && l.conf < 75) return false;
+      // a line of nothing but short lowercase words ("ween olf") is texture
+      // too, unless the model is confident
+      if (l.conf < 80 && /^[a-z]{1,4}( [a-z]{1,4})+$/.test(l.text.trim())) return false;
       return l.conf >= 70 || this._wordish(l.text);
     });
 

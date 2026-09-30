@@ -13,7 +13,7 @@
    'heavy-status' report back. */
 
 // Bump this on every deploy so installed phones pick up the update.
-const CACHE = 'milana-v11';
+const CACHE = 'milana-v12';
 
 const CORE = [
   './',

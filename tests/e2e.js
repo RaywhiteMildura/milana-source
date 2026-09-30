@@ -348,9 +348,12 @@ const { URL, SHOTS, sleep, swCacheName, launch, loadCJKFont, makeReporter } = re
       x.translate(w / 2, h / 2); x.rotate((opts.rot || 0) * Math.PI / 180); x.translate(-w / 2, -h / 2);
       x.fillStyle = '#272320'; fn(x);
       x.restore(); x.filter = 'none';
+      // seeded grain: the same photo every run, so a pass or fail means something
       const img = x.getImageData(0, 0, w, h), d = img.data;
+      let gs = 12345;
+      const grnd = () => { gs = (gs * 1664525 + 1013904223) % 4294967296; return gs / 4294967296; };
       for (let i = 0; i < d.length; i += 4) {
-        const n = (Math.random() * 64) - 32;
+        const n = (grnd() * 64) - 32;
         d[i] += n; d[i + 1] += n; d[i + 2] += n;
       }
       x.putImageData(img, 0, 0);
