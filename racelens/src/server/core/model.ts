@@ -16,7 +16,8 @@ import { BASE_WEIGHTS, computeFieldStats, evaluateRunner, type FactorContext } f
 import { applyDayPatterns, patternBias } from './daypatterns.js';
 import { expectedTrackRating } from './weather.js';
 import { summariseRaceMarket } from './market.js';
-import { buildBettingPlan } from './betting.js';
+import { buildBettingPlan, expectedReturn } from './betting.js';
+import { starters } from './field.js';
 
 /**
  * The prediction model.
@@ -218,14 +219,17 @@ function reasonsAndConcerns(f: FactorScore[], runner: Runner): { reasons: string
   const concerns = sorted.filter((x) => x.contribution < -0.04).slice(0, 3).map((x) => `${x.label}: ${x.evidence}`);
   if (runner.verification.sourceCount <= 1) concerns.push('Only one source covers this runner – details unverified');
   if (runner.verification.conflicts.length) concerns.push(`Sources disagree: ${runner.verification.conflicts[0]}`);
-  if (runner.emergency) concerns.push('Emergency runner – may not gain a start');
+  if (runner.emergency) concerns.push('Emergency – it only starts because of a scratching; check it is confirmed');
   return { reasons, concerns };
 }
 
 export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
   const now = opts.now ?? new Date();
   const race: Race = { ...raceIn, runners: summariseRaceMarket(raceIn.runners) };
-  const active = race.runners.filter((r) => !r.scratched);
+  // Emergencies waiting for a vacancy are left out: they would take win chance from the real starters
+  // and change the place terms.
+  const active = starters(race.runners);
+  race.fieldSize = active.length;
   const patterns = opts.dayPatterns || [];
   const weights = applyDayPatterns(BASE_WEIGHTS, patterns);
   const expectedRating = expectedTrackRating(race.trackRating, forecastDrift(opts.weather));
@@ -260,10 +264,12 @@ export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
   const marketAvailable = marketProbs.filter((p) => p != null).length >= Math.max(2, Math.floor(active.length * 0.6));
   // Benter-style pool: ~0.4 fundamentals / 0.6 market when prices are available (research/modelknowledge.md §13).
   const lambda = marketAvailable ? (opts.marketWeight ?? 0.55) : 0;
+  // A runner nobody has priced gets a neutral market opinion (its own model probability), never a punitive guess.
+  // The priced runners' market shares sum to 1 on their own, so scale them down to leave that room.
+  const priced = (i: number) => marketProbs[i] != null && marketProbs[i]! > 0;
+  const unpricedMass = modelProbs.reduce((a, p, i) => (priced(i) ? a : a + p), 0);
   let pooled = evaluated.map((e, i) => {
-    const mp = marketProbs[i];
-    // A runner nobody has priced gets a neutral market opinion (its own model probability), never a punitive guess.
-    const m = mp != null && mp > 0 ? mp : modelProbs[i];
+    const m = priced(i) ? marketProbs[i]! * (1 - unpricedMass) : modelProbs[i];
     return Math.exp((1 - lambda) * Math.log(Math.max(modelProbs[i], 1e-6)) + lambda * Math.log(Math.max(m, 1e-6)));
   });
   const total = pooled.reduce((a, b) => a + b, 0) || 1;
@@ -296,7 +302,7 @@ export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
         bestOdds: e.runner.market?.bestWin,
         bestPlace: e.runner.market?.bestPlace,
         fairOdds: round(1 / Math.max(winProb, 0.001), 2),
-        valueEdge: mp != null ? round(winProb - mp, 4) : undefined,
+        valueEdge: e.runner.market?.bestWin ? round(expectedReturn(winProb, e.runner.market.bestWin), 4) : undefined,
         dataCompleteness: e.completeness,
         verificationScore: e.runner.verification.score,
       };
@@ -329,8 +335,8 @@ function summarise(race: Race, ranked: RunnerAssessment[], c: ConfidenceRating, 
   const second = ranked[1];
   const bits = [`${t.name} (${t.number}) is our top pick at ${Math.round(t.winProb * 100)}% to win${t.bestOdds ? ` (best $${t.bestOdds.toFixed(2)})` : ''}.`];
   if (second) bits.push(`${second.name} (${second.number}) next at ${Math.round(second.winProb * 100)}%.`);
-  if (t.valueEdge != null && t.valueEdge > 0.03) bits.push('The market has the top pick under the odds we rate it at – value.');
-  else if (t.valueEdge != null && t.valueEdge < -0.05) bits.push('The market is shorter on the top pick than we are – no value on top.');
+  if (t.valueEdge != null && t.bestOdds && t.valueEdge > 0.03) bits.push(`$${t.bestOdds.toFixed(2)} is better than our fair price of $${t.fairOdds.toFixed(2)} – value.`);
+  else if (t.valueEdge != null && t.bestOdds && t.valueEdge < 0) bits.push(`$${t.bestOdds.toFixed(2)} is under our fair price of $${t.fairOdds.toFixed(2)} – no value on top at that price.`);
   bits.push(`Confidence ${c.label.toLowerCase()} (${c.overall}/100).`);
   if (patterns.length) bits.push(`Adjusted for today's patterns: ${patterns.map((p) => p.label).join(', ')}.`);
   void race;

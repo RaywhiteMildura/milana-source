@@ -3,7 +3,8 @@ import type { FactorScore, Runner, RunnerAssessment } from '@shared/types';
 import { fmtOdds, fmtPct, fmtWeight } from '../lib/format';
 import { Bar, Chip, RankBadge, Saddle, ScoreBar } from './ui';
 
-export const VALUE_EDGE_THRESHOLD = 0.03;
+/** Same margin the betting plan wants before it calls a runner value: the best price at least 5% above our fair price. */
+export const VALUE_EDGE_THRESHOLD = 0.05;
 
 function FactorsTable({ factors }: { factors: FactorScore[] }) {
   if (!factors.length) return <p className="muted small">No factor breakdown available.</p>;
@@ -54,7 +55,7 @@ export function RankedRunnerCard({ assessment, runner, bookmaker }: { assessment
   const a = assessment;
   const reasons = a.reasons ?? [];
   const concerns = a.concerns ?? [];
-  const hasValue = a.valueEdge != null && a.valueEdge > VALUE_EDGE_THRESHOLD && a.marketWinProb != null;
+  const hasValue = a.valueEdge != null && a.valueEdge >= VALUE_EDGE_THRESHOLD && a.bestOdds != null;
   const details = [
     runner?.barrier != null ? `Barrier ${runner.barrier}` : null,
     runner?.jockey ? `J: ${runner.jockey}` : null,
@@ -73,8 +74,8 @@ export function RankedRunnerCard({ assessment, runner, bookmaker }: { assessment
           <Saddle number={a.number} />
           <h3 className="ranked__name">{a.name}</h3>
           {hasValue && (
-            <Chip tone="gold" className="value-badge" testId="value-badge" title="Our win chance is well above what the market price implies">
-              VALUE: {fmtPct(a.winProb)} vs market {fmtPct(a.marketWinProb)}
+            <Chip tone="gold" className="value-badge" testId="value-badge" title="The best price on offer pays more than our fair price for this runner">
+              VALUE: {fmtOdds(a.bestOdds)} vs fair {fmtOdds(a.fairOdds)}
             </Chip>
           )}
         </header>

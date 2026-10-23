@@ -1,5 +1,6 @@
 import type { MarketSummary, OddsQuote, Runner } from '../../shared/types.js';
 import { mean, round, stddev } from '../../shared/util.js';
+import { starters } from './field.js';
 
 /**
  * Market engine: turns a pile of odds quotes from many bookmakers into a
@@ -49,11 +50,11 @@ export function summariseRunnerMarket(runner: Pick<Runner, 'odds'>): MarketSumma
 
 /**
  * Attach a MarketSummary to every runner and normalise implied probabilities
- * across the (non-scratched) field so they sum to 1.
+ * across the runners that will start so they sum to 1.
  */
 export function summariseRaceMarket(runners: Runner[]): Runner[] {
   const out = runners.map((r) => ({ ...r, market: summariseRunnerMarket(r) }));
-  const active = out.filter((r) => !r.scratched && r.market?.meanWin);
+  const active = starters(out).filter((r) => r.market?.meanWin);
   const raw = active.map((r) => 1 / r.market!.meanWin!);
   const total = raw.reduce((a, b) => a + b, 0);
   if (total > 0) {

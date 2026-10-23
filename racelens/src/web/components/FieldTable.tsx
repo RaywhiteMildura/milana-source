@@ -318,7 +318,7 @@ export function FieldTable({ race, names, tz }: { race: Race; names?: Record<str
                         </Chip>
                       )}
                       {r.emergency && (
-                        <Chip tone="amber" className="chip--xs">
+                        <Chip tone="amber" className="chip--xs" title="Emergency: it only starts if a horse is scratched in time, and is not in our picks until then">
                           EM
                         </Chip>
                       )}

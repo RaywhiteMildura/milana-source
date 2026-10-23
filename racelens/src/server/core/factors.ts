@@ -3,6 +3,7 @@ import { clamp, mean, parseLastStarts, round, stddev } from '../../shared/util.j
 import { jockeyTier, trainerTier, STAMINA_SIRES, VENUE_TWEAKS, WET_TRACK_SIRES } from './knowledge.js';
 import { wetTrackFactor } from './weather.js';
 import { newsFactorForRunner } from './news.js';
+import { starters } from './field.js';
 
 /**
  * Factor library. Each factor returns a standardised score in [-1, 1] plus a
@@ -77,7 +78,7 @@ export const FACTOR_LABELS: Record<string, string> = {
 };
 
 export function computeFieldStats(race: Race): FieldStats {
-  const active = race.runners.filter((r) => !r.scratched);
+  const active = starters(race.runners);
   const weights = active.map((r) => r.weight).filter((w): w is number => typeof w === 'number' && w > 0);
   const winRates = active.map((r) => (r.career && r.career.starts > 0 ? r.career.wins / r.career.starts : undefined)).filter((x): x is number => x != null);
   const placeRates = active

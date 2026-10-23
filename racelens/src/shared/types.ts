@@ -395,7 +395,7 @@ export interface RunnerAssessment {
   bestOdds?: number;
   bestPlace?: number;
   fairOdds: number;
-  /** winProb - marketWinProb */
+  /** Expected profit per $1 at the best price, by our win chance (winProb × bestOdds − 1); above 0 = value. */
   valueEdge?: number;
   dataCompleteness: number;
   verificationScore: number;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { FormLine, Race, Runner, Settings } from '../../shared/types.js';
+import type { FormLine, Race, Runner, RunnerAssessment, Settings } from '../../shared/types.js';
 import { diffPredictions, predictRace, rng, simulateOrders, softmax, spearman, strengthFromFactors } from './model.js';
 import { runQuality, classLevel, barrier as barrierFactor, computeFieldStats, inferPosition } from './factors.js';
 import { buildBettingPlan, combinations, kellyFraction, permutations, placeSlots } from './betting.js';
@@ -257,7 +257,9 @@ describe('betting plan', () => {
     const low = buildBettingPlan({ race, ranked: p.ranked, confidence: { ...p.confidence, overall: 20, label: 'Low' }, settings });
     expect(low.stance).toBe('skip');
     expect(low.suggestions).toHaveLength(0);
-    const high = buildBettingPlan({ race, ranked: p.ranked, confidence: { ...p.confidence, overall: 80, label: 'High' }, settings });
+    // The test prices sit under our fair odds; give the top pick a price that beats them.
+    const ranked = p.ranked.map((r) => (r.number === 1 ? { ...r, bestOdds: 4.4 } : r));
+    const high = buildBettingPlan({ race, ranked, confidence: { ...p.confidence, overall: 80, label: 'High' }, settings });
     expect(high.stance).toBe('bet');
     expect(high.suggestions.some((s) => s.type === 'win' || s.type === 'each-way')).toBe(true);
     expect(high.totalAmount).toBeLessThanOrEqual(3 * 10 * 2 + 0.01); // never beyond profile cap (each-way doubles)
@@ -276,6 +278,87 @@ describe('betting plan', () => {
     expect(cons.suggestions.some((s) => s.type === 'trifecta')).toBe(false);
     expect(cons.notes.join(' ')).toMatch(/first two/);
     expect(aggr.suggestions.some((s) => s.type === 'first4')).toBe(false); // needs 8+ runners
+  });
+});
+
+describe('betting plan only backs prices that beat our fair odds', () => {
+  const high = { overall: 80, label: 'High' as const, components: { dataCompleteness: 1, sourceAgreement: 1, separation: 1, marketAlignment: 1, fieldSize: 1, freshness: 1 }, notes: [] };
+  function rankedFor(race: Race) {
+    return predictRace(race, { venueSlug: 'flemington', settings, now: NOW, simulations: 1000 }).ranked;
+  }
+  function withPrices(race: Race, set: Record<number, Partial<RunnerAssessment>>) {
+    return rankedFor(race).map((r) => {
+      const o = set[r.number];
+      if (!o) return r;
+      const next = { ...r, ...o };
+      return { ...next, fairOdds: Math.round((1 / next.winProb) * 100) / 100 };
+    });
+  }
+
+  it('does not back a top pick or a "value" runner priced under fair (review scenario: 30% at $3.00, 19.5% at $5.00)', () => {
+    const race = makeRace(14);
+    const ranked = withPrices(race, { 1: { winProb: 0.3, placeProb: 0.62, bestOdds: 3, bestPlace: 1.3 }, 2: { winProb: 0.195, placeProb: 0.5, bestOdds: 5, bestPlace: 1.7 } });
+    const plan = buildBettingPlan({ race, ranked, confidence: high, settings });
+    const backed = plan.suggestions.filter((s) => s.type === 'win' || s.type === 'each-way').flatMap((s) => s.runners);
+    expect(backed).not.toContain(1);
+    expect(backed).not.toContain(2);
+    expect(plan.notes.join(' ')).toMatch(/Horse 1 is the most likely winner, but \$3\.00 is under our fair price of \$3\.33/);
+    for (const s of plan.suggestions) expect(s.rationale).not.toMatch(/edge/);
+  });
+
+  it('backs a runner whose price is clearly above fair and says what price to take', () => {
+    const race = makeRace(14);
+    const ranked = withPrices(race, { 1: { winProb: 0.3, bestOdds: 3 }, 2: { winProb: 0.195, placeProb: 0.5, bestOdds: 6.5, bestPlace: 2.1 } });
+    const plan = buildBettingPlan({ race, ranked, confidence: high, settings });
+    const v = plan.suggestions.find((s) => s.priority === 'value' && s.runners[0] === 2);
+    expect(v).toBeDefined();
+    expect(v!.rationale).toMatch(/fair \$5\.13\) and \$6\.50 is on offer – about 27% more than it is worth/);
+    expect(v!.rationale).toMatch(/Take \$5\.39 or better/);
+  });
+
+  it('gives a price to wait for instead of a stake when the top pick has no price yet', () => {
+    const race = makeRace(12);
+    const ranked = withPrices(race, { 1: { winProb: 0.32, bestOdds: undefined, bestPlace: undefined } });
+    const plan = buildBettingPlan({ race, ranked, confidence: high, settings });
+    expect(plan.suggestions.some((s) => s.priority === 'core')).toBe(false);
+    expect(plan.notes.join(' ')).toMatch(/No price yet for Horse 1\. It is only worth a win bet at \$3\.13 or better/);
+  });
+
+  it('marks value as the expected return at the best price', () => {
+    const race = makeRace(10);
+    for (const r of rankedFor(race)) expect(r.valueEdge).toBeCloseTo(r.winProb * r.bestOdds! - 1, 3);
+  });
+});
+
+describe('field: emergencies and unpriced runners', () => {
+  it('leaves a waiting emergency out of the picks and the place terms, and lets it in after a scratching', () => {
+    const race = makeRace(8);
+    race.runners[7].emergency = true;
+    race.fieldSize = 8;
+    const p = predictRace(race, { venueSlug: 'flemington', settings, now: NOW, simulations: 1000 });
+    expect(p.ranked.map((r) => r.number)).not.toContain(8);
+    expect(p.ranked.reduce((a, r) => a + r.winProb, 0)).toBeCloseTo(1, 2);
+    expect(p.betting.notes.join(' ')).toMatch(/first two/);
+
+    race.runners[2].scratched = true;
+    const q = predictRace(race, { venueSlug: 'flemington', settings, now: NOW, simulations: 1000 });
+    expect(q.ranked.map((r) => r.number)).toContain(8);
+    expect(q.ranked).toHaveLength(7);
+  });
+
+  it('does not mark down a runner just because nobody has priced it', () => {
+    // Ten identical horses; nobody has priced the first three.
+    const race = makeRace(10);
+    race.runners = race.runners.map((r, i) => ({
+      ...makeRunner(1),
+      id: r.id,
+      number: r.number,
+      name: r.name,
+      odds: i < 3 ? [] : [{ source: 'a', bookmaker: 'A', type: 'fixed' as const, win: 9, place: 2.6, fetchedAt: 't' }],
+    }));
+    const p = predictRace(race, { venueSlug: 'flemington', settings, now: NOW, simulations: 1000 });
+    const probs = p.ranked.map((r) => r.winProb);
+    expect(Math.max(...probs) - Math.min(...probs)).toBeLessThan(0.01);
   });
 });
 
