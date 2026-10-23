@@ -47,7 +47,7 @@ const SPONSOR_PREFIX = /^(?:sportsbet|ladbrokes|bet365|tab|tabtouch|neds|pointsb
 
 /** Racing Australia track abbreviations used in run lines ("CAUL 10Oct26"). Unknown codes are kept as printed. */
 const TRACK_CODES: Record<string, string> = {
-  FLEM: 'Flemington', CAUL: 'Caulfield', MV: 'Moonee Valley', 'M V': 'Moonee Valley', SANH: 'Sandown Hillside', SANL: 'Sandown Lakeside',
+  FLEM: 'Flemington', CAUL: 'Caulfield', MV: 'Moonee Valley', 'M V': 'Moonee Valley', SAND: 'Sandown', SANH: 'Sandown Hillside', SANL: 'Sandown Lakeside',
   RAND: 'Randwick', KENS: 'Kensington', RHIL: 'Rosehill', WFM: 'Warwick Farm', 'W FM': 'Warwick Farm', CANT: 'Canterbury', KGR: 'Kembla Grange', KEMB: 'Kembla Grange',
   NCLE: 'Newcastle', GOSF: 'Gosford', HAWK: 'Hawkesbury', WYNG: 'Wyong', SCNE: 'Scone', CANB: 'Canberra',
   EFM: 'Eagle Farm', 'E FM': 'Eagle Farm', DOOM: 'Doomben', GCST: 'Gold Coast', SCST: 'Sunshine Coast', IPSW: 'Ipswich', TWBA: 'Toowoomba',
@@ -73,6 +73,14 @@ export class PageUnavailableError extends Error {
   }
 }
 
+/** Thrown when a host served a real meeting page for a different venue or date (another host may have the right one). */
+export class PageMismatchError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'PageMismatchError';
+  }
+}
+
 export interface RacingAustraliaOptions {
   /** Politeness delay between page fetches (ms). */
   delayMs?: number;
@@ -86,6 +94,12 @@ export interface RacingAustraliaOptions {
   pageCacheMaxEntries?: number;
   /** Most HTML (characters) behind the kept pages (default 3 MB); a parsed page holds ~30x its HTML in memory. */
   pageCacheMaxChars?: number;
+  /** How long a host that served a bot wall / human check is left alone (ms, default 30 min). */
+  wallPauseMs?: number;
+  /** How long a date's meeting list is reused (ms, default 2 h). */
+  calendarCacheMs?: number;
+  /** How long an empty meeting list is reused (ms, default 10 min). */
+  emptyCalendarCacheMs?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -198,11 +212,18 @@ function shortDate(day: string, mon: string, year: string): string | undefined {
 // Page classification / identity
 // ---------------------------------------------------------------------------
 
+/** Racing Australia's own verification interstitial: "Are you human? … let us know that you are not a robot" (research §2.2). */
+const HUMAN_CHECK = /are you human|not a robot|unusual activity/i;
+
 /** Detect bodies that are not the requested meeting page. */
 export function classifyPage(html: string): Exclude<UnavailableReason, 'transport'> | undefined {
   const t = html.replace(/<!--[\s\S]*?-->/g, '').trim();
   if (/not currently available/i.test(t)) return 'not-available';
-  if (/race-venue-date|race-title|race-strip-fields|Key=|(?:Acceptances|Nominations|Weights|Results|Form) on /i.test(t)) return undefined;
+  // The meeting header or race tables make it a real page whatever else it says.
+  if (/race-venue-date|race-title|race-strip-fields/i.test(t)) return undefined;
+  // Tested before the weaker markers below: the human check can echo the requested URL (…?Key=…) in its form.
+  if (HUMAN_CHECK.test(t)) return 'bot-wall';
+  if (/Key=|(?:Acceptances|Nominations|Weights|Results|Form) on /i.test(t)) return undefined;
   if (/just a moment|checking your browser|enable javascript and cookies|access denied|captcha|request unsuccessful|incapsula|cf-browser-verification|verify you are human|pardon our interruption|attention required/i.test(t.slice(0, 8000))) return 'bot-wall';
   if (t.length < 400) return 'empty';
   return undefined;
@@ -271,16 +292,34 @@ function venueMatches(headerTitle: string, wanted: string[]): boolean {
   return false;
 }
 
-/** Throw unless the page header names the venue and the date we asked for. */
+/** A meeting page carries RA's dated meeting header or race tables; a wall, error or maintenance page carries neither. */
+function looksLikeMeetingPage($: CheerioAPI, header: PageHeader): boolean {
+  if ($('.race-venue-date, table.race-title, table.race-strip-fields, table.horse-form-table').length) return true;
+  return !!header.date; // the bare /ozracing/ page: <h2>TAREE Acceptances on Tuesday 21st July, 2026</h2>
+}
+
+/**
+ * Throw unless the page header names the venue and the date we asked for: PageUnavailableError when it is not a
+ * meeting page at all, PageMismatchError when it is another meeting's page (either way the next host is tried).
+ */
 export function assertMeetingPage($: CheerioAPI, meeting: Pick<MeetingSummary, 'venue' | 'date'>, key: string, url: string): void {
   const header = pageHeader($);
-  if (!header || !header.title) throw new PageUnavailableError(`Racing Australia: unexpected page (no meeting header) at ${url}`, 'empty', url);
+  if (!header || !header.title || !looksLikeMeetingPage($, header)) throw new PageUnavailableError(`Racing Australia: unexpected page (no meeting header or race tables) at ${url}`, 'empty', url);
   const parsed = parseKey(key);
   if (!venueMatches(header.title, [meeting.venue, parsed?.venue || ''])) {
-    throw new Error(`Racing Australia returned "${header.title}" when ${meeting.venue} (${key}) was requested`);
+    throw new PageMismatchError(`Racing Australia returned "${header.title}" when ${meeting.venue} (${key}) was requested`);
   }
   if (header.date && header.date !== meeting.date) {
-    throw new Error(`Racing Australia returned ${header.date} ("${header.title}") when ${meeting.date} was requested`);
+    throw new PageMismatchError(`Racing Australia returned ${header.date} ("${header.title}") when ${meeting.date} was requested`);
+  }
+}
+
+/** "2:40 pm", Melbourne time (the owner's clock). */
+function melbourneClock(ms: number): string {
+  try {
+    return new Intl.DateTimeFormat('en-AU', { timeZone: 'Australia/Melbourne', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(ms)).replace(/\s+/g, ' ');
+  } catch {
+    return new Date(ms).toISOString();
   }
 }
 
@@ -1096,6 +1135,15 @@ interface CachedPage {
   $: CheerioAPI;
 }
 
+interface CachedCalendar {
+  /** Past this the date's calendar is read again. */
+  expiresAt: number;
+  /** Calendar entries for the date, trials included, by key. */
+  entries: Map<string, CalendarEntry>;
+  /** States whose meetings for the date are all in `entries`: listed on the by-date calendar, or read from their own calendar. */
+  states: Set<string>;
+}
+
 export class RacingAustraliaAdapter implements SourceAdapter {
   id = 'racingaustralia';
   name = 'Racing Australia (official fields)';
@@ -1116,6 +1164,13 @@ export class RacingAustraliaAdapter implements SourceAdapter {
    */
   private readonly pages = new Map<string, CachedPage>();
   private lastFetchAt = 0;
+  private readonly wallPauseMs: number;
+  /** Per host: until when (epoch ms, ctx clock) it is left alone after serving a bot wall / human check. */
+  private readonly walledUntil = new Map<string, number>();
+  private readonly calendarCacheMs: number;
+  private readonly emptyCalendarCacheMs: number;
+  /** Meeting lists by date (YYYY-MM-DD); every fetchRace / fetchResults without a key looks its meeting up here. */
+  private readonly calendars = new Map<string, CachedCalendar>();
 
   constructor(opts: RacingAustraliaOptions | number = {}) {
     const o = typeof opts === 'number' ? { delayMs: opts } : opts;
@@ -1125,39 +1180,16 @@ export class RacingAustraliaAdapter implements SourceAdapter {
     this.resultsCacheMs = o.resultsCacheMs ?? 60_000;
     this.pageCacheMaxEntries = Math.max(1, o.pageCacheMaxEntries ?? 12);
     this.pageCacheMaxChars = Math.max(0, o.pageCacheMaxChars ?? 3_000_000);
+    this.wallPauseMs = Math.max(0, o.wallPauseMs ?? 30 * 60_000);
+    this.calendarCacheMs = Math.max(0, o.calendarCacheMs ?? 2 * 60 * 60_000);
+    this.emptyCalendarCacheMs = Math.max(0, o.emptyCalendarCacheMs ?? 10 * 60_000);
   }
 
   // -- public API -------------------------------------------------------------
 
   async listMeetings(date: string, ctx: FetchContext): Promise<MeetingSummary[]> {
-    const ymd = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    const mon = ymd ? MONTHS[Number(ymd[2]) - 1] : undefined;
-    if (!ymd || !mon) return [];
-    const found = new Map<string, CalendarEntry>();
-    const collect = ($: CheerioAPI) => {
-      for (const e of parseCalendar($)) if (e.date === date) found.set(e.key, e);
-    };
-    let failures = 0;
-    try {
-      collect((await this.getPage(`Calendar.aspx?Date=${ymd[1]}${mon}${ymd[3]}`, ctx)).$);
-    } catch (err) {
-      failures++;
-      ctx.log.warn(`Racing Australia: date calendar failed: ${err instanceof Error ? err.message : err}`);
-    }
-    if (!found.size) {
-      // The by-date calendar is the lightly evidenced form; the per-state calendars are the well-trodden one.
-      let stateFailures = 0;
-      for (const st of STATES) {
-        try {
-          collect((await this.getPage(`Calendar.aspx?State=${st}`, ctx)).$);
-        } catch (err) {
-          stateFailures++;
-          ctx.log.warn(`Racing Australia: ${st} calendar failed: ${err instanceof Error ? err.message : err}`);
-        }
-      }
-      if (!found.size && failures && stateFailures === STATES.length) throw new Error('Racing Australia: calendar unavailable on all hosts');
-    }
-    return [...found.values()].filter((e) => !/^trials?$/i.test(e.variant || '')).map((e) => this.summary(e, date));
+    const cal = await this.calendar(date, ctx);
+    return cal ? this.summaries(cal, date) : [];
   }
 
   async fetchMeeting(meeting: MeetingSummary, ctx: FetchContext): Promise<MeetingRaw> {
@@ -1220,19 +1252,103 @@ export class RacingAustraliaAdapter implements SourceAdapter {
     return { id: `${date}:${slug}`, date, venue, venueSlug: slug, state: e.state, country: 'AUS', raceType: 'thoroughbred', sourceRefs: refs, sources: [this.id] };
   }
 
-  /** Use the recorded key; otherwise look the venue up on the day's calendar (RA's spelling matters); otherwise build it. */
+  private summaries(cal: CachedCalendar, date: string): MeetingSummary[] {
+    return [...cal.entries.values()].filter((e) => !/^trials?$/i.test(e.variant || '')).map((e) => this.summary(e, date));
+  }
+
+  /**
+   * The date's calendar entries, cached per date (a non-empty list for `calendarCacheMs`, an empty one for
+   * `emptyCalendarCacheMs`). Undefined for a malformed date.
+   */
+  private async calendar(date: string, ctx: FetchContext): Promise<CachedCalendar | undefined> {
+    const ymd = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const mon = ymd ? MONTHS[Number(ymd[2]) - 1] : undefined;
+    if (!ymd || !mon) return undefined;
+    const now = ctx.now().getTime();
+    for (const [d, c] of this.calendars) if (now >= c.expiresAt) this.calendars.delete(d);
+    const cached = this.calendars.get(date);
+    if (cached) return cached;
+
+    const entries = new Map<string, CalendarEntry>();
+    const states = new Set<string>();
+    const collect = ($: CheerioAPI) => {
+      for (const e of parseCalendar($)) if (e.date === date) entries.set(e.key, e);
+    };
+    let failures = 0;
+    try {
+      collect((await this.getPage(`Calendar.aspx?Date=${ymd[1]}${mon}${ymd[3]}`, ctx)).$);
+      for (const e of entries.values()) states.add(e.state);
+    } catch (err) {
+      if (this.pausedUntil(ctx)) throw err; // every host asked for a human check: no state crawl
+      failures++;
+      ctx.log.warn(`Racing Australia: date calendar failed: ${err instanceof Error ? err.message : err}`);
+    }
+    if (!entries.size) {
+      // The by-date calendar is the lightly evidenced form; the per-state calendars are the well-trodden one.
+      let stateFailures = 0;
+      for (const st of STATES) {
+        try {
+          collect((await this.getPage(`Calendar.aspx?State=${st}`, ctx)).$);
+          states.add(st);
+        } catch (err) {
+          if (this.pausedUntil(ctx)) throw err;
+          stateFailures++;
+          ctx.log.warn(`Racing Australia: ${st} calendar failed: ${err instanceof Error ? err.message : err}`);
+        }
+      }
+      if (!entries.size && failures && stateFailures === STATES.length) throw new Error('Racing Australia: calendar unavailable on all hosts');
+    }
+    const cal: CachedCalendar = { expiresAt: now + (entries.size ? this.calendarCacheMs : this.emptyCalendarCacheMs), entries, states };
+    // A crawl cut short by the caller's time budget is incomplete: use it, but do not keep it.
+    if (!ctx.signal?.aborted) this.calendars.set(date, cal);
+    return cal;
+  }
+
+  private findOnCalendar(cal: CachedCalendar, meeting: MeetingSummary): MeetingSummary | undefined {
+    const list = this.summaries(cal, meeting.date);
+    const want = normaliseName(meeting.venue);
+    const canonical = normaliseName(canonicalVenue(meeting.venue));
+    return (
+      list.find((m) => normaliseName(m.venue) === want || m.venueSlug === meeting.venueSlug || normaliseName(m.venue) === canonical) ||
+      list.find((m) => normaliseName(parseKey(m.sourceRefs.racingaustralia)?.venue || '') === want)
+    );
+  }
+
+  /**
+   * Use the recorded key; otherwise look the venue up on the day's (cached) calendar, reading the meeting's own
+   * state calendar once when the by-date calendar did not list that state (RA's spelling matters); otherwise build it.
+   */
   private async resolveKey(meeting: MeetingSummary, ctx: FetchContext): Promise<string> {
     const ref = meeting.sourceRefs?.racingaustralia;
     if (ref) return ref;
     try {
-      const list = await this.listMeetings(meeting.date, ctx);
-      const want = normaliseName(meeting.venue);
-      const hit = list.find((m) => normaliseName(m.venue) === want || m.venueSlug === meeting.venueSlug) || list.find((m) => normaliseName(parseKey(m.sourceRefs.racingaustralia)?.venue || '') === want);
+      const cal = await this.calendar(meeting.date, ctx);
+      let hit = cal && this.findOnCalendar(cal, meeting);
+      const state = (meeting.state || findVenue(meeting.venue)?.state || '').toUpperCase();
+      const australian = !meeting.country || /^(AUS?|AUSTRALIA)$/i.test(meeting.country);
+      if (cal && !hit && australian && STATES.includes(state) && !cal.states.has(state)) {
+        const { $ } = await this.getPage(`Calendar.aspx?State=${state}`, ctx);
+        for (const e of parseCalendar($)) if (e.date === meeting.date) cal.entries.set(e.key, e);
+        cal.states.add(state);
+        hit = this.findOnCalendar(cal, meeting);
+      }
       if (hit) return hit.sourceRefs.racingaustralia;
     } catch (err) {
       ctx.log.warn(`Racing Australia: calendar lookup failed, building the key from the venue name: ${err instanceof Error ? err.message : err}`);
     }
     return meetingKey(meeting);
+  }
+
+  /** When every host is paused after a human check, the earliest time one may be asked again. */
+  private pausedUntil(ctx: FetchContext): number | undefined {
+    const now = ctx.now().getTime();
+    let earliest = Infinity;
+    for (const host of this.hosts) {
+      const until = this.walledUntil.get(host) ?? 0;
+      if (until <= now) return undefined;
+      earliest = Math.min(earliest, until);
+    }
+    return Number.isFinite(earliest) ? earliest : undefined;
   }
 
   private async polite(): Promise<void> {
@@ -1243,32 +1359,73 @@ export class RacingAustraliaAdapter implements SourceAdapter {
     this.lastFetchAt = Date.now();
   }
 
-  /** GET a FreeFields-relative path from the first host that answers with a real page. */
-  private async getPage(path: string, ctx: FetchContext): Promise<{ $: CheerioAPI; url: string; html: string }> {
+  /**
+   * GET a FreeFields-relative path from the first host that answers with a real page. `accept` vets the page
+   * (throwing PageUnavailableError / PageMismatchError moves on to the next host). A host that serves a bot wall
+   * or human check is left alone for `wallPauseMs`; while every host is paused this fails without a request.
+   */
+  private async getPage(path: string, ctx: FetchContext, accept?: ($: CheerioAPI, url: string) => void): Promise<{ $: CheerioAPI; url: string; html: string }> {
     const errors: string[] = [];
     const reasons: UnavailableReason[] = [];
+    let mismatch: PageMismatchError | undefined;
+    let requests = 0;
     for (const host of this.hosts) {
       const url = new URL(path, host).toString();
+      const hostname = new URL(url).hostname;
+      const paused = this.walledUntil.get(host) ?? 0;
+      if (paused > ctx.now().getTime()) {
+        reasons.push('bot-wall');
+        errors.push(`${hostname}: human check, paused until ${melbourneClock(paused)}`);
+        continue;
+      }
+      requests++;
       await this.polite();
       let html: string;
       try {
-        html = await ctx.http.getText(url, { headers: HEADERS, retries: 0 });
+        const res = await ctx.http.request<unknown>(url, { method: 'GET', expect: 'text', headers: HEADERS, retries: 0 });
+        // A challenge can come with a 403 / 429 status: only its body says it is one.
+        if (!res.ok && classifyPage(res.text) !== 'bot-wall') throw new Error(`HTTP ${res.status} for ${url}`);
+        html = res.text;
       } catch (err) {
         reasons.push('transport');
-        errors.push(`${new URL(url).hostname}: ${err instanceof Error ? err.message : String(err)}`);
+        errors.push(`${hostname}: ${err instanceof Error ? err.message : String(err)}`);
         continue;
       }
       const reason = classifyPage(html);
       if (reason) {
         reasons.push(reason);
-        errors.push(`${new URL(url).hostname}: ${reason === 'not-available' ? 'not currently available' : reason === 'empty' ? 'empty page' : 'bot wall'}`);
+        errors.push(`${hostname}: ${reason === 'not-available' ? 'not currently available' : reason === 'empty' ? 'empty page' : 'bot wall'}`);
         ctx.log.warn(`Racing Australia: ${reason} from ${url}`);
+        if (reason === 'bot-wall' && this.wallPauseMs > 0) this.walledUntil.set(host, ctx.now().getTime() + this.wallPauseMs);
         continue;
       }
-      return { $: load(html), url, html };
+      const $ = load(html);
+      if (accept) {
+        try {
+          accept($, url);
+        } catch (err) {
+          if (err instanceof PageUnavailableError) {
+            reasons.push(err.reason);
+            errors.push(`${hostname}: not a meeting page`);
+          } else if (err instanceof PageMismatchError) {
+            mismatch ??= err;
+            errors.push(`${hostname}: ${err.message}`);
+          } else {
+            throw err;
+          }
+          ctx.log.warn(`Racing Australia: ${err.message}`);
+          continue;
+        }
+      }
+      return { $, url, html };
     }
+    const until = this.pausedUntil(ctx);
+    if (!requests && until) throw new PageUnavailableError(`Racing Australia asked for a human check – paused until ${melbourneClock(until)}`, 'bot-wall', path);
+    // Another meeting's page is a data error, reported as such unless some host said the stage is not published yet.
+    if (mismatch && !reasons.includes('not-available')) throw mismatch;
     const reason: UnavailableReason = reasons.includes('not-available') ? 'not-available' : reasons.includes('bot-wall') ? 'bot-wall' : reasons.includes('empty') ? 'empty' : 'transport';
-    throw new PageUnavailableError(`Racing Australia: ${path.split('?')[0]} unavailable on all hosts (${errors.join('; ')})`, reason, path);
+    const pausedNote = until ? ` – Racing Australia asked for a human check, paused until ${melbourneClock(until)}` : '';
+    throw new PageUnavailableError(`Racing Australia: ${path.split('?')[0]} unavailable on all hosts (${errors.join('; ')})${pausedNote}`, reason, path);
   }
 
   private async cachedPage(kind: string, key: string, path: string, meeting: MeetingSummary, ctx: FetchContext, ttl: number): Promise<CheerioAPI> {
@@ -1278,8 +1435,7 @@ export class RacingAustraliaAdapter implements SourceAdapter {
     this.prunePages(now);
     const hit = this.pages.get(ck);
     if (hit && now - hit.at < ttl) return hit.$;
-    const { $, url, html } = await this.getPage(path, ctx);
-    assertMeetingPage($, meeting, key, url);
+    const { $, html } = await this.getPage(path, ctx, ($page, url) => assertMeetingPage($page, meeting, key, url));
     this.pages.delete(ck); // re-insert so insertion order == age
     this.pages.set(ck, { at: now, expiresAt: now + ttl, size: html.length, $ });
     this.prunePages(now, ck);

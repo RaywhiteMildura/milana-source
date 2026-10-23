@@ -5,6 +5,7 @@ import { sleep } from '../../core/http.js';
 import { arr, bool, num, obj, parseCondition, parseMargin, parseStats, pick, splitCountry, str, toNum, type Dict } from './parse.js';
 import { groupFrom } from './tab.js';
 import { parseRaceTime } from './timezone.js';
+import { findVenue } from './venues.js';
 
 /**
  * Racing.com (Racing Victoria) public GraphQL API – the official Victorian
@@ -92,10 +93,15 @@ export class RacingComAdapter implements SourceAdapter {
   }
 
   private meetingSummary(m: Dict, date: string): MeetingSummary | undefined {
-    const name = str(m, 'venueName', 'meetingName');
-    if (!name) return undefined;
+    const rawName = str(m, 'venueName', 'meetingName');
+    if (!rawName) return undefined;
     const state = str(m, 'state');
     if (state && !/^(VIC|NSW|QLD|SA|WA|TAS|NT|ACT)$/i.test(state)) return undefined; // skip HK etc.
+    const country = str(m, 'country') || 'AUS';
+    // Track configurations ("Sandown Hillside", "Caulfield Heath", "The Valley") map onto the canonical venue so sources
+    // merge; the feed's own name stays in sourceRefs (queries go by meet code, never by name).
+    const known = /^(AUS?|AUSTRALIA)$/i.test(country) ? findVenue(rawName) : undefined;
+    const name = known?.name || rawName;
     const slug = normaliseName(name).replace(/\s+/g, '-');
     const cond = parseCondition([str(m, 'trackCondition'), str(m, 'trackRating')].filter(Boolean).join(' '));
     return {
@@ -103,15 +109,15 @@ export class RacingComAdapter implements SourceAdapter {
       date: str(m, 'date') || date,
       venue: name,
       venueSlug: slug,
-      state,
-      country: str(m, 'country') || 'AUS',
+      state: state || known?.state,
+      country,
       raceType: 'thoroughbred',
       raceCount: num(m, 'racesCount'),
       trackCondition: cond.text,
       trackRating: cond.rating,
       weather: str(m, 'weather'),
       rail: str(m, 'railPosition'),
-      sourceRefs: { racingcom: str(m, 'id')! },
+      sourceRefs: { racingcom: str(m, 'id')!, 'racingcom.venue': rawName },
       sources: [this.id],
     };
   }
@@ -119,7 +125,14 @@ export class RacingComAdapter implements SourceAdapter {
   private async resolveMeetCode(meeting: MeetingSummary, ctx: FetchContext): Promise<string> {
     if (meeting.sourceRefs?.racingcom) return meeting.sourceRefs.racingcom;
     const list = await this.listMeetings(meeting.date, ctx);
-    const hit = list.find((m) => m.venueSlug === meeting.venueSlug || normaliseName(m.venue) === normaliseName(meeting.venue) || normaliseName(m.venue).includes(normaliseName(meeting.venue)));
+    const want = canonicalName(meeting.venue);
+    const hit = list.find(
+      (m) =>
+        m.venueSlug === meeting.venueSlug ||
+        normaliseName(m.venue) === normaliseName(meeting.venue) ||
+        normaliseName(m.venue).includes(normaliseName(meeting.venue)) ||
+        (!!want && (canonicalName(m.venue) === want || canonicalName(m.sourceRefs['racingcom.venue'] || '') === want)),
+    );
     if (!hit) throw new Error(`racing.com: no meeting matching ${meeting.venue} on ${meeting.date}`);
     return hit.sourceRefs.racingcom;
   }
@@ -282,6 +295,10 @@ export class RacingComAdapter implements SourceAdapter {
     const tw = toNum(pick(trainer, 'winPercent'));
     const trw = toNum(pick(trainer, 'recentWinPercent'));
     const claim = toNum(pick(jockey, 'weightClaim'));
+    // RunnerRaw.weight is the allotted weight (as Racing Australia prints it); the apprentice claim is reported
+    // separately and taken off downstream. `weightCarried` is already net of the claim.
+    const allotted = toNum(pick(e, 'weight'));
+    const carried = toNum(pick(e, 'weightCarried'));
     return {
       number: num(e, 'raceEntryNumber'),
       name,
@@ -289,7 +306,7 @@ export class RacingComAdapter implements SourceAdapter {
       barrier: num(e, 'liveBarrierNumber') || num(e, 'barrierNumber'),
       jockey: str(jockey, 'fullName') || str(e, 'jockeyName'),
       trainer: str(trainer, 'fullName') || str(e, 'trainerName'),
-      weight: toNum(pick(e, 'weightCarried')) ?? toNum(pick(e, 'weight')),
+      weight: allotted ?? (carried != null ? carried + (claim && claim > 0 ? claim : 0) : undefined),
       claim: claim && claim > 0 ? claim : undefined,
       scratched,
       emergency: bool(e, 'emergency') || undefined,
@@ -328,9 +345,11 @@ export class RacingComAdapter implements SourceAdapter {
     const p800 = num(h, 'positionAt800');
     const p400 = num(h, 'positionAt400');
     const wt = toNum(pick(h, 'winningTime'));
+    const venue = str(h, 'venue');
     return {
       date: date.slice(0, 10),
-      venue: str(h, 'venue') || 'Unknown',
+      // "The Valley" / "Sandown Hillside" → the canonical venue; overseas and unknown tracks keep the feed's name.
+      venue: venue ? findVenue(venue)?.name || venue : 'Unknown',
       distance: toNum(pick(h, 'distance')) || 0,
       trackCondition: cond.text,
       trackRating: cond.rating,
@@ -350,6 +369,11 @@ export class RacingComAdapter implements SourceAdapter {
 }
 
 class GqlError extends Error {}
+
+/** Normalised canonical venue ("Sandown Hillside" / "Sandown" → "sandown"), for matching meetings across feeds. */
+function canonicalName(venue: string): string {
+  return normaliseName(findVenue(venue)?.name ?? venue);
+}
 
 function stripNull(o: Dict): Dict {
   const out: Dict = {};

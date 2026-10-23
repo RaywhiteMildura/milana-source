@@ -303,6 +303,28 @@ describe('EntainAdapter', () => {
     await expect(en.fetchRace({ ...bare, venue: 'Nowhere', venueSlug: 'nowhere' }, 1, h.ctx)).rejects.toThrow(/no meeting matching Nowhere/);
   });
 
+  it('lists a track configuration under the canonical venue and resolves it by either name', async () => {
+    const listing = fx('affiliates_meetings_2026-10-24_T_AUS.json').replace('"name": "Doomben"', '"name": "Sandown Hillside"');
+    expect(listing).toContain('"name": "Sandown Hillside"');
+    const meetingsRoute: Route = [/\/meetings\?enc=json&date_from=2026-10-24&date_to=2026-10-24&category=T&country=AUS&limit=200$/, listing];
+    const list = await en.listMeetings('2026-10-24', harness([meetingsRoute]).ctx);
+    const sandown = list.find((m) => m.sourceRefs['entain.venue'] === 'Sandown Hillside')!;
+    expect(sandown).toMatchObject({ id: '2026-10-24:sandown', venue: 'Sandown', venueSlug: 'sandown', state: 'QLD' }); // state as the feed sends it
+    // Today's Flemington card is unchanged (plus the raw name in its refs).
+    const flem = list.find((m) => m.venue === 'Flemington')!;
+    expect(flem).toMatchObject({ id: '2026-10-24:flemington', venueSlug: 'flemington', state: 'VIC' });
+    expect(flem.sourceRefs['entain.venue']).toBe('Flemington');
+
+    const DOOMBEN_R1 = '25cf7338-d368-533c-a7d9-b348d1a3c8f5';
+    for (const venue of ['Sandown', 'Sandown Hillside']) {
+      const h = harness([meetingsRoute]);
+      const slug = venue.toLowerCase().replace(/\s+/g, '-');
+      const bare: MeetingSummary = { id: `2026-10-24:${slug}`, date: '2026-10-24', venue, venueSlug: slug, raceType: 'thoroughbred', sourceRefs: {}, sources: [] };
+      await expect(en.fetchRace(bare, 1, h.ctx)).rejects.toThrow(/HTTP 404/); // resolved; the event itself is not in the fixtures
+      expect(h.urls[h.urls.length - 1]).toContain(`/events/${DOOMBEN_R1}?enc=json`);
+    }
+  });
+
   it('helpers: race name splitting and speed-map labels', () => {
     expect(splitRaceName('Ladbrokes Cox Plate @ Flemington (Bm70) Hcp')).toEqual({ name: 'Ladbrokes Cox Plate @ Flemington', raceClass: 'BM70 Hcp' });
     expect(splitRaceName('Members Lounge Fillies & Mares (Bm78) Hcp')).toEqual({ name: 'Members Lounge Fillies & Mares', raceClass: 'BM78 Hcp' });

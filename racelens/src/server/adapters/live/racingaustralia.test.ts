@@ -6,6 +6,7 @@ import { silentLogger } from '../../core/logger.js';
 import type { FetchContext } from '../types.js';
 import type { MeetingSummary } from '../../../shared/types.js';
 import {
+  PageUnavailableError,
   RacingAustraliaAdapter,
   buildKey,
   canonicalVenue,
@@ -53,6 +54,23 @@ const meeting = (over: Partial<MeetingSummary> & Pick<MeetingSummary, 'date' | '
 const CAULFIELD = meeting({ date: '2025-10-18', venue: 'Caulfield', state: 'VIC', sourceRefs: { racingaustralia: '2025Oct18,VIC,Caulfield' } });
 const FLEM = meeting({ date: '2026-10-24', venue: 'Flemington', state: 'VIC', sourceRefs: { racingaustralia: '2026Oct24,VIC,Flemington' } });
 const TAREE = meeting({ date: '2026-07-21', venue: 'Taree', state: 'NSW', sourceRefs: { racingaustralia: '2026Jul21,NSW,Taree' } });
+
+/**
+ * CONSTRUCTED: Racing Australia's own verification interstitial, worded as horseride matches it ("Are you human?" /
+ * "let us know that you are not a robot", research/racingaustralia.md §2.2), long enough to pass the 400-character
+ * floor and echoing the requested Key in its form action.
+ */
+const HUMAN_CHECK = `<!DOCTYPE html>
+<html><head><title>Racing Australia</title></head>
+<body><form method="post" action="./Form.aspx?Key=2026Oct24%2CVIC%2CFlemington" id="form1">
+<div class="content"><h2>Are you human?</h2>
+<p>We have noticed requests from your connection that look automated. Before we take you to the Free Fields page you asked for,
+please let us know that you are not a robot by ticking the box below. This check helps us keep the service fast for everyone.</p>
+<div class="g-recaptcha" data-sitekey="constructed"></div><input type="submit" value="Continue" /></div>
+</form></body></html>`;
+
+/** CONSTRUCTED: a page that is neither a meeting page nor a known wall (no dated header, no race tables). */
+const MAINTENANCE = `<!DOCTYPE html><html><head><title>Racing Australia - Free Fields</title></head><body><div class="content"><h1>Scheduled maintenance</h1><p>${'Free Fields is being updated and will be back shortly. '.repeat(10)}</p></div></body></html>`;
 
 const RESULTS_ROUTE: Route = [/^https:\/\/www\.racingaustralia\.horse\/FreeFields\/Results\.aspx\?Key=2025Oct18%2CVIC%2CCaulfield$/, fx('results_REAL_caulfield_2025-10-18.html')];
 const FORM_ROUTE: Route = [/^https:\/\/www\.racingaustralia\.horse\/FreeFields\/Form\.aspx\?Key=2026Oct24%2CVIC%2CFlemington$/, fx('form_flemington_2026-10-24.html')];
@@ -127,6 +145,16 @@ describe('RacingAustraliaAdapter', () => {
       expect(classifyPage(fx('form_flemington_2026-10-24.html'))).toBeUndefined();
       expect(classifyPage(fx('results_REAL_caulfield_2025-10-18.html'))).toBeUndefined();
       expect(classifyPage(fx('ozracing_acceptances_taree_2026-07-21.html'))).toBeUndefined();
+    });
+
+    it("recognises Racing Australia's own human check, even when it echoes the requested Key", () => {
+      expect(HUMAN_CHECK.length).toBeGreaterThan(400);
+      expect(HUMAN_CHECK).toContain('Key=');
+      expect(classifyPage(HUMAN_CHECK)).toBe('bot-wall');
+      expect(classifyPage('<html><body><p>We have detected unusual activity from your network.</p></body></html>')).toBe('bot-wall');
+      // A real meeting page stays a real page whatever its text says.
+      expect(classifyPage(fx('form_flemington_2026-10-24.html').replace('</body>', '<p>not a robot</p></body>'))).toBeUndefined();
+      expect(classifyPage(fx('calendar_VIC.html'))).toBeUndefined();
     });
   });
 
@@ -258,6 +286,13 @@ describe('RacingAustraliaAdapter', () => {
       expect(river.form![1]).toMatchObject({ trackCondition: 'Soft 7', trackRating: 7, position: 2, margin: 0.2, startingPrice: 5.5 });
     });
 
+    it('maps the SAND run-line code onto Sandown', async () => {
+      const { ctx } = harness([[/Form\.aspx/, fx('form_flemington_2026-10-24.html').replace('BDGO 11Oct26', 'SAND 11Oct26')]]);
+      const m = await new RacingAustraliaAdapter(0).fetchMeeting(FLEM, ctx);
+      const river = m.races[1].runners.find((r) => r.number === 4)!;
+      expect(river.form!.map((f) => f.venue)).toEqual(['Sandown', 'Geelong']);
+    });
+
     it('serves fetchForm / fetchRace from the cached Form page without refetching', async () => {
       const { ctx, hits } = harness([FORM_ROUTE]);
       const adapter = new RacingAustraliaAdapter(0);
@@ -382,6 +417,91 @@ describe('RacingAustraliaAdapter', () => {
       expect(hits).toHaveLength(3);
     });
 
+    it("uses the mirror's page when the primary host asks for a human check, and leaves the primary alone afterwards", async () => {
+      const { ctx, hits } = harness([
+        [PRIMARY, HUMAN_CHECK],
+        [/^https:\/\/racing\.racingnsw\.com\.au\/FreeFields\/Form\.aspx\?Key=2026Oct24%2CVIC%2CFlemington$/, fx('form_flemington_2026-10-24.html')],
+        [/^https:\/\/racing\.racingnsw\.com\.au\/FreeFields\/Results\.aspx\?Key=2025Oct18%2CVIC%2CCaulfield$/, fx('results_REAL_caulfield_2025-10-18.html')],
+      ]);
+      const adapter = new RacingAustraliaAdapter(0);
+      const m = await adapter.fetchMeeting(FLEM, ctx);
+      expect(m.races).toHaveLength(2);
+      expect(m.meeting.venue).toBe('Flemington');
+      expect(hits).toHaveLength(2);
+      expect(hits[0]).toMatch(PRIMARY);
+      expect(hits[1]).toMatch(NSW_MIRROR);
+      // The next page skips the walled host.
+      expect((await adapter.fetchResults(CAULFIELD, 7, ctx))!.placings[0]).toEqual([3]);
+      expect(hits).toHaveLength(3);
+      expect(hits[2]).toMatch(NSW_MIRROR);
+    });
+
+    it('pauses every walled host: the next call fails at once without a request, and requests resume after the pause', async () => {
+      let now = new Date('2026-10-24T00:00:00.000Z'); // 11:00 am in Melbourne
+      const { ctx, hits } = harness([[/Form\.aspx|Calendar\.aspx/, HUMAN_CHECK]]);
+      ctx.now = () => now;
+      const adapter = new RacingAustraliaAdapter(0);
+      await expect(adapter.fetchMeeting(FLEM, ctx)).rejects.toThrow(/Form\.aspx unavailable on all hosts .*bot wall.*paused until 11:30 am/);
+      expect(hits).toHaveLength(3);
+
+      now = new Date('2026-10-24T00:10:00.000Z');
+      const paused = await adapter.fetchMeeting(FLEM, ctx).catch((e: unknown) => e);
+      expect(paused).toBeInstanceOf(PageUnavailableError);
+      expect((paused as PageUnavailableError).reason).toBe('bot-wall');
+      expect((paused as Error).message).toBe('Racing Australia asked for a human check – paused until 11:30 am');
+      await expect(adapter.fetchResults(CAULFIELD, 7, ctx)).rejects.toThrow('Racing Australia asked for a human check – paused until 11:30 am');
+      // A meeting without a key: no calendar crawl either.
+      await expect(adapter.fetchMeeting(meeting({ date: '2026-10-24', venue: 'Ballarat', state: 'VIC' }), ctx)).rejects.toThrow(/paused until 11:30 am/);
+      await expect(adapter.listMeetings('2026-10-24', ctx)).rejects.toThrow(/paused until 11:30 am/);
+      expect(hits).toHaveLength(3);
+
+      now = new Date('2026-10-24T00:30:00.000Z');
+      await expect(adapter.fetchMeeting(FLEM, ctx)).rejects.toThrow(/unavailable on all hosts/);
+      expect(hits).toHaveLength(6);
+    });
+
+    it('treats a human check served with a 403 as a wall too', async () => {
+      const { ctx, hits } = harness([
+        [PRIMARY, { body: HUMAN_CHECK, status: 403 }],
+        [NSW_MIRROR, fx('form_flemington_2026-10-24.html')],
+      ]);
+      const adapter = new RacingAustraliaAdapter({ delayMs: 0, pageCacheMs: 0 });
+      expect((await adapter.fetchMeeting(FLEM, ctx)).races).toHaveLength(2);
+      expect((await adapter.fetchMeeting(FLEM, ctx)).races).toHaveLength(2);
+      expect(hits.map((u) => new URL(u).hostname)).toEqual(['www.racingaustralia.horse', 'racing.racingnsw.com.au', 'racing.racingnsw.com.au']);
+    });
+
+    it('tries the next host when a page has neither a meeting header nor race tables, without pausing that host', async () => {
+      const { ctx, hits } = harness([
+        [PRIMARY, MAINTENANCE],
+        [NSW_MIRROR, fx('form_flemington_2026-10-24.html')],
+      ]);
+      const adapter = new RacingAustraliaAdapter({ delayMs: 0, pageCacheMs: 0 });
+      expect((await adapter.fetchMeeting(FLEM, ctx)).races).toHaveLength(2);
+      expect(hits.map((u) => new URL(u).hostname)).toEqual(['www.racingaustralia.horse', 'racing.racingnsw.com.au']);
+      await adapter.fetchMeeting(FLEM, ctx);
+      expect(hits).toHaveLength(4);
+      expect(hits[2]).toMatch(PRIMARY); // not a wall: the primary is still asked first
+
+      const everywhere = harness([[/Form\.aspx/, MAINTENANCE]]);
+      const err = await new RacingAustraliaAdapter(0).fetchMeeting(FLEM, everywhere.ctx).catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(PageUnavailableError);
+      expect((err as PageUnavailableError).reason).toBe('empty');
+      expect((err as Error).message).toMatch(/Form\.aspx unavailable on all hosts .*not a meeting page/);
+      expect(everywhere.hits).toHaveLength(3);
+    });
+
+    it("tries the next host when one serves another meeting's page", async () => {
+      const { ctx, hits } = harness([
+        [PRIMARY, fx('results_REAL_caulfield_2025-10-18.html')],
+        [NSW_MIRROR, fx('form_flemington_2026-10-24.html')],
+      ]);
+      const m = await new RacingAustraliaAdapter(0).fetchMeeting(FLEM, ctx);
+      expect(m.meeting.sourceRefs.racingaustralia).toBe('2026Oct24,VIC,Flemington');
+      expect(m.races.map((r) => r.name)).toEqual(['Maribyrnong Trial Stakes', 'Ascot Vale Plate']);
+      expect(hits.map((u) => new URL(u).hostname)).toEqual(['www.racingaustralia.horse', 'racing.racingnsw.com.au']);
+    });
+
     it('respects a custom host list', async () => {
       const { ctx, hits } = harness([[/^https:\/\/m\.racingaustralia\.horse\/FreeFields\/Form\.aspx/, fx('form_flemington_2026-10-24.html')]]);
       const adapter = new RacingAustraliaAdapter({ delayMs: 0, hosts: ['https://m.racingaustralia.horse/FreeFields'] });
@@ -469,8 +589,78 @@ describe('RacingAustraliaAdapter', () => {
 
     it('throws only when every calendar request failed', async () => {
       const { ctx } = harness([]);
-      await expect(ra.listMeetings('2026-10-24', ctx)).rejects.toThrow(/calendar unavailable/);
-      expect(await ra.listMeetings('not-a-date', ctx)).toEqual([]);
+      const adapter = new RacingAustraliaAdapter(0); // `ra` already holds this date's list
+      await expect(adapter.listMeetings('2026-10-24', ctx)).rejects.toThrow(/calendar unavailable/);
+      expect(await adapter.listMeetings('not-a-date', ctx)).toEqual([]);
+    });
+
+    it('reuses a date\'s meeting list: a non-empty list for 2 h, an empty one for 10 min', async () => {
+      let now = new Date('2026-10-24T00:00:00.000Z');
+      const { ctx, hits } = harness([[/Calendar\.aspx/, fx('calendar_VIC.html')]]);
+      ctx.now = () => now;
+      const adapter = new RacingAustraliaAdapter(0);
+      expect(await adapter.listMeetings('2026-10-24', ctx)).toHaveLength(2);
+      expect(hits).toHaveLength(1);
+      now = new Date('2026-10-24T01:59:00.000Z');
+      const again = await adapter.listMeetings('2026-10-24', ctx);
+      expect(again.map((m) => m.venue)).toEqual(['Flemington', 'Ballarat']);
+      expect(hits).toHaveLength(1);
+      again[0].sourceRefs.racingaustralia = 'mutated by a caller';
+      expect((await adapter.listMeetings('2026-10-24', ctx))[0].sourceRefs.racingaustralia).toBe('2026Oct24,VIC,Flemington');
+      now = new Date('2026-10-24T02:00:00.000Z');
+      await adapter.listMeetings('2026-10-24', ctx);
+      expect(hits).toHaveLength(2);
+
+      // Nothing on the date: the 9-page crawl is not repeated for 10 minutes.
+      expect(await adapter.listMeetings('2026-12-25', ctx)).toEqual([]);
+      expect(hits).toHaveLength(11);
+      now = new Date('2026-10-24T02:09:00.000Z');
+      expect(await adapter.listMeetings('2026-12-25', ctx)).toEqual([]);
+      expect(hits).toHaveLength(11);
+      now = new Date('2026-10-24T02:10:00.000Z');
+      await adapter.listMeetings('2026-12-25', ctx);
+      expect(hits).toHaveLength(20);
+    });
+
+    it('looks a keyless meeting up on the cached calendar: the second fetch makes no calendar request', async () => {
+      const { ctx, hits } = harness([
+        [/Calendar\.aspx\?Date=2026Oct24$/, fx('calendar_VIC.html')],
+        [/Form\.aspx\?Key=2026Oct24%2CVIC%2CSportsbet-Ballarat$/, fx('form_flemington_2026-10-24.html').replace('Flemington: Victoria Racing Club', 'Sportsbet-Ballarat: Ballarat Turf Club')],
+      ]);
+      const adapter = new RacingAustraliaAdapter({ delayMs: 0, pageCacheMs: 0 });
+      const ballarat = meeting({ date: '2026-10-24', venue: 'Ballarat', state: 'VIC' });
+      expect((await adapter.fetchRace(ballarat, 1, ctx)).sourceRefs.racingaustralia).toBe('2026Oct24,VIC,Sportsbet-Ballarat#Race1');
+      expect(hits.filter((u) => u.includes('Calendar.aspx'))).toHaveLength(1);
+      await adapter.fetchRace(ballarat, 2, ctx);
+      await adapter.fetchForm(ballarat, 1, ctx);
+      expect(hits.filter((u) => u.includes('Calendar.aspx'))).toHaveLength(1);
+      expect(hits.filter((u) => u.includes('Form.aspx'))).toHaveLength(3);
+    });
+
+    it("reads the meeting's own state calendar once when the by-date calendar lists other states only", async () => {
+      const nsw = '<html><head><title>Racing Australia - Calendar - NSW</title></head><body><table class="calendar"><tr><td>Sat 24 Oct 2026</td><td><a href="/FreeFields/Form.aspx?Key=2026Oct24%2CNSW%2CRoyal+Randwick">Royal Randwick</a></td></tr></table></body></html>';
+      const { ctx, hits } = harness([
+        [/Calendar\.aspx\?Date=2026Oct24$/, fx('calendar_VIC.html')],
+        [/Calendar\.aspx\?State=NSW$/, nsw],
+        [/(?:Form|Acceptances|Results)\.aspx/, fx('not_available.html')],
+      ]);
+      const adapter = new RacingAustraliaAdapter(0);
+      const randwick = meeting({ date: '2026-10-24', venue: 'Randwick' }); // state from the venue table
+      await expect(adapter.fetchMeeting(randwick, ctx)).rejects.toThrow(/not currently available/);
+      expect(hits.filter((u) => u.includes('Calendar.aspx')).map((u) => new URL(u).search)).toEqual(['?Date=2026Oct24', '?State=NSW']);
+      expect(hits.some((u) => u.includes('Form.aspx?Key=2026Oct24%2CNSW%2CRoyal%20Randwick'))).toBe(true);
+      await expect(adapter.fetchResults(randwick, 1, ctx)).resolves.toBeNull();
+      expect(hits.filter((u) => u.includes('Calendar.aspx'))).toHaveLength(2);
+      expect(hits.some((u) => u.includes('Results.aspx?Key=2026Oct24%2CNSW%2CRoyal%20Randwick'))).toBe(true);
+      // Discovery now lists the NSW meeting too.
+      expect((await adapter.listMeetings('2026-10-24', ctx)).map((m) => m.venue)).toEqual(['Flemington', 'Ballarat', 'Randwick']);
+
+      // A venue the state calendar does not list either: that state is not read again.
+      const kembla = meeting({ date: '2026-10-24', venue: 'Kembla Grange' });
+      await adapter.fetchResults(kembla, 1, ctx);
+      await adapter.fetchResults(kembla, 1, ctx);
+      expect(hits.filter((u) => u.includes('Calendar.aspx'))).toHaveLength(2);
+      expect(hits.some((u) => u.includes('Results.aspx?Key=2026Oct24%2CNSW%2CKembla%20Grange'))).toBe(true);
     });
 
     it('parses the stage links and prefers the most advanced stage per meeting', () => {

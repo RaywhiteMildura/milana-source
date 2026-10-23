@@ -98,7 +98,7 @@ describe('RacingComAdapter', () => {
     expect(scratched.country).toBe('NZ');
     const emergency = r1.runners.find((r) => r.number === 3)!;
     expect(emergency.emergency).toBe(true);
-    expect(emergency.weight).toBe(53);
+    expect(emergency.weight).toBe(55); // allotted `weight`, not the 53 kg `weightCarried`
     expect(emergency.jockeyStats).toMatchObject({ winPct: 19 });
     expect(emergency.form![0]).toMatchObject({ trackRating: 6, margin: 3.2, inRunning: '9-8' });
   });
@@ -151,5 +151,57 @@ describe('RacingComAdapter', () => {
     const meeting = { id: '2026-10-24:flemington', date: '2026-10-24', venue: 'Flemington', venueSlug: 'flemington', raceType: 'thoroughbred' as const, sourceRefs: {}, sources: [] };
     const m = await rc.fetchMeeting(meeting, ctx);
     expect(m.meeting.sourceRefs.racingcom).toBe('MEET-FLM-20261024');
+  });
+
+  it('reports the allotted weight and the claim separately for an apprentice (research fixture, BIRDCAGE BANDIT)', async () => {
+    const research = fs.readFileSync(path.resolve('research/fixtures/racingcom/graphql-getRaceForm-prerace.json'), 'utf8');
+    const meeting = { id: '2026-10-24:flemington', date: '2026-10-24', venue: 'Flemington', venueSlug: 'flemington', state: 'VIC', raceType: 'thoroughbred' as const, sourceRefs: { racingcom: 'MEET-FLM-20261024' }, sources: [] };
+    const race = await rc.fetchRace(meeting, 3, ctxFor([[/getRaceForm\(meetCode:"MEET-FLM-20261024", raceNumber:3\)/, research]]));
+    const bandit = race.runners.find((r) => r.number === 3)!;
+    expect(bandit).toMatchObject({ name: 'BIRDCAGE BANDIT', jockey: 'Celine Gaudray', weight: 57.5, claim: 2 }); // weight '57.5kg', weightCarried '55.5kg'
+    expect(race.runners.find((r) => r.number === 1)).toMatchObject({ weight: 58.5 });
+    expect(race.runners.find((r) => r.number === 1)!.claim).toBeUndefined();
+    // Form lines name the canonical venue.
+    expect(race.runners.find((r) => r.number === 2)!.form!.map((f) => f.venue)).toEqual(['Caulfield', 'Moonee Valley']); // "The Valley"
+    expect(race.runners.find((r) => r.number === 5)!.form!.map((f) => f.venue)).toEqual(['Flemington', 'Sandown']); // "Sandown Hillside" (the Werribee jump-out is not form)
+
+    // Only `weightCarried` published: the claim is added back.
+    const carriedOnly = research.replace('"weight": "57.5kg",', '');
+    expect(carriedOnly).not.toBe(research);
+    const r2 = await rc.fetchRace(meeting, 3, ctxFor([[/getRaceForm\(meetCode:"MEET-FLM-20261024", raceNumber:3\)/, carriedOnly]]));
+    expect(r2.runners.find((r) => r.number === 3)).toMatchObject({ weight: 57.5, claim: 2 });
+  });
+
+  it('lists track configurations under the canonical venue and resolves either name, querying by meet code', async () => {
+    const listing = JSON.stringify({
+      data: {
+        m: [
+          { id: 'MEET-SAN-20261028', date: '2026-10-28', meetingName: 'Sandown Hillside', venueName: 'Sandown Hillside', state: 'VIC', country: 'AUS', isTab: 1, isTrial: false, isJumpOut: false, isPicnic: false, racesCount: 8 },
+          { id: 'MEET-MV-20261028', date: '2026-10-28', meetingName: 'The Valley', venueName: 'The Valley', state: 'VIC', country: 'AUS', isTab: 1, isTrial: false, isJumpOut: false, isPicnic: false, racesCount: 8 },
+        ],
+      },
+    });
+    const ctx = ctxFor([
+      [/GetMeetingByDate\(date:"2026-10-28"\)/, listing],
+      [/getRacesForMeet\(meetCode:"MEET-SAN-20261028"\)/, fx('races-FLM.json')],
+    ]);
+    const list = await rc.listMeetings('2026-10-28', ctx);
+    expect(list.map((m) => [m.venue, m.venueSlug, m.id])).toEqual([
+      ['Sandown', 'sandown', '2026-10-28:sandown'],
+      ['Moonee Valley', 'moonee-valley', '2026-10-28:moonee-valley'],
+    ]);
+    expect(list[0].sourceRefs).toEqual({ racingcom: 'MEET-SAN-20261028', 'racingcom.venue': 'Sandown Hillside' });
+    for (const venue of ['Sandown', 'Sandown Hillside']) {
+      const slug = venue.toLowerCase().replace(/\s+/g, '-');
+      const m = await rc.fetchMeeting({ id: `2026-10-28:${slug}`, date: '2026-10-28', venue, venueSlug: slug, state: 'VIC', raceType: 'thoroughbred', sourceRefs: {}, sources: [] }, ctx);
+      expect(m.meeting.sourceRefs.racingcom).toBe('MEET-SAN-20261028');
+    }
+    // GraphQL goes by the date and the feed's own meet code; the canonical name is never sent.
+    expect(ctx.bodies.some((b) => /Sandown/.test(b))).toBe(false);
+
+    // Flemington (today's card) is unchanged.
+    const [flem] = await rc.listMeetings('2026-10-24', ctxFor(routes));
+    expect(flem).toMatchObject({ id: '2026-10-24:flemington', venue: 'Flemington', venueSlug: 'flemington', state: 'VIC' });
+    expect(flem.sourceRefs).toEqual({ racingcom: 'MEET-FLM-20261024', 'racingcom.venue': 'Flemington' });
   });
 });

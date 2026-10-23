@@ -4,6 +4,7 @@ import type { FetchContext, SourceAdapter } from '../types.js';
 import { HttpError, sleep } from '../../core/http.js';
 import { arr, bool, num, obj, parseCondition, parseStats, pick, splitCountry, str, titleCase, toNum, type Dict } from './parse.js';
 import { groupFrom } from './tab.js';
+import { findVenue } from './venues.js';
 
 /**
  * Entain Australia (Ladbrokes.com.au / Neds.com.au) via the official, documented
@@ -107,9 +108,15 @@ export class EntainAdapter implements SourceAdapter {
   }
 
   private meetingSummary(m: Dict, date: string): MeetingSummary | undefined {
-    const name = (str(m, 'name') || '').replace(SPONSOR_PREFIX, '').trim();
+    const rawName = str(m, 'name') || '';
+    const stripped = rawName.replace(SPONSOR_PREFIX, '').trim();
     const meetingId = str(m, 'meeting', 'id');
-    if (!name || !meetingId) return undefined;
+    if (!stripped || !meetingId) return undefined;
+    const country = str(m, 'country') || 'AUS';
+    const raceType = RACE_TYPE[(str(m, 'category') || 'T').toUpperCase()] || 'thoroughbred';
+    // Track configurations ("Sandown Hillside", "Caulfield Heath", "The Valley") map onto the canonical venue so sources merge.
+    const known = raceType === 'thoroughbred' && /^(AUS?|AUSTRALIA)$/i.test(country) ? findVenue(stripped) : undefined;
+    const name = known?.name || stripped;
     // race_number 0 rows are specials (Jockey Challenge etc.), not races.
     const races = arr(m.races)
       .map(obj)
@@ -124,15 +131,15 @@ export class EntainAdapter implements SourceAdapter {
       date,
       venue: name,
       venueSlug: slug,
-      state: str(m, 'state'),
-      country: str(m, 'country') || 'AUS',
-      raceType: RACE_TYPE[(str(m, 'category') || 'T').toUpperCase()] || 'thoroughbred',
+      state: str(m, 'state') || known?.state,
+      country,
+      raceType,
       raceCount: races.length || undefined,
       trackCondition: cond.text,
       trackRating: cond.rating,
       weather,
       firstRaceTime: starts.length ? new Date(Math.min(...starts)).toISOString() : undefined,
-      sourceRefs: { entain: `${meetingId}|${races.map((r) => `${num(r, 'race_number')}:${str(r, 'id')}`).join(',')}` },
+      sourceRefs: { entain: `${meetingId}|${races.map((r) => `${num(r, 'race_number')}:${str(r, 'id')}`).join(',')}`, 'entain.venue': rawName },
       sources: [this.id],
     };
   }
@@ -153,7 +160,15 @@ export class EntainAdapter implements SourceAdapter {
     const existing = this.parseRefs(meeting);
     if (existing && existing.events.size) return existing;
     const list = await this.listMeetings(meeting.date, ctx);
-    const hit = list.find((m) => m.raceType === meeting.raceType && (m.venueSlug === meeting.venueSlug || normaliseName(m.venue) === normaliseName(meeting.venue)));
+    // "Sandown" and "Sandown Hillside" are the same meeting: compare canonical venue names too.
+    const want = canonicalName(meeting.venue);
+    const hit = list.find(
+      (m) =>
+        m.raceType === meeting.raceType &&
+        (m.venueSlug === meeting.venueSlug ||
+          normaliseName(m.venue) === normaliseName(meeting.venue) ||
+          (!!want && (canonicalName(m.venue) === want || canonicalName((m.sourceRefs['entain.venue'] || '').replace(SPONSOR_PREFIX, '')) === want))),
+    );
     const refs = hit && this.parseRefs(hit);
     if (!refs || !refs.events.size) throw new Error(`Entain: no meeting matching ${meeting.venue} on ${meeting.date}`);
     return refs;
@@ -466,6 +481,11 @@ function statsFromSnake(o: Dict): Dict | undefined {
     wins: num(o, 'number_of_wins', 'wins'),
     ...(itemised ? { seconds, thirds } : { placings }),
   };
+}
+
+/** Normalised canonical venue ("Sandown Hillside" / "Sandown" → "sandown"), for matching meetings across feeds. */
+function canonicalName(venue: string): string {
+  return normaliseName(findVenue(venue)?.name ?? venue);
 }
 
 function unixToIso(v?: number): string | undefined {
