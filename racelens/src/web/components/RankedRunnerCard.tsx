@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import type { FactorScore, Runner, RunnerAssessment } from '@shared/types';
 import { fmtOdds, fmtPct, fmtWeight } from '../lib/format';
+import { useMediaQuery } from '../lib/hooks';
 import { Bar, Chip, RankBadge, Saddle, ScoreBar } from './ui';
 
 /** Same margin the betting plan wants before it calls a runner value: the best price at least 5% above our fair price. */
 export const VALUE_EDGE_THRESHOLD = 0.05;
+/** On a phone each card shows this many reasons and concerns until "+N more" is tapped (six cards of seven chips each is pages of scrolling). */
+const PHONE_CHIPS = 2;
 
 function FactorsTable({ factors }: { factors: FactorScore[] }) {
   if (!factors.length) return <p className="muted small">No factor breakdown available.</p>;
@@ -52,9 +55,13 @@ function FactorsTable({ factors }: { factors: FactorScore[] }) {
 
 export function RankedRunnerCard({ assessment, runner, bookmaker }: { assessment: RunnerAssessment; runner?: Runner; bookmaker?: string }) {
   const [open, setOpen] = useState(false);
+  const [allChips, setAllChips] = useState(false);
+  const phone = useMediaQuery('(max-width: 480px)');
   const a = assessment;
-  const reasons = a.reasons ?? [];
-  const concerns = a.concerns ?? [];
+  const limit = phone && !allChips ? PHONE_CHIPS : Infinity;
+  const reasons = (a.reasons ?? []).slice(0, limit);
+  const concerns = (a.concerns ?? []).slice(0, limit);
+  const hidden = (a.reasons ?? []).length + (a.concerns ?? []).length - reasons.length - concerns.length;
   const hasValue = a.valueEdge != null && a.valueEdge >= VALUE_EDGE_THRESHOLD && a.bestOdds != null;
   const details = [
     runner?.barrier != null ? `Barrier ${runner.barrier}` : null,
@@ -107,6 +114,11 @@ export function RankedRunnerCard({ assessment, runner, bookmaker }: { assessment
                 ⚠ {c}
               </Chip>
             ))}
+            {hidden > 0 && (
+              <button type="button" className="chip chip--neutral chip-more" onClick={() => setAllChips(true)} data-testid="chips-more">
+                +{hidden} more
+              </button>
+            )}
           </div>
         )}
 

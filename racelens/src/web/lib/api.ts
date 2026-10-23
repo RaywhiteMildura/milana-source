@@ -333,10 +333,17 @@ export interface RequestState<T> {
   error: string | null;
   /** When the copy on screen was saved on this phone, while RaceLens cannot be reached (see `savedKey`); null when live. */
   savedAt: string | null;
+  /** When the data on screen last came live from the server (null before it ever did). */
+  receivedAt: string | null;
   /** Re-run the request. `silent` keeps the current data on screen while it refreshes. */
   reload: (silent?: boolean) => Promise<void>;
   /** Show newer data from the server (marks it live). */
   setData: (d: T | null) => void;
+  /**
+   * Another request found the server gone (the page's own live poll): label the data on screen as a saved copy from
+   * `since` (default: when it arrived) and keep retrying, as when this request itself fails. Needs a `savedKey`.
+   */
+  markUnreachable: (since?: string | null) => void;
 }
 
 interface RequestData<T> {
@@ -441,7 +448,13 @@ export function useRequest<T>(fn: () => Promise<T>, deps: unknown[], savedKey?: 
     setState((s) => ({ ...s, data: d, savedAt: null }));
   }, []);
 
-  return { ...state, reload, setData };
+  const markUnreachable = useCallback((since?: string | null) => {
+    if (!keyRef.current) return;
+    setState((s) => (s.data == null || s.savedAt ? s : { ...s, error: null, savedAt: since ?? liveAt.current ?? new Date().toISOString() }));
+  }, []);
+
+  // liveAt only changes together with state, so reading it here is current.
+  return { ...state, receivedAt: liveAt.current, reload, setData, markUnreachable };
 }
 
 export interface JobPollState {

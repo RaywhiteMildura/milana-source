@@ -11,6 +11,73 @@ function runnerLabel(n: number, runners: Map<number, Runner>): string {
   return r ? `${n} ${r.name}` : `No. ${n}`;
 }
 
+/** The disclaimer-style notes ("Suggestions only…") stay small; the rest (price marks, warnings) must be easy to read. */
+const isFinePrint = (note: string) => /^suggestions only/i.test(note.trim());
+
+/** The note worth repeating at the top: one naming a price to wait for, else the first real note. */
+export function keyNote(plan: BettingPlan): string | undefined {
+  const notes = (plan.notes ?? []).filter((n) => !isFinePrint(n));
+  return notes.find((n) => /\$\d/.test(n)) ?? notes[0];
+}
+
+/** "3 Marmalade Sky" for one runner, "3, 5, 7" for several, "3 / 5, 7 / 2, 5, 7" for legs. */
+function runnersShort(s: BetSuggestion, runners: Map<number, Runner>): string {
+  if (s.legs && s.legs.length) return s.legs.map((leg) => leg.join(', ')).join(' / ');
+  const list = s.runners ?? [];
+  return list.length === 1 ? runnerLabel(list[0], runners) : list.join(', ');
+}
+
+/**
+ * The bets at a glance, at the top of the race's picks: on a phone the full
+ * betting structure sits below six runner cards. The button jumps to it.
+ */
+export function BetSummary({ plan, runners }: { plan: BettingPlan; runners: Map<number, Runner> }) {
+  const suggestions = [...(plan.suggestions ?? [])].sort((a, b) => PRIORITY_ORDER.indexOf(a.priority) - PRIORITY_ORDER.indexOf(b.priority));
+  const note = keyNote(plan);
+  return (
+    <section className="card bet-summary" data-testid="bet-summary" aria-labelledby="bet-summary-title">
+      <header className="bet-summary__head">
+        <h3 id="bet-summary-title">Bets for this race</h3>
+        <Chip tone={stanceTone(plan.stance)} className="stance">
+          {stanceLabel(plan.stance)}
+        </Chip>
+      </header>
+      {suggestions.length ? (
+        <ul className="bet-summary__list">
+          {suggestions.map((s, i) => {
+            // The price to insist on ("Take $6.69 or better"), when the rationale names one.
+            const mark = s.rationale?.match(/\$\d+(?:\.\d+)?\s+or better/i)?.[0];
+            return (
+              <li key={i} className="bet-summary__row" data-testid="bet-summary-row">
+                <span className="bet-summary__type">{betTypeLabel(s.type)}</span>
+                <span className="bet-summary__runners">
+                  {runnersShort(s, runners)}
+                  {mark && <span className="bet-summary__mark small">take {mark}</span>}
+                </span>
+                <strong className="bet-summary__stake">{fmtMoney(s.stakeAmount)}</strong>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="bet-summary__none">No bets suggested{plan.stance === 'skip' ? ' – we would skip it.' : '.'}</p>
+      )}
+      {note && <p className="bet-summary__note">{note}</p>}
+      <div className="bet-summary__foot">
+        <span className="small muted">Suggestions only. Bet responsibly.</span>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => document.getElementById('betting-plan')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          data-testid="bet-summary-more"
+        >
+          Full betting structure ↓
+        </button>
+      </div>
+    </section>
+  );
+}
+
 function RunnersText({ s, runners }: { s: BetSuggestion; runners: Map<number, Runner> }) {
   if (s.legs && s.legs.length) {
     return (
@@ -33,7 +100,7 @@ export function BettingPlanView({ plan, runners, sizedWith, current }: { plan: B
   const groups = PRIORITY_ORDER.map((p) => ({ p, items: suggestions.filter((s) => s.priority === p) })).filter((g) => g.items.length);
 
   return (
-    <section className="card betting" data-testid="betting-plan" data-stance={plan.stance}>
+    <section className="card betting" id="betting-plan" data-testid="betting-plan" data-stance={plan.stance}>
       <header className="betting__head">
         <div>
           <h3>Betting structure</h3>
@@ -98,9 +165,11 @@ export function BettingPlanView({ plan, runners, sizedWith, current }: { plan: B
       )}
 
       {plan.notes?.length > 0 && (
-        <ul className="notes">
+        <ul className="notes betting__notes">
           {plan.notes.map((n, i) => (
-            <li key={i}>{n}</li>
+            <li key={i} className={isFinePrint(n) ? 'betting__fine' : undefined}>
+              {n}
+            </li>
           ))}
         </ul>
       )}

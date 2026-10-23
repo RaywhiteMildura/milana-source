@@ -347,7 +347,7 @@ export function HomePage({ query }: { query: URLSearchParams }) {
             </div>
             {packs.loading && !packs.data ? (
               <SkeletonCard lines={2} />
-            ) : packs.error ? (
+            ) : packs.error && !packs.data ? (
               <ErrorState title="Couldn't load saved research" message={packs.error} onRetry={() => packs.reload()} />
             ) : !packs.data || packs.data.length === 0 ? (
               <EmptyState icon="🗂" title="Nothing saved yet">

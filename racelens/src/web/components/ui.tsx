@@ -1,6 +1,6 @@
 /** Small presentational building blocks shared across pages. */
 import type { CSSProperties, ReactNode } from 'react';
-import { deviceZone, fmtDateTime, fmtTime, pct100, verificationTone, type Tone } from '../lib/format';
+import { fmtSeenAt, pct100, verificationTone, type Tone } from '../lib/format';
 
 export function Spinner({ size = 18, label }: { size?: number; label?: string }) {
   return (
@@ -146,12 +146,10 @@ export function ErrorState({ title = 'Something went wrong', message, onRetry }:
 
 /** On screen instead of live data while RaceLens cannot be reached (useRequest's `savedAt`); the page keeps retrying. */
 export function SavedCopyBanner({ savedAt }: { savedAt: string }) {
-  const sameDay = new Date(savedAt).toDateString() === new Date().toDateString();
-  const when = sameDay ? fmtTime(savedAt, deviceZone()) : fmtDateTime(savedAt, deviceZone());
   return (
     <p className="banner banner--warn saved-copy" role="status" data-testid="saved-copy-banner">
-      <strong>Saved copy from {when} – not live.</strong> Retrying…
-      <span className="saved-copy__why small">The Mac mini is not answering (is Tailscale on? any signal?). This page updates by itself once it does.</span>
+      <strong>Saved copy from {fmtSeenAt(savedAt)} – not live.</strong> Retrying…
+      <span className="banner__detail small">The Mac mini is not answering (is Tailscale on? any signal?). This page updates by itself once it does.</span>
     </p>
   );
 }

@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { JobProgress, MeetingPack, NewsItem, Race } from '@shared/types';
 import { normaliseName, normalisePerson, parseTrackRating, trackRatingLabel } from '@shared/util';
-import { api, errorMessage, useJobPoll, useRequest, isQueued } from '../lib/api';
-import { countdown, deviceZone, fmtDistance, fmtLongDate, fmtMoney, fmtOdds, fmtPct, fmtRelative, fmtTime, meetingZone, plural, raceStatusLabel, verificationWord, zoneAbbrev } from '../lib/format';
+import { api, errorMessage, isUnreachable, useJobPoll, useRequest, isQueued } from '../lib/api';
+import { countdown, deviceZone, fmtDistance, fmtLongDate, fmtMoney, fmtOdds, fmtPct, fmtRelative, fmtSeenAt, fmtTime, meetingZone, plural, raceStatusLabel, verificationWord, zoneAbbrev } from '../lib/format';
+import { useMediaQuery } from '../lib/hooks';
 import { CATCHUP_STALE_MS, catchupDue, newsToast, packNews, resultWatchLine, watchLineVisible } from '../lib/raceday';
 import { navigate, routes } from '../lib/router';
 import { savedKeys } from '../lib/saved';
 import { useServerNow, useSession } from '../lib/session';
-import { BettingPlanView } from '../components/BettingPlanView';
+import { BetSummary, BettingPlanView } from '../components/BettingPlanView';
 import { ConfidenceMeter } from '../components/ConfidenceMeter';
 import { DayPatterns } from '../components/DayPatterns';
 import { FieldTable, NewsItems } from '../components/FieldTable';
@@ -82,6 +83,9 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   }, [pack.savedAt]);
   const names = sources.data ?? undefined;
   const [section, setSection] = useState<Section>('prediction');
+  /** The race `section` was chosen for: another race opens on its picks (see below). */
+  const [sectionRace, setSectionRace] = useState<number | null>(null);
+  const phone = useMediaQuery('(max-width: 480px)');
   const [packJob, setPackJob] = useState<ActiveJob | null>(null);
   const [raceJob, setRaceJob] = useState<ActiveJob | null>(null);
   const [starting, setStarting] = useState<string | null>(null);
@@ -189,23 +193,52 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   useEffect(() => {
     seenRef.current = { updatedAt: data?.updatedAt, resulted: Object.keys(data?.results ?? {}).length };
   }, [data?.updatedAt, data?.results]);
+  const poll = useRef({ busy: false, at: 0, misses: 0, lastContact: null as string | null });
+  const livePoll = useRef(async () => undefined as void);
+  livePoll.current = async () => {
+    const st = poll.current;
+    // A saved copy on screen: useRequest is already retrying.
+    if (!dataRef.current || st.busy || jobRunningRef.current || onSavedCopyRef.current) return;
+    st.busy = true;
+    st.at = Date.now();
+    try {
+      const mine = (await api.getPacks()).find((p) => p.id === id);
+      st.misses = 0;
+      st.lastContact = new Date().toISOString();
+      if (!mine) return;
+      const seen = seenRef.current;
+      const grew = mine.resultedRaces > seen.resulted;
+      if (!grew && !(seen.updatedAt && mine.updatedAt > seen.updatedAt)) return;
+      applyFresh(await api.getPack(id));
+    } catch (e) {
+      // One missed check is harmless; two in a row means the phone has lost the Mac: say so (the saved-copy
+      // banner, from the last time it answered) and let useRequest retry until it answers again.
+      if (isUnreachable(e) && ++st.misses >= 2) {
+        st.misses = 0;
+        const since = [st.lastContact, pack.receivedAt].filter((t): t is string => !!t).sort().pop();
+        pack.markUnreachable(since);
+      }
+    } finally {
+      st.busy = false;
+    }
+  };
   useEffect(() => {
     if (!data) return;
-    const timer = window.setInterval(async () => {
-      // A saved copy on screen: useRequest is already retrying.
-      if (jobRunningRef.current || onSavedCopyRef.current) return;
-      try {
-        const mine = (await api.getPacks()).find((p) => p.id === id);
-        if (!mine) return;
-        const seen = seenRef.current;
-        const grew = mine.resultedRaces > seen.resulted;
-        if (!grew && !(seen.updatedAt && mine.updatedAt > seen.updatedAt)) return;
-        applyFresh(await api.getPack(id));
-      } catch {
-        /* a missed poll is harmless */
-      }
-    }, 30_000);
-    return () => window.clearInterval(timer);
+    poll.current.at = Date.now();
+    const timer = window.setInterval(() => void livePoll.current(), 30_000);
+    // Back from the lock screen (timers were frozen there): check for news now rather than at the next tick.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && Date.now() - poll.current.at > 5_000) void livePoll.current();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    window.addEventListener('pageshow', onVisible);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+      window.removeEventListener('pageshow', onVisible);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, !!data]);
 
@@ -229,6 +262,25 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   const prediction = race && data ? data.predictions?.[race.number] : undefined;
   const result = race && data ? data.results?.[race.number] : undefined;
   const watch = race && data ? data.resultWatch?.[race.number] : undefined;
+
+  // Another race keeps the open tab (comparing fields across races), except Result: that stays only if the race
+  // has a result too, else it opens on the picks – never on an empty result form. The "Next" bar always opens the picks.
+  if (selectedNumber !== sectionRace) {
+    setSectionRace(selectedNumber);
+    if (sectionRace != null && section === 'result' && !result) setSection('prediction');
+  }
+
+  // Keep the selected race in view in the sideways strip (on R8 it would sit off-screen behind R1–R3).
+  // Sideways only: setting scrollLeft never scrolls the page.
+  const raceTabsRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const strip = raceTabsRef.current;
+    const tab = strip?.querySelector<HTMLElement>('.race-tab.is-selected');
+    if (!strip || !tab) return;
+    const s = strip.getBoundingClientRect();
+    const t = tab.getBoundingClientRect();
+    strip.scrollLeft += t.left - s.left - (s.width - t.width) / 2;
+  }, [selectedNumber, races.length]);
 
   // The race to head to once this one is done: the next un-resulted race after it, else any un-resulted race.
   const nextRace = useMemo(() => {
@@ -353,7 +405,8 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
     );
   }
 
-  if (pack.error || !data) {
+  // A full-page error only when there is nothing to show; a failed refresh keeps the page (notice below).
+  if (!data) {
     const notFound = pack.error && /not found/i.test(pack.error);
     return (
       <div className="page page--pack">
@@ -387,6 +440,12 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   return (
     <div className="page page--pack" data-testid="pack-page">
       {pack.savedAt && <SavedCopyBanner savedAt={pack.savedAt} />}
+      {pack.error && (
+        <p className="banner banner--warn" role="status" data-testid="refresh-failed">
+          <strong>Couldn't refresh – showing what you had{pack.receivedAt ? ` from ${fmtSeenAt(pack.receivedAt)}` : ''}.</strong>
+          <span className="banner__detail small">{pack.error}</span>
+        </p>
+      )}
       {/* ------------------------------------------------------------ header */}
       <section className="card pack-head" data-testid="pack-header">
         <div className="pack-head__row">
@@ -436,8 +495,8 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
           </div>
           <Ring
             value={data.verificationScore}
-            size={92}
-            stroke={9}
+            size={phone ? 56 : 92}
+            stroke={phone ? 6 : 9}
             testId="pack-verification"
             caption={
               <>
@@ -474,7 +533,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
         </EmptyState>
       ) : (
         <>
-          <nav className="race-tabs" role="tablist" aria-label="Races" data-testid="race-tabs">
+          <nav className="race-tabs" role="tablist" aria-label="Races" data-testid="race-tabs" ref={raceTabsRef}>
             {races.map((r) => {
               const st = raceState(data, r);
               const sel = r.number === selectedNumber;
@@ -562,7 +621,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
 
           {result &&
             (nextRace ? (
-              <a href={routes.pack(id, nextRace.number)} className="next-race" data-testid="next-race-bar" data-race={nextRace.number}>
+              <a href={routes.pack(id, nextRace.number)} className="next-race" onClick={() => setSection('prediction')} data-testid="next-race-bar" data-race={nextRace.number}>
                 <span className="next-race__label">Next:</span>
                 <strong>
                   R{nextRace.number}
@@ -613,6 +672,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
                 </EmptyState>
               ) : (
                 <>
+                  {prediction.betting && <BetSummary plan={prediction.betting} runners={runnerByNo} />}
                   <div className="section-title">
                     <h2>Our finishing order</h2>
                     <span className="small muted">

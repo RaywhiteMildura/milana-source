@@ -692,6 +692,145 @@ test.describe('phone at the track', () => {
     await expect(page.getByTestId('meeting-card').first()).toBeVisible();
   });
 
+  test('on an iPhone 13 the bets for the race come within two screens of the race, and jump to the full structure', async ({ page }) => {
+    await openFirstMeeting(page);
+    const raceTop = (await page.getByTestId('race-detail').boundingBox())!.y;
+    const summary = page.getByTestId('bet-summary');
+    await expect(summary).toBeVisible();
+    const box = (await summary.boundingBox())!;
+    expect(box.y + box.height - raceTop).toBeLessThan(2 * 844);
+    // The stance reads as one word, never "Wat/ch".
+    const stance = summary.locator('.stance');
+    expect((await stance.boundingBox())!.height).toBeLessThan(40);
+    expect(await noHorizontalOverflow(page)).toBe(true);
+
+    // Runner cards keep two reasons and two concerns until asked for more.
+    const withMore = page.getByTestId('ranked-runner').filter({ has: page.getByTestId('chips-more') }).first();
+    if (await withMore.count()) {
+      const card = page.locator(`[data-testid="ranked-runner"][data-number="${await withMore.getAttribute('data-number')}"]`);
+      const chips = await card.locator('.chip').count();
+      await card.getByTestId('chips-more').click();
+      await expect(card.getByTestId('chips-more')).toHaveCount(0);
+      expect(await card.locator('.chip').count()).toBeGreaterThanOrEqual(chips);
+    }
+
+    await summary.getByTestId('bet-summary-more').click();
+    await expect(page.getByTestId('betting-plan')).toBeInViewport();
+    expect((await page.getByTestId('stance-badge').boundingBox())!.height).toBeLessThan(40);
+  });
+
+  test('the race strip keeps the selected race in view', async ({ page }) => {
+    await openFirstMeeting(page);
+    const tabs = page.getByTestId('race-tab');
+    const last = tabs.last();
+    const lastNo = await last.getAttribute('data-race');
+    const deepLink = `${page.url().replace(/\/race\/\d+$/, '')}/race/${lastNo}`;
+    await page.goto('about:blank');
+    await page.goto(deepLink);
+    await expect(page.getByTestId('race-detail')).toHaveAttribute('data-race', String(lastNo));
+    await expect(last).toHaveAttribute('aria-selected', 'true');
+    // Within the strip's visible width: the selected race yes, R1 no.
+    const shown = (tab: ReturnType<Page['getByTestId']>) =>
+      tab.evaluate((el) => {
+        const s = el.parentElement!.getBoundingClientRect();
+        const t = el.getBoundingClientRect();
+        return t.left >= s.left - 1 && t.right <= s.right + 1;
+      });
+    await expect.poll(() => shown(last)).toBe(true);
+    expect(await shown(tabs.first())).toBe(false);
+    // Sideways only: the page itself did not scroll.
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  });
+
+  test('"Next" from a race result opens the next race on its picks, not its empty result form', async ({ page }) => {
+    await servePackWith(page, (pack) => {
+      const p = pack as unknown as { races: Array<{ number: number; runners: Array<{ number: number; scratched?: boolean }> }>; results?: Record<number, unknown> };
+      const race = p.races[0];
+      const placings = race.runners.filter((r) => !r.scratched).slice(0, 3).map((r) => [r.number]);
+      return { results: { ...(p.results ?? {}), [race.number]: { raceNumber: race.number, placings, recordedAt: new Date().toISOString(), source: 'racingaustralia', status: 'final' } } };
+    });
+    await openFirstMeeting(page);
+    const tabs = page.getByTestId('race-tab');
+    await tabs.first().click();
+    await page.getByTestId('result-tab').click();
+    await expect(page.getByTestId('placings')).toBeVisible();
+
+    const next = page.getByTestId('next-race-bar');
+    const nextNo = await next.getAttribute('data-race');
+    await next.click();
+    await expect(page.getByTestId('race-detail')).toHaveAttribute('data-race', String(nextNo));
+    await expect(page.getByTestId('prediction-tab')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByTestId('ranked-runner').first()).toBeVisible();
+    await expect(page.getByTestId('manual-result-form')).toHaveCount(0);
+
+    // From the race strip: Result stays open only for a race that has one.
+    await page.getByTestId('result-tab').click();
+    await tabs.first().click();
+    await expect(page.getByTestId('result-tab')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByTestId('placings')).toBeVisible();
+    await tabs.nth(2).click();
+    await expect(page.getByTestId('race-detail')).toHaveAttribute('data-race', (await tabs.nth(2).getAttribute('data-race')) ?? '');
+    await expect(page.getByTestId('prediction-tab')).toHaveAttribute('aria-selected', 'true');
+  });
+
+  test('a failed refresh keeps the meeting on screen with a small notice instead of an error page', async ({ page }) => {
+    await openFirstMeeting(page);
+    let refuse = true;
+    await page.route(
+      (url) => /^\/api\/packs\/[^/]+$/.test(url.pathname),
+      (route) => (route.request().method() === 'GET' && refuse ? route.fulfill({ status: 429, json: { error: 'Too many requests – wait a moment.' } }) : route.fallback()),
+    );
+    await page.getByTestId('refresh-btn').click();
+    const notice = page.getByTestId('refresh-failed');
+    await expect(notice).toContainText(/Couldn't refresh – showing what you had from \S+\./);
+    await expect(notice).toContainText('Too many requests');
+    await expect(page.getByTestId('race-detail')).toBeVisible();
+    await expect(page.getByTestId('ranked-runner').first()).toBeVisible();
+    await expect(page.getByTestId('error-state')).toHaveCount(0);
+
+    refuse = false;
+    await page.getByTestId('refresh-btn').click();
+    await expect(notice).toHaveCount(0);
+  });
+
+  test('losing the Mac mid-session shows the not-live banner after two missed checks, and clears it when it answers', async ({ page }) => {
+    await page.clock.install();
+    await openFirstMeeting(page);
+    const banner = page.getByTestId('saved-copy-banner');
+    await page.route('**/api/**', (route) => route.abort('internetdisconnected'));
+    for (let i = 0; i < 2; i++) {
+      await expect(banner).toHaveCount(0); // one missed check is not news
+      const missed = page.waitForEvent('requestfailed', (r) => isPackList(r.url(), r.method()));
+      await page.clock.fastForward('00:31');
+      await missed;
+    }
+    await expect(banner).toContainText(/Saved copy from \S+ – not live\. Retrying…/);
+    await expect(page.getByTestId('race-detail')).toBeVisible();
+    // It stays in sight while the picks scroll.
+    await page.getByTestId('ranked-runner').last().scrollIntoViewIfNeeded();
+    await expect(banner).toBeInViewport();
+
+    await page.unroute('**/api/**');
+    await page.clock.fastForward('00:16');
+    await expect(banner).toHaveCount(0);
+  });
+
+  test('coming back from the lock screen updates the countdown and checks for news at once', async ({ page }) => {
+    await page.clock.install();
+    const start = new Date(Date.now() + 2 * 3600_000).toISOString();
+    await servePackWith(page, (pack) => ({ races: pack.races.map((r) => ({ ...r, startTime: start })) }));
+    await openFirstMeeting(page);
+    const countdown = page.getByTestId('countdown').locator('strong');
+    await expect(countdown).toHaveText(/Jumps in (2 h 0|1 h 59) min/);
+
+    // Locked for 20 minutes: the phone froze every timer, so nothing ticked meanwhile.
+    await page.clock.setSystemTime((await page.evaluate(() => Date.now())) + 20 * 60_000);
+    const checked = page.waitForRequest((r) => isPackList(r.url(), r.method()), { timeout: 5_000 });
+    await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+    await checked;
+    await expect(countdown).toHaveText(/Jumps in 1 h (40|39) min/);
+  });
+
   const VERSION = { commit: 'a1b2c3d4e5f6a7b8', branch: 'main', installedAt: '2026-10-23T21:00:00.000Z' };
 
   test('Settings updates RaceLens from the phone: confirm, progress every 5 s through the restart, then Reload', async ({ page }) => {

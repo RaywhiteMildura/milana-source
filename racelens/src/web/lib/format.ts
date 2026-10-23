@@ -152,6 +152,12 @@ export function fmtDateTime(iso?: string | null, tz: string = TZ): string {
   return `${day}, ${fmtTime(iso, tz)}`;
 }
 
+/** When the phone got something, on the phone's own clock: "1:42pm" today, else "Fri 23 Oct, 1:42pm". */
+export function fmtSeenAt(iso: string): string {
+  const sameDay = new Date(iso).toDateString() === new Date().toDateString();
+  return sameDay ? fmtTime(iso, deviceZone()) : fmtDateTime(iso, deviceZone());
+}
+
 /** Local race-day date (YYYY-MM-DD, Melbourne) of an ISO timestamp. */
 export function ymdOfIso(iso?: string | null): string | null {
   const t = parseIso(iso);
