@@ -408,14 +408,28 @@ async function fetchNews(deps: ResearchDeps, meeting: MeetingSummary, races: Rac
     adapters.map(async (a) => {
       const started = Date.now();
       let failures = 0;
+      let tried = 0;
+      let lastError = '';
       // Sequential per source with a small pause: friendly to rate limits (Reddit, Google).
       for (const q of qs) {
+        // A source that refused the first three searches outright (blocked or down) will refuse the rest:
+        // stop asking, so research does not keep the phone waiting (Reddit refuses many servers).
+        if (tried >= 3 && failures === tried) break;
+        tried++;
         const r = await timed((c) => a.searchNews!(q, c || deps.ctx), `${a.name} news`, deps.ctx, 15_000);
-        if (r.error) failures++;
-        else items.push(...(r.value || []));
+        if (r.error) {
+          failures++;
+          lastError = r.error;
+        } else items.push(...(r.value || []));
         await sleep(a.id === 'reddit' ? 1200 : 250);
       }
-      statuses.push(statusOf(a, failures < qs.length, Date.now() - started, { itemCount: items.filter((i) => i.source === a.id).length, error: failures ? `${failures}/${qs.length} queries failed` : undefined }));
+      const skipped = qs.length - tried;
+      statuses.push(
+        statusOf(a, failures < tried, Date.now() - started, {
+          itemCount: items.filter((i) => i.source === a.id).length,
+          error: failures ? `${failures}/${tried} queries failed${skipped ? ` (stopped early; ${lastError.slice(0, 120)})` : ''}` : undefined,
+        }),
+      );
     }),
   );
   // Match against all runners of the meeting
