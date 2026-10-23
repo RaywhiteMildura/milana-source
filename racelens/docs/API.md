@@ -41,7 +41,11 @@ The cookie is marked `Secure` when the request arrived over HTTPS – directly, 
 
 Job polling: the UI polls `GET /api/jobs/:id` about once a second (the catch-up every 2 s) until `status` is `done` or `error`; after three `404`s in a row it treats the job as lost. `JobProgress.steps` gives a step list for a friendly progress panel; `percent` and `message` give the headline.
 
-Host guard: requests whose `Host` header is not this machine (localhost, its own interface addresses – re-read every 30 s, and on an unknown name at most every 5 s – or a name listed in `RACELENS_ALLOWED_HOSTS`) answer `421 { error }`; `RACELENS_ALLOWED_HOSTS=*` disables the check for hosted platforms.
+Host guard: requests whose `Host` header is not this machine (localhost, its own interface addresses – re-read every 30 s, and on an unknown name at most every 5 s – or a name listed in `RACELENS_ALLOWED_HOSTS`) answer `421 { error }`; `RACELENS_ALLOWED_HOSTS=*` disables the check for hosted platforms when a password is set (without one the guard stays on for the machine's own names and the `RACELENS_PUBLIC_URL` host).
+
+Cross-site guard: a write (anything but GET/HEAD/OPTIONS) under /api whose `Origin` is another site, `null`, or whose `Sec-Fetch-Site` is `cross-site`, answers `403 { code: 'cross-site' }`. Requests without an `Origin` (curl, scripts) are not affected.
+
+Compression: JSON and the app's files over 1 KB are sent brotli- or gzip-compressed when the request's `Accept-Encoding` allows it (`Vary: Accept-Encoding`).
 
 ## The automatic race day
 
@@ -94,10 +98,10 @@ The web app polls `/api/health` every 30 s while the Settings page is open to sh
 | `RACELENS_HOST` | `127.0.0.1` by default; `0.0.0.0` listens on every interface and makes `/api/health` report `urls` (unless hosted) |
 | `RACELENS_DATA_DIR` | default `./data`; holds `packs/`, `cache/`, `settings.json`, `.secret` (signs the session cookies, together with the password) and `.revoked-sessions.json` |
 | `RACELENS_PASSWORD` | enables the login described above; changing it signs every session out |
-| `RACELENS_ALLOWED_HOSTS` | comma-separated extra hostnames for the host guard, or `*` (disables the guard and marks the server as hosted) |
+| `RACELENS_ALLOWED_HOSTS` | comma-separated extra hostnames for the host guard, or `*` (disables the guard when a password is set, and marks the server as hosted) |
 | `RACELENS_PUBLIC_URL` | absolute http(s) URL reported as `publicUrl` (also on a non-hosted server, e.g. a Tailscale Serve name) |
 | `RACELENS_TRUST_PROXY` | `1` sets Express `trust proxy` to 1, so client IPs (and the login rate limit) come from the proxy's `X-Forwarded-For`. Also on automatically when `FLY_APP_NAME` or `RENDER` is set; `RACELENS_ALLOWED_HOSTS=*` alone does not turn it on |
-| `RACELENS_ALLOW_OPEN` | `1` lets a hosted server start without a password; otherwise it exits with "Refusing to start" |
+| `RACELENS_ALLOW_OPEN` | `1` lets a hosted or proxied server (`RACELENS_TRUST_PROXY`, `RACELENS_PUBLIC_URL` or named `RACELENS_ALLOWED_HOSTS` set) start without a password; otherwise it exits with "Refusing to start" |
 | `FLY_APP_NAME`, `RENDER`, `RENDER_EXTERNAL_URL` | set by Fly.io / Render themselves: mark the server as hosted, turn on proxy trust and provide the default `publicUrl` |
 | `RACELENS_QR` | `0` suppresses the start-up QR code (never printed when hosted) |
 | `RACELENS_LOG` | `debug` / `info` (default) / `warn` / `error` |
