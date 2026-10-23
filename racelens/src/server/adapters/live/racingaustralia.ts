@@ -1190,7 +1190,7 @@ export class RacingAustraliaAdapter implements SourceAdapter {
     }
     const race = parseResultsPage($).get(raceNumber);
     if (!race?.placings?.length) return null;
-    return { raceNumber, placings: race.placings, margins: race.margins, time: race.time, recordedAt: ctx.now().toISOString(), source: this.id };
+    return { raceNumber, placings: race.placings, margins: race.margins, time: race.time, recordedAt: ctx.now().toISOString(), source: this.id, status: 'final' };
   }
 
   // -- internals ---------------------------------------------------------------

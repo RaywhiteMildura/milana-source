@@ -205,6 +205,7 @@ export class EntainAdapter implements SourceAdapter {
       dividends: race.dividends,
       recordedAt: ctx.now().toISOString(),
       source: this.id,
+      status: race.status === 'final' ? 'final' : 'interim',
     };
   }
 
