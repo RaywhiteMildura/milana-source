@@ -3,7 +3,7 @@ import type { MeetingPack, MeetingSummary, RaceResult, Settings, SourceStatus } 
 import type { AdapterRegistry } from '../adapters/registry.js';
 import type { FetchContext } from '../adapters/types.js';
 import { JobManager, StillQueuedError } from '../jobs/manager.js';
-import { collectAndRerate, discoverMeetings, dueResultChecks, isManualResult, predictAll, recheckMeeting, recordResult, researchMeeting, sameResult, skipResultsJob, type ResearchDeps } from '../jobs/research.js';
+import { collectAndRerate, discoverMeetings, dueResultChecks, isManualResult, keepJumpedPredictions, predictAll, recheckMeeting, recordResult, researchMeeting, sameResult, scoreResult, skipResultsJob, type ResearchDeps } from '../jobs/research.js';
 import { Store } from '../store/store.js';
 import { detectDayPatterns } from '../core/daypatterns.js';
 import { withTimeout } from '../core/http.js';
@@ -181,9 +181,10 @@ export function createApi(deps: ApiDeps): Router {
         ['predict', 'Rating & betting structure'],
       ];
       const job = deps.jobs.start('research', { meetingId, plannedSteps }, async (job) => {
-        const pack = await researchMeeting(researchDeps(), meeting!, job);
-        // Re-running research must not throw away results, scorecards and the day's history.
+        // Re-running research must not throw away results, scorecards, the picks races jumped with and the day's
+        // history. (Jobs of one meeting run one at a time, so the pack read here is still current at the end.)
         const existing = deps.store.getPack(meetingId);
+        const pack = await researchMeeting(researchDeps(), meeting!, job, existing);
         if (existing) carryOver(existing, pack, deps.store.getSettings(), deps.now?.() ?? new Date());
         deps.store.savePack(pack);
       });
@@ -354,8 +355,9 @@ export function createApi(deps: ApiDeps): Router {
 }
 
 /**
- * Carry results, scorecards, history, the watcher's memory and the predictions of resulted races from an older
- * pack into a re-researched one. A result typed in by hand always wins over what the sources say now.
+ * Carry results, scorecards, history, the watcher's memory and the predictions (with their betting plans) of the
+ * races that have run or jumped from an older pack into a re-researched one; every result is scored against the
+ * prediction its race jumped with. A result typed in by hand always wins over what the sources say now.
  */
 export function carryOver(existing: MeetingPack, pack: MeetingPack, settings: Settings, now: Date): void {
   const manual = new Set(
@@ -372,11 +374,13 @@ export function carryOver(existing: MeetingPack, pack: MeetingPack, settings: Se
   });
   // The fresh research's own lines about a hand-typed race would contradict the result that is kept.
   pack.history = [...existing.history, ...pack.history.filter((h) => h.raceNumber == null || !manual.has(h.raceNumber))];
+  // A race is scored on the picks it jumped with, never on a rating made after it ran.
+  keepJumpedPredictions(existing, pack, now);
+  for (const n of Object.keys(pack.results)) scoreResult(pack, Number(n));
   for (const [n, result] of Object.entries(existing.results)) {
     const raceNumber = Number(n);
     const fresh = pack.results[raceNumber];
     if (fresh && !manual.has(raceNumber)) continue; // the new research already found (and cross-checked) it
-    if (existing.predictions[raceNumber]) pack.predictions[raceNumber] = existing.predictions[raceNumber];
     recordResult(pack, raceNumber, result, 'confirmed', { history: false }); // its line is already in the carried history
     if (fresh && placingsText(fresh.placings.slice(0, 3)) !== placingsText(result.placings.slice(0, 3))) {
       const said = fresh.placings

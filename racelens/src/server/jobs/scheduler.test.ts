@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { MeetingPack, Race, RaceResult, ResultWatch } from '../../shared/types.js';
+import type { FieldAgreement, MeetingPack, Race, RaceRaw, RaceResult, ResultWatch, Runner, Settings } from '../../shared/types.js';
 import type { FetchContext } from '../adapters/types.js';
 import { AdapterRegistry } from '../adapters/registry.js';
 import { silentLogger } from '../core/logger.js';
-import { AutoRecheckScheduler, dueResultChecks, RESULTS_RETRY_MS } from './scheduler.js';
+import { AutoRecheckScheduler, cardRefreshDue, dueResultChecks, RESULTS_RETRY_MS } from './scheduler.js';
 import { JobManager } from './manager.js';
-import { nextResultCheckAt, RESULT_WATCH } from './research.js';
+import { nextResultCheckAt, predictAll, RESULT_WATCH } from './research.js';
 import { DEFAULT_SETTINGS } from '../store/store.js';
 
 function race(number: number, startIso: string | undefined, over: Partial<Race> = {}): Race {
@@ -273,5 +273,236 @@ describe('AutoRecheckScheduler results jobs', () => {
     expect(job.status).toBe('done');
     expect(job.steps.map((s) => s.status)).toEqual(['skipped', 'skipped', 'skipped']);
     expect(t.fetches()).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Race-day refresh of the whole card, and a pre-race check that runs late
+// ---------------------------------------------------------------------------
+
+/** Melbourne time on race day (AEDT, +11). */
+const local = (hhmm: string) => new Date(`2026-10-24T${hhmm}:00.000+11:00`);
+/** 20:00 the night before: when the card was researched. */
+const NIGHT_BEFORE = '2026-10-23T09:00:00.000Z';
+
+function agree<T>(value: T): FieldAgreement<T> {
+  return { value, agree: ['card'], disagree: [], confidence: 1 };
+}
+
+function starter(number: number): Runner {
+  const name = ['Alpha', 'Bravo', 'Charlie', 'Delta'][number - 1];
+  return {
+    id: `r${number}`,
+    number,
+    name,
+    barrier: number,
+    jockey: `Rider ${number}`,
+    trainer: 'T Trainer',
+    weight: 56,
+    scratched: false,
+    form: [],
+    gearChanges: [],
+    comments: [],
+    ratings: { rating: 90 - number * 3 },
+    odds: [],
+    fields: { barrier: agree(number), jockey: agree(`Rider ${number}`), trainer: agree('T Trainer'), weight: agree(56), scratched: agree(false), number: agree(number) },
+    sources: ['card'],
+    verification: { score: 1, sourceCount: 1, conflicts: [], checkedFields: 6, agreedFields: 6 },
+    news: [],
+  };
+}
+
+/** R1 12:25, R2 13:00, R3 13:35 AEDT, researched the night before. */
+function racedayPack(fetchedAt = NIGHT_BEFORE): MeetingPack {
+  const p = pack(['12:25', '13:00', '13:35'].map((hhmm, i) => race(i + 1, local(hhmm).toISOString(), { runners: [1, 2, 3, 4].map(starter), fieldSize: 4, sources: ['card'], fetchedAt })));
+  p.meeting.timezone = 'Australia/Melbourne';
+  predictAll(p, DEFAULT_SETTINGS, new Date(NIGHT_BEFORE));
+  return p;
+}
+
+describe('cardRefreshDue', () => {
+  it.each<[string, string, MeetingPack, boolean]>([
+    ['not before 07:30 track time', '07:29', racedayPack(), false],
+    ['from 07:30 when the card was fetched the night before', '07:30', racedayPack(), true],
+    ['not while the card is less than an hour old', '08:00', racedayPack(local('07:10').toISOString()), false],
+    ['an hour after the card was fetched', '08:10', racedayPack(local('07:10').toISOString()), true],
+    ['never within 15 minutes of a jump', '12:11', racedayPack(), false],
+    ['between races, for the races still to run', '12:26', racedayPack(), true],
+    ['never once the last race has jumped', '13:36', racedayPack(), false],
+  ])('%s', (_name, hhmm, p, expected) => {
+    expect(cardRefreshDue(p, local(hhmm))).toBe(expected);
+  });
+
+  it('only on the meeting\'s own date, by its own clock', () => {
+    const tomorrow = racedayPack();
+    tomorrow.meeting.date = '2026-10-25';
+    expect(cardRefreshDue(tomorrow, local('09:00'))).toBe(false);
+    const perth = racedayPack(); // 07:30 AWST is 10:30 AEDT
+    perth.meeting.timezone = 'Australia/Perth';
+    expect(cardRefreshDue(perth, local('10:29'))).toBe(false);
+    expect(cardRefreshDue(perth, local('10:30'))).toBe(true);
+  });
+});
+
+describe('AutoRecheckScheduler race-day refresh and late pre-race checks', () => {
+  function setup(settings: Settings = DEFAULT_SETTINGS) {
+    let clock = local('07:00');
+    let stored = racedayPack();
+    const calls: number[] = [];
+    let scratched: number | undefined;
+    let down = false;
+    const registry = new AdapterRegistry();
+    registry.register({
+      id: 'card',
+      name: 'card',
+      kind: 'official',
+      capabilities: ['racecard'],
+      fetchRace: async (_m, n, c) => {
+        calls.push(n);
+        if (down) throw new Error('HTTP 503');
+        const r = stored.races.find((x) => x.number === n)!;
+        return {
+          number: n,
+          name: r.name,
+          distance: r.distance,
+          startTime: r.startTime,
+          status: 'open',
+          sourceRefs: {},
+          runners: r.runners.map((x) => ({ number: x.number, name: x.name, barrier: x.barrier, jockey: x.jockey, trainer: x.trainer, weight: x.weight, ratings: x.ratings, scratched: n === 1 && x.number === scratched })),
+          source: 'card',
+          fetchedAt: c.now().toISOString(),
+        } as RaceRaw;
+      },
+    });
+    const ctx = { http: { bound: () => ({}) }, log: silentLogger, now: () => clock, jurisdiction: 'VIC' } as unknown as FetchContext;
+    const store = {
+      getSettings: () => settings,
+      listPacks: () => [{ id: stored.id, meeting: stored.meeting, updatedAt: stored.updatedAt }],
+      getPack: () => structuredClone(stored),
+      savePack: (p: MeetingPack) => (stored = structuredClone(p)),
+    };
+    const jobs = new JobManager();
+    const infos: string[] = [];
+    const make = () => new AutoRecheckScheduler({ store: store as never, jobs, researchDeps: () => ({ registry, ctx, settings, now: () => clock }), now: () => clock, log: { info: (m) => infos.push(m), warn: () => undefined } });
+    let sched = make();
+    const tick = async (hhmm: string) => {
+      clock = local(hhmm);
+      const n = await sched.tick();
+      for (const j of jobs.list()) await jobs.wait(j.id, 5_000);
+      return n;
+    };
+    return {
+      jobs,
+      calls,
+      infos,
+      tick,
+      stored: () => stored,
+      scratch: (n: number) => (scratched = n),
+      setDown: (v: boolean) => (down = v),
+      setClock: (hhmm: string) => (clock = local(hhmm)),
+      restart: () => (sched = make()),
+      sched: () => sched,
+    };
+  }
+
+  it('from 07:30 track time it refreshes every race still to run, at most hourly, so a morning scratching reaches the picks', async () => {
+    const t = setup();
+    expect(await t.tick('07:00')).toBe(0);
+    expect(await t.tick('07:29')).toBe(0);
+    const top = t.stored().predictions[3].top[0].number;
+    expect(t.stored().predictions[1].top[0].number).toBe(top); // same field, same picks
+    t.scratch(top); // scratched overnight in R1
+
+    expect(await t.tick('07:30')).toBe(1);
+    expect(t.calls).toEqual([1, 2, 3]);
+    const p = t.stored();
+    for (const r of p.races) expect(r.fetchedAt).toBe(local('07:30').toISOString());
+    for (const n of [1, 2, 3]) expect(p.predictions[n].generatedAt).toBe(local('07:30').toISOString());
+    expect(p.races[0].runners.find((r) => r.number === top)!.scratched).toBe(true);
+    expect(p.predictions[1].ranked.map((r) => r.number)).not.toContain(top);
+    expect(p.predictions[1].betting.suggestions.flatMap((b) => b.runners)).not.toContain(top);
+    expect(p.history.at(-1)).toMatchObject({ type: 'recheck', summary: expect.stringMatching(/^Automatic race-day refresh \(every race still to run\): \d+ changes?/) });
+    expect(p.history.at(-1)?.changes).toContain(`R1: ${p.races[0].runners.find((r) => r.number === top)!.name} (${top}) scratched`);
+    expect(t.infos).toContain('Race-day refresh: Flemington (every race still to run)');
+
+    expect(await t.tick('07:31')).toBe(0);
+    expect(await t.tick('08:29')).toBe(0);
+    expect(await t.tick('08:30')).toBe(1);
+    expect(t.calls).toEqual([1, 2, 3, 1, 2, 3]);
+  });
+
+  it('waits while another job of the meeting is queued or running, costing nothing, and goes on the next tick', async () => {
+    const t = setup();
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const blocker = t.jobs.start('research', { meetingId: 'p' }, async () => {
+      await gate;
+    });
+    t.setClock('07:30');
+    expect(await t.sched().tick()).toBe(0);
+    expect(t.jobs.list()).toHaveLength(1);
+    release();
+    await t.jobs.wait(blocker.id);
+    expect(t.calls).toEqual([]);
+    expect(await t.tick('07:31')).toBe(1);
+    expect(t.calls).toEqual([1, 2, 3]);
+  });
+
+  it('leaves races that have jumped alone and stops once the last race has jumped', async () => {
+    const t = setup();
+    const r1 = structuredClone(t.stored().predictions[1]);
+    expect(await t.tick('12:11')).toBe(0); // R1 jumps within 15 minutes: its own pre-race checks are about to run
+    expect(t.calls).toEqual([]);
+    expect(await t.tick('12:26')).toBe(1);
+    expect(t.calls).toEqual([2, 3]);
+    expect(t.stored().predictions[1]).toEqual(r1);
+    expect(await t.tick('13:36')).toBe(0);
+  });
+
+  it('a refresh that reaches no source is not retried every minute, and a restarted server refreshes a stale card on its first tick', async () => {
+    const t = setup();
+    t.setDown(true);
+    expect(await t.tick('07:30')).toBe(1);
+    expect(t.stored().races[0].fetchedAt).toBe(NIGHT_BEFORE); // nothing new: the card keeps the time it was really fetched
+    expect(await t.tick('07:31')).toBe(0);
+    expect(await t.tick('08:29')).toBe(0);
+    t.restart();
+    expect(await t.tick('08:31')).toBe(1); // the card is still old: refreshed straight away
+    t.setDown(false);
+    t.restart();
+    expect(await t.tick('08:32')).toBe(1);
+    expect(t.stored().races[0].fetchedAt).toBe(local('08:32').toISOString());
+    t.restart();
+    expect(await t.tick('08:40')).toBe(0); // fresh card: nothing to do, whatever the scheduler remembers
+  });
+
+  it('is off together with the automatic pre-race checks', async () => {
+    const t = setup({ ...DEFAULT_SETTINGS, autoRecheckMinutesBeforeRace: 0 });
+    expect(await t.tick('07:30')).toBe(0);
+    expect(t.calls).toEqual([]);
+  });
+
+  it('a pre-race check queued behind a long job until after the jump is skipped: the race keeps the picks it jumped with', async () => {
+    const t = setup();
+    const r1 = structuredClone(t.stored().predictions[1]);
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const blocker = t.jobs.start('research', { meetingId: 'p' }, async () => {
+      await gate;
+    });
+    t.setClock('12:16'); // R1 jumps in nine minutes
+    expect(await t.sched().tick()).toBe(1);
+    const check = t.jobs.list().find((j) => j.type === 'recheck')!;
+    expect(check.raceNumber).toBe(1);
+    t.setClock('12:26'); // the long job ends after the jump
+    release();
+    await t.jobs.wait(blocker.id);
+    const done = await t.jobs.wait(check.id);
+    expect(done.status).toBe('done');
+    expect(done.steps.map((s) => s.status)).toEqual(['skipped', 'skipped', 'skipped']);
+    expect(done.message).toBe('R1 has already jumped - picks left as they were');
+    expect(t.calls).toEqual([]);
+    expect(t.stored().predictions[1]).toEqual(r1);
+    expect(t.infos).toContain('Auto pre-race check skipped: Flemington R1 has already jumped');
   });
 });

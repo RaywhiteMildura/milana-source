@@ -43,11 +43,24 @@ describe('automatic results (demo mode)', () => {
     expect(scheduler.status().watching).toEqual([]);
   });
 
-  it('starts nothing until two minutes after the jump', async () => {
+  it('starts no results check until two minutes after the jump (the race-day refresh of the races still to run goes first)', async () => {
     clock = t('12:26'); // R1 jumped at 12:25
-    expect(await scheduler.tick()).toBe(0);
+    const before = store.getPack(id)!;
+    expect(await scheduler.tick()).toBe(1);
     expect(resultsJobs()).toHaveLength(0);
     expect(scheduler.status().lastTickAt).toBe(clock.toISOString());
+    // The card was researched at 00:30, so the first tick after 07:30 refreshes every race still to run – not R1, which has jumped.
+    const [refresh] = jobs.list().filter((j) => j.type === 'recheck' && j.meetingId === id);
+    expect(refresh.raceNumber).toBeUndefined();
+    expect((await jobs.wait(refresh.id, 60_000)).status).toBe('done');
+    const after = store.getPack(id)!;
+    expect(after.predictions[1]).toEqual(before.predictions[1]);
+    expect(after.races.find((r) => r.number === 1)!.fetchedAt).toBe(before.races.find((r) => r.number === 1)!.fetchedAt);
+    for (const n of [2, 3, 9]) {
+      expect(after.races.find((r) => r.number === n)!.fetchedAt).toBe(clock.toISOString());
+      expect(after.predictions[n].generatedAt).toBe(clock.toISOString());
+    }
+    expect(after.history.at(-1)?.summary).toMatch(/^Automatic race-day refresh \(every race still to run\): /);
   });
 
   it('a tick after race 1 fetches the result, scores it, re-rates the rest of the card and books the next look', async () => {
@@ -154,6 +167,7 @@ describe('automatic results (demo mode)', () => {
   });
 
   it('a server that was off all afternoon catches up on every race in one job', async () => {
+    const before = store.getPack(id)!;
     clock = t('17:30'); // every race has jumped; the demo publishes results for R1–R3 only
     expect(await scheduler.tick()).toBe(1);
     const job = await waitLatest();
@@ -163,7 +177,9 @@ describe('automatic results (demo mode)', () => {
     const pack = store.getPack(id)!;
     expect(pack.results[3]?.placings[0]).toEqual([2]);
     const line = pack.history.filter((h) => h.type === 'results').at(-1)!;
-    expect(line.summary).toMatch(/^Automatic results check: R3 result in - .+ \(2\) won; R4, R5, R6, R7, R8, R9 re-rated$/);
+    // Every race has jumped, so none is re-rated: each keeps (and is scored on) the picks it jumped with.
+    expect(line.summary).toMatch(/^Automatic results check: R3 result in - .+ \(2\) won$/);
+    for (const n of [3, 4, 5, 6, 7, 8, 9]) expect(pack.predictions[n]).toEqual(before.predictions[n]);
     // R2's one-source result is accepted once the schedule ran out; R4–R9 are still being watched.
     expect(pack.resultWatch![2]).toMatchObject({ note: 'One source only' });
     expect(pack.resultWatch![2].nextCheckAt).toBeUndefined();

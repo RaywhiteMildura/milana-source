@@ -7,7 +7,7 @@ import { forecastDrift } from '../core/model.js';
 import { summariseWeather } from '../core/weather.js';
 import { DEFAULT_SETTINGS } from '../store/store.js';
 import { JobHandle } from './manager.js';
-import { buildNewsQueries, chooseResult, collectAndRerate, confirmationChecks, dueResultChecks, isResultSettled, mergeMeetingSummaries, predictAll, recheckMeeting, researchMeeting, type ResearchDeps } from './research.js';
+import { buildNewsQueries, chooseResult, collectAndRerate, confirmationChecks, dueResultChecks, isResultSettled, keepJumpedPredictions, mergeMeetingSummaries, predictAll, raceJumped, recheckMeeting, recordResult, researchMeeting, type ResearchDeps } from './research.js';
 
 const meeting: MeetingSummary = { id: '2026-10-24:flemington', date: '2026-10-24', venue: 'Flemington', venueSlug: 'flemington', raceType: 'thoroughbred', sourceRefs: {}, sources: [] };
 
@@ -299,9 +299,12 @@ describe('collectAndRerate', () => {
 
   it('without a race list it checks every race that has jumped and describes mixed outcomes per race', async () => {
     const pack = makePack();
+    const r2 = structuredClone(pack.predictions[2]);
     const out = await collectAndRerate(deps({ a: report('a', [[3], [4], [1]]), b: report('b', [[3], [4], [1]]) }, at(45)), pack, job(), undefined, { automatic: true });
     expect(out).toEqual({ newly: [1], checked: [1, 2] }); // R2 jumped five minutes ago, no result yet
-    expect(pack.history.at(-1)?.summary).toBe('Automatic results check: R1 result in - Charlie (3) won; R2 re-rated');
+    // R2 has jumped: it keeps the picks it jumped with (they are what it will be scored on), so nothing is re-rated.
+    expect(pack.history.at(-1)?.summary).toBe('Automatic results check: R1 result in - Charlie (3) won');
+    expect(pack.predictions[2]).toEqual(r2);
     expect(pack.resultWatch?.[2]).toMatchObject({ attempts: 1, note: 'Nothing published yet', nextCheckAt: iso(46) });
     const again = await collectAndRerate(deps({ a: report('a', [[3], [4], [1]]), b: report('b', [[3], [4], [1]]) }, at(46)), pack, job(), undefined, { automatic: true });
     expect(again).toEqual({ newly: [], checked: [2] }); // R1 is settled and left alone
@@ -714,5 +717,117 @@ describe('meeting keys resolved by the sources', () => {
     await recheckMeeting(deps({}, at(-30), [fake]), pack, job(), 1);
     await collectAndRerate(deps({}, at(3), [fake]), pack, job(), [1]);
     expect(seen).toEqual(['race:X', 'results:X']);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// A race is scored on the picks it jumped with (review fixes)
+// ---------------------------------------------------------------------------
+
+/** A race-card source that answers with the pack's own race (true start time), optionally changed. */
+function sameCard(pack: MeetingPack, onCall: (n: number) => void, change: (raw: RaceRaw) => void = () => undefined): SourceAdapter {
+  return {
+    id: 'card',
+    name: 'card',
+    kind: 'official',
+    capabilities: ['racecard'],
+    fetchRace: async (_m, n, c) => {
+      onCall(n);
+      const r = pack.races.find((x) => x.number === n)!;
+      const raw = {
+        number: n,
+        name: r.name,
+        distance: r.distance,
+        startTime: r.startTime,
+        status: 'open',
+        sourceRefs: {},
+        runners: r.runners.map((x) => ({ number: x.number, name: x.name, barrier: x.barrier, jockey: x.jockey, trainer: x.trainer, weight: x.weight, scratched: x.scratched })),
+        source: 'card',
+        fetchedAt: c.now().toISOString(),
+      } as RaceRaw;
+      change(raw);
+      return raw;
+    },
+  };
+}
+
+describe('the picks a race jumped with', () => {
+  it('raceJumped: the scheduled start has passed or a feed says run or abandoned; "closed" alone only counts without a start time', () => {
+    expect(raceJumped(race(1, 0), at(-0.5))).toBe(false);
+    expect(raceJumped(race(1, 0), at(0))).toBe(true);
+    for (const status of ['interim', 'final', 'abandoned'] as const) expect(raceJumped(race(1, 10, { status }), at(0))).toBe(true);
+    // TAB calls a market suspended minutes before the jump (a late scratching) "closed": still to be re-rated.
+    expect(raceJumped(race(1, 10, { status: 'closed' }), at(0))).toBe(false);
+    expect(raceJumped(race(1, 0, { status: 'closed', startTime: undefined }), at(0))).toBe(true);
+    expect(raceJumped(race(1, 0, { status: 'open', startTime: undefined }), at(0))).toBe(false);
+  });
+
+  it('predictAll never re-rates a race that has jumped; one never rated before is rated for display, flagged and never scored', () => {
+    const pack = makePack3();
+    const r1 = structuredClone(pack.predictions[1]);
+    delete pack.predictions[2]; // say R2 was never rated
+    predictAll(pack, DEFAULT_SETTINGS, at(45)); // R1 jumped at 0, R2 at 40; R3 is still to run
+    expect(pack.predictions[1]).toEqual(r1);
+    expect(pack.predictions[2]).toMatchObject({ postJump: true, generatedAt: iso(45) });
+    expect(pack.predictions[2].confidence.notes[0]).toBe('Rated after this race had started - shown for reference only, not scored');
+    expect(pack.predictions[2].betting.notes[0]).toBe('Rated after this race had started - shown for reference only, not scored');
+    expect(pack.predictions[3].generatedAt).toBe(iso(45));
+    expect(pack.predictions[3].postJump).toBeUndefined();
+
+    recordResult(pack, 1, { raceNumber: 1, placings: [[2], [1], [3]], recordedAt: iso(46), source: 'a' });
+    recordResult(pack, 2, { raceNumber: 2, placings: [[2], [1], [3]], recordedAt: iso(46), source: 'a' });
+    expect(pack.results[1].scorecard).toBeDefined();
+    expect(pack.results[2].scorecard).toBeUndefined();
+    expect(pack.history.find((h) => h.raceNumber === 1)?.summary).toMatch(/our pick ranked \d/);
+    expect(pack.history.find((h) => h.raceNumber === 2)?.summary).not.toMatch(/our pick ranked/);
+  });
+
+  it('a pre-race check of a race that has jumped refreshes and re-rates nothing, and says so; a whole-card check only touches races still to run', async () => {
+    const pack = makePack3();
+    const before = structuredClone(pack.predictions);
+    const calls: number[] = [];
+    const src = () => [sameCard(pack, (n) => calls.push(n))];
+    const { changes } = await recheckMeeting(deps({}, at(45), src()), pack, job(), 2);
+    expect(calls).toEqual([]);
+    expect(changes).toEqual([]);
+    expect(pack.predictions).toEqual(before);
+    expect(pack.history.at(-1)?.summary).toBe('Pre-race check R2: the race has started - picks left as they were at the jump');
+
+    await recheckMeeting(deps({}, at(46), src()), pack, job());
+    expect(calls).toEqual([3]);
+    expect(pack.predictions[1]).toEqual(before[1]);
+    expect(pack.predictions[2]).toEqual(before[2]);
+    expect(pack.predictions[3].generatedAt).toBe(iso(46));
+    expect(pack.races[2].fetchedAt).toBe(iso(46));
+    expect(pack.races[1].fetchedAt).toBe(iso(-60));
+  });
+
+  it('a result that lands after a later race jumped re-rates only the races still to run', async () => {
+    const pack = makePack3();
+    const before = structuredClone(pack.predictions);
+    await collectAndRerate(deps({ a: report('a', [[2], [1], [3]]) }, at(41)), pack, job(), [1], { automatic: true });
+    expect(pack.predictions[2]).toEqual(before[2]); // R2 jumped a minute ago
+    expect(pack.predictions[3].generatedAt).toBe(iso(41));
+    expect(pack.history.at(-1)?.summary).toBe('Automatic results check: R1 result in - Bravo (2) won; R3 re-rated');
+  });
+
+  it('keepJumpedPredictions carries the picks of races that have run or jumped, but not over a fresh rating made before the jump', () => {
+    const old = makePack3(); // rated at -60
+    old.results[1] = { raceNumber: 1, placings: [[2], [1], [3]], recordedAt: iso(5), source: 'a' };
+    const fresh = makePack3();
+    predictAll(fresh, DEFAULT_SETTINGS, at(39)); // R2 and R3 rated afresh a minute before R2's jump (research ran across it)
+    const r2 = structuredClone(fresh.predictions[2]);
+    fresh.predictions[1] = { ...fresh.predictions[1], generatedAt: iso(50) }; // R1 rated after it ran
+    expect(keepJumpedPredictions(old, fresh, at(50))).toEqual([1]);
+    expect(fresh.predictions[1]).toEqual(old.predictions[1]);
+    expect(fresh.predictions[2]).toEqual(r2);
+    expect(keepJumpedPredictions(undefined, fresh, at(50))).toEqual([]);
+  });
+
+  it('dead heats: a horse finishes one place behind the number of horses ahead of it', () => {
+    const pack = makePack();
+    recordResult(pack, 1, { raceNumber: 1, placings: [[4], [2, 3], [1]], recordedAt: iso(3), source: 'a' });
+    const pos = Object.fromEntries(pack.races[0].runners.map((r) => [r.number, r.finishingPosition]));
+    expect(pos).toEqual({ 4: 1, 2: 2, 3: 2, 1: 4 });
   });
 });

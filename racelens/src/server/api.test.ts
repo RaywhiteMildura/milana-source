@@ -8,6 +8,7 @@ import { createApp } from './app.js';
 import { DEMO_DATE, DEMO_MEETING_ID, DEMO_VENUE_SLUG } from './adapters/demo/index.js';
 import { dueResultChecks } from './jobs/research.js';
 import { EXCLUSIVE_WAIT_MS } from './jobs/manager.js';
+import { scorePrediction } from './core/scorecard.js';
 
 /**
  * End-to-end API test in demo mode: discovery → research job → pack →
@@ -130,10 +131,14 @@ describe('RaceLens API (demo mode)', () => {
       expect(pack.races.find((r) => r.number === n)!.status).toBe('final');
     }
     expect(pack.dayPatterns.length).toBeGreaterThan(0);
-    // Later races carry the patterns and have change notes
-    const remaining = pack.races.filter((r) => !pack.results[r.number]);
+    // Races still to run carry the patterns and have change notes; races that jumped without a result yet keep the picks they jumped with.
+    const clockNow = Date.parse(`${DEMO_DATE}T15:30:00.000+11:00`);
+    const remaining = pack.races.filter((r) => !pack.results[r.number] && Date.parse(r.startTime!) > clockNow);
     expect(remaining.length).toBeGreaterThan(0);
     expect(pack.predictions[remaining[0].number].dayPatternsApplied.length).toBeGreaterThan(0);
+    const jumped = pack.races.filter((r) => !pack.results[r.number] && Date.parse(r.startTime!) <= clockNow);
+    expect(jumped.map((r) => r.number)).toEqual([4, 5, 6]);
+    for (const r of jumped) expect(Date.parse(pack.predictions[r.number].generatedAt)).toBeLessThan(Date.parse(r.startTime!));
     expect(pack.history.filter((h) => h.type === 'results').length).toBeGreaterThanOrEqual(3);
   });
 
@@ -366,5 +371,99 @@ describe('RaceLens API on race day (demo mode, moving clock)', () => {
     } finally {
       jobs.exclusiveWaitMs = EXCLUSIVE_WAIT_MS;
     }
+  });
+});
+
+/**
+ * A race is scored on the picks it jumped with. Re-running research after races have run, a manual result and a
+ * meeting first researched mid-afternoon must never replace or re-rate those picks. Demo race times (Melbourne,
+ * +11): R1 12:25, R2 13:00, R3 13:35, R4 14:10, R5 14:45 …; results exist for R1–R3.
+ */
+describe('RaceLens API: the picks each race jumped with (demo mode, moving clock)', () => {
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'racelens-jumped-'));
+  const t = (hhmm: string) => new Date(`${DEMO_DATE}T${hhmm}:00.000+11:00`);
+  let clock = t('09:00');
+  const built = createApp({ mode: 'demo', dataDir, now: () => clock });
+  const { app, store, jobs } = built;
+  const id = DEMO_MEETING_ID;
+  const startOf = (p: MeetingPack, n: number) => Date.parse(p.races.find((r) => r.number === n)!.startTime!);
+
+  afterAll(() => {
+    built.scheduler.stop();
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  });
+
+  async function research(): Promise<void> {
+    const start = await request(app).post('/api/research').send({ date: DEMO_DATE, venueSlug: DEMO_VENUE_SLUG }).expect(200);
+    expect((await jobs.wait(start.body.jobId, 60_000)).status).toBe('done');
+  }
+
+  it('re-running research after races have run keeps their pre-race predictions and scores every result against them', async () => {
+    await research();
+    clock = t('13:05'); // R1 and R2 have run
+    const c = await request(app).post(`/api/packs/${encodeURIComponent(id)}/results`).send({ catchup: true }).expect(200);
+    expect((await jobs.wait(c.body.jobId, 60_000)).status).toBe('done');
+    clock = t('14:15'); // R3 has run (its result is not in the pack yet), R4 jumped five minutes ago
+    const before = store.getPack(id)!;
+    expect(Object.keys(before.results).map(Number)).toEqual([1, 2]);
+
+    await research();
+    const after = store.getPack(id)!;
+    for (const n of [1, 2, 3, 4]) {
+      expect(after.predictions[n]).toEqual(before.predictions[n]); // same generatedAt, picks and betting plan
+      expect(Date.parse(after.predictions[n].generatedAt)).toBeLessThan(startOf(after, n));
+    }
+    for (const n of [1, 2]) expect(after.results[n].scorecard).toEqual(before.results[n].scorecard);
+    // R3's result came in with the re-run: scored on the picks R3 jumped with, and its history line says so.
+    expect(after.results[3].scorecard).toEqual(scorePrediction(before.predictions[3], after.results[3]));
+    expect(after.history.some((h) => h.raceNumber === 3 && h.summary.includes(`our pick ranked ${after.results[3].scorecard!.winnerRank}`))).toBe(true);
+    // The races still to run are rated afresh.
+    for (const n of [5, 6, 7, 8, 9]) expect(after.predictions[n].generatedAt).toBe(clock.toISOString());
+    expect(Object.values(after.predictions).some((p) => p.postJump)).toBe(false);
+  });
+
+  it('a meeting first researched mid-afternoon rates the races already run for display only: flagged, never scored', async () => {
+    await request(app).delete(`/api/packs/${encodeURIComponent(id)}`).expect(200);
+    await research(); // still 14:15
+    const pack = store.getPack(id)!;
+    for (const n of [1, 2, 3, 4]) {
+      expect(pack.predictions[n]).toMatchObject({ postJump: true, generatedAt: clock.toISOString() });
+      expect(pack.predictions[n].confidence.notes[0]).toMatch(/^Rated after this race had started/);
+    }
+    for (const n of [5, 6, 7, 8, 9]) expect(pack.predictions[n].postJump).toBeUndefined();
+    for (const n of [1, 2, 3]) {
+      expect(pack.results[n]).toBeDefined();
+      expect(pack.results[n].scorecard).toBeUndefined();
+    }
+    expect(pack.history.some((h) => /our pick ranked/.test(h.summary))).toBe(false);
+  });
+
+  it('a result typed in by hand re-rates only the races still to run, not one that has jumped', async () => {
+    clock = t('14:50'); // R5 jumped at 14:45 and has no result
+    const before = store.getPack(id)!;
+    const r4 = before.races.find((r) => r.number === 4)!;
+    const active = r4.runners.filter((r) => !r.scratched).map((r) => r.number);
+    const res = await request(app)
+      .post(`/api/packs/${encodeURIComponent(id)}/results/manual`)
+      .send({ raceNumber: 4, placings: [[active[0]], [active[1]], [active[2]]] })
+      .expect(200);
+    const after: MeetingPack = res.body;
+    expect(after.results[4].source).toBe('manual');
+    expect(after.results[4].scorecard).toBeUndefined(); // R4 was first rated after its jump
+    for (const n of [1, 2, 3, 4, 5]) expect(after.predictions[n]).toEqual(before.predictions[n]);
+    for (const n of [6, 7, 8, 9]) expect(after.predictions[n].generatedAt).toBe(clock.toISOString());
+  });
+
+  it('a damaged pack file is served from its backup, so re-running research still keeps the day\'s results', async () => {
+    const file = path.join(dataDir, 'packs', `${encodeURIComponent(id)}.json`);
+    const good = store.getPack(id)!;
+    fs.writeFileSync(file, fs.readFileSync(file, 'utf8').slice(0, 5000)); // a torn write
+    const served: MeetingPack = (await request(app).get(`/api/packs/${encodeURIComponent(id)}`).expect(200)).body;
+    expect(Object.keys(served.results).length).toBeGreaterThanOrEqual(3); // the previous save: R1–R3 at least
+    await research();
+    const after = store.getPack(id)!;
+    for (const n of Object.keys(served.results).map(Number)) expect(after.results[n]).toBeDefined();
+    expect(after.history.length).toBeGreaterThan(served.history.length);
+    expect(good.results[4]).toBeDefined();
   });
 });

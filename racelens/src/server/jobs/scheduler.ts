@@ -1,12 +1,15 @@
 import type { MeetingPack, SchedulerStatus } from '../../shared/types.js';
 import type { Store } from '../store/store.js';
 import type { JobManager } from './manager.js';
-import { collectAndRerate, dueResultChecks, isResultSettled, recheckMeeting, skipResultsJob, type ResearchDeps } from './research.js';
+import { collectAndRerate, dueResultChecks, isResultSettled, raceJumped, recheckMeeting, skipResultsJob, type ResearchDeps } from './research.js';
 
 /**
  * Background scheduler. Every minute it looks at the saved packs for the
  * current race days and
  *
+ *  - race morning onwards: refreshes the whole card (every race still to run)
+ *    about once an hour from 07:30 track time, so a morning scratching or rider
+ *    change reaches the picks hours before that race's own checks (cardRefreshDue),
  *  - pre-race: runs a recheck for any race that jumps within
  *    `autoRecheckMinutesBeforeRace` minutes (once on entering the window, once
  *    inside the final three minutes), and
@@ -50,6 +53,43 @@ export { dueResultChecks };
 /** After a results job for a meeting fails (e.g. the disk is full), the scheduler leaves that meeting alone this long before trying again. */
 export const RESULTS_RETRY_MS = 5 * 60_000;
 
+/** Race-day refresh of the whole card: at most this often per meeting, and only once the card is this old. */
+export const CARD_REFRESH_MS = 60 * 60_000;
+/** Track-local time (HH:MM) from which the race-day card refreshes run. */
+export const CARD_REFRESH_FROM = '07:30';
+/** No card refresh this close to a jump: that race's own pre-race checks are due and must not queue behind it. */
+export const CARD_REFRESH_QUIET_MS = 15 * 60_000;
+
+/** Calendar date (YYYY-MM-DD) and 24-hour time (HH:MM) at `now` in an IANA time zone. */
+function localClock(now: Date, timeZone: string): { date: string; time: string } {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now);
+  const v = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+  return { date: `${v('year')}-${v('month')}-${v('day')}`, time: `${v('hour')}:${v('minute')}` };
+}
+
+/**
+ * Whether the race-day refresh of every race still to run is due. Pure. Due on the meeting's own date from 07:30
+ * track time while a race is still to run, once the oldest race card among those races was fetched an hour ago or
+ * more (so a pack researched the night before is refreshed on the first tick after 07:30, and a fresh one an hour
+ * after its research) – never within 15 minutes of a jump. The scheduler adds the at-most-hourly limit per meeting.
+ */
+export function cardRefreshDue(pack: MeetingPack, now: Date): boolean {
+  const { date, time } = localClock(now, pack.meeting.timezone || 'Australia/Melbourne');
+  if (date !== pack.meeting.date || time < CARD_REFRESH_FROM) return false;
+  const t = now.getTime();
+  const toRun = pack.races.filter((r) => !pack.results[r.number] && r.status !== 'abandoned' && !raceJumped(r, now));
+  if (!toRun.length) return false;
+  if (toRun.some((r) => Date.parse(r.startTime ?? '') - t < CARD_REFRESH_QUIET_MS)) return false;
+  const oldest = Math.min(...toRun.map((r) => Date.parse(r.fetchedAt) || 0));
+  return t - oldest >= CARD_REFRESH_MS;
+}
+
+const RECHECK_STEPS: Array<[string, string]> = [
+  ['results', 'Results so far'],
+  ['patterns', 'Day patterns'],
+  ['repredict', 'Re-rating'],
+];
+
 export class AutoRecheckScheduler {
   private timer?: NodeJS.Timeout;
   private firstTimer?: NodeJS.Timeout;
@@ -64,6 +104,8 @@ export class AutoRecheckScheduler {
   private resultsFailedAt = new Map<string, number>();
   /** Said once that results are due but no results source is enabled (instead of starting a pointless job every minute). */
   private warnedNoResultsSource = false;
+  /** When the last race-day card refresh of each meeting was started (also one that failed): at most one per CARD_REFRESH_MS. */
+  private cardRefreshedAt = new Map<string, number>();
 
   constructor(private readonly deps: SchedulerDeps) {}
 
@@ -146,7 +188,13 @@ export class AutoRecheckScheduler {
     return due;
   }
 
-  /** One pass over the saved packs. Returns the number of jobs started (pre-race rechecks plus results checks). */
+  /** At most one race-day card refresh per meeting per CARD_REFRESH_MS (a clock set back counts as "long ago"). */
+  private cardRefreshAllowed(packId: string, now: Date): boolean {
+    const last = this.cardRefreshedAt.get(packId);
+    return last === undefined || now.getTime() < last || now.getTime() - last >= CARD_REFRESH_MS;
+  }
+
+  /** One pass over the saved packs. Returns the number of jobs started (race-day refreshes, pre-race rechecks and results checks). */
   async tick(): Promise<number> {
     const now = this.deps.now?.() ?? new Date();
     const settings = this.deps.store.getSettings();
@@ -159,13 +207,11 @@ export class AutoRecheckScheduler {
     // Pre-race checks concern meetings on today's or tomorrow's local date; results concern today's or yesterday's.
     const preRaceDates = localDates(now, [0, 1]);
     const resultDates = localDates(now, [-1, 0]);
+    const active = this.deps.jobs.list().filter((j) => (j.status === 'queued' || j.status === 'running') && j.meetingId);
     // One results job per meeting at a time: a queued or running one will see the same races.
-    const activeResults = new Set(
-      this.deps.jobs
-        .list()
-        .filter((j) => j.type === 'results' && (j.status === 'queued' || j.status === 'running') && j.meetingId)
-        .map((j) => j.meetingId as string),
-    );
+    const activeResults = new Set(active.filter((j) => j.type === 'results').map((j) => j.meetingId as string));
+    // Meetings with any job queued or running (or started by this tick): the race-day card refresh waits for them.
+    const busy = new Set(active.map((j) => j.meetingId as string));
     for (const item of this.deps.store.listPacks()) {
       const wantPreRace = preRaceDates.has(item.meeting.date);
       const wantResults = autoResults && resultDates.has(item.meeting.date);
@@ -176,10 +222,18 @@ export class AutoRecheckScheduler {
       if (wantPreRace) {
         for (const raceNumber of this.dueRaces(pack, now, minutes)) {
           started++;
+          busy.add(pack.id);
           this.deps.log?.info(`Auto pre-race check: ${pack.meeting.venue} R${raceNumber}`);
-          this.deps.jobs.start('recheck', { meetingId: pack.id, raceNumber, plannedSteps: [['results', 'Results so far'], ['patterns', 'Day patterns'], ['repredict', 'Re-rating']] }, async (job) => {
+          this.deps.jobs.start('recheck', { meetingId: pack.id, raceNumber, plannedSteps: RECHECK_STEPS }, async (job) => {
             const latest = this.deps.store.getPack(pack.id);
             if (!latest) return; // deleted meanwhile
+            // Queued behind a long job until after the jump: the race keeps the picks it jumped with.
+            const race = latest.races.find((r) => r.number === raceNumber);
+            if (!race || raceJumped(race, this.deps.now?.() ?? new Date())) {
+              this.deps.log?.info(`Auto pre-race check skipped: ${pack.meeting.venue} R${raceNumber} has already jumped`);
+              skipResultsJob(job, `R${raceNumber} has already jumped - picks left as they were`);
+              return;
+            }
             try {
               await recheckMeeting(this.deps.researchDeps(), latest, job, raceNumber);
               const last = latest.history[latest.history.length - 1];
@@ -187,6 +241,32 @@ export class AutoRecheckScheduler {
               if (this.deps.store.getPack(pack.id)) this.deps.store.savePack(latest);
             } catch (err) {
               this.deps.log?.warn(`Auto pre-race check failed: ${pack.meeting.venue} R${raceNumber}: ${errorText(err)}`);
+              throw err;
+            }
+          });
+        }
+        // The race-day card refresh only runs with automatic pre-race checks on, never alongside another job of the
+        // meeting, and after any results check that is due (that one goes first, the refresh on a later tick).
+        if (minutes > 0 && !busy.has(pack.id) && this.cardRefreshAllowed(pack.id, now) && cardRefreshDue(pack, now) && !(wantResults && dueResultChecks(pack, now, settings).length)) {
+          started++;
+          busy.add(pack.id);
+          this.cardRefreshedAt.set(pack.id, now.getTime());
+          this.deps.log?.info(`Race-day refresh: ${pack.meeting.venue} (every race still to run)`);
+          this.deps.jobs.start('recheck', { meetingId: pack.id, plannedSteps: RECHECK_STEPS }, async (job) => {
+            const latest = this.deps.store.getPack(pack.id);
+            if (!latest) return; // deleted meanwhile
+            // Re-read at run time: a research or pre-race check may have refreshed the card meanwhile.
+            if (!cardRefreshDue(latest, this.deps.now?.() ?? new Date())) {
+              skipResultsJob(job, 'The race cards are up to date');
+              return;
+            }
+            try {
+              await recheckMeeting(this.deps.researchDeps(), latest, job);
+              const last = latest.history[latest.history.length - 1];
+              if (last) last.summary = last.summary.replace(/^Pre-race check \(all remaining\)/, 'Automatic race-day refresh (every race still to run)');
+              if (this.deps.store.getPack(pack.id)) this.deps.store.savePack(latest);
+            } catch (err) {
+              this.deps.log?.warn(`Race-day refresh failed: ${pack.meeting.venue}: ${errorText(err)}`);
               throw err;
             }
           });

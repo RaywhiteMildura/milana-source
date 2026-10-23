@@ -476,6 +476,11 @@ export interface Prediction {
   /** Diff versus the previous prediction for this race (pre-race recheck) */
   changes?: string[];
   modelVersion: string;
+  /**
+   * Rated after the race had jumped (a meeting first researched after it ran): shown for reference only, never
+   * scored and left out of the "our pick ranked N" tally.
+   */
+  postJump?: boolean;
 }
 
 export interface RaceResult {

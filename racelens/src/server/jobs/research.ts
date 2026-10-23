@@ -23,7 +23,7 @@ import { predictRace } from '../core/model.js';
 import { summariseRaceMarket } from '../core/market.js';
 import { detectDayPatterns } from '../core/daypatterns.js';
 import { matchNews } from '../core/news.js';
-import { scorePrediction } from '../core/scorecard.js';
+import { positionsByRunner, scorePrediction } from '../core/scorecard.js';
 import { mapLimit, sleep, withTimeout } from '../core/http.js';
 
 /**
@@ -516,14 +516,37 @@ function dedupeNews(items: NewsItem[]): NewsItem[] {
   return out;
 }
 
+/**
+ * Whether a race has jumped: its scheduled start has passed, or a feed reports it run (interim / final) or
+ * abandoned. "closed" counts only for a race without a start time: TAB reports a market suspended minutes before
+ * the jump (often for a late scratching) as closed, and that pre-race check must still re-rate the race.
+ */
+export function raceJumped(race: Pick<Race, 'startTime' | 'status'>, now: Date): boolean {
+  if (race.status === 'interim' || race.status === 'final' || race.status === 'abandoned') return true;
+  const start = race.startTime ? Date.parse(race.startTime) : NaN;
+  if (Number.isFinite(start)) return now.getTime() >= start;
+  return race.status === 'closed';
+}
+
+/**
+ * Whether a race may be (re-)rated now. A race is scored on the picks it jumped with, so once it has a result or
+ * has jumped it is never re-rated; one with no prediction at all (a meeting first researched after it ran) still
+ * gets one for display, flagged postJump. Abandoned races are never rated.
+ */
+export function rateable(pack: MeetingPack, race: Race, now: Date): boolean {
+  if (race.status === 'abandoned' || pack.results[race.number]) return false;
+  return !pack.predictions[race.number] || !raceJumped(race, now);
+}
+
+const POST_JUMP_NOTE = 'Rated after this race had started - shown for reference only, not scored';
+
 export function predictAll(pack: MeetingPack, settings: Settings, now: Date, onlyRaces?: number[]): void {
   for (const race of pack.races) {
     if (onlyRaces && !onlyRaces.includes(race.number)) continue;
-    if (race.status === 'abandoned') continue;
-    if (pack.results[race.number]) continue; // never re-predict a finished race
+    if (!rateable(pack, race, now)) continue; // never re-predict a finished, jumped or abandoned race
     race.runners = summariseRaceMarket(race.runners); // keep consensus odds on the saved runners for the UI
     const previous = pack.predictions[race.number];
-    pack.predictions[race.number] = predictRace(race, {
+    const prediction = predictRace(race, {
       venueSlug: pack.meeting.venueSlug,
       weather: pack.weather,
       news: pack.news,
@@ -532,11 +555,39 @@ export function predictAll(pack: MeetingPack, settings: Settings, now: Date, onl
       now,
       previous,
     });
+    if (raceJumped(race, now)) {
+      prediction.postJump = true;
+      prediction.confidence.notes = [POST_JUMP_NOTE, ...prediction.confidence.notes];
+      prediction.betting.notes = [POST_JUMP_NOTE, ...prediction.betting.notes];
+    }
+    pack.predictions[race.number] = prediction;
   }
 }
 
-/** Full research of a meeting. */
-export async function researchMeeting(deps: ResearchDeps, meeting: MeetingSummary, job: JobHandle): Promise<MeetingPack> {
+/**
+ * Carry the predictions of the races that have run (a result in either pack) or jumped from an earlier pack of the
+ * meeting into a newer one: a race is scored on the picks it jumped with, never on a rating made afterwards. A fresh
+ * rating made before the jump (the race started while research ran) is kept instead. Returns the races carried.
+ */
+export function keepJumpedPredictions(previous: MeetingPack | undefined, pack: MeetingPack, now: Date): number[] {
+  const kept: number[] = [];
+  for (const [n, prediction] of Object.entries(previous?.predictions ?? {})) {
+    const raceNumber = Number(n);
+    const race = pack.races.find((r) => r.number === raceNumber);
+    const before = previous!.races.find((r) => r.number === raceNumber);
+    const resulted = !!previous!.results[raceNumber] || !!pack.results[raceNumber];
+    if (!resulted && !(race && raceJumped(race, now)) && !(before && raceJumped(before, now))) continue;
+    const fresh = pack.predictions[raceNumber];
+    const start = Date.parse(race?.startTime ?? '');
+    if (!resulted && fresh && !fresh.postJump && Number.isFinite(start) && Date.parse(fresh.generatedAt) < start) continue;
+    pack.predictions[raceNumber] = prediction;
+    kept.push(raceNumber);
+  }
+  return kept;
+}
+
+/** Full research of a meeting. `previous` is the meeting's saved pack, if any: races that have run keep its picks. */
+export async function researchMeeting(deps: ResearchDeps, meeting: MeetingSummary, job: JobHandle, previous?: MeetingPack): Promise<MeetingPack> {
   const now = deps.now?.() ?? new Date();
   const statuses: SourceStatus[] = [];
 
@@ -593,15 +644,19 @@ export async function researchMeeting(deps: ResearchDeps, meeting: MeetingSummar
   };
 
   // Rate every race first so races that have already been run get a scorecard, then learn from those results.
+  // Races that have run or jumped keep the picks an earlier research gave them; a race first rated after its jump
+  // is flagged postJump and never scored.
+  const kept = keepJumpedPredictions(previous, pack, now);
+  const toRate = pack.races.map((r) => r.number).filter((n) => !kept.includes(n));
   job.start('predict', 'Rating every race and building betting structures');
-  predictAll(pack, deps.settings, now);
-  job.finish('predict', 'done', `${Object.keys(pack.predictions).length} races predicted`);
+  predictAll(pack, deps.settings, now, toRate);
+  job.finish('predict', 'done', `${Object.keys(pack.predictions).length - kept.length} races predicted${kept.length ? `; R${kept.join(', R')} kept the picks made before the jump` : ''}`);
 
   await collectResults(deps, pack, job, true);
   pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
   if (pack.dayPatterns.length) {
     job.start('patterns', 'Applying patterns from today\'s results to the remaining races');
-    predictAll(pack, deps.settings, now);
+    predictAll(pack, deps.settings, now, toRate);
     job.finish('patterns', 'done', pack.dayPatterns.map((p) => p.label).join('; '));
   }
 
@@ -958,7 +1013,7 @@ export async function collectAndRerate(deps: ResearchDeps, pack: MeetingPack, jo
     pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
     const resulted = Object.keys(pack.results).length;
     job.finish('patterns', 'done', pack.dayPatterns.length ? pack.dayPatterns.map((p) => p.label).join('; ') : `No strong patterns yet (${resulted} result${resulted === 1 ? '' : 's'} in)`);
-    rerated = pack.races.filter((r) => !pack.results[r.number] && r.status !== 'abandoned').map((r) => r.number);
+    rerated = pack.races.filter((r) => rateable(pack, r, now)).map((r) => r.number); // races that have jumped keep their picks
     job.start('repredict', 'Re-rating');
     predictAll(pack, deps.settings, now, rerated);
     job.finish('repredict', 'done', rerated.length ? `${rerated.length} race${rerated.length === 1 ? '' : 's'} re-rated` : 'No races left to rate');
@@ -991,19 +1046,27 @@ export async function collectAndRerate(deps: ResearchDeps, pack: MeetingPack, jo
   return { newly, checked };
 }
 
+/** (Re-)score a race's recorded result against its prediction. A prediction made after the jump is never scored. */
+export function scoreResult(pack: MeetingPack, raceNumber: number): void {
+  const result = pack.results[raceNumber];
+  const prediction = pack.predictions[raceNumber];
+  if (!result) return;
+  if (prediction?.postJump) delete result.scorecard;
+  else if (prediction) result.scorecard = scorePrediction(prediction, result);
+}
+
 export function recordResult(pack: MeetingPack, raceNumber: number, result: RaceResult, kind: ResultKind = 'new', opts: { history?: boolean } = {}): void {
   const race = pack.races.find((r) => r.number === raceNumber);
-  const prediction = pack.predictions[raceNumber];
   const stored: RaceResult = { ...result, raceNumber, status: result.status || 'final', recordedAt: result.recordedAt || new Date().toISOString() };
-  if (prediction) stored.scorecard = scorePrediction(prediction, stored);
   pack.results[raceNumber] = stored;
+  scoreResult(pack, raceNumber);
   if (race) {
     race.status = stored.status === 'interim' ? 'interim' : 'final';
     race.results = stored.placings;
-    for (const r of race.runners) {
-      const pos = stored.placings.findIndex((slot) => slot.includes(r.number));
-      r.finishingPosition = pos >= 0 ? pos + 1 : r.finishingPosition;
-    }
+    // One slot per finishing position, dead heats sharing one: a horse's position is one more than the number of
+    // horses ahead of it, so [[4],[2,7],[9]] puts 2 and 7 second and 9 fourth (the rule scorePrediction uses).
+    const positions = positionsByRunner(stored.placings);
+    for (const r of race.runners) r.finishingPosition = positions.get(r.number)?.[0] ?? r.finishingPosition;
   }
   if (opts.history === false) return;
   const who = describeWinner(pack, stored);
@@ -1024,7 +1087,10 @@ export function recordResult(pack: MeetingPack, raceNumber: number, result: Race
 export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job: JobHandle, raceNumber?: number): Promise<{ changes: string[]; refreshed: number[] }> {
   const now = deps.now?.() ?? new Date();
   const adapters = deps.registry.withCapability('racecard', deps.settings.disabledSources);
-  const targets = pack.races.filter((r) => !pack.results[r.number] && r.status !== 'abandoned' && (raceNumber ? r.number === raceNumber : true));
+  // Races that have jumped keep the card and the picks they jumped with: they are neither refreshed nor re-rated.
+  const targets = pack.races.filter((r) => rateable(pack, r, now) && (raceNumber ? r.number === raceNumber : true));
+  const asked = raceNumber ? pack.races.find((r) => r.number === raceNumber) : undefined;
+  const alreadyJumped = !!asked && !pack.results[asked.number] && asked.status !== 'abandoned' && !targets.length;
   const changes: string[] = [];
   const refreshed: number[] = [];
 
@@ -1101,15 +1167,15 @@ export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job:
   job.finish('patterns', 'done', pack.dayPatterns.length ? pack.dayPatterns.map((p) => p.label).join('; ') : `No strong patterns yet (${Object.keys(pack.results).length} result${Object.keys(pack.results).length === 1 ? '' : 's'} in)`);
 
   // Race-day rain still to come, for the expected going (at most every 30 minutes, best effort).
-  if (pack.races.some((r) => !pack.results[r.number] && r.status !== 'abandoned')) await refreshWeather(deps, pack, job, now);
+  if (pack.races.some((r) => rateable(pack, r, now))) await refreshWeather(deps, pack, job, now);
 
   // 3. Re-predict -------------------------------------------------------------
   job.start('repredict', 'Re-rating with the latest information');
   const previous: Record<number, Prediction> = { ...pack.predictions };
   // A result that arrived in this check re-rates every race still to be run, as the watcher would.
-  const toPredict = raceNumber && !newly.length ? [raceNumber] : pack.races.filter((r) => !pack.results[r.number] && r.status !== 'abandoned').map((r) => r.number);
+  const toPredict = pack.races.filter((r) => (raceNumber && !newly.length ? r.number === raceNumber : true) && rateable(pack, r, now)).map((r) => r.number);
   predictAll(pack, deps.settings, now, toPredict);
-  for (const n of raceNumber ? [raceNumber] : toPredict) {
+  for (const n of toPredict.filter((x) => !raceNumber || x === raceNumber)) {
     const p = pack.predictions[n];
     if (p?.changes?.length) changes.push(...p.changes.map((c) => `R${n}: ${c}`));
     else if (p && previous[n]) p.changes = p.changes || [];
@@ -1124,10 +1190,10 @@ export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job:
     at: now.toISOString(),
     type: 'recheck',
     raceNumber,
-    summary: raceNumber ? `Pre-race check R${raceNumber}: ${changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'}` : 'no changes'}${newly.length ? `, results in for R${newly.join(', R')}` : ''}` : `Pre-race check (all remaining): ${changes.length} change${changes.length === 1 ? '' : 's'}${newly.length ? `, results in for R${newly.join(', R')}` : ''}`,
+    summary: raceNumber ? `Pre-race check R${raceNumber}: ${alreadyJumped ? 'the race has started - picks left as they were at the jump' : changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'}` : 'no changes'}${newly.length ? `, results in for R${newly.join(', R')}` : ''}` : `Pre-race check (all remaining): ${changes.length} change${changes.length === 1 ? '' : 's'}${newly.length ? `, results in for R${newly.join(', R')}` : ''}`,
     changes,
   });
-  job.message(changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'} found` : 'No changes – picks stand');
+  job.message(changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'} found` : alreadyJumped ? 'The race has started – picks left as they were' : 'No changes – picks stand');
   return { changes, refreshed };
 }
 
