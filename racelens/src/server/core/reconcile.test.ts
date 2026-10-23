@@ -219,3 +219,181 @@ describe('source priority and sticky scratchings', () => {
     expect(mr.trainer).toBe('C. Maher & D. Eustace');
   });
 });
+
+const FIELD = ['Alpine Echo', 'Brave Lass', 'Copper Coast', 'Dusty Road', 'Ember Glow', 'Flying Kite', 'Golden Mile', 'Harbour Lights'];
+const field = (over: (r: RunnerRaw, i: number) => Partial<RunnerRaw> = () => ({})): RunnerRaw[] =>
+  FIELD.map((name, i) => {
+    const r: RunnerRaw = { number: i + 1, name, barrier: i + 1 };
+    return { ...r, ...over(r, i) };
+  });
+const ra = (runners: RunnerRaw[]) => ({ source: 'racingaustralia', weight: 1, race: race('racingaustralia', runners) });
+const rc = (runners: RunnerRaw[]) => ({ source: 'racingcom', weight: 1, race: race('racingcom', runners) });
+const bookie = (source: 'tab' | 'sportsbet' | 'entain', runners: RunnerRaw[]) => ({ source, weight: 0.65, race: race(source, runners) });
+
+describe('form lines across sources that spell tracks differently', () => {
+  it('keeps one line per race date, newest first, with the official spelling and gaps filled', () => {
+    const r = reconcileRace([
+      bookie('sportsbet', [
+        {
+          number: 1,
+          name: 'X',
+          form: [
+            { date: '2026-08-30', venue: 'Randwick', distance: 1300, position: 5, starters: 14, raceClass: 'BM78' },
+            { date: '2026-09-20', venue: 'Moonee Valley', distance: 1200, position: 1, starters: 9, raceClass: 'BM70' },
+            { date: '2026-10-10', venue: 'Sandown', distance: 1400, position: 2, starters: 10, raceClass: 'BM84' },
+          ],
+        },
+      ]),
+      rc([
+        {
+          number: 1,
+          name: 'X',
+          form: [
+            { date: '2026-10-10', venue: 'Sandown Lakeside', distance: 1400, position: 2, starters: 10, margin: 0.5, startingPrice: 6, inRunning: '4-3' },
+            { date: '2026-09-20', venue: 'The Valley', distance: 1200, position: 1, starters: 9, margin: 0, startingPrice: 3.2 },
+            { date: '2026-08-30', venue: 'Royal Randwick', distance: 1300, position: 5, starters: 14, margin: 4.1 },
+          ],
+        },
+      ]),
+      ra([
+        {
+          number: 1,
+          name: 'X',
+          form: [
+            { date: '2026-10-10', venue: 'SAND', distance: 1400, position: 2, starters: 10 },
+            { date: '2026-09-20', venue: 'Moonee Valley', distance: 1200, position: 1, starters: 9 },
+            { date: '2026-08-30', venue: 'Randwick', distance: 0, position: 5, starters: 0 },
+          ],
+        },
+      ]),
+    ]);
+    const form = r.runners[0].form;
+    expect(form).toHaveLength(3);
+    expect(form.map((f) => f.date)).toEqual(['2026-10-10', '2026-09-20', '2026-08-30']);
+    expect(form.map((f) => f.venue)).toEqual(['SAND', 'Moonee Valley', 'Randwick']); // heaviest source's spelling
+    expect(form.every((f) => f.source === 'racingaustralia')).toBe(true);
+    expect(form[0]).toMatchObject({ margin: 0.5, startingPrice: 6, inRunning: '4-3', raceClass: 'BM84' }); // filled from lighter sources
+    expect(form[2]).toMatchObject({ distance: 1300, starters: 14 }); // 0 = unknown, so filled too
+  });
+
+  it('keeps one line for a date even when distances disagree, and does not mix in the far-out line', () => {
+    const r = reconcileRace([
+      ra([{ number: 1, name: 'X', form: [{ date: '2026-10-10', venue: 'Flemington', distance: 1200, position: 3, starters: 12 }] }]),
+      bookie('sportsbet', [{ number: 1, name: 'X', form: [{ date: '2026-10-10', venue: 'Flemington', distance: 1600, position: 3, starters: 12, margin: 2 }] }]),
+    ]);
+    expect(r.runners[0].form).toHaveLength(1);
+    expect(r.runners[0].form[0].distance).toBe(1200);
+    expect(r.runners[0].form[0].margin).toBeUndefined();
+  });
+
+  it('still separates undated lines by venue and distance', () => {
+    const r = reconcileRace([
+      ra([{ number: 1, name: 'X', form: [{ date: '', venue: 'Flemington', distance: 1200, position: 3, starters: 12 }, { date: '', venue: 'Caulfield', distance: 1400, position: 1, starters: 9 }] }]),
+    ]);
+    expect(r.runners[0].form).toHaveLength(2);
+  });
+});
+
+describe('scratchings against an official source still showing the horse', () => {
+  const vote = (scratched: boolean) => [{ number: 1, name: 'Late Out', scratched }];
+  it('scratches when three bookmakers report it, even though Racing Australia still shows it running', () => {
+    const r = reconcileRace([ra(vote(false)), bookie('tab', vote(true)), bookie('sportsbet', vote(true)), bookie('entain', vote(true))]);
+    const a = r.runners[0];
+    expect(a.scratched).toBe(true);
+    expect(a.fields.scratched.value).toBe(true);
+    expect(a.verification.conflicts.some((c) => c.startsWith('Scratching') && c.includes('racingaustralia says running'))).toBe(true);
+    expect(r.fieldSize).toBe(0);
+  });
+
+  it('scratches on two bookmakers against an official running', () => {
+    expect(reconcileRace([ra(vote(false)), bookie('tab', vote(true)), bookie('entain', vote(true))]).runners[0].scratched).toBe(true);
+  });
+
+  it('keeps the horse running when only one bookmaker reports it scratched, but lists the conflict', () => {
+    const a = reconcileRace([ra(vote(false)), bookie('tab', vote(true)), bookie('sportsbet', vote(false))]).runners[0];
+    expect(a.scratched).toBe(false);
+    expect(a.verification.conflicts.some((c) => c.startsWith('Scratching') && c.includes('tab says scratched'))).toBe(true);
+  });
+
+  it('scratches when one official source reports it, whatever the other official source says', () => {
+    const a = reconcileRace([ra(vote(false)), rc(vote(true))]).runners[0];
+    expect(a.scratched).toBe(true);
+    expect(a.fields.scratched).toMatchObject({ value: true, agree: ['racingcom'], disagree: [{ source: 'racingaustralia', value: false }] });
+    expect(a.verification.conflicts.some((c) => c.startsWith('Scratching'))).toBe(true);
+  });
+});
+
+describe('a source answering with a different race', () => {
+  const OTHER = ['Ironbark', 'Jasper Bay', 'Kingfisher', 'Lunar Tide', 'Mystic Rain', 'Northern Sky', 'Opal Dream', 'Pacific Gale'];
+  it('ignores a bookmaker whose field does not match, instead of merging a second field', () => {
+    const r = reconcileRace([ra(field()), rc(field()), bookie('sportsbet', OTHER.map((name, i) => ({ number: i + 1, name, barrier: i + 1 })))]);
+    expect(r.runners).toHaveLength(8);
+    expect(r.runners.map((x) => x.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(r.runners.map((x) => x.name)).toEqual(FIELD);
+    expect(r.sources).toEqual(['racingaustralia', 'racingcom']);
+    expect(r.verification.conflicts).toContain('sportsbet listed a different field – ignored');
+    expect(r.fieldSize).toBe(8);
+  });
+
+  it('still merges a source that has one extra runner (a late addition)', () => {
+    const tab = [...field().slice(0, 7), { number: 9, name: 'Quiet Achiever', barrier: 9 }];
+    const r = reconcileRace([ra(field()), rc(field()), bookie('tab', tab)]);
+    expect(r.runners).toHaveLength(9);
+    expect(r.sources).toContain('tab');
+    expect(r.runners.find((x) => x.name === 'Quiet Achiever')!.number).toBe(9);
+    expect(r.verification.conflicts.some((c) => c.includes('different field'))).toBe(false);
+  });
+
+  it('leaves out a runner only one source lists when its saddlecloth belongs to another horse', () => {
+    const three = [{ number: 1, name: 'Alpine Echo' }, { number: 2, name: 'Brave Lass' }, { number: 3, name: 'Copper Coast' }];
+    const r = reconcileRace([ra(three), rc(three), bookie('tab', [three[0], { number: 2, name: 'Stray Cat' }, three[2]])]);
+    expect(r.runners.map((x) => x.name)).toEqual(['Alpine Echo', 'Brave Lass', 'Copper Coast']);
+    expect(r.runners.every((x) => x.number > 0)).toBe(true);
+    expect(r.verification.conflicts.some((c) => c.includes('Stray Cat') && c.includes('left out'))).toBe(true);
+  });
+});
+
+describe('barriers renumbered after a scratching', () => {
+  // #3 (barrier 3) is scratched: TAB and Racing Australia keep the original draw, Entain moves everyone outside it in one.
+  const original = () => field((r) => (r.number === 3 ? { scratched: true } : {}));
+  const renumbered = () => field((r) => (r.number === 3 ? { scratched: true, barrier: undefined } : r.barrier! > 3 ? { barrier: r.barrier! - 1 } : {}));
+
+  it('raises no barrier conflicts and shows the original draw', () => {
+    const r = reconcileRace([ra(original()), bookie('tab', original()), bookie('entain', renumbered())]);
+    expect(r.runners.flatMap((x) => x.verification.conflicts).filter((c) => c.startsWith('Barrier'))).toEqual([]);
+    expect(r.runners.map((x) => x.barrier)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(r.runners.find((x) => x.number === 8)!.fields.barrier.agree).toEqual(['racingaustralia', 'tab', 'entain']);
+  });
+
+  it("prefers the original draw over racing.com's live barrier when Racing Australia is missing", () => {
+    const r = reconcileRace([rc(renumbered()), bookie('tab', original())]);
+    expect(r.runners.find((x) => x.number === 8)!.barrier).toBe(8);
+    expect(r.runners.flatMap((x) => x.verification.conflicts).filter((c) => c.startsWith('Barrier'))).toEqual([]);
+  });
+
+  it('still flags a barrier that differs by more than the scratchings inside it', () => {
+    const wrong = renumbered().map((r) => (r.number === 8 ? { ...r, barrier: 5 } : r));
+    const r = reconcileRace([ra(original()), bookie('tab', original()), bookie('entain', wrong)]);
+    expect(r.runners.find((x) => x.number === 8)!.verification.conflicts.some((c) => c.startsWith('Barrier'))).toBe(true);
+    // A scratching drawn outside a runner gives no slack: #2 drawn 2 must match exactly.
+    const r2 = reconcileRace([ra(original()), bookie('entain', renumbered().map((x) => (x.number === 2 ? { ...x, barrier: 1 } : x)))]);
+    expect(r2.runners.find((x) => x.number === 2)!.verification.conflicts.some((c) => c.startsWith('Barrier'))).toBe(true);
+  });
+});
+
+describe('field size with emergencies', () => {
+  const withEmergency = (scratch?: number) => field((r) => ({ ...(r.number === 8 ? { emergency: true } : {}), ...(r.number === scratch ? { scratched: true } : {}) }));
+  it('does not count a waiting emergency as a starter', () => {
+    expect(reconcileRace([ra(withEmergency())]).fieldSize).toBe(7);
+  });
+  it('counts the emergency once a scratching gives it a start', () => {
+    const r = reconcileRace([ra(withEmergency(2))]);
+    expect(r.fieldSize).toBe(7);
+    expect(r.runners.filter((x) => !x.scratched)).toHaveLength(7);
+  });
+  it('uses the same rule on a pre-race refresh', () => {
+    const previous = reconcileRace([ra(withEmergency())]);
+    expect(mergeRaceRefresh(previous, reconcileRace([ra(withEmergency())])).fieldSize).toBe(7);
+    expect(mergeRaceRefresh(previous, reconcileRace([ra(withEmergency(2))])).fieldSize).toBe(7);
+  });
+});
