@@ -1,0 +1,5 @@
+{
+ "_fixtureNote": "HTTP 429 body. Wording is VERBATIM from Open-Meteo's RateLimiter.swift (minutely) and from two 2026 projects that recorded the daily message (louistouquet/PowAtlas docs, ContextLab/hypertools notes). Variants: 'Minutely API request limit exceeded. Please try again in one minute.' / 'Hourly API request limit exceeded. Please try again in the next hour.' / 'Daily API request limit exceeded. Please try again tomorrow.' / 'Too many concurrent requests'. Note key order: reason first, then error.",
+ "reason": "Daily API request limit exceeded. Please try again tomorrow.",
+ "error": true
+}

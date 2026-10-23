@@ -1,0 +1,79 @@
+{
+ "_fixtureNote": "CONSTRUCTED. GET https://api.weather.bom.gov.au/v1/locations/r1r118/forecasts/daily  Field names per bremor api doc/API.md: data[] (7 days) with rain.amount.min/max/units + rain.chance (%), uv.category/max_index/start_time/end_time, astronomical.sunrise_time/sunset_time, date, temp_max, temp_min, extended_text, short_text, icon_descriptor (sunny|mostly_sunny|partly_cloudy|cloudy|light_shower|shower|heavy_shower|light_rain|rain|storm|windy|fog|hazy|dusty|frost|snow|tropical_cyclone|clear), fire_danger, fire_danger_category, and 'now' {is_night, now_label, later_label, temp_now, temp_later} on the first day only. Dates/times are UTC ISO strings. Values invented; truncated to 2 days.",
+ "metadata": {
+  "response_timestamp": "2026-10-24T02:12:30Z",
+  "issue_time": "2026-10-23T18:05:00Z",
+  "forecast_region": "Melbourne",
+  "forecast_type": "metropolitan",
+  "copyright": "This Application Programming Interface (API) is owned by the Bureau of Meteorology (Bureau). You must not use, copy or share it."
+ },
+ "data": [
+  {
+   "rain": {
+    "amount": {
+     "min": 0,
+     "max": 1,
+     "units": "mm"
+    },
+    "chance": 30
+   },
+   "uv": {
+    "category": "high",
+    "end_time": "2026-10-24T05:30:00Z",
+    "max_index": 7,
+    "start_time": "2026-10-23T23:20:00Z"
+   },
+   "astronomical": {
+    "sunrise_time": "2026-10-23T19:22:00Z",
+    "sunset_time": "2026-10-24T08:47:00Z"
+   },
+   "date": "2026-10-23T13:00:00Z",
+   "temp_max": 19,
+   "temp_min": 10,
+   "extended_text": "Partly cloudy. Slight (30%) chance of a shower in the afternoon and evening. Winds southwesterly 15 to 25 km/h.",
+   "short_text": "Possible shower.",
+   "icon_descriptor": "shower",
+   "fire_danger": "Moderate",
+   "fire_danger_category": {
+    "text": "Moderate",
+    "default_colour": "#7CB342",
+    "dark_mode_colour": "#7CB342"
+   },
+   "now": {
+    "is_night": false,
+    "now_label": "Max",
+    "later_label": "Overnight Min",
+    "temp_now": 19,
+    "temp_later": 10
+   }
+  },
+  {
+   "rain": {
+    "amount": {
+     "min": 2,
+     "max": 8,
+     "units": "mm"
+    },
+    "chance": 80
+   },
+   "uv": {
+    "category": "moderate",
+    "end_time": "2026-10-25T04:50:00Z",
+    "max_index": 5,
+    "start_time": "2026-10-25T00:00:00Z"
+   },
+   "astronomical": {
+    "sunrise_time": "2026-10-24T19:20:00Z",
+    "sunset_time": "2026-10-25T08:48:00Z"
+   },
+   "date": "2026-10-24T13:00:00Z",
+   "temp_max": 15,
+   "temp_min": 10,
+   "extended_text": "Cloudy. High (80%) chance of showers, most likely in the morning. Winds southwesterly 20 to 30 km/h.",
+   "short_text": "Showers.",
+   "icon_descriptor": "shower",
+   "fire_danger": null,
+   "fire_danger_category": null
+  }
+ ]
+}

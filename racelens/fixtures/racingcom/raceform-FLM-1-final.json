@@ -1,0 +1,14 @@
+{
+  "_fixtureNote": "Constructed getRaceForm response after the race: raceEntries carry finish/margins/SP.",
+  "data": {
+    "r": {
+      "id": "RACE-FLM-1", "raceNumber": 1, "name": "Maribyrnong Trial Stakes", "distance": "1000m", "class": "Listed", "raceStatus": "Resulted", "hasResults": true, "resultsString": "3-1", "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T12:25:00", "totalPrizeMoney": "$200,000",
+      "raceEntries": [
+        { "id": "E1", "raceEntryNumber": 1, "barrierNumber": 4, "liveBarrierNumber": 3, "weightCarried": "57kg", "scratched": false, "isLateScratching": false, "emergency": false, "finish": 2, "position": 2, "margin": "0.5L", "beatenMargin": "0.5L", "horseName": "Quick Study", "jockeyName": "J McDonald", "trainerName": "C Waller", "startingPrice": "$2.60", "positionAtSettled": 2, "positionAt800": 2, "positionAt400": 2, "horse": { "name": "Quick Study", "careerStats": "2:1-1-0", "lastTen": "[\"1\",\"2\"]", "horseForm": [] }, "odds": [] },
+        { "id": "E3", "raceEntryNumber": 3, "barrierNumber": 1, "liveBarrierNumber": 1, "weightCarried": "53kg", "scratched": false, "isLateScratching": false, "emergency": true, "finish": 1, "position": 1, "margin": null, "beatenMargin": null, "horseName": "Slow Boat", "jockeyName": "B Shinn", "trainerName": "A & S Freedman", "startingPrice": "$26.00", "positionAtSettled": 9, "positionAt800": 9, "positionAt400": 5, "horse": { "name": "Slow Boat", "careerStats": "2:1-0-0", "lastTen": "[\"4\",\"1\"]", "horseForm": [] }, "odds": [] },
+        { "id": "E2", "raceEntryNumber": 2, "scratched": true, "isLateScratching": false, "finish": 109, "horseName": "Late Scratch", "horse": { "name": "Late Scratch", "horseForm": [] }, "odds": [] }
+      ],
+      "formRaceEntries": []
+    }
+  }
+}

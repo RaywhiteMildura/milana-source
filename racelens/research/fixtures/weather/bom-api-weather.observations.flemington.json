@@ -1,0 +1,42 @@
+{
+ "_fixtureNote": "CONSTRUCTED. GET https://api.weather.bom.gov.au/v1/locations/r1r118/observations  (6-char geohash). Field names per bremor/bureau_of_meteorology api doc/API.md and PyBoM/collector.py (observations: data.temp, temp_feels_like, wind.speed_kilometre/speed_knot/direction, gust.speed_kilometre/speed_knot, max_gust, max_temp, min_temp, rain_since_9am, humidity, station.bom_id/name/distance; metadata.issue_time, observation_time). The integration sends User-Agent 'MakeThisAPIOpenSource/1.0.0' and it works, so this host does not demand a browser UA (medium). Values invented.",
+ "metadata": {
+  "response_timestamp": "2026-10-24T02:12:30Z",
+  "issue_time": "2026-10-24T02:10:00Z",
+  "observation_time": "2026-10-24T02:00:00Z",
+  "copyright": "This Application Programming Interface (API) is owned by the Bureau of Meteorology (Bureau). You must not use, copy or share it. Please contact us for more information on ways in which you can access our data. Follow this link http://www.bom.gov.au/inside/contacts.shtml to view our contact details."
+ },
+ "data": {
+  "temp": 17.9,
+  "temp_feels_like": 15.2,
+  "wind": {
+   "speed_kilometre": 19,
+   "speed_knot": 10,
+   "direction": "SW"
+  },
+  "gust": {
+   "speed_kilometre": 31,
+   "speed_knot": 17
+  },
+  "max_gust": {
+   "speed_kilometre": 35,
+   "speed_knot": 19,
+   "time": "2026-10-24T01:20:00Z"
+  },
+  "max_temp": {
+   "time": "2026-10-24T02:00:00Z",
+   "value": 17.9
+  },
+  "min_temp": {
+   "time": "2026-10-23T19:10:00Z",
+   "value": 9.6
+  },
+  "rain_since_9am": 0.0,
+  "humidity": 56,
+  "station": {
+   "bom_id": "086038",
+   "name": "Essendon Airport",
+   "distance": 6690
+  }
+ }
+}

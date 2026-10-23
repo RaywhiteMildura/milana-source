@@ -1,0 +1,2232 @@
+{
+  "_fixtureNote": "CONSTRUCTED, MEDIUM confidence. GET https://api.ladbrokes.com.au/gql/router?operationName=RacingRaceCardScreenWeb&variables={\"id\":\"RacingRaceCard:<raceUUID>\",\"isLoggedIn\":false,\"includePlaceExtra\":true}&extensions={\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"...\"}}. Field names come from the operation's printed GraphQL document (DanielTomaro13/sportsdata-mcp specs/entain.documents.json: RaceCardHeader, RacingRaceCardRunnerField.runnerRows{barrierLabel,jockeyName,trainerName,fluctuations{decimal},speedMap,trackerInfo,form{comment,fields,tabs}}, RaceCardResults) and the live-verified truncated sample in Entain.md (header, meeting, tips, raceSelector). Values invented; betTypeSelectors/totePools/exotic markets omitted. Hashes rotate on every deploy: see report section 6.",
+  "data": {
+    "raceCard": {
+      "id": "RacingRaceCard:0a5931c4-8552-5223-a15e-db35e53d55f3",
+      "additionalInfo": "Rail: True Entire Circuit. Penetrometer 4.98.",
+      "distance": 1600,
+      "eventRuleMessage": "Final Field. Bets struck after the final field is declared are eligible for a full refund on scratched horses.",
+      "trackCondition": "Good 4",
+      "weatherIcon": "FINE",
+      "name": "Flemington Spring Classic (Bm84) Hcp",
+      "advertisedStart": "2026-10-24T05:20:00.000Z",
+      "fullForm": "https://ladbrokesform.com.au/form/0a5931c4-8552-5223-a15e-db35e53d55f3",
+      "number": 7,
+      "status": "OPEN",
+      "protestReason": null,
+      "meeting": {
+        "id": "RacingMeeting:c1eb9968-e932-5b14-a0f8-d159722d5017",
+        "meetingCode": "FLE",
+        "category": "HORSE",
+        "name": "Flemington",
+        "regionId": "8e2a3927-4c4b-4f1a-9a7e-0b7f6d5c4e3a",
+        "venue": {
+          "name": "Flemington",
+          "country": "AUS"
+        }
+      },
+      "videoChannels": [
+        {
+          "channelId": "bd93ca0c-5b1a-4b7e-9d2e-7c6f1a2b3c4d",
+          "type": "CHANNEL",
+          "url": "https://www.ladbrokes.com.au/videos/nep/channel1.m3u8?verify=1792900000-EXAMPLE"
+        }
+      ],
+      "tips": [
+        {
+          "id": "0a5931c4-8552-5223-a15e-db35e53d55f3",
+          "author": {
+            "name": "racingandsports"
+          },
+          "entrants": [
+            {
+              "id": "RacingEntrant:a5a33ef8-dc4a-51ae-bb3b-a75405fd74de"
+            },
+            {
+              "id": "RacingEntrant:083d726d-fe9a-5a2d-9381-bb872e2aeebf"
+            },
+            {
+              "id": "RacingEntrant:69f046f2-5042-5306-9d4d-801db5c3ad46"
+            },
+            {
+              "id": "RacingEntrant:8a234db3-a792-5c4a-927c-517344a48c87"
+            }
+          ],
+          "productType": {
+            "productGroupId": "1d4a6b1e-0f6a-4d3b-9a2c-8e7f6a5b4c3d",
+            "productTypeId": "940b8704-e497-4a76-b390-00918ff7d282",
+            "showOdds": true,
+            "noOddsPlaceholder": "TBD",
+            "suspendedPlaceholder": "TBA"
+          },
+          "summary": "VELVET MONARCH (1) has been racing in stronger grades and his last-start fourth at Caulfield behind two Group winners reads well for this. Drawn to get cover and should be too classy. RAPID VERDICT (8) is the improver, three wins from four this prep and the blinkers go on. HARBOUR LIGHTS (2) will roll forward from the wide gate and is hard to run down on the Flemington straight. LUNAR SOVEREIGN (4) is the knockout chance at odds."
+        }
+      ],
+      "blogTips": [],
+      "willPays": [],
+      "raceSelector": [
+        {
+          "id": "RacingRace:e143b009-7376-5899-982c-f79b4a46fbcd",
+          "number": 1,
+          "finalFieldMarket": {
+            "id": "RacingMarket:e7ec83a3-36e0-5c80-9c5f-5a9eb496b9d8",
+            "status": "CLOSED"
+          }
+        },
+        {
+          "id": "RacingRace:b04b24ce-8208-5044-aead-1c122120b5c4",
+          "number": 2,
+          "finalFieldMarket": {
+            "id": "RacingMarket:3a5015b5-f2cb-543c-bf48-2daa33c24273",
+            "status": "CLOSED"
+          }
+        },
+        {
+          "id": "RacingRace:dc9e5c73-b372-5850-b4ef-235347ed8c3c",
+          "number": 3,
+          "finalFieldMarket": {
+            "id": "RacingMarket:4adb3324-3c50-5037-8657-90036c41cfed",
+            "status": "CLOSED"
+          }
+        },
+        {
+          "id": "RacingRace:5dd91e10-8837-5f3e-b14e-3b8908527f41",
+          "number": 4,
+          "finalFieldMarket": {
+            "id": "RacingMarket:80cfad39-dbab-5845-86f2-3c02adf1aef7",
+            "status": "CLOSED"
+          }
+        },
+        {
+          "id": "RacingRace:68bf0618-0404-5527-a80f-1ebc03e2f5fe",
+          "number": 5,
+          "finalFieldMarket": {
+            "id": "RacingMarket:670d482e-a73e-5fbf-b7f6-4cc60209f0a2",
+            "status": "CLOSED"
+          }
+        },
+        {
+          "id": "RacingRace:bdd0d2ee-f8f5-532b-8e6d-654c60cea8c4",
+          "number": 6,
+          "finalFieldMarket": {
+            "id": "RacingMarket:23f89351-dac5-58dd-a0e5-3406b29ecdf3",
+            "status": "CLOSED"
+          }
+        },
+        {
+          "id": "RacingRace:0a5931c4-8552-5223-a15e-db35e53d55f3",
+          "number": 7,
+          "finalFieldMarket": {
+            "id": "RacingMarket:addf5e39-cb2a-54b7-83b1-3c9244d97c54",
+            "status": "OPEN"
+          }
+        },
+        {
+          "id": "RacingRace:26577c0a-332c-505d-b8b9-8119a365fbf7",
+          "number": 8,
+          "finalFieldMarket": {
+            "id": "RacingMarket:6ac53f86-b5ec-58ee-8d19-bf652d43ed3f",
+            "status": "OPEN"
+          }
+        },
+        {
+          "id": "RacingRace:9c2575c6-e9cc-5c2b-a472-24126d174c12",
+          "number": 9,
+          "finalFieldMarket": {
+            "id": "RacingMarket:17ac6abe-980f-50a4-bcbc-dfb4c1f6917b",
+            "status": "OPEN"
+          }
+        }
+      ],
+      "finalField": {
+        "id": "RacingRaceCardRunnerField:addf5e39-cb2a-54b7-83b1-3c9244d97c54",
+        "categoryType": {
+          "id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+          "name": "Horse Racing",
+          "parentCategoryId": "2b665a75-16dd-4713-a85b-8e47631028b1",
+          "slug": "horse-racing"
+        },
+        "status": "OPEN",
+        "name": "Final Field",
+        "type": "FINAL_FIELD",
+        "actualStart": "2026-10-24T05:20:00.000Z",
+        "advertisedStart": "2026-10-24T05:20:00.000Z",
+        "marketRuleId": "08016b1d-2c3d-4e5f-8a9b-0c1d2e3f4a5b",
+        "marketTypeId": "5f6e7d8c-9b0a-4c1d-8e2f-3a4b5c6d7e8f",
+        "runners": [
+          {
+            "id": "RacingRunnerRow:a5a33ef8-dc4a-51ae-bb3b-a75405fd74de",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:69f046f2-5042-5306-9d4d-801db5c3ad46",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:0e53df4e-d40f-5373-9e95-76107a37bf7e",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:8a234db3-a792-5c4a-927c-517344a48c87",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:188f8b9c-1469-53e1-9d13-52763e343d72",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:074da9ac-40d2-56f6-b5ed-956894fd8ed0",
+            "scratchedTimestamp": "2026-10-24T00:12:00Z"
+          },
+          {
+            "id": "RacingRunnerRow:9498ae58-b08d-5518-883e-15444498411a",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:083d726d-fe9a-5a2d-9381-bb872e2aeebf",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:1ccad8e7-9063-524e-8cac-deb35a1ae1fe",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:906994de-cfec-563f-a190-4b07f6a0887a",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:4e079e9f-4d58-54ea-a1ff-6e5eca3a72ce",
+            "scratchedTimestamp": null
+          },
+          {
+            "id": "RacingRunnerRow:83069a75-718c-52d3-91cd-c56a8a9014b7",
+            "scratchedTimestamp": null
+          }
+        ],
+        "runnerRows": [
+          {
+            "id": "RacingRunnerRow:a5a33ef8-dc4a-51ae-bb3b-a75405fd74de",
+            "barrierLabel": "7",
+            "jockeyName": "Blake Shinn",
+            "name": "Velvet Monarch",
+            "number": 1,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "131x4",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/velvet-monarch_64x64.png",
+            "trainerName": "Ciaron Maher",
+            "fluctuations": [
+              {
+                "decimal": 5.8
+              },
+              {
+                "decimal": 5.3
+              },
+              {
+                "decimal": 5.1
+              },
+              {
+                "decimal": 4.8
+              },
+              {
+                "decimal": 4.4
+              },
+              {
+                "decimal": 4.6
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "a5a33ef8-dc4a-51ae-bb3b-a75405fd74de:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 18,
+                  "denominator": 5,
+                  "decimal": 4.6
+                }
+              },
+              {
+                "id": "a5a33ef8-dc4a-51ae-bb3b-a75405fd74de:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 3,
+                  "denominator": 4,
+                  "decimal": 1.75
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "Midfield",
+              "markerColour": "#2D7FF9",
+              "progress": 0.58,
+              "settlingLengths": 5
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "VELVET MONARCH (1) is the one to beat here.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "5yo G",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "ZOUSTAR (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "VELVET QUEEN (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "60",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:69f046f2-5042-5306-9d4d-801db5c3ad46",
+            "barrierLabel": "11",
+            "jockeyName": "Jamie Kah",
+            "name": "Harbour Lights",
+            "number": 2,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "324x1",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/harbour-lights_64x64.png",
+            "trainerName": "Chris Waller",
+            "fluctuations": [
+              {
+                "decimal": 7.5
+              },
+              {
+                "decimal": 6.9
+              },
+              {
+                "decimal": 6.6
+              },
+              {
+                "decimal": 6.3
+              },
+              {
+                "decimal": 5.7
+              },
+              {
+                "decimal": 6.0
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "69f046f2-5042-5306-9d4d-801db5c3ad46:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 5,
+                  "denominator": 1,
+                  "decimal": 6
+                }
+              },
+              {
+                "id": "69f046f2-5042-5306-9d4d-801db5c3ad46:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 11,
+                  "denominator": 10,
+                  "decimal": 2.1
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "Leader",
+              "markerColour": "#2D7FF9",
+              "progress": 1.0,
+              "settlingLengths": 0
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "HARBOUR LIGHTS (2) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "4yo M",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "SNITZEL (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "PORT OF CALL (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "59",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:0e53df4e-d40f-5373-9e95-76107a37bf7e",
+            "barrierLabel": "2",
+            "jockeyName": "Craig Williams",
+            "name": "Iron Tempest",
+            "number": 3,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "31244",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/iron-tempest_64x64.png",
+            "trainerName": "Anthony & Sam Freedman",
+            "fluctuations": [
+              {
+                "decimal": 11.2
+              },
+              {
+                "decimal": 10.3
+              },
+              {
+                "decimal": 9.9
+              },
+              {
+                "decimal": 9.5
+              },
+              {
+                "decimal": 8.5
+              },
+              {
+                "decimal": 9.0
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "0e53df4e-d40f-5373-9e95-76107a37bf7e:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 8,
+                  "denominator": 1,
+                  "decimal": 9
+                }
+              },
+              {
+                "id": "0e53df4e-d40f-5373-9e95-76107a37bf7e:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 9,
+                  "denominator": 5,
+                  "decimal": 2.8
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "On Pace",
+              "markerColour": "#2D7FF9",
+              "progress": 0.83,
+              "settlingLengths": 2
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "IRON TEMPEST (3) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "6yo G",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "FASTNET ROCK (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "STORM WARNING (NZ)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "58.5",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:8a234db3-a792-5c4a-927c-517344a48c87",
+            "barrierLabel": "5",
+            "jockeyName": "Mark Zahra",
+            "name": "Lunar Sovereign",
+            "number": 4,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "2x516",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/lunar-sovereign_64x64.png",
+            "trainerName": "Ben, Will & Jd Hayes",
+            "fluctuations": [
+              {
+                "decimal": 9.4
+              },
+              {
+                "decimal": 8.6
+              },
+              {
+                "decimal": 8.2
+              },
+              {
+                "decimal": 7.9
+              },
+              {
+                "decimal": 7.1
+              },
+              {
+                "decimal": 7.5
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "8a234db3-a792-5c4a-927c-517344a48c87:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 13,
+                  "denominator": 2,
+                  "decimal": 7.5
+                }
+              },
+              {
+                "id": "8a234db3-a792-5c4a-927c-517344a48c87:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 3,
+                  "denominator": 2,
+                  "decimal": 2.5
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "Midfield",
+              "markerColour": "#2D7FF9",
+              "progress": 0.67,
+              "settlingLengths": 4
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "LUNAR SOVEREIGN (4) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "4yo G",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "WRITTEN TYCOON (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "MOONLIT SKY (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "58",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:188f8b9c-1469-53e1-9d13-52763e343d72",
+            "barrierLabel": "1",
+            "jockeyName": "Damian Lane",
+            "name": "Saffron Street",
+            "number": 5,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "7x213",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/saffron-street_64x64.png",
+            "trainerName": "Mick Price & Michael Kent Jnr",
+            "fluctuations": [
+              {
+                "decimal": 16.2
+              },
+              {
+                "decimal": 14.9
+              },
+              {
+                "decimal": 14.3
+              },
+              {
+                "decimal": 13.7
+              },
+              {
+                "decimal": 12.3
+              },
+              {
+                "decimal": 13.0
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "188f8b9c-1469-53e1-9d13-52763e343d72:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 12,
+                  "denominator": 1,
+                  "decimal": 13
+                }
+              },
+              {
+                "id": "188f8b9c-1469-53e1-9d13-52763e343d72:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 14,
+                  "denominator": 5,
+                  "decimal": 3.8
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "Back Marker",
+              "markerColour": "#2D7FF9",
+              "progress": 0.33,
+              "settlingLengths": 8
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "SAFFRON STREET (5) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "5yo M",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "I AM INVINCIBLE (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "SAFFRON ROSE (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "57.5",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:074da9ac-40d2-56f6-b5ed-956894fd8ed0",
+            "barrierLabel": "9",
+            "jockeyName": "Ethan Brown",
+            "name": "Bayside Rebel",
+            "number": 6,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "58361",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/bayside-rebel_64x64.png",
+            "trainerName": "Matthew Williams",
+            "fluctuations": [
+              {
+                "decimal": 32.5
+              },
+              {
+                "decimal": 29.9
+              },
+              {
+                "decimal": 28.6
+              },
+              {
+                "decimal": 27.3
+              },
+              {
+                "decimal": 24.7
+              },
+              {
+                "decimal": 26.0
+              }
+            ],
+            "scratchedTimestamp": "2026-10-24T00:12:00Z",
+            "scratchedDeduction": "12c win / 5c place",
+            "prices": [],
+            "speedMap": {
+              "label": "Midfield",
+              "markerColour": "#2D7FF9",
+              "progress": 0.5,
+              "settlingLengths": 6
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "BAYSIDE REBEL (6) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "6yo G",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "TORONADO (IRE)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "REBEL BAY (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "57.5",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:9498ae58-b08d-5518-883e-15444498411a",
+            "barrierLabel": "4",
+            "jockeyName": "Celine Gaudray",
+            "name": "Northern Quill",
+            "number": 7,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "15x09",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/northern-quill_64x64.png",
+            "trainerName": "Lindsey Smith",
+            "fluctuations": [
+              {
+                "decimal": 20.0
+              },
+              {
+                "decimal": 18.4
+              },
+              {
+                "decimal": 17.6
+              },
+              {
+                "decimal": 16.8
+              },
+              {
+                "decimal": 15.2
+              },
+              {
+                "decimal": 16.0
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "9498ae58-b08d-5518-883e-15444498411a:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 15,
+                  "denominator": 1,
+                  "decimal": 16
+                }
+              },
+              {
+                "id": "9498ae58-b08d-5518-883e-15444498411a:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 17,
+                  "denominator": 5,
+                  "decimal": 4.4
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "On Pace",
+              "markerColour": "#2D7FF9",
+              "progress": 0.75,
+              "settlingLengths": 3
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "NORTHERN QUILL (7) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "5yo M",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "TOO DARN HOT (GB)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "FEATHER PEN (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "58.5",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:083d726d-fe9a-5a2d-9381-bb872e2aeebf",
+            "barrierLabel": "12",
+            "jockeyName": "Ben Melham",
+            "name": "Rapid Verdict",
+            "number": 8,
+            "isMarketMover": true,
+            "performanceMetric": null,
+            "recentResults": "x2241",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/rapid-verdict_64x64.png",
+            "trainerName": "Peter Moody & Katherine Coleman",
+            "fluctuations": [
+              {
+                "decimal": 10.6
+              },
+              {
+                "decimal": 9.8
+              },
+              {
+                "decimal": 9.4
+              },
+              {
+                "decimal": 8.9
+              },
+              {
+                "decimal": 8.1
+              },
+              {
+                "decimal": 8.5
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "083d726d-fe9a-5a2d-9381-bb872e2aeebf:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 15,
+                  "denominator": 2,
+                  "decimal": 8.5
+                }
+              },
+              {
+                "id": "083d726d-fe9a-5a2d-9381-bb872e2aeebf:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 17,
+                  "denominator": 10,
+                  "decimal": 2.7
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "Leader",
+              "markerColour": "#2D7FF9",
+              "progress": 1.0,
+              "settlingLengths": 0
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "RAPID VERDICT (8) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "4yo H",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "CAPITALIST (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "FINAL RULING (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "57",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:1ccad8e7-9063-524e-8cac-deb35a1ae1fe",
+            "barrierLabel": "6",
+            "jockeyName": "Daniel Stackhouse",
+            "name": "Golden Larrikin",
+            "number": 9,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "26x47",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/golden-larrikin_64x64.png",
+            "trainerName": "Phillip Stokes",
+            "fluctuations": [
+              {
+                "decimal": 26.2
+              },
+              {
+                "decimal": 24.1
+              },
+              {
+                "decimal": 23.1
+              },
+              {
+                "decimal": 22.1
+              },
+              {
+                "decimal": 19.9
+              },
+              {
+                "decimal": 21.0
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "1ccad8e7-9063-524e-8cac-deb35a1ae1fe:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 20,
+                  "denominator": 1,
+                  "decimal": 21
+                }
+              },
+              {
+                "id": "1ccad8e7-9063-524e-8cac-deb35a1ae1fe:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 9,
+                  "denominator": 2,
+                  "decimal": 5.5
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "Back Marker",
+              "markerColour": "#2D7FF9",
+              "progress": 0.25,
+              "settlingLengths": 9
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "GOLDEN LARRIKIN (9) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "7yo G",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "PIERRO (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "LARRIKIN LASS (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "56.5",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:906994de-cfec-563f-a190-4b07f6a0887a",
+            "barrierLabel": "3",
+            "jockeyName": "Jye McNeil",
+            "name": "Miss Tullamore",
+            "number": 10,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "312x5",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/miss-tullamore_64x64.png",
+            "trainerName": "Danny O'Brien",
+            "fluctuations": [
+              {
+                "decimal": 12.5
+              },
+              {
+                "decimal": 11.5
+              },
+              {
+                "decimal": 11.0
+              },
+              {
+                "decimal": 10.5
+              },
+              {
+                "decimal": 9.5
+              },
+              {
+                "decimal": 10.0
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "906994de-cfec-563f-a190-4b07f6a0887a:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 9,
+                  "denominator": 1,
+                  "decimal": 10
+                }
+              },
+              {
+                "id": "906994de-cfec-563f-a190-4b07f6a0887a:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 2,
+                  "denominator": 1,
+                  "decimal": 3
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "Midfield",
+              "markerColour": "#2D7FF9",
+              "progress": 0.58,
+              "settlingLengths": 5
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "MISS TULLAMORE (10) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "4yo M",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "DUNDEEL (NZ)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "TULLAMORE DEW (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "56",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:4e079e9f-4d58-54ea-a1ff-6e5eca3a72ce",
+            "barrierLabel": "8",
+            "jockeyName": "Teo Nugent",
+            "name": "Shadow Admiral",
+            "number": 11,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "0x587",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/shadow-admiral_64x64.png",
+            "trainerName": "Grahame Begg",
+            "fluctuations": [
+              {
+                "decimal": 51.2
+              },
+              {
+                "decimal": 47.1
+              },
+              {
+                "decimal": 45.1
+              },
+              {
+                "decimal": 43.1
+              },
+              {
+                "decimal": 38.9
+              },
+              {
+                "decimal": 41.0
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "4e079e9f-4d58-54ea-a1ff-6e5eca3a72ce:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 40,
+                  "denominator": 1,
+                  "decimal": 41
+                }
+              },
+              {
+                "id": "4e079e9f-4d58-54ea-a1ff-6e5eca3a72ce:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 8,
+                  "denominator": 1,
+                  "decimal": 9
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "Midfield",
+              "markerColour": "#2D7FF9",
+              "progress": 0.5,
+              "settlingLengths": 6
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "SHADOW ADMIRAL (11) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "5yo G",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "SHAMUS AWARD (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "ADMIRAL'S DAUGHTER (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "55.5",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "RacingRunnerRow:83069a75-718c-52d3-91cd-c56a8a9014b7",
+            "barrierLabel": "10",
+            "jockeyName": "Carleen Hefel",
+            "name": "Coastal Breeze",
+            "number": 12,
+            "isMarketMover": false,
+            "performanceMetric": null,
+            "recentResults": "8x690",
+            "silkUrl": "https://cdn.prod.pricekinetics.com/silks/events/racing/betmakers-cmFjZToyMjAwNzE1/coastal-breeze_64x64.png",
+            "trainerName": "Tony & Calvin McEvoy",
+            "fluctuations": [
+              {
+                "decimal": 63.8
+              },
+              {
+                "decimal": 58.6
+              },
+              {
+                "decimal": 56.1
+              },
+              {
+                "decimal": 53.6
+              },
+              {
+                "decimal": 48.4
+              },
+              {
+                "decimal": 51.0
+              }
+            ],
+            "scratchedTimestamp": null,
+            "scratchedDeduction": null,
+            "prices": [
+              {
+                "id": "83069a75-718c-52d3-91cd-c56a8a9014b7:940b8704-e497-4a76-b390-00918ff7d282:",
+                "odds": {
+                  "numerator": 50,
+                  "denominator": 1,
+                  "decimal": 51
+                }
+              },
+              {
+                "id": "83069a75-718c-52d3-91cd-c56a8a9014b7:7cf3eea6-5654-42be-9c2e-6de280e7bb34:",
+                "odds": {
+                  "numerator": 10,
+                  "denominator": 1,
+                  "decimal": 11
+                }
+              }
+            ],
+            "speedMap": {
+              "label": "Back Marker",
+              "markerColour": "#2D7FF9",
+              "progress": 0.17,
+              "settlingLengths": 10
+            },
+            "trackerInfo": {
+              "betCountPercent": 8.3,
+              "betStakePercent": 8.3
+            },
+            "form": {
+              "comment": "COASTAL BREEZE (12) needs luck from the draw but is capable.",
+              "fields": [
+                {
+                  "label": "Career",
+                  "value": "18: 4-3-2",
+                  "highlighted": false
+                },
+                {
+                  "label": "Track",
+                  "value": "4: 1-1-0",
+                  "highlighted": true
+                },
+                {
+                  "label": "Dist",
+                  "value": "6: 2-1-0",
+                  "highlighted": false
+                },
+                {
+                  "label": "Good",
+                  "value": "11: 3-2-1",
+                  "highlighted": false
+                },
+                {
+                  "label": "1st Up",
+                  "value": "3: 1-0-1",
+                  "highlighted": false
+                }
+              ],
+              "tabs": [
+                {
+                  "title": "Form",
+                  "data": [
+                    {
+                      "label": "Age/Sex",
+                      "value": "4yo M",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Sire",
+                      "value": "BRAZEN BEAU (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Dam",
+                      "value": "OCEAN DRIFT (AUS)",
+                      "highlighted": false
+                    },
+                    {
+                      "label": "Weight",
+                      "value": "57",
+                      "highlighted": false
+                    }
+                  ]
+                },
+                {
+                  "title": "Last Starts",
+                  "data": [
+                    {
+                      "title": "Recent results",
+                      "rows": [
+                        {
+                          "data": [
+                            {
+                              "label": "Date",
+                              "value": "11-10-26",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Track",
+                              "value": "Caulfield",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Dist",
+                              "value": "1600",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Cond",
+                              "value": "Good4",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Pos",
+                              "value": "4/12",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "Margin",
+                              "value": "1.8L",
+                              "highlighted": false
+                            },
+                            {
+                              "label": "SP",
+                              "value": "$7.00",
+                              "highlighted": false
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "liveRacingMarket": null,
+      "totePools": [],
+      "meetingSelector": [
+        {
+          "id": "RacingMeeting:c1eb9968-e932-5b14-a0f8-d159722d5017",
+          "name": "Flemington",
+          "meetingCode": "FLE",
+          "nextToGoRace": {
+            "id": "RacingRace:0a5931c4-8552-5223-a15e-db35e53d55f3"
+          },
+          "venue": {
+            "id": "ed806bb7-c901-546f-ad7d-58c04bcf427c",
+            "country": null
+          }
+        }
+      ],
+      "results": [],
+      "mysteryBetTypeSelector": null,
+      "favouriteVsField": null,
+      "oddsVsEvens": null,
+      "headToHead": null,
+      "boxOneAndEight": null
+    }
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-24 worked example (fictional runners) showing the fundamental score -> softmax -> Benter blend -> confidence pipeline for a Flemington 1600m BM84, Good 4, rail True, 10 runners. Numbers are illustrative only.",
+  "race": {
+    "venue": "Flemington",
+    "date": "2026-10-24",
+    "raceNumber": 5,
+    "distance": 1600,
+    "class": "BM84",
+    "trackCondition": "Good 4",
+    "rail": "True",
+    "runners": 10,
+    "placesPaid": 3
+  },
+  "parameters": {
+    "alpha": 0.4,
+    "beta": 0.6,
+    "softmaxTemperature": 2,
+    "marketSource": "betfair_geometric_mid 4 min before jump"
+  },
+  "runners": [
+    {
+      "number": 1,
+      "name": "Riverina Rocket",
+      "barrier": 7,
+      "fundamentalScore": 0.62,
+      "marketOdds": 3.4,
+      "p_fund": 0.252,
+      "p_mkt": 0.284,
+      "p_blend": 0.272
+    },
+    {
+      "number": 2,
+      "name": "Steel Carousel",
+      "barrier": 2,
+      "fundamentalScore": 0.48,
+      "marketOdds": 4.2,
+      "p_fund": 0.19,
+      "p_mkt": 0.23,
+      "p_blend": 0.214
+    },
+    {
+      "number": 3,
+      "name": "Nullarbor Night",
+      "barrier": 11,
+      "fundamentalScore": 0.31,
+      "marketOdds": 7.5,
+      "p_fund": 0.136,
+      "p_mkt": 0.129,
+      "p_blend": 0.132
+    },
+    {
+      "number": 4,
+      "name": "Golden Furlong",
+      "barrier": 4,
+      "fundamentalScore": 0.22,
+      "marketOdds": 9,
+      "p_fund": 0.113,
+      "p_mkt": 0.107,
+      "p_blend": 0.11
+    },
+    {
+      "number": 5,
+      "name": "Maribyrnong Mist",
+      "barrier": 9,
+      "fundamentalScore": 0.05,
+      "marketOdds": 12,
+      "p_fund": 0.081,
+      "p_mkt": 0.08,
+      "p_blend": 0.081
+    },
+    {
+      "number": 6,
+      "name": "Kensington Gate",
+      "barrier": 1,
+      "fundamentalScore": -0.04,
+      "marketOdds": 16,
+      "p_fund": 0.067,
+      "p_mkt": 0.06,
+      "p_blend": 0.063
+    },
+    {
+      "number": 7,
+      "name": "Quiet Thunder",
+      "barrier": 5,
+      "fundamentalScore": -0.12,
+      "marketOdds": 21,
+      "p_fund": 0.057,
+      "p_mkt": 0.046,
+      "p_blend": 0.05
+    },
+    {
+      "number": 8,
+      "name": "Saltbush Sailor",
+      "barrier": 10,
+      "fundamentalScore": -0.25,
+      "marketOdds": 31,
+      "p_fund": 0.044,
+      "p_mkt": 0.031,
+      "p_blend": 0.036
+    },
+    {
+      "number": 9,
+      "name": "Bourke Street",
+      "barrier": 3,
+      "fundamentalScore": -0.33,
+      "marketOdds": 41,
+      "p_fund": 0.038,
+      "p_mkt": 0.024,
+      "p_blend": 0.029
+    },
+    {
+      "number": 10,
+      "name": "Dusty Verandah",
+      "barrier": 8,
+      "fundamentalScore": -0.6,
+      "marketOdds": 101,
+      "p_fund": 0.022,
+      "p_mkt": 0.01,
+      "p_blend": 0.014
+    }
+  ],
+  "note": "p_mkt = (1/odds) normalised to sum 1 (overround 1.037). p_fund = softmax(tau*score), tau=2. p_blend = exp(alpha*ln p_fund + beta*ln p_mkt) renormalised. Columns sum to ~1.00 after rounding.",
+  "predictedOrder": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "confidence": {
+    "inputs": {
+      "sourceAgreement": 0.95,
+      "marketConcentration": 0.45,
+      "modelMarketAgreement": 0.9,
+      "formCompleteness": 0.8,
+      "conditionsVolatility": 0.05,
+      "fieldSizeScore": 0.67,
+      "dayPatternSupport": 0.5
+    },
+    "C": 0.701,
+    "label": "Good",
+    "detractors": [
+      "Favourite only $3.40 in an even top two",
+      "10-runner field"
+    ]
+  },
+  "bettingSketch": {
+    "win": {
+      "runner": 1,
+      "odds": 3.4,
+      "p_blend": 0.272,
+      "marketImplied": 0.294,
+      "kellyFull": -0.0313,
+      "kellyQuarter": 0,
+      "decision": "NO BET",
+      "note": "f* = ((3.4-1)*0.272 - 0.728)/(3.4-1) = -0.0313 < 0: blended probability is below the market-implied chance, so Kelly says no bet. Illustrates that a market-anchored model rarely finds edge on the favourite."
+    },
+    "eachWayCandidate": {
+      "runner": 3,
+      "odds": 7.5,
+      "p_blend": 0.132,
+      "marketImplied": 0.133,
+      "decision": "NO BET",
+      "reason": "blend about equal to market"
+    },
+    "exotic": {
+      "type": "TRIFECTA standout",
+      "banker": 1,
+      "others": [
+        2,
+        3,
+        4
+      ],
+      "combos": 6,
+      "flexiOutlay": 6,
+      "flexiPercent": 100
+    }
+  }
+}

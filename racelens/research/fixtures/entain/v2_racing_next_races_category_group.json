@@ -1,0 +1,134 @@
+{
+  "_fixtureNote": "CONSTRUCTED from the documented shape (DanielTomaro13/sportsdata-mcp Entain.md, verified live 2026-05-25, ~32 KB): GET /v2/racing/next-races-category-group?count=5&categories=[\"4a2788f8-e825-4d36-9894-efd4baf1cfae\"]. Note advertised_start is RFC3339 here, not {seconds} as on /rest/v1.",
+  "category_race_map": {
+    "4a2788f8-e825-4d36-9894-efd4baf1cfae": {
+      "race_ids": [
+        "0a5931c4-8552-5223-a15e-db35e53d55f3",
+        "32eb4b7e-6418-5bf3-a592-d4e5569a0a86",
+        "26577c0a-332c-505d-b8b9-8119a365fbf7"
+      ]
+    }
+  },
+  "race_summaries": {
+    "0a5931c4-8552-5223-a15e-db35e53d55f3": {
+      "race_id": "0a5931c4-8552-5223-a15e-db35e53d55f3",
+      "race_name": "Flemington Spring Classic (Bm84) Hcp",
+      "race_number": 7,
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "meeting_name": "Flemington",
+      "category_id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+      "advertised_start": "2026-10-24T05:20:00Z",
+      "race_form": {
+        "distance": 1600,
+        "distance_type": {
+          "id": "570775ef-09aa-4e09-a4f8-6b9b2bd7cf2d",
+          "name": "Metres",
+          "short_name": "m"
+        },
+        "distance_type_id": "570775ef-09aa-4e09-a4f8-6b9b2bd7cf2d",
+        "track_condition": {
+          "id": "8dac31aa-4c18-4b36-9f88-15b9a6b4bb5c",
+          "name": "Good4",
+          "short_name": "good4"
+        },
+        "track_condition_id": "8dac31aa-4c18-4b36-9f88-15b9a6b4bb5c",
+        "weather": {
+          "id": "08e6f7c4-6d1f-4a0e-a6ad-21bf9c4b8f38",
+          "name": "Fine",
+          "short_name": "fine",
+          "icon_uri": "FINE"
+        },
+        "weather_id": "08e6f7c4-6d1f-4a0e-a6ad-21bf9c4b8f38",
+        "race_comment": "VELVET MONARCH (1) has been racing in stronger grades and his last-start fourth at Caulfield behind two Group winners reads well for this. Drawn to get cover and should be too classy. RAPID VERDICT (8) is the improver, three wins from four this prep and the blinkers go on. HARBOUR LIGHTS (2) will roll forward from the wide gate and is hard to run down on the Flemington straight. LUNAR SOVEREIGN (4) is the knockout chance at odds.",
+        "additional_data": "{\"revealed_race_info\": {\"track_name\": \"Flemington\", \"state\": \"VIC\", \"country\": \"AUS\", \"number\": 7, \"race_name\": \"Flemington Spring Classic (Bm84) Hcp\", \"time\": \"2026-10-24T05:20:00Z\", \"class\": \"BM84\", \"start_type\": \"Barrier\", \"prizemonies\": {\"1st\": 110000, \"2nd\": 36000, \"3rd\": 18000, \"4th\": 10000, \"total_value\": 200000}, \"localised_prizemonies\": {\"AUD\": {\"1st\": 110000, \"2nd\": 36000, \"3rd\": 18000, \"4th\": 10000, \"total_value\": 200000}}, \"rail_position\": \"True Entire Circuit. (Pent: 4.98)\", \"track_direction\": \"Left\", \"track_surface\": \"Turf\", \"group\": \"\", \"gait\": \"\", \"track_home_straight_metres\": 450, \"track_circumference\": 2312, \"race_comment_provider\": \"Racing and Sports\"}}",
+        "generated": 1,
+        "silk_base_url": "drr38safykj6s.cloudfront.net",
+        "race_comment_alternative": "VELVET MONARCH (1) has been racing in stronger grades and his last-start fourth at Caulfield behind two Group winners reads well for this. Drawn to get cover and should be too classy. RAPID VERDICT (8) is the improver, three wins from four this prep and the blinkers go on. HARBOUR LIGHTS (2) will roll forward from the wide gate and is hard to run down on the Flemington straight. LUNAR SOVEREIGN (4) is the knockout chance at odds."
+      },
+      "venue_id": "ed806bb7-c901-546f-ad7d-58c04bcf427c",
+      "venue_name": "Flemington",
+      "venue_state": "VIC",
+      "venue_country": "AUS"
+    },
+    "32eb4b7e-6418-5bf3-a592-d4e5569a0a86": {
+      "race_id": "32eb4b7e-6418-5bf3-a592-d4e5569a0a86",
+      "race_name": "Brisbane Racing Club (Bm75) Hcp",
+      "race_number": 3,
+      "meeting_id": "3d7daef6-53e5-581b-a0ed-28dfda54ee53",
+      "meeting_name": "Doomben",
+      "category_id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+      "advertised_start": "2026-10-24T05:27:00Z",
+      "race_form": {
+        "distance": 1600,
+        "distance_type": {
+          "id": "570775ef-09aa-4e09-a4f8-6b9b2bd7cf2d",
+          "name": "Metres",
+          "short_name": "m"
+        },
+        "distance_type_id": "570775ef-09aa-4e09-a4f8-6b9b2bd7cf2d",
+        "track_condition": {
+          "id": "8dac31aa-4c18-4b36-9f88-15b9a6b4bb5c",
+          "name": "Good4",
+          "short_name": "good4"
+        },
+        "track_condition_id": "8dac31aa-4c18-4b36-9f88-15b9a6b4bb5c",
+        "weather": {
+          "id": "08e6f7c4-6d1f-4a0e-a6ad-21bf9c4b8f38",
+          "name": "Fine",
+          "short_name": "fine",
+          "icon_uri": "FINE"
+        },
+        "weather_id": "08e6f7c4-6d1f-4a0e-a6ad-21bf9c4b8f38",
+        "race_comment": "OCEAN SAGE (2) was dominant last start and gets the soft run from the gate.",
+        "additional_data": "{\"revealed_race_info\": {\"track_name\": \"Doomben\", \"state\": \"QLD\", \"country\": \"AUS\", \"number\": 3, \"race_name\": \"Brisbane Racing Club (Bm75) Hcp\", \"time\": \"2026-10-24T05:27:00Z\", \"class\": \"BM84\", \"start_type\": \"Barrier\", \"prizemonies\": {\"1st\": 110000, \"2nd\": 36000, \"3rd\": 18000, \"4th\": 10000, \"total_value\": 200000}, \"localised_prizemonies\": {\"AUD\": {\"1st\": 110000, \"2nd\": 36000, \"3rd\": 18000, \"4th\": 10000, \"total_value\": 200000}}, \"rail_position\": \"True Entire Circuit. (Pent: 4.98)\", \"track_direction\": \"Left\", \"track_surface\": \"Turf\", \"group\": \"\", \"gait\": \"\", \"track_home_straight_metres\": 450, \"track_circumference\": 2312, \"race_comment_provider\": \"Racing and Sports\"}}",
+        "generated": 1,
+        "silk_base_url": "drr38safykj6s.cloudfront.net",
+        "race_comment_alternative": "OCEAN SAGE (2) was dominant last start and gets the soft run from the gate."
+      },
+      "venue_id": "091a3623-8b90-58f1-a7cd-03c9852aa7b8",
+      "venue_name": "Doomben",
+      "venue_state": "QLD",
+      "venue_country": "AUS"
+    },
+    "26577c0a-332c-505d-b8b9-8119a365fbf7": {
+      "race_id": "26577c0a-332c-505d-b8b9-8119a365fbf7",
+      "race_name": "Riverbank Plate (Bm70) Hcp",
+      "race_number": 8,
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "meeting_name": "Flemington",
+      "category_id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+      "advertised_start": "2026-10-24T06:00:00Z",
+      "race_form": {
+        "distance": 1800,
+        "distance_type": {
+          "id": "570775ef-09aa-4e09-a4f8-6b9b2bd7cf2d",
+          "name": "Metres",
+          "short_name": "m"
+        },
+        "distance_type_id": "570775ef-09aa-4e09-a4f8-6b9b2bd7cf2d",
+        "track_condition": {
+          "id": "8dac31aa-4c18-4b36-9f88-15b9a6b4bb5c",
+          "name": "Good4",
+          "short_name": "good4"
+        },
+        "track_condition_id": "8dac31aa-4c18-4b36-9f88-15b9a6b4bb5c",
+        "weather": {
+          "id": "08e6f7c4-6d1f-4a0e-a6ad-21bf9c4b8f38",
+          "name": "Fine",
+          "short_name": "fine",
+          "icon_uri": "FINE"
+        },
+        "weather_id": "08e6f7c4-6d1f-4a0e-a6ad-21bf9c4b8f38",
+        "race_comment": "STAYING POWER (4) is the one to beat over the trip.",
+        "additional_data": "{\"revealed_race_info\": {\"track_name\": \"Flemington\", \"state\": \"VIC\", \"country\": \"AUS\", \"number\": 8, \"race_name\": \"Riverbank Plate (Bm70) Hcp\", \"time\": \"2026-10-24T06:00:00Z\", \"class\": \"BM84\", \"start_type\": \"Barrier\", \"prizemonies\": {\"1st\": 110000, \"2nd\": 36000, \"3rd\": 18000, \"4th\": 10000, \"total_value\": 200000}, \"localised_prizemonies\": {\"AUD\": {\"1st\": 110000, \"2nd\": 36000, \"3rd\": 18000, \"4th\": 10000, \"total_value\": 200000}}, \"rail_position\": \"True Entire Circuit. (Pent: 4.98)\", \"track_direction\": \"Left\", \"track_surface\": \"Turf\", \"group\": \"\", \"gait\": \"\", \"track_home_straight_metres\": 450, \"track_circumference\": 2312, \"race_comment_provider\": \"Racing and Sports\"}}",
+        "generated": 1,
+        "silk_base_url": "drr38safykj6s.cloudfront.net",
+        "race_comment_alternative": "STAYING POWER (4) is the one to beat over the trip."
+      },
+      "venue_id": "ed806bb7-c901-546f-ad7d-58c04bcf427c",
+      "venue_name": "Flemington",
+      "venue_state": "VIC",
+      "venue_country": "AUS"
+    }
+  }
+}

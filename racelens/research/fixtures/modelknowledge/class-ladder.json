@@ -1,0 +1,35 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Ordinal class ladder for class-change scoring. The numeric 'level' values are RaceLens spacing choices (low confidence); the ordering and benchmark mechanics are sourced.",
+  "ladder": [
+    {"code": "MDN", "label": "Maiden", "level": 40},
+    {"code": "CL1", "label": "Class 1", "level": 48},
+    {"code": "CL2", "label": "Class 2", "level": 52},
+    {"code": "CL3", "label": "Class 3", "level": 56},
+    {"code": "BM58", "label": "Benchmark 58", "level": 58},
+    {"code": "0-64", "label": "Ratings 0-64 (VIC, reintroduced 2022)", "level": 62},
+    {"code": "BM64", "label": "Benchmark 64", "level": 64},
+    {"code": "BM70", "label": "Benchmark 70", "level": 70},
+    {"code": "BM74", "label": "Benchmark 74 (VIC metro from 2024)", "level": 74},
+    {"code": "BM78", "label": "Benchmark 78", "level": 78},
+    {"code": "BM84", "label": "Benchmark 84", "level": 84},
+    {"code": "BM90", "label": "Benchmark 90", "level": 90},
+    {"code": "BM100", "label": "Benchmark 100", "level": 100},
+    {"code": "OPEN", "label": "Open handicap", "level": 92},
+    {"code": "LR", "label": "Listed (min $80k, mostly $100k)", "level": 95},
+    {"code": "G3", "label": "Group 3", "level": 100},
+    {"code": "G2", "label": "Group 2", "level": 105},
+    {"code": "G1", "label": "Group 1", "level": 112}
+  ],
+  "benchmarkMechanics": {
+    "kgPerRatingPoint": 0.5,
+    "weightAtBenchmark": 60,
+    "noUpperEligibilityLimit": true,
+    "example": "rating 130 horse in a BM78 carries 86 kg",
+    "ratingsRaceDiffers": "a 0-78 ratings race restricts eligibility to <=78",
+    "stateDifferences": "BM70 stronger in VIC/NSW than QLD",
+    "sources": ["https://new.racingandsports.com/news/racing/press-release/2012-04-30/benchmarking-trial-starts-in-victoria/247679", "https://www.horise.com/guides/horse-racing-handicap-ratings/", "https://www.racingvictoria.com.au/news/2022-06-14/rv-media-release-programming-changes-announced-to-improve-opportunities-for-lower-rated-horses", "https://racingvictoria.com.au/news/2024-05-16/victorias-race-programs-set-to-feature-two-new-classes", "https://www.gobet.com.au/horse-racing-tips/guides/horse-racing-classes/"],
+    "confidence": "medium"
+  },
+  "classChangeBands": {"drop": [30, 20, 10, 0], "rise": [20, 10, 0], "source": "https://raw.githubusercontent.com/Pardosa13/www.theformanalyst.com/main/chat_assistant.py", "confidence": "high", "note": "band convention from community tool; effect sizes not published"},
+  "weightEvidence": {"doncaster56_5kgHeadToHeads": {"won": 446, "of": 698, "share": 0.64, "interpretation": "class, not weight, drives it", "source": "https://www.racingandsports.com/news/racing/news/2018-04-04/weighing-up-the-doncaster/442952", "confidence": "medium"}, "ruleOfThumbLengthsPerKg": {"1200m": 0.67, "2400m": 1.0, "confidence": "low", "note": "memory"}}
+}

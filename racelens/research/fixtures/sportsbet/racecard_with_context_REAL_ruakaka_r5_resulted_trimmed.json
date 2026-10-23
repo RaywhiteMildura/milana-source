@@ -1,0 +1,1270 @@
+{
+  "_fixtureNote": "REAL wire capture (NOT constructed), TRIMMED for size. GET https://www.sportsbet.com.au/apigw/sportsbook-racing/Sportsbook/Racing/Events/10812059/RacecardWithContext?classId=1 - Ruakaka (NZ) R5, 2026-08-15, captured after the race (bettingStatus RESULTED). Source: github.com/kaballas/yy1 backup/race_10812059_class_1.json @0cd4af7b (338 KB original). Trimming: Win or Place kept to 5 of 15 selections, recentStartsThoroughbreds to 2 per runner, secondary markets reduced to Odds vs Evens, SRM/SGM lists to 1 market x 2 selections, context to 4 meetings / 3 events. Every retained key/value is verbatim.",
+  "racecardEvent": {
+    "id": 10812059,
+    "raceNumber": 5,
+    "distance": "1600",
+    "className": "Horses - Aus/NZ",
+    "competitionId": 583,
+    "competitionName": "Ruakaka",
+    "startTime": 1786763220,
+    "quinellaAvailable": true,
+    "exactaAvailable": true,
+    "trifectaAvailable": true,
+    "showFoldIcon": false,
+    "estStartTime": 1786763251,
+    "hasBIR": true,
+    "hasBIRStarted": false,
+    "eventSort": "MTCH",
+    "bettingStatus": "RESULTED",
+    "livePriceResultConfirmed": true,
+    "livePriceSettled": true,
+    "nonLivePriceSettled": true,
+    "powerPlayExtra": false,
+    "country": "New Zealand",
+    "sameGameMultiEnabled": true,
+    "name": "R5 Ruakākā Beach Front Motel (Bm65)",
+    "displayName": "R5 Ruakaka",
+    "statusCode": "R",
+    "classId": 1,
+    "sort": 50,
+    "trackStatus": "Soft (6)",
+    "streamingAvailable": false,
+    "availableStreamingType": "sky",
+    "raceReplayAvailable": false,
+    "firstFourAvailable": true,
+    "srmExoticsConfig": {
+      "availableExotics": {
+        "exactaAvailable": true,
+        "quinellaAvailable": true,
+        "trifectaAvailable": true,
+        "firstFourAvailable": true
+      },
+      "enabled": true,
+      "guaranteedPrice": false
+    },
+    "mbsAvailable": false,
+    "longFormAvailable": true,
+    "competitionStartTime": 1786754400,
+    "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059",
+    "externalId": "b3bcf1cf-3c5a-448e-b778-9c63c352c2ac",
+    "topXFinishMarketList": [],
+    "srmExoticsMarketList": [
+      {
+        "id": 250890614,
+        "name": "Win",
+        "marketType": "-",
+        "marketSort": "--",
+        "livePriceAvailable": true,
+        "availablePriceTypes": "L",
+        "eachwayAvailable": false,
+        "placeAvailable": true,
+        "sameGameMultiEnabled": true,
+        "accMax": 25,
+        "accRestriction": "-",
+        "selections": [
+          {
+            "id": 1238624502,
+            "name": "Double Take",
+            "isOut": false,
+            "prices": [
+              {
+                "priceCode": "L",
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614/Selections/1238624502/Prices/L"
+              }
+            ],
+            "multiplesKey": "Double Take",
+            "sort": 1,
+            "statusCode": "S",
+            "externalId": "993a82bf-c7b0-44e7-8c6e-b2d7570043fe",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/undefined/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614/Selections/1238624502"
+          },
+          {
+            "id": 1238624505,
+            "name": "Jurisprudence",
+            "isOut": false,
+            "prices": [
+              {
+                "priceCode": "L",
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614/Selections/1238624505/Prices/L"
+              }
+            ],
+            "multiplesKey": "Jurisprudence",
+            "sort": 2,
+            "statusCode": "S",
+            "externalId": "6b591264-0554-4b77-8202-e181d541e548",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/undefined/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614/Selections/1238624505"
+          }
+        ],
+        "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614",
+        "statusCode": "S",
+        "sort": 901,
+        "isDisplayed": false,
+        "srmExoticsFixedOddsAvailable": true,
+        "externalId": "f18f79b5-b98c-46a4-bdfa-a3970279794c"
+      }
+    ],
+    "sgmMarketList": [
+      {
+        "id": 250890614,
+        "name": "Win",
+        "marketType": "-",
+        "marketSort": "--",
+        "livePriceAvailable": true,
+        "availablePriceTypes": "L",
+        "eachwayAvailable": false,
+        "placeAvailable": true,
+        "sameGameMultiEnabled": true,
+        "accMax": 25,
+        "accRestriction": "-",
+        "selections": [
+          {
+            "id": 1238624502,
+            "name": "Double Take",
+            "isOut": false,
+            "prices": [
+              {
+                "priceCode": "L",
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614/Selections/1238624502/Prices/L"
+              }
+            ],
+            "multiplesKey": "Double Take",
+            "sort": 1,
+            "statusCode": "S",
+            "externalId": "993a82bf-c7b0-44e7-8c6e-b2d7570043fe",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/undefined/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614/Selections/1238624502"
+          },
+          {
+            "id": 1238624505,
+            "name": "Jurisprudence",
+            "isOut": false,
+            "prices": [
+              {
+                "priceCode": "L",
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614/Selections/1238624505/Prices/L"
+              }
+            ],
+            "multiplesKey": "Jurisprudence",
+            "sort": 2,
+            "statusCode": "S",
+            "externalId": "6b591264-0554-4b77-8202-e181d541e548",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/undefined/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614/Selections/1238624505"
+          }
+        ],
+        "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890614",
+        "statusCode": "S",
+        "sort": 901,
+        "isDisplayed": false,
+        "sameMarketMultiEnabled": true,
+        "externalId": "f18f79b5-b98c-46a4-bdfa-a3970279794c"
+      }
+    ],
+    "markets": [
+      {
+        "id": 250890610,
+        "name": "Win or Place",
+        "marketType": "-",
+        "marketSort": "--",
+        "BIR": false,
+        "availablePriceTypes": "MID,MDP,L",
+        "blurb": "Only final field runners subject to deductions",
+        "livePriceAvailable": true,
+        "homeTote": "SUT",
+        "poolDividendList": [
+          {
+            "dividendValue": "15.6000",
+            "legResults": "9,6",
+            "races": "6,5",
+            "name": "RUAKAKA 2026/08/15 Races(5,6)",
+            "poolType": "Running Double"
+          },
+          {
+            "dividendValue": "25.3000",
+            "legResults": "8,9",
+            "races": "4,5",
+            "name": "RUAKAKA 2026/08/15 Races(4,5)",
+            "poolType": "Running Double"
+          },
+          {
+            "dividendValue": "1182.4000",
+            "legResults": "9,6,2,8",
+            "races": "8,6,5,7",
+            "name": "RUAKAKA 2026/08/15 Races(5,6,7,8)",
+            "poolType": "Quaddie"
+          }
+        ],
+        "accMax": 25,
+        "accRestriction": "-",
+        "trifectaAvailable": true,
+        "firstFourAvailable": true,
+        "quinellaAvailable": true,
+        "exactaAvailable": true,
+        "cashoutIcon": false,
+        "geolocationExclusion": [],
+        "statusCode": "S",
+        "sort": 0,
+        "numPlaces": 3,
+        "eachwayAvailable": true,
+        "placeAvailable": true,
+        "international": false,
+        "mbsAvailable": false,
+        "isDisplayed": true,
+        "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610",
+        "httpLink": "Sportsbook/Racing/Events/10812059/Markets/250890610",
+        "selections": [
+          {
+            "id": 1238624462,
+            "name": "Double Take",
+            "runnerNumber": 1,
+            "drawNumber": 14,
+            "shortForm": "X007",
+            "jockey": "Tom Wigram",
+            "weightGram": 60000,
+            "trainer": "J & R Vance",
+            "isOut": false,
+            "recentOddsFluctuations": [
+              46,
+              41,
+              46,
+              41,
+              35,
+              34,
+              27,
+              26,
+              23,
+              26
+            ],
+            "powerPlayPricing": {
+              "sPrice": 51,
+              "rPrice": 44,
+              "gPrice": 67,
+              "vPrice": 51,
+              "pPrice": 61,
+              "lPrice": 61,
+              "mPrice": 61,
+              "ePrice": 61
+            },
+            "marketMover": false,
+            "prices": [
+              {
+                "priceCode": "MDP",
+                "winPrice": 34,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624462/Prices/MDP"
+              },
+              {
+                "priceCode": "MID",
+                "winPrice": 34,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624462/Prices/MID"
+              },
+              {
+                "priceCode": "L",
+                "placePriceNum": 8,
+                "placePriceDen": 1,
+                "winPriceNum": 40,
+                "winPriceDen": 1,
+                "winPrice": 41,
+                "placePrice": 9,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624462/Prices/L"
+              }
+            ],
+            "result": "L",
+            "multiplesKey": "Double Take",
+            "sort": 10,
+            "statusCode": "S",
+            "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/b3bcf1cf-3c5a-448e-b778-9c63c352c2ac/53be7b7b-4e1e-4121-826d-80aaba32911f.png",
+            "statistics": {
+              "winPercentage": 11.11,
+              "placePercentage": 33.33,
+              "dryRating": "79",
+              "wetRating": "79",
+              "sire": "Declaration Of War (USA)",
+              "dam": "Hidden Kisses (AUS)",
+              "colour": "b",
+              "age": 10,
+              "sex": "g",
+              "overview": "Doesn’t win out of turn and ran below par last time when seventh over 1600m at Te Rapa and beaten 15 lengths. Drops in class, and can do much better.",
+              "overviewProvider": "R_AND_S",
+              "total": "54:6,5,7",
+              "distance": "8:0,1,0",
+              "track": "8:2,1,1",
+              "firm": "0:0,0,0",
+              "good": "24:3,4,3",
+              "soft": "18:2,1,3",
+              "heavy": "6:1,0,0",
+              "firstUp": "8:0,0,1",
+              "secondUp": "8:0,1,0",
+              "jumps": "0:0,0,0",
+              "distanceTrack": "2:0,1,0",
+              "speed": 42,
+              "formFig": "73x007",
+              "thirdUp": "7:0,1,1",
+              "fourthUp": "5:1,0,2",
+              "horseJockey": "0:0,0,0",
+              "synthetic": "6:0,0,1",
+              "recentStartsThoroughbreds": [
+                {
+                  "place": 7,
+                  "totalRunners": 7,
+                  "date": "25/07/2026",
+                  "trackName": "Te Rapa",
+                  "distance": "1600m",
+                  "trackStatus": "Heavy",
+                  "trackStatusValue": 10,
+                  "margin": "15.5L",
+                  "jockey": "M Hashizume",
+                  "weight": "56kg",
+                  "barrier": 3,
+                  "startingPrice": "$23.60",
+                  "class": "BM75",
+                  "time": "01.43.61",
+                  "first": "Pegasus (56.5kg)",
+                  "second": "Amira D'Argento (54.5kg)"
+                },
+                {
+                  "place": 12,
+                  "totalRunners": 14,
+                  "date": "14/06/2026",
+                  "trackName": "Matamata",
+                  "distance": "1600m",
+                  "trackStatus": "Soft",
+                  "trackStatusValue": 7,
+                  "margin": "7.3L",
+                  "jockey": "Hayley Hassman",
+                  "weight": "57.5kg",
+                  "barrier": 12,
+                  "startingPrice": "$31.60",
+                  "class": "RST70",
+                  "time": "01.40.91",
+                  "first": "Flamenco (54.5kg)",
+                  "second": "Jungle Love (58kg)"
+                }
+              ],
+              "prizeMoney": 584832,
+              "fluc1": 41,
+              "fluc2": 46,
+              "openPrice": 23,
+              "lastStart": {},
+              "lastSix": "73x007",
+              "blinkers": false
+            },
+            "weightClaim": "a3",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/1/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624462",
+            "resultConfirmed": true,
+            "trainerLocation": "Ardmore Lodge",
+            "racingIQShortformAvailable": true,
+            "runnerCountry": "AUS",
+            "place": 12,
+            "margin": "6.8L"
+          },
+          {
+            "id": 1238624466,
+            "name": "Jurisprudence",
+            "runnerNumber": 2,
+            "drawNumber": 3,
+            "shortForm": "3463",
+            "jockey": "Abhay Seesa",
+            "weightGram": 59000,
+            "trainer": "Danny Walker & Arron Tata",
+            "isOut": false,
+            "recentOddsFluctuations": [
+              9.5,
+              9,
+              9.5,
+              9,
+              9.5,
+              9,
+              9.5,
+              10,
+              9.5,
+              9
+            ],
+            "powerPlayPricing": {
+              "sPrice": 11,
+              "rPrice": 11,
+              "gPrice": 11,
+              "vPrice": 11,
+              "pPrice": 11,
+              "lPrice": 11,
+              "mPrice": 11,
+              "ePrice": 11
+            },
+            "marketMover": false,
+            "prices": [
+              {
+                "priceCode": "MDP",
+                "winPrice": 9.5,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624466/Prices/MDP"
+              },
+              {
+                "priceCode": "MID",
+                "winPrice": 9.5,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624466/Prices/MID"
+              },
+              {
+                "priceCode": "L",
+                "placePriceNum": 19,
+                "placePriceDen": 10,
+                "winPriceNum": 8,
+                "winPriceDen": 1,
+                "winPrice": 9,
+                "placePrice": 2.9,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624466/Prices/L"
+              }
+            ],
+            "result": "P",
+            "multiplesKey": "Jurisprudence",
+            "sort": 20,
+            "statusCode": "S",
+            "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/b3bcf1cf-3c5a-448e-b778-9c63c352c2ac/074df6c3-f90f-466f-aef5-412c50660820.png",
+            "statistics": {
+              "winPercentage": 8.7,
+              "placePercentage": 34.78,
+              "dryRating": "99",
+              "wetRating": "99",
+              "sire": "Justify (USA)",
+              "dam": "Eckstein (AUS)",
+              "colour": "b",
+              "age": 6,
+              "sex": "h",
+              "overview": "Is not a prolific winner with just two victories from 23 starts. Last start finished third over 1400m at this track. Capable enough on his day and is a key runner.",
+              "overviewProvider": "R_AND_S",
+              "total": "23:2,1,5",
+              "distance": "9:1,0,2",
+              "track": "1:0,0,1",
+              "firm": "0:0,0,0",
+              "good": "7:0,0,3",
+              "soft": "13:2,1,2",
+              "heavy": "1:0,0,0",
+              "firstUp": "3:0,0,2",
+              "secondUp": "3:1,0,1",
+              "jumps": "0:0,0,0",
+              "distanceTrack": "0:0,0,0",
+              "speed": 65,
+              "formFig": "063463",
+              "thirdUp": "3:1,0,0",
+              "fourthUp": "2:0,0,0",
+              "horseJockey": "1:0,0,1",
+              "synthetic": "2:0,0,0",
+              "recentStartsThoroughbreds": [
+                {
+                  "place": 3,
+                  "totalRunners": 12,
+                  "date": "18/07/2026",
+                  "trackName": "Ruakaka",
+                  "distance": "1400m",
+                  "trackStatus": "Good",
+                  "trackStatusValue": 4,
+                  "margin": "3.3L",
+                  "jockey": "Abhay Sessa",
+                  "weight": "55kg",
+                  "barrier": 3,
+                  "startingPrice": "$11.00",
+                  "class": "BM65",
+                  "time": "01.23.39",
+                  "first": "Miss Seth (54.5kg)",
+                  "second": "Chicago Dream (56kg)"
+                },
+                {
+                  "place": 6,
+                  "totalRunners": 14,
+                  "date": "23/05/2026",
+                  "trackName": "Ellerslie",
+                  "distance": "1600m",
+                  "trackStatus": "Soft",
+                  "trackStatusValue": 5,
+                  "margin": "3.1L",
+                  "jockey": "Corentin Berge",
+                  "weight": "59.5kg",
+                  "barrier": 9,
+                  "startingPrice": "$11.00",
+                  "class": "BM65",
+                  "time": "01.36.72",
+                  "first": "I Park (59kg)",
+                  "second": "Free Bird (57.5kg)"
+                }
+              ],
+              "prizeMoney": 106225,
+              "fluc1": 9,
+              "fluc2": 9.5,
+              "openPrice": 13,
+              "lastStart": {},
+              "lastSix": "063463",
+              "awards": [
+                {
+                  "type": "trackExpert",
+                  "rate": 100,
+                  "awardTitle": "Track Talent",
+                  "awardDescription": "Solid top 3 record at track: 100%",
+                  "iconName": "likesTheTrack"
+                }
+              ],
+              "blinkers": false
+            },
+            "weightClaim": "a4",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/2/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624466",
+            "resultConfirmed": true,
+            "trainerLocation": "Byerley Park",
+            "racingIQShortformAvailable": true,
+            "runnerCountry": "AUS",
+            "place": 3,
+            "dividend": [
+              "SP:9.00",
+              "NSW:2.9",
+              "UNI:2.9",
+              "MID:2.9",
+              "STAB:2.6",
+              "NTS:2.6",
+              "NTL:2.6"
+            ],
+            "margin": "2.5L"
+          },
+          {
+            "id": 1238624469,
+            "name": "Sugar Daddy",
+            "runnerNumber": 3,
+            "drawNumber": 10,
+            "shortForm": "152",
+            "jockey": "Sam Mcnab",
+            "weightGram": 59000,
+            "trainer": "A W Pike",
+            "isOut": false,
+            "recentOddsFluctuations": [
+              5,
+              5.5,
+              6,
+              5.5
+            ],
+            "powerPlayPricing": {
+              "sPrice": 6.25,
+              "rPrice": 6.25,
+              "gPrice": 6.25,
+              "vPrice": 6.25,
+              "pPrice": 6.25,
+              "lPrice": 6.25,
+              "mPrice": 6.25,
+              "ePrice": 6.25
+            },
+            "marketMover": false,
+            "prices": [
+              {
+                "priceCode": "MDP",
+                "winPrice": 5.9,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624469/Prices/MDP"
+              },
+              {
+                "priceCode": "MID",
+                "winPrice": 5.9,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624469/Prices/MID"
+              },
+              {
+                "priceCode": "L",
+                "placePriceNum": 23,
+                "placePriceDen": 20,
+                "winPriceNum": 9,
+                "winPriceDen": 2,
+                "winPrice": 5.5,
+                "placePrice": 2.15,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624469/Prices/L"
+              }
+            ],
+            "result": "L",
+            "multiplesKey": "Sugar Daddy",
+            "sort": 30,
+            "statusCode": "S",
+            "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/b3bcf1cf-3c5a-448e-b778-9c63c352c2ac/f57530ae-b5ab-482b-a215-21aa9857693d.png",
+            "statistics": {
+              "winPercentage": 33.33,
+              "placePercentage": 66.67,
+              "dryRating": "97",
+              "wetRating": "97",
+              "sire": "Deep Field (AUS)",
+              "dam": "Kiss The Daddy (USA)",
+              "colour": "b",
+              "age": 4,
+              "sex": "g",
+              "overview": "Lightly raced gelding who was beaten 7 lengths into second last start over 1600m at Te Rapa. Key runner who is expected to be in the finish.",
+              "overviewProvider": "R_AND_S",
+              "total": "3:1,1,0",
+              "distance": "2:0,1,0",
+              "track": "0:0,0,0",
+              "firm": "0:0,0,0",
+              "good": "0:0,0,0",
+              "soft": "1:0,0,0",
+              "heavy": "2:1,1,0",
+              "firstUp": "1:1,0,0",
+              "secondUp": "1:0,0,0",
+              "jumps": "0:0,0,0",
+              "distanceTrack": "0:0,0,0",
+              "speed": 38,
+              "formFig": "152",
+              "thirdUp": "1:0,1,0",
+              "fourthUp": "0:0,0,0",
+              "horseJockey": "2:1,0,0",
+              "synthetic": "0:0,0,0",
+              "recentStartsThoroughbreds": [
+                {
+                  "place": 2,
+                  "totalRunners": 15,
+                  "date": "25/07/2026",
+                  "trackName": "Te Rapa",
+                  "distance": "1600m",
+                  "trackStatus": "Heavy",
+                  "trackStatusValue": 10,
+                  "margin": "7.3L",
+                  "jockey": "S T Collett",
+                  "weight": "59kg",
+                  "barrier": 2,
+                  "startingPrice": "$7.20",
+                  "class": "BM65",
+                  "time": "01.43.77",
+                  "first": "Zenith (54.5kg)",
+                  "second": "Sugar Daddy (59kg)"
+                },
+                {
+                  "place": 5,
+                  "totalRunners": 14,
+                  "date": "04/07/2026",
+                  "trackName": "Te Rapa",
+                  "distance": "1600m",
+                  "trackStatus": "Soft",
+                  "trackStatusValue": 7,
+                  "margin": "1.6L",
+                  "jockey": "Sam McNab",
+                  "weight": "57kg",
+                  "barrier": 16,
+                  "startingPrice": "$9.70",
+                  "class": "BM65",
+                  "time": "01.39.80",
+                  "first": "Afterglo (57kg)",
+                  "second": "Ever Charm (56kg)"
+                }
+              ],
+              "prizeMoney": 16870,
+              "fluc1": 5.5,
+              "fluc2": 5,
+              "openPrice": 5.5,
+              "lastStart": {},
+              "lastSix": "152",
+              "awards": [
+                {
+                  "type": "perfectPrep1stUp",
+                  "rate": 100,
+                  "awardTitle": "Ready to Fire",
+                  "awardDescription": "Past success 1st run back",
+                  "iconName": "readyToFire"
+                }
+              ],
+              "blinkers": false
+            },
+            "weightClaim": "a2",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/3/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624469",
+            "resultConfirmed": true,
+            "trainerLocation": "Cambridge",
+            "racingIQShortformAvailable": true,
+            "runnerCountry": "AUS",
+            "place": 8,
+            "margin": "4.9L"
+          },
+          {
+            "id": 1238624471,
+            "name": "I Dunnet",
+            "runnerNumber": 4,
+            "drawNumber": 11,
+            "shortForm": "71X9",
+            "jockey": "Wiremu Pinn",
+            "weightGram": 58000,
+            "trainer": "K I Rae",
+            "isOut": false,
+            "recentOddsFluctuations": [
+              41,
+              35,
+              34,
+              31,
+              27,
+              26,
+              27,
+              26,
+              27,
+              26
+            ],
+            "powerPlayPricing": {
+              "sPrice": 67,
+              "rPrice": 67,
+              "gPrice": 67,
+              "vPrice": 67,
+              "pPrice": 67,
+              "lPrice": 67,
+              "mPrice": 67,
+              "ePrice": 67
+            },
+            "marketMover": false,
+            "prices": [
+              {
+                "priceCode": "MDP",
+                "winPrice": 31,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624471/Prices/MDP"
+              },
+              {
+                "priceCode": "MID",
+                "winPrice": 31,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624471/Prices/MID"
+              },
+              {
+                "priceCode": "L",
+                "placePriceNum": 9,
+                "placePriceDen": 1,
+                "winPriceNum": 45,
+                "winPriceDen": 1,
+                "winPrice": 46,
+                "placePrice": 10,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624471/Prices/L"
+              }
+            ],
+            "result": "L",
+            "multiplesKey": "I Dunnet",
+            "sort": 40,
+            "statusCode": "S",
+            "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/b3bcf1cf-3c5a-448e-b778-9c63c352c2ac/528373f2-30e0-4469-8953-be251b6e2a3d.png",
+            "statistics": {
+              "winPercentage": 10,
+              "placePercentage": 30,
+              "dryRating": "86",
+              "wetRating": "86",
+              "sire": "Preferment (NZ)",
+              "dam": "Ididit (NZ)",
+              "colour": "b",
+              "age": 4,
+              "sex": "g",
+              "overview": "Didn't do a great deal when resuming over 1300m at this track last start, finishing 5.5 lengths away in ninth. Might need another run.",
+              "overviewProvider": "R_AND_S",
+              "total": "10:1,0,2",
+              "distance": "3:1,0,0",
+              "track": "5:0,0,2",
+              "firm": "0:0,0,0",
+              "good": "1:0,0,0",
+              "soft": "7:0,0,1",
+              "heavy": "2:1,0,1",
+              "firstUp": "3:0,0,1",
+              "secondUp": "2:0,0,1",
+              "jumps": "0:0,0,0",
+              "distanceTrack": "0:0,0,0",
+              "speed": 82,
+              "formFig": "4471x9",
+              "thirdUp": "1:0,0,0",
+              "fourthUp": "1:0,0,0",
+              "horseJockey": "2:0,0,1",
+              "synthetic": "0:0,0,0",
+              "recentStartsThoroughbreds": [
+                {
+                  "place": 9,
+                  "totalRunners": 12,
+                  "date": "01/08/2026",
+                  "trackName": "Ruakaka",
+                  "distance": "1300m",
+                  "trackStatus": "Soft",
+                  "trackStatusValue": 6,
+                  "margin": "5.7L",
+                  "jockey": "W F Pinn",
+                  "weight": "58.5kg",
+                  "barrier": 3,
+                  "startingPrice": "$38.00",
+                  "class": "BM65",
+                  "time": "01.18.69",
+                  "first": "Rotten Tommy (59kg)",
+                  "second": "Ashoka (57kg)"
+                },
+                {
+                  "place": 1,
+                  "totalRunners": 7,
+                  "date": "08/04/2026",
+                  "trackName": "Avondale",
+                  "distance": "1600m",
+                  "trackStatus": "Heavy",
+                  "trackStatusValue": 8,
+                  "margin": "0.1L",
+                  "jockey": "Jack Taplin",
+                  "weight": "54.5kg",
+                  "barrier": 12,
+                  "startingPrice": "$5.20",
+                  "class": "Mdn",
+                  "time": "01.41.12",
+                  "first": "I Dunnet (54.5kg)",
+                  "second": "Not Usual Moana (54kg)"
+                }
+              ],
+              "prizeMoney": 16475,
+              "fluc1": 35,
+              "fluc2": 41,
+              "openPrice": 27,
+              "lastStart": {},
+              "lastSix": "4471x9",
+              "awards": [
+                {
+                  "type": "distanceSuccess",
+                  "rate": 33.33,
+                  "awardTitle": "Striking Dist.",
+                  "awardDescription": "Good distance record",
+                  "iconName": "likesTheDistance"
+                }
+              ],
+              "blinkers": false
+            },
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/4/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624471",
+            "resultConfirmed": true,
+            "trainerLocation": "Ruakaka",
+            "racingIQShortformAvailable": true,
+            "runnerCountry": "NZ",
+            "place": 10,
+            "margin": "6.0L"
+          },
+          {
+            "id": 1238624474,
+            "name": "Emmy Dazzler",
+            "runnerNumber": 5,
+            "drawNumber": 13,
+            "shortForm": "20X5",
+            "jockey": "Sienna Brown",
+            "weightGram": 57500,
+            "trainer": "C J Wood",
+            "isOut": false,
+            "recentOddsFluctuations": [
+              18,
+              17,
+              18,
+              17,
+              18,
+              17,
+              18,
+              17,
+              16,
+              17
+            ],
+            "powerPlayPricing": {
+              "sPrice": 20,
+              "rPrice": 20,
+              "gPrice": 20,
+              "vPrice": 20,
+              "pPrice": 20,
+              "lPrice": 20,
+              "mPrice": 20,
+              "ePrice": 20
+            },
+            "marketMover": false,
+            "prices": [
+              {
+                "priceCode": "MDP",
+                "winPrice": 21,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624474/Prices/MDP"
+              },
+              {
+                "priceCode": "MID",
+                "winPrice": 21,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624474/Prices/MID"
+              },
+              {
+                "priceCode": "L",
+                "placePriceNum": 17,
+                "placePriceDen": 5,
+                "winPriceNum": 16,
+                "winPriceDen": 1,
+                "winPrice": 17,
+                "placePrice": 4.4,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624474/Prices/L"
+              }
+            ],
+            "result": "L",
+            "multiplesKey": "Emmy Dazzler",
+            "sort": 50,
+            "statusCode": "S",
+            "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/b3bcf1cf-3c5a-448e-b778-9c63c352c2ac/026c6db9-8458-4112-981b-24943ceeeb8c.png",
+            "statistics": {
+              "winPercentage": 11.11,
+              "placePercentage": 37.04,
+              "dryRating": "96",
+              "wetRating": "96",
+              "sire": "Embellish (NZ)",
+              "dam": "Maid Of Steel (NZ)",
+              "colour": "b",
+              "age": 6,
+              "sex": "m",
+              "overview": "Beaten 6 lengths into fifth when resuming last start over 1300m at Cambridge Synthetic. Strips fitter and is among the chances.",
+              "overviewProvider": "R_AND_S",
+              "total": "27:3,4,3",
+              "distance": "5:0,1,1",
+              "track": "1:0,0,0",
+              "firm": "0:0,0,0",
+              "good": "9:0,2,1",
+              "soft": "5:0,0,1",
+              "heavy": "7:2,1,0",
+              "firstUp": "4:0,0,0",
+              "secondUp": "3:0,0,0",
+              "jumps": "0:0,0,0",
+              "distanceTrack": "1:0,0,0",
+              "speed": 22,
+              "formFig": "7220x5",
+              "thirdUp": "3:0,0,0",
+              "fourthUp": "3:1,0,0",
+              "horseJockey": "10:1,2,1",
+              "synthetic": "6:1,1,1",
+              "recentStartsThoroughbreds": [
+                {
+                  "place": 5,
+                  "totalRunners": 5,
+                  "date": "29/07/2026",
+                  "trackName": "Cambridge Synthetic",
+                  "distance": "1300m",
+                  "trackStatus": "Synthetic",
+                  "trackStatusValue": null,
+                  "margin": "5.9L",
+                  "jockey": "Sienna Brown",
+                  "weight": "51kg",
+                  "barrier": 3,
+                  "startingPrice": "$7.20",
+                  "class": "BM80",
+                  "time": "01.15.41",
+                  "first": "Perfect Dividends (53.5kg)",
+                  "second": "Bannen (54kg)"
+                },
+                {
+                  "place": 12,
+                  "totalRunners": 14,
+                  "date": "26/12/2025",
+                  "trackName": "Ellerslie",
+                  "distance": "1400m",
+                  "trackStatus": "Soft",
+                  "trackStatusValue": 5,
+                  "margin": "5.3L",
+                  "jockey": "Sienna Brown",
+                  "weight": "54kg",
+                  "barrier": 8,
+                  "startingPrice": "$18.50",
+                  "class": "BM65",
+                  "time": "01.24.21",
+                  "first": "Mid Ocean (56.5kg)",
+                  "second": "High Emotion (57.5kg)"
+                }
+              ],
+              "prizeMoney": 72275,
+              "fluc1": 17,
+              "fluc2": 18,
+              "openPrice": 16,
+              "lastStart": {},
+              "lastSix": "7220x5",
+              "blinkers": false
+            },
+            "weightClaim": "a3",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/5/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/250890610/Selections/1238624474",
+            "resultConfirmed": true,
+            "trainerLocation": "Cambridge",
+            "racingIQShortformAvailable": true,
+            "runnerCountry": "NZ",
+            "place": 6,
+            "margin": "2.9L"
+          }
+        ]
+      },
+      {
+        "id": 251199830,
+        "name": "Odds vs Evens",
+        "marketType": "-",
+        "marketSort": "RO",
+        "BIR": false,
+        "availablePriceTypes": "L",
+        "livePriceAvailable": true,
+        "accMax": 25,
+        "accRestriction": "-",
+        "cashoutIcon": false,
+        "geolocationExclusion": [],
+        "statusCode": "S",
+        "sort": 40,
+        "international": false,
+        "mbsAvailable": false,
+        "isDisplayed": false,
+        "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/251199830",
+        "httpLink": "Sportsbook/Racing/Events/10812059/Markets/251199830",
+        "selections": [
+          {
+            "id": 1240119015,
+            "name": "Odds",
+            "isOut": false,
+            "prices": [
+              {
+                "priceCode": "L",
+                "winPriceNum": 880,
+                "winPriceDen": 1000,
+                "winPrice": 1.88,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/251199830/Selections/1240119015/Prices/L"
+              }
+            ],
+            "sort": 10,
+            "statusCode": "S",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/undefined/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/251199830/Selections/1240119015"
+          },
+          {
+            "id": 1240119016,
+            "name": "Evens",
+            "isOut": false,
+            "prices": [
+              {
+                "priceCode": "L",
+                "winPriceNum": 820,
+                "winPriceDen": 1000,
+                "winPrice": 1.82,
+                "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/251199830/Selections/1240119016/Prices/L"
+              }
+            ],
+            "sort": 20,
+            "statusCode": "S",
+            "longFormLink": "https://www.sportsbetform.com.au/mobile/10812059/undefined/",
+            "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/583/Events/10812059/Markets/251199830/Selections/1240119016"
+          }
+        ]
+      }
+    ],
+    "results": [
+      {
+        "id": 1238624466,
+        "name": "Jurisprudence",
+        "runnerNumber": 2,
+        "result": "P",
+        "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/b3bcf1cf-3c5a-448e-b778-9c63c352c2ac/074df6c3-f90f-466f-aef5-412c50660820.png",
+        "winPrice": 9,
+        "placePrice": 2.9,
+        "jockey": "Abhay Seesa",
+        "trainer": "Danny Walker & Arron Tata",
+        "drawNumber": 3,
+        "place": 3,
+        "dividend": [
+          "SP:9.00",
+          "NSW:2.9",
+          "UNI:2.9",
+          "MID:2.9",
+          "STAB:2.6",
+          "NTS:2.6",
+          "NTL:2.6"
+        ]
+      },
+      {
+        "id": 1238624477,
+        "name": "Interplanetary",
+        "runnerNumber": 6,
+        "result": "P",
+        "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/b3bcf1cf-3c5a-448e-b778-9c63c352c2ac/53103a57-3519-4f1c-826f-dbfd8b4e728f.png",
+        "winPrice": 31,
+        "placePrice": 7,
+        "jockey": "Erin M Leighton",
+        "trainer": "S & E Clotworthy",
+        "drawNumber": 15,
+        "place": 4,
+        "dividend": [
+          "SP:31.00"
+        ]
+      },
+      {
+        "id": 1238624481,
+        "name": "Merriama",
+        "runnerNumber": 8,
+        "result": "P",
+        "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/b3bcf1cf-3c5a-448e-b778-9c63c352c2ac/9ea9a043-9c25-4c1a-9238-17ea51179727.png",
+        "winPrice": 3.8,
+        "placePrice": 1.7,
+        "jockey": "Michael Mc Nab",
+        "trainer": "Ms K A Hoskin",
+        "drawNumber": 1,
+        "place": 2,
+        "dividend": [
+          "SP:3.80",
+          "NSW:1.9",
+          "UNI:1.9",
+          "MID:1.9",
+          "STAB:1.7",
+          "NTS:1.7",
+          "NTL:1.7"
+        ]
+      },
+      {
+        "id": 1238624483,
+        "name": "Miss Seth",
+        "runnerNumber": 9,
+        "result": "W",
+        "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/b3bcf1cf-3c5a-448e-b778-9c63c352c2ac/0367f3cb-a0ee-49f7-a509-ed6c5c2f7cf7.png",
+        "winPrice": 4.8,
+        "placePrice": 1.95,
+        "jockey": "Rihaan Goyaram",
+        "trainer": "K I Rae",
+        "drawNumber": 6,
+        "place": 1,
+        "dividend": [
+          "SP:4.80",
+          "NSW/PL:4.4/1.7",
+          "UNI/PL:4.6/1.6",
+          "MID/PL:4.4/1.7",
+          "STAB/PL:4.0/1.8",
+          "NTS/PL:4.0/1.8",
+          "NTL:1.8",
+          "NTV:4.2",
+          "NTX:4.4",
+          "NTP/NTL:4.0/1.8"
+        ]
+      }
+    ],
+    "exoticResults": [
+      {
+        "name": "Quinella",
+        "runnerNumbers": [
+          "9",
+          "8"
+        ],
+        "dividend": "7.1"
+      },
+      {
+        "name": "Exacta",
+        "runnerNumbers": [
+          "9",
+          "8"
+        ],
+        "dividend": "17.5"
+      },
+      {
+        "name": "Trifecta",
+        "runnerNumbers": [
+          "9",
+          "8",
+          "2"
+        ],
+        "dividend": "91.4"
+      },
+      {
+        "name": "First 4",
+        "runnerNumbers": [
+          "9",
+          "8",
+          "2",
+          "6"
+        ],
+        "dividend": "1462.9"
+      }
+    ],
+    "deductions": [
+      {
+        "name": "Billy Blinx",
+        "runnerNumber": 15,
+        "dateTimeTo": 1786737676,
+        "id": 3159690,
+        "isValid": "Y",
+        "priceType": "L",
+        "value": 0,
+        "placeDeduction": 0
+      }
+    ],
+    "overview": "MISS SETH (9) saves her best for her home track, and followed up her upset win here 2 starts back with a fast finishing third as the favourite a fortnight ago on this track. The extra 300m is the key here, and she will again be hard to hold out. MERRIAMA (8) showed a quick turn of foot when scoring her maiden win here 2 weeks ago over this trip. She has more than 3 lengths to spare over her rivals that day, and she could well be good enough to take the next step immediately. JURISPRUDENCE (2) is a very consistent type who has been thereabouts through the winter. A former surface on this course seems to suit him, and he should be right the finish again. SUGAR DADDY (3) kept up a strong gallop when finishing second behind a runaway winner at Te Rapa 3 weeks ago. He is a progressive gelding who should figure in the top 4 here. PACT (10) built her form strongly to score here by half a length 4 weeks ago. That was her first run on a good track, and she can go on with the job.",
+    "type": "horse",
+    "category": "standard",
+    "streaming": {
+      "replay": {
+        "provider": "sky"
+      }
+    },
+    "longFormLink": "https://www.sportsbetform.com.au/form/RUNZ_15082026_05.html",
+    "tippedSelection1": 1238624483,
+    "tippedSelection2": 1238624481,
+    "tippedSelection3": 1238624466,
+    "tippedSelection4": 1238624469,
+    "tippedSelectionProvider": "R_AND_S",
+    "tippedSelectionDescription": "Expert tips provided by Racing and Sports",
+    "grade": "UNKNOWN_GROUP",
+    "isFeatureRace": false,
+    "tempo": "Normal",
+    "isInternational": false
+  },
+  "racecardContext": {
+    "meetings": [
+      {
+        "classId": 1,
+        "className": "Horses - Aus/NZ",
+        "name": "Caulfield",
+        "competitionId": 279,
+        "id": 10812202,
+        "isFullyResulted": true,
+        "firstEventStartTime": 1786760700,
+        "lastEventStartTime": 1786778100
+      },
+      {
+        "classId": 1,
+        "className": "Horses - Aus/NZ",
+        "name": "Rosehill",
+        "competitionId": 580,
+        "id": 10812157,
+        "isFullyResulted": true,
+        "firstEventStartTime": 1786757700,
+        "lastEventStartTime": 1786776900
+      },
+      {
+        "classId": 1,
+        "className": "Horses - Aus/NZ",
+        "name": "Morphettville",
+        "competitionId": 488,
+        "id": 10812135,
+        "isFullyResulted": true,
+        "firstEventStartTime": 1786761480,
+        "lastEventStartTime": 1786778820
+      },
+      {
+        "classId": 1,
+        "className": "Horses - Aus/NZ",
+        "name": "Doomben",
+        "competitionId": 330,
+        "id": 10812173,
+        "isFullyResulted": true,
+        "firstEventStartTime": 1786758180,
+        "lastEventStartTime": 1786775280
+      }
+    ],
+    "pools": [],
+    "events": [
+      {
+        "id": 10812054,
+        "raceNumber": 1,
+        "startTime": 1786754400,
+        "distance": "1200",
+        "name": "R1 Brett Sawyers @ Ray White Bream Bay Mdn",
+        "trackStatus": "Soft (6)",
+        "statusCode": "R",
+        "mbsAvailable": false,
+        "sameGameMultiEnabled": true
+      },
+      {
+        "id": 10812055,
+        "raceNumber": 2,
+        "startTime": 1786756380,
+        "distance": "1100",
+        "name": "R2 Gallagher Insurance Bream Bay Sprint (Bm75)",
+        "trackStatus": "Soft (6)",
+        "statusCode": "R",
+        "mbsAvailable": false,
+        "sameGameMultiEnabled": true
+      },
+      {
+        "id": 10812058,
+        "raceNumber": 3,
+        "startTime": 1786758780,
+        "distance": "1600",
+        "name": "R3 Tree Wise Northland Mdn",
+        "trackStatus": "Soft (6)",
+        "statusCode": "R",
+        "mbsAvailable": false,
+        "sameGameMultiEnabled": true
+      }
+    ]
+  }
+}

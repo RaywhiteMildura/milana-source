@@ -1,0 +1,12 @@
+{
+  "_fixtureNote": "CONSTRUCTED. Shape of POST https://graphql.rmdprod.racing.com/ with body {\"query\":\"query Meetings($states: String!, $daysBack: Int!, $daysForward: Int!, $userDate: String!) { GetRaceMeetingsByStateNew(states: $states, daysBack: $daysBack, daysForward: $daysForward, userDate: $userDate) { id venue date state isTrial isJumpOut meetUrl sortOrder } }\",\"variables\":{\"states\":\"VIC\",\"daysBack\":1,\"daysForward\":3,\"userDate\":\"2026-10-24\"}}. Source of field names: danielboasemammoth/racing-predictor src/lib/scrapers/racing-com.ts (medium). Quirk documented there: VIC meetings are folded into every response regardless of the requested state, so dedupe by id. meetUrl/id values are invented placeholders.",
+  "data": {
+    "GetRaceMeetingsByStateNew": [
+      { "id": "20261023-GEEL", "venue": "Geelong", "date": "2026-10-23", "state": "VIC", "isTrial": false, "isJumpOut": false, "meetUrl": "/form-guide/2026-10-23/geelong", "sortOrder": 1 },
+      { "id": "20261024-FLEM", "venue": "Flemington", "date": "2026-10-24", "state": "VIC", "isTrial": false, "isJumpOut": false, "meetUrl": "/form-guide/2026-10-24/flemington", "sortOrder": 1 },
+      { "id": "20261024-CRAN-T", "venue": "Cranbourne", "date": "2026-10-24", "state": "VIC", "isTrial": true, "isJumpOut": false, "meetUrl": "/form-guide/2026-10-24/cranbourne-trials", "sortOrder": 9 },
+      { "id": "20261025-BDGO", "venue": "Bendigo", "date": "2026-10-25", "state": "VIC", "isTrial": false, "isJumpOut": false, "meetUrl": "/form-guide/2026-10-25/bendigo", "sortOrder": 1 },
+      { "id": "20261026-MORN-JO", "venue": "Mornington", "date": "2026-10-26", "state": "VIC", "isTrial": false, "isJumpOut": true, "meetUrl": "/form-guide/2026-10-26/mornington-jump-outs", "sortOrder": 9 }
+    ]
+  }
+}

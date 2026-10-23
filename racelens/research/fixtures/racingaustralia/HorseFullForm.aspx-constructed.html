@@ -1,0 +1,52 @@
+<!--
+  CONSTRUCTED fixture - LOW/MEDIUM confidence. Models the horse profile / full-form page
+  GET https://www.racingaustralia.horse/InteractiveForm/HorseFullForm.aspx?horsecode=<base64>&stage=Form&Key=2026Oct24,VIC,Flemington&src=horseform&raceentry=<base64>
+  (legacy form ?HorseCode=<base64>&src=horsesearch, reached from https://racingaustralia.horse/SearchServices/HorseSearch.aspx).
+  A search-engine snippet of a live page shows the text "Career summary: 11-1:4:2 Prizemoney: $176,585".
+  EVIDENCED structure: WhoKnowsGroup/WKG-Scarp RAHorseDataScrapper.java (2016, NSW mirror) selects TWO table.horse-search-details:
+    [0] header: tbody>tr>td, td[1] holds h2.first (horse name) followed by <br> and a "...: <foaling date>" text node;
+    [1] detail rows in this order: 0 status (td>strong), 1 owner (td>strong), 2 stewards embargoes (td), 3 emergency vaccination record (td>a),
+        4 last gear change (td, comma separated), 5 trainer (td>a), 7 statistics row whose <b> labels are followed by text nodes:
+        prize, bonus, ..., max-min dist win, 1st up, 2nd up, firm, good, soft, heavy.
+  SteamatipAi ScrapingService.kt (2025) reads the run history from table.interactive-race-fields (first row = header), each row's text like
+    "7th of 11 BRAT 29Jun25 1500m Soft7 MDN-SW $37,500 ($750) John Allen 57.5kg Barrier 7 1st Tassron 59.5kg, 2nd Autumnheat 59.5kg 1:34.04 (600m 36.89), 7.9L, 5th@800m, 6th@400m, $10/$16/$15/$16"
+  (same grammar as the Form.aspx run lines, but the position is an ORDINAL "7th of 11", and trial rows start with "T"/"J"), and finds
+  "Record:", "1st Up:", "2nd Up:", "Track:", "Dist:", "Track/Dist:", "Firm:", "Good:", "Soft:", "Heavy:" stats in "N:W-S-T" format in the page text.
+  NOT evidenced: the "/horse/{name}" pretty URL from the task brief (no public code or indexed page uses it) - treat as unverified.
+-->
+<!DOCTYPE html>
+<html>
+<head><title>Racing Australia</title></head>
+<body>
+<div class="page-content">
+<table class="horse-search-details" width="750" cellpadding="3" cellspacing="0" border="0">
+  <tbody>
+    <tr>
+      <td class="silks"><img src="https://www.racingaustralia.horse/JockeySilks/64092.png" width="46" height="60"/></td>
+      <td><h2 class="first">TRUE LINE</h2><br/>Foaled: 12/09/2024<br/>2 year old bay colt (male) by <a class="GreenLink" href="HorseFullForm.aspx?horsecode=U0lSRTAwMQ%3d%3d">SNITZEL</a> out of <a class="GreenLink" href="HorseFullForm.aspx?horsecode=REFNMDAx">STRAIGHT LINE</a> (<a class="GreenLink" href="HorseFullForm.aspx?horsecode=RFNJUkUwMDE%3d">REDOUTE'S CHOICE</a>)<br/>Country of Birth: AUS</td>
+    </tr>
+  </tbody>
+</table>
+<table class="horse-search-details" width="750" cellpadding="3" cellspacing="0" border="0">
+  <tbody>
+    <tr><td>Status:</td><td><strong>Active</strong></td></tr>
+    <tr><td>Owner:</td><td><strong>Mr C Maher, Mrs J Maher, Flemington Syndicate (Mgr: T Line)</strong></td></tr>
+    <tr><td>Stewards Embargoes:</td><td>None</td></tr>
+    <tr><td>Emergency Vaccination Record:</td><td><a href="EmergencyVaccinationRecord.aspx?horsecode=RkxFTTAwMDAwMDAxMQ%3d%3d">View</a></td></tr>
+    <tr><td>Last Gear Change:</td><td>24/10/2026, Blinkers FIRST TIME</td></tr>
+    <tr><td>Trainer:</td><td><a class="GreenLink" href="TrainerLastRuns.aspx?trainercode=VDAwMDE%3d&amp;trainername=Ciaron+Maher">Ciaron Maher</a> (Ballarat)</td></tr>
+    <tr><td>Colours:</td><td>Navy Blue, White Stars, Red Sleeves And Cap</td></tr>
+    <tr><td colspan="2"><b>Career:</b> 4:3-1-0 <b>Prizemoney:</b> $212,400 <b>Bonus:</b> $35,000 <b>Record:</b> 4:3-1-0 <b>Win Range:</b> 1000m - 1000m <b>Max/Min Dist Win:</b> 1000m/1000m <b>1st Up:</b> 1:1-0-0 <b>2nd Up:</b> 1:0-1-0 <b>Firm:</b> 0:0-0-0 <b>Good:</b> 3:2-1-0 <b>Soft:</b> 1:1-0-0 <b>Heavy:</b> 0:0-0-0 <b>Synthetic:</b> 0:0-0-0 <b>Track:</b> 1:1-0-0 <b>Dist:</b> 2:2-0-0 <b>Track/Dist:</b> 1:1-0-0</td></tr>
+  </tbody>
+</table>
+<br/>
+<table class="interactive-race-fields" width="750" cellpadding="3" cellspacing="0" border="0">
+  <tr><th>Finish</th><th>Race Details</th></tr>
+  <tr class='OddRow'><td class='Pos'>1st of 9</td><td class='remain'><b><a class="GreenLink" href="Meeting.aspx?racecode=Q0FVTC0yMDI2MTAxMC0x">CAUL 10Oct26</a></b> 1000m Good4 2YO SW $150,000 ($90,000) <a class="GreenLink" href="JockeyLastRuns.aspx?jockeycode=SjAwMDE%3d">Jamie Kah</a> 57kg Barrier 2<br/>1st True Line 57kg, 2nd Rail Runner 57kg 0:57.45 (600m 33.80), 0.75L, 3rd@800m, 1st@400m, $2.40/$2.30/$2.20/$2.10</td></tr>
+  <tr class='EvenRow'><td class='Pos'>1st of 7</td><td class='remain'><b><a class="GreenLink" href="Meeting.aspx?racecode=RkxFTS0yMDI2MDkxOS0x">FLEM 19Sep26</a></b> 1000m Good3 2YO MDN-SW $75,000 ($41,250) <a class="GreenLink" href="JockeyLastRuns.aspx?jockeycode=SjAwMDE%3d">Jamie Kah</a> 57kg Barrier 5<br/>1st True Line 57kg, 2nd Second Best 55kg 0:56.98 (600m 33.52), 1.5L, 2nd@800m, 1st@400m, $3.10/$2.80/$2.60/$2.50F</td></tr>
+  <tr class='OddRow'><td class='Pos'>2nd of 8</td><td class='remain'><b><a class="GreenLink" href="Meeting.aspx?racecode=TVYtMjAyNjA4MjktMQ">MV 29Aug26</a></b> 1000m Soft5 2YO MDN-SW $60,000 ($11,400) <a class="GreenLink" href="JockeyLastRuns.aspx?jockeycode=SjAwMDc%3d">Mark Zahra</a> 57kg (cd 55kg) Barrier 1<br/>1st Quick Start 57kg, 2nd True Line 57kg 0:58.60 (600m 34.70), 0.3L, 4th@800m, 3rd@400m, $4.80/$4.40/$4.20/$4EF</td></tr>
+  <tr class='EvenRow'><td class='Pos'><font color="#ff0000">T</font> 1st of 6</td><td class='remain'><b><a class="GreenLink" href="Meeting.aspx?racecode=Q1JBTi0yMDI2MDgxNS1UMQ">CRAN 15Aug26</a></b> 800m Good4 2YO TRL $0 <a class="GreenLink" href="JockeyLastRuns.aspx?jockeycode=SjAwMDE%3d">Jamie Kah</a> 0kg Barrier 3<br/>1st True Line 0kg, 2nd Trial Horse 0kg 0:47.10 (600m 34.10), 2.0L</td></tr>
+</table>
+</div>
+</body>
+</html>

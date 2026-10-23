@@ -1,0 +1,40 @@
+{
+  "_fixtureNote": "Constructed to match the TAB tab-info-service meetings shape; values illustrative.",
+  "meetings": [
+    {
+      "meetingName": "FLEMINGTON",
+      "location": "VIC",
+      "raceType": "R",
+      "meetingDate": "2026-10-24",
+      "prizeMoney": "$12,000,000",
+      "weatherCondition": "FINE",
+      "trackCondition": "GOOD4",
+      "railPosition": "+3m Entire Circuit",
+      "venueMnemonic": "FLM",
+      "sellCode": { "meetingCode": "V", "scheduledType": "R" },
+      "races": [
+        { "raceNumber": 1, "raceName": "MARIBYRNONG TRIAL STAKES", "raceStartTime": "2026-10-24T01:25:00.000Z", "raceDistance": 1000, "raceStatus": "Normal", "raceClassConditions": "LR 2YO SW", "_links": { "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/1?jurisdiction=VIC" } },
+        { "raceNumber": 2, "raceName": "FILLIES CLASSIC", "raceStartTime": "2026-10-24T02:00:00.000Z", "raceDistance": 1600, "raceStatus": "Normal", "raceClassConditions": "G2 3YO F SW" }
+      ]
+    },
+    {
+      "meetingName": "RANDWICK",
+      "location": "NSW",
+      "raceType": "R",
+      "meetingDate": "2026-10-24",
+      "weatherCondition": "OVERCAST",
+      "trackCondition": "SOFT5",
+      "railPosition": "True",
+      "venueMnemonic": "RAN",
+      "races": [{ "raceNumber": 1, "raceName": "OPENING HCP", "raceStartTime": "2026-10-24T01:10:00.000Z", "raceDistance": 1200, "raceStatus": "Normal" }]
+    },
+    {
+      "meetingName": "THE MEADOWS",
+      "location": "VIC",
+      "raceType": "G",
+      "meetingDate": "2026-10-24",
+      "venueMnemonic": "MEA",
+      "races": [{ "raceNumber": 1, "raceName": "GREYHOUND RACE", "raceStartTime": "2026-10-24T08:00:00.000Z", "raceDistance": 525, "raceStatus": "Normal" }]
+    }
+  ]
+}

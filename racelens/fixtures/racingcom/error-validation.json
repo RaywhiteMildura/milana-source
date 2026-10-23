@@ -1,0 +1,1 @@
+{ "data": null, "errors": [ { "message": "Validation error of type FieldUndefined: Field 'tempo' in type 'Race' is undefined @ 'r/tempo'", "errorType": "ValidationError" } ] }

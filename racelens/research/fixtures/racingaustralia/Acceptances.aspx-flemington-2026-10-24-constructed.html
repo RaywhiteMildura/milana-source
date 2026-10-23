@@ -1,0 +1,62 @@
+<!--
+  CONSTRUCTED fixture (not a live capture). Models GET https://www.racingaustralia.horse/FreeFields/Acceptances.aspx?Key=2026Oct24,VIC,Flemington
+  (~125 KB live; identical data at ...&BodyClass=PrintFriendly and, bare, at /ozracing/Acceptances.aspx?key=...). EVIDENCED facts reproduced:
+   * Kelvin-Agents ra_fields.py (live-tested 2026-08-05 on Canterbury Park, NSW) walks every <table>: a row whose joined text matches
+     /Race\s+(\d+)\s*-\s*[\d:APM ]*(.*)/ starts a race; the next row containing "Of $" gives prize (and /Group\s*[123]|Listed/ gives grade);
+     a row containing the text "Hcp Rating" is the column header; data rows are zipped against that header and read by the names
+     "No", "Horse", "Trainer", "Jockey", "Barrier", "Weight", "Probable Weight", "Penalty", "Hcp Rating", "Last 10".
+     The official rating is blank for maiden/unrated horses (86.2% of runners had one in that sample).
+   * Horse names are UPPER CASE with a country suffix "(NZ)" "(GB)" "(IRE)" ... ; jockeys may carry a claim "(a2)" / "(a)" ; emergencies carry "e" after the number.
+   * Bookie: the text "TAB MEETING" marks TAB-covered meetings; "Rail:" text gives the rail; silks ids come from Form.aspx not from here.
+  Table/row class names mirror the REAL Results page (race-title / race-strip-fields / OddRow / EvenRow) - medium confidence for this page.
+-->
+<!DOCTYPE html>
+<html>
+<head><title>Flemington: Victoria Racing Club Saturday, 24 October 2026</title></head>
+<body>
+<div class="page-content">
+<div class="top">
+  <h2>Flemington: Victoria Racing Club <span class="race-venue-date">Saturday, 24 October 2026</span></h2>
+  <span class="meeting-type">Meeting Type: Metro (TAB MEETING)</span>
+  <br/>
+  <div class="printer-friendly"><a href="?Key=2026Oct24,VIC,Flemington&amp;BodyClass=PrintFriendly" target="_blank">Print Friendly</a></div>
+</div>
+<div class='race-venue-bottom'>
+  <div class='col1'><b>Rail Position:</b> True Entire Circuit <b>Track Condition:</b> Good 4 <b>Track Type:</b> Turf <b>Weather:</b> Fine <b>Penetrometer:</b> 4.78</div>
+  <div class='col2'><b>Acceptances Last Published:</b> 22-Oct-2026 11:02AM</div>
+  <div class='comments'>Field Limit 16 + 4 EM for all races. Emergencies in order: 1st EM, 2nd EM, 3rd EM, 4th EM.</div>
+</div>
+<br/>
+<a name="Race1"></a>
+<table width="750" border="0" cellspacing="0" cellpadding="5" class="race-title">
+  <tr><th><span class='raceNum'>Race 1</span> - 12:40PM Maribyrnong Trial Stakes (1000 METRES)
+    <span class="localtimedisplayed">Times displayed in local time of Race Meeting</span></th></tr>
+  <tr class="race-info"><td><b>Of $200,000.1st $120,000, 2nd $36,000, 3rd $18,000, 4th $9,000, 5th $5,000, 6th $4,000, 7th $4,000, 8th $4,000</b><br/>Prize money contribution totalling 3.5% will be directed to jockey, equine and participant welfare prior to distribution LISTED<br/>Set Weights, Two-Years-Old, Apprentices cannot claim.<br/><br/><b>Track Name:</b> Main <b>Track Type:</b> Turf</td></tr>
+</table>
+<br/>
+<table width="750" border="0" cellpadding="3" cellspacing="0" class="race-strip-fields">
+  <tr><th class="no">No</th><th>Horse</th><th>Trainer</th><th>Jockey</th><th>Barrier</th><th>Weight</th><th>Probable Weight</th><th class="penalty">Penalty</th><th class="hcp">Hcp Rating</th><th class="last">Last 10</th></tr>
+  <tr class='OddRow'><td class="no">1</td><td class="horse"><a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxMQ%3d%3d&amp;stage=Acceptances&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0x" target="_blank">TRUE LINE</a></td><td class="trainer">Ciaron Maher</td><td class="jockey">Jamie Kah</td><td>4</td><td>58kg</td><td>58kg</td><td class="penalty"></td><td class="hcp">92</td><td class="last">11</td></tr>
+  <tr class='EvenRow'><td class="no">2</td><td class="horse"><a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxMg%3d%3d&amp;stage=Acceptances&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0y" target="_blank">HARBOUR SPRINT (NZ)</a></td><td class="trainer">Anthony &amp; Sam Freedman</td><td class="jockey">Craig Williams</td><td>1</td><td>58kg</td><td>58kg</td><td class="penalty"></td><td class="hcp"></td><td class="last">1</td></tr>
+  <tr class='OddRow'><td class="no">3</td><td class="horse"><a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxMw%3d%3d&amp;stage=Acceptances&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0z" target="_blank">GOLDEN STRAIGHT</a></td><td class="trainer">Chris Waller</td><td class="jockey">Mark Zahra</td><td>8</td><td>56kg</td><td>56kg</td><td class="penalty"></td><td class="hcp">90</td><td class="last">21</td></tr>
+  <tr class='EvenRow'><td class="no">6</td><td class="horse"><a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxNg%3d%3d&amp;stage=Acceptances&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS02" target="_blank">MISSING ENTRY</a></td><td class="trainer">Chris Waller</td><td class="jockey">Blake Shinn</td><td>7</td><td>58kg</td><td>58kg</td><td class="penalty"></td><td class="hcp">89</td><td class="last">2x1</td></tr>
+  <tr class='OddRow'><td class="no">17e</td><td class="horse"><a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxNw%3d%3d&amp;stage=Acceptances&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0xNw" target="_blank">SPARE PART</a></td><td class="trainer">Danny O'Brien</td><td class="jockey">Celine Gaudray (a2)</td><td>12</td><td>56kg</td><td>54kg</td><td class="penalty"></td><td class="hcp"></td><td class="last">x4</td></tr>
+</table>
+<br/>
+<a name="Race2"></a>
+<table width="750" border="0" cellspacing="0" cellpadding="5" class="race-title">
+  <tr><th><span class='raceNum'>Race 2</span> - 1:15PM Ascot Vale Plate (1200 METRES)
+    <span class="localtimedisplayed">Times displayed in local time of Race Meeting</span></th></tr>
+  <tr class="race-info"><td><b>Of $150,000.1st $82,500, 2nd $27,000, 3rd $13,500, 4th $6,750, 5th $3,750, 6th $3,000, 7th $3,000, 8th $3,000, 9th $3,000, 10th $3,000</b><br/>BENCHMARK 78, Handicap, Apprentices can claim.<br/><br/><b>Track Name:</b> Main <b>Track Type:</b> Turf</td></tr>
+</table>
+<br/>
+<table width="750" border="0" cellpadding="3" cellspacing="0" class="race-strip-fields">
+  <tr><th class="no">No</th><th>Horse</th><th>Trainer</th><th>Jockey</th><th>Barrier</th><th>Weight</th><th>Probable Weight</th><th class="penalty">Penalty</th><th class="hcp">Hcp Rating</th><th class="last">Last 10</th></tr>
+  <tr class='OddRow'><td class="no">1</td><td class="horse"><a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAyMQ%3d%3d&amp;stage=Acceptances&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMi0x" target="_blank">ASCOT AVENUE</a></td><td class="trainer">Ciaron Maher</td><td class="jockey">Damian Lane</td><td>6</td><td>61kg</td><td>61kg</td><td class="penalty"></td><td class="hcp">84</td><td class="last">3x12104</td></tr>
+  <tr class='EvenRow'><td class="no">2</td><td class="horse"><a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAyMg%3d%3d&amp;stage=Acceptances&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMi0y" target="_blank">VALE VIEW</a></td><td class="trainer">Phillip Stokes</td><td class="jockey">Celine Gaudray (a2)</td><td>11</td><td>59.5kg</td><td>57.5kg</td><td class="penalty">1.5kg</td><td class="hcp">81</td><td class="last">21x5631</td></tr>
+  <tr class='OddRow'><td class="no">4</td><td class="horse"><a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAyNA%3d%3d&amp;stage=Acceptances&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMi00" target="_blank">RIVER BEND (NZ)</a></td><td class="trainer">Danny O'Brien</td><td class="jockey">Harry Coffey</td><td>2</td><td>58kg</td><td>58kg</td><td class="penalty"></td><td class="hcp">78</td><td class="last">0x4421</td></tr>
+</table>
+<p class="copyright">VIC racing materials, including fields, form and horse racing results, is subject to copyright which is owned by RVL and other parties working with it.</p>
+</div>
+</body>
+</html>

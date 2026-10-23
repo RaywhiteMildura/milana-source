@@ -1,0 +1,30 @@
+{
+  "_fixtureNote": "REAL race summary object (unmodified) from GET .../racing/next-to-go/races?jurisdiction=NSW on 2017-09-12 (Menangle harness R6), recorded as a code comment in github.com/Tjorriemorrie/tabby legacy/data/scraper.py.",
+  "raceStartTime": "2017-09-12T07:34:00.000Z",
+  "raceNumber": 6,
+  "raceName": "CORDINA CHICKENS PACE MS",
+  "raceDistance": 1609,
+  "broadcastChannel": "Sky Racing 1",
+  "broadcastChannels": [
+    "Sky Racing 1"
+  ],
+  "meeting": {
+    "sellCode": {
+      "meetingCode": "S",
+      "scheduledType": "H"
+    },
+    "raceType": "H",
+    "meetingName": "MENANGLE",
+    "location": "NSW",
+    "weatherCondition": "FINE",
+    "trackCondition": "FAST",
+    "railPosition": null,
+    "venueMnemonic": "MEN",
+    "meetingDate": "2017-09-12"
+  },
+  "_links": {
+    "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-09-12/meetings/H/MEN/races/6?jurisdiction=NSW",
+    "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-09-12/meetings/H/MEN/races/6/form?jurisdiction=NSW",
+    "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-09-12/meetings/H/MEN/races/6/big-bets?jurisdiction=NSW"
+  }
+}

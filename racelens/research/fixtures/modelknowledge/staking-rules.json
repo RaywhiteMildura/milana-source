@@ -1,0 +1,53 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Australian bet-type, place-term, flexi and staking rules with sources. Takeout figures are a 2012 QLD regulation schedule and may have changed.",
+  "placeTerms": {
+    "fieldSizeAtBetPlacement": true,
+    "rules": [
+      {"minRunners": 8, "maxRunners": 99, "placesPaid": 3},
+      {"minRunners": 5, "maxRunners": 7, "placesPaid": 2, "label": "NTD - no third dividend"},
+      {"minRunners": 0, "maxRunners": 4, "placesPaid": 0}
+    ],
+    "eachWay": "equal stakes on win and place ($10 EW = $5 win + $5 place)",
+    "deadHeat": "separate dead-heat rules; stake divided",
+    "sources": ["https://intercom.help/playwest/en/articles/9104123-racing-bet-glossary", "https://en.wikipedia.org/wiki/Betting_on_horse_racing"],
+    "confidence": "high"
+  },
+  "betTypes": [
+    {"code": "WIN", "description": "first"},
+    {"code": "PLACE", "description": "first N per placeTerms"},
+    {"code": "EACHWAY", "description": "win + place"},
+    {"code": "QUINELLA", "description": "1st & 2nd any order", "boxable": true},
+    {"code": "EXACTA", "description": "1st & 2nd exact order", "boxable": true},
+    {"code": "DUET", "description": "any two of first three", "boxable": true},
+    {"code": "TRIFECTA", "description": "1st-3rd exact order", "boxable": true, "flexi": true, "standout": true},
+    {"code": "FIRST4", "description": "1st-4th exact order", "boxable": true, "flexi": true, "standout": true},
+    {"code": "QUADDIE", "description": "winners of four nominated races at one meeting", "flexi": true},
+    {"code": "BIG6", "description": "winners of six nominated races", "flexi": true}
+  ],
+  "combinatorics": {
+    "boxQuinella": "n*(n-1)/2", "boxExacta": "n*(n-1)", "boxTrifecta": "n*(n-1)*(n-2)", "boxFirst4": "n*(n-1)*(n-2)*(n-3)",
+    "standoutTrifecta": "1 x k x (k-1) for one banker to win and k others for 2nd/3rd",
+    "quaddie": "product of runners per leg",
+    "examples": [{"bet": "box trifecta 3 runners", "combos": 6, "costAt1Dollar": 6}, {"bet": "box trifecta 5 runners", "combos": 60, "flexi10Dollars": "16.66% of dividend"}, {"bet": "box First 4 4 runners", "combos": 24, "costAt1Dollar": 24}, {"bet": "box First 4 5 runners", "combos": 120}],
+    "sources": ["https://rtip.arizona.edu/sites/rtip.arizona.edu/files/Haslett%20Wagering.pdf", "https://www.racingandsports.com/faq/types-of-betting/what-is-a-first-four-/453017"],
+    "confidence": "high"
+  },
+  "flexi": {
+    "availableOn": ["TRIFECTA", "FIRST4", "QUADDIE", "BIG6"],
+    "percentage": "outlay / (combinations x $1) x 100; dividend paid at that percentage",
+    "source": "https://publishingservices.racingaustralia.horse/otherpublications/thechampionships-day1/files/assets/common/downloads/page0067.pdf",
+    "confidence": "high"
+  },
+  "toteTakeout": {"win": 0.145, "quinella": 0.1475, "double": 0.17, "quadrella": 0.20, "trifecta": 0.21, "first4": 0.225, "source": "https://legislation.qld.gov.au/view/pdf/asmade/sl-2012-0007", "jurisdiction": "QLD 2012", "confidence": "medium", "note": "dated; verify current state rates"},
+  "kelly": {
+    "formula": "f* = (b*p - q) / b, b = decimalOdds - 1, q = 1 - p",
+    "betfairCode": "stake = (((odds-1)*p - (1-p)) / (odds-1)) * bankroll * partialKelly",
+    "fraction": {"default": 0.25, "max": 0.5, "ultraConservative": 0.1, "noEdge": 0},
+    "multiRunnerNote": "per-horse Kelly is not optimal for several runners in one race; sort by p_i/statePrice_i and stake the excess over a cash baseline (Whelan 2025; Long 2026)",
+    "sources": ["https://raw.githubusercontent.com/betfair-down-under/autoHubTutorials/master/stakingMethodsAndBankrollManagement/stakingFunctions.py", "https://www.topendsports.com/sports-betting/tools/kelly-criterion-calculator/", "https://oddspapi.io/blog/?p=2898", "https://arxiv.org/pdf/2107.08827", "https://www.karlwhelan.com/?p=2411", "https://arxiv.org/html/2603.13581v1"],
+    "confidence": "high"
+  },
+  "unitStaking": {"unitAsShareOfBankroll": [0.01, 0.02], "maxUnitsPerBet": {"conservative": 1.5, "balanced": 3, "aggressive": 5}, "maxShareOfBankrollPerRace": 0.05, "maxShareOfBankrollPerDay": 0.15, "confidence": "low", "note": "convention / memory; RaceLens betting.ts profiles consistent"},
+  "exoticEdgeRule": {"minModelEdgeOverTakeout": 0.25, "preferStandoutOverFullBox": true, "quaddieFlexiRange": [0.5, 1.0], "confidence": "low"},
+  "eachWayRule": {"priceRange": [4, 12], "requiresPlacesPaid": 3, "minPlaceProb": 0.5, "confidence": "low"}
+}

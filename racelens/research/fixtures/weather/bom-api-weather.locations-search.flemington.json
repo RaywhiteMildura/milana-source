@@ -1,0 +1,23 @@
+{
+ "_fixtureNote": "CONSTRUCTED. GET https://api.weather.bom.gov.au/v1/locations?search=Flemington  (also accepts 'lat,lon' e.g. search=-37.7903,144.9125 per bremor/bureau_of_meteorology api doc/API.md). Fields per API.md: metadata.response_timestamp, metadata.copyright, data[].geohash (7 chars), id, name, postcode, state. Geohash of Flemington racecourse computed here = r1r1186; use the first 6 characters (r1r118) for /observations and /forecasts/*.",
+ "metadata": {
+  "response_timestamp": "2026-10-23T22:05:11Z",
+  "copyright": "This Application Programming Interface (API) is owned by the Bureau of Meteorology (Bureau). You must not use, copy or share it. Please contact us for more information on ways in which you can access our data. Follow this link http://www.bom.gov.au/inside/contacts.shtml to view our contact details."
+ },
+ "data": [
+  {
+   "geohash": "r1r1186",
+   "id": "Flemington-r1r0f",
+   "name": "Flemington",
+   "postcode": "3031",
+   "state": "VIC"
+  },
+  {
+   "geohash": "r1r0fd4",
+   "id": "Flemington Racecourse-r1r0fd4",
+   "name": "Flemington Racecourse",
+   "postcode": "3031",
+   "state": "VIC"
+  }
+ ]
+}

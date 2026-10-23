@@ -1,0 +1,31 @@
+<!--
+  CONSTRUCTED fixture. Models https://racingaustralia.horse/FreeFields/Calendar.aspx?State=VIC (also ?Date=2026Oct24, and
+  https://racing.racingnsw.com.au/FreeFields/Calendar_Meetings.aspx?date=01/10/2026 on the NSW mirror). The only thing every public client
+  depends on is the set of anchors href="/FreeFields/<Page>.aspx?Key=<YYYYMonDD>,<STATE>,<Venue>[,Trial|Picnic]" where <Page> is the meeting's
+  current stage (Nominations | Weights | Acceptances | Form | Results); kyw ra.js matchKey() greps /Form\.aspx\?Key=([^"'&]+)/, Kelvin greps
+  href=["'](/FreeFields/\w+\.aspx\?Key=[^"']+)["'], Bookie greps href="/FreeFields/[A-Za-z_]+\.aspx\?Key=([^"&]+)". Venue names carry sponsor
+  prefixes exactly as RA spells them (take them from here, never guess). Layout/labels are invented.
+-->
+<!DOCTYPE html>
+<html>
+<head><title>Racing Australia - Calendar - VIC</title></head>
+<body>
+<div class="top"><h2>Race Meetings - Victoria</h2>
+  <div class="state-nav">
+    <a href="/FreeFields/Calendar.aspx?State=NSW">NSW</a> | <a href="/FreeFields/Calendar.aspx?State=VIC">VIC</a> | <a href="/FreeFields/Calendar.aspx?State=QLD">QLD</a> | <a href="/FreeFields/Calendar.aspx?State=SA">SA</a> | <a href="/FreeFields/Calendar.aspx?State=WA">WA</a> | <a href="/FreeFields/Calendar.aspx?State=TAS">TAS</a> | <a href="/FreeFields/Calendar.aspx?State=ACT">ACT</a> | <a href="/FreeFields/Calendar.aspx?State=NT">NT</a>
+  </div>
+</div>
+<table class="calendar" width="750" border="0" cellpadding="3" cellspacing="0">
+  <tr><th>Date</th><th>Meeting</th><th>Stage</th></tr>
+  <tr class="OddRow"><td>Fri 23 Oct 2026</td><td><a href="/FreeFields/Results.aspx?Key=2026Oct23%2CVIC%2CLadbrokes+Geelong">Ladbrokes Geelong</a></td><td>Results</td></tr>
+  <tr class="EvenRow"><td>Sat 24 Oct 2026</td><td><a href="/FreeFields/Form.aspx?Key=2026Oct24%2CVIC%2CFlemington">Flemington</a></td><td>Form <a href="/FreeFields/Acceptances.aspx?Key=2026Oct24%2CVIC%2CFlemington">Acceptances</a> <a href="/FreeFields/Scratchings.aspx?Key=2026Oct24%2CVIC%2CFlemington">Scratchings</a></td></tr>
+  <tr class="OddRow"><td>Sat 24 Oct 2026</td><td><a href="/FreeFields/Form.aspx?Key=2026Oct24%2CVIC%2CSportsbet-Ballarat">Sportsbet-Ballarat</a></td><td>Form</td></tr>
+  <tr class="EvenRow"><td>Sat 24 Oct 2026</td><td><a href="/FreeFields/Acceptances.aspx?Key=2026Oct24%2CVIC%2CSouthside+Cranbourne%2CTrial">Southside Cranbourne (Trial)</a></td><td>Acceptances</td></tr>
+  <tr class="OddRow"><td>Sun 25 Oct 2026</td><td><a href="/FreeFields/Acceptances.aspx?Key=2026Oct25%2CVIC%2CBendigo">Bendigo</a></td><td>Acceptances</td></tr>
+  <tr class="EvenRow"><td>Sun 25 Oct 2026</td><td><a href="/FreeFields/Weights.aspx?Key=2026Oct25%2CVIC%2CSportsbet+Sandown+Hillside">Sportsbet Sandown Hillside</a></td><td>Weights</td></tr>
+  <tr class="OddRow"><td>Tue 27 Oct 2026</td><td><a href="/FreeFields/Nominations.aspx?Key=2026Oct27%2CVIC%2CThe+Valley">The Valley</a></td><td>Nominations</td></tr>
+  <tr class="EvenRow"><td>Sat 31 Oct 2026</td><td><a href="/FreeFields/Nominations.aspx?Key=2026Oct31%2CVIC%2CFlemington">Flemington</a></td><td>Nominations</td></tr>
+  <tr class="OddRow"><td>Sun 01 Nov 2026</td><td><a href="/FreeFields/Nominations.aspx?Key=2026Nov01%2CVIC%2CHanging+Rock%2CPicnic">Hanging Rock (Picnic)</a></td><td>Nominations</td></tr>
+</table>
+</body>
+</html>

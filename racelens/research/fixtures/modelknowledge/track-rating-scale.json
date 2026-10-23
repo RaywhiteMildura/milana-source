@@ -1,0 +1,37 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Australian 10-point track rating scale (ARB, adopted December 2014). Descriptions paraphrase Racing NSW / Racing Australia wording from search snippets.",
+  "adopted": "2014-12",
+  "sources": ["https://t.racingaustralia.horse/FAQ/Track-Ratings.aspx", "https://racingnsw.com.au/rules-policies-whs/racing-nsw-policies/track-rating-system", "https://en.wikipedia.org/wiki/Going_(horse_racing)"],
+  "confidence": "high",
+  "ratings": [
+    {"rating": 1, "label": "Firm 1", "category": "firm", "description": "Dry hard track"},
+    {"rating": 2, "label": "Firm 2", "category": "firm", "description": "Firm track"},
+    {"rating": 3, "label": "Good 3", "category": "good", "description": "Good track with reasonable grass coverage, little cushion"},
+    {"rating": 4, "label": "Good 4", "category": "good", "description": "Track with some give in it (ideal)"},
+    {"rating": 5, "label": "Soft 5", "category": "soft", "description": "Track with a reasonable amount of give"},
+    {"rating": 6, "label": "Soft 6", "category": "soft", "description": "Moist but not badly affected"},
+    {"rating": 7, "label": "Soft 7", "category": "soft", "description": "More rain-affected track that will chop out"},
+    {"rating": 8, "label": "Heavy 8", "category": "heavy", "description": "Rain-affected track that will chop out"},
+    {"rating": 9, "label": "Heavy 9", "category": "heavy", "description": "Wet track getting into a squelchy area"},
+    {"rating": 10, "label": "Heavy 10", "category": "heavy", "description": "Heaviest category; maximum wetness, nearing saturation"}
+  ],
+  "legacyTerms": {"Fast": "Firm", "Dead": "Soft 5", "Slow": "Soft 7 / Heavy 8", "note": "Dropped in 2014; Good and Heavy retained"},
+  "synthetic": {"descriptors": ["Fast", "Good", "Soft"], "source": "https://t.racingaustralia.horse/FAQ/Track-Ratings.aspx"},
+  "penetrometer": {
+    "method": "1 kg weight falls 1 m down a shaft driving a 1 cm^2 rod into the soil; 60 positions x 3 drops = 180 drops, averaged; higher = softer",
+    "timing": "at least two days before the meeting and on race morning",
+    "combinedWith": "subjective visual assessment (turf cover, give, surface moisture); correlation to rating differs by venue soil type",
+    "source": "https://www.brc.com.au/track-information/",
+    "confidence": "high"
+  },
+  "wetFormGate": {"Good3": 0, "Good4": 0, "Soft5": 0.4, "Soft6": 0.55, "Soft7": 0.7, "Heavy8": 0.85, "Heavy9": 0.95, "Heavy10": 1.0, "confidence": "low", "note": "RaceLens suggestion, not sourced"},
+  "predictabilityByGoing": {
+    "note": "One private AU model's top-pick strike rate by going (small n); indicative only",
+    "Good4": {"n": 320, "top1": [0.225, 0.275]}, "Heavy8": {"n": 67, "top1": [0.254, 0.284]}, "Heavy9": {"n": 35, "top1": [0.143, 0.20]}, "Heavy10": {"n": 14, "top1": [0.357, 0.357]},
+    "source": "github.com/Kelvin1761/Kelvin-Agents docs (code-search excerpt)", "confidence": "low"
+  },
+  "wetSires": [
+    {"sire": "Snitzel", "wetStrikeRate": 0.157, "overallStrikeRate": 0.14, "since": "2018-08", "source": "https://www.ttrausnz.com.au/edition/2024-04-12/handling-the-wet-the-worthy-stallions-with-extreme-wet-track-credentials", "confidence": "medium"},
+    {"sire": "Zoustar", "goodStrikeRate": 0.2056, "goodRecord": "102/496", "softHeavyStrikeRate": 0.1695, "softHeavyRecord": "40/236", "blackTypeWetHitRate": 0.086, "source": "https://ttrausnz.com.au/edition/2019-07-18/mastering-the-conditions-australias-top-sires-on-dry-and-wet-tracks", "confidence": "medium"}
+  ]
+}

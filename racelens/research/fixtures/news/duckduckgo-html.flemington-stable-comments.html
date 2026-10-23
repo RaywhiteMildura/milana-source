@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+  _fixtureNote: CONSTRUCTED fixture for RaceLens. Not a live capture.
+  Stands in for: POST https://html.duckduckgo.com/html/  body: q=Flemington+stable+comments+24+October&kl=au-en&b=
+  (GET https://html.duckduckgo.com/html/?q=...&kl=au-en also works).
+  DOM structure follows what multiple open-source scrapers select on (see research/news.md):
+    .result / .web-result containers, h2.result__title > a.result__a (href wraps the target in //duckduckgo.com/l/?uddg=<encoded>&rut=...),
+    a.result__snippet, div.result__extras__url > a.result__url, .result--ad for sponsored rows,
+    and the "Next" form in div.nav-link carrying hidden inputs s, dc, v, o, api, vqd, kl, q used for page 2+.
+  Exact class names are MEDIUM confidence (consistent across scrapers, not verified live here).
+-->
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8">
+  <meta name="referrer" content="origin">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Flemington stable comments 24 October at DuckDuckGo</title>
+  <link rel="stylesheet" href="//duckduckgo.com/s1861.css" type="text/css">
+</head>
+<body class="body--html">
+<div>
+  <div class="site-wrapper-border"></div>
+  <div id="header" class="header cw header--html">
+    <form name="x" class="header__form" action="/html/" method="post">
+      <input name="q" autocomplete="off" class="search__input search__input--html" id="search_form_input_homepage" type="text" value="Flemington stable comments 24 October">
+      <input type="hidden" name="b" value="">
+      <input type="hidden" name="kl" value="au-en">
+    </form>
+  </div>
+  <div id="links" class="results">
+
+    <div class="result results_links results_links_deep result--ad">
+      <div class="links_main links_deep result__body">
+        <h2 class="result__title">
+          <a rel="nofollow" class="result__a" href="https://duckduckgo.com/y.js?ad_domain=example-bookmaker.com.au&amp;ad_provider=bingv7aa&amp;u3=https%3A%2F%2Fwww.example-bookmaker.com.au%2Fracing%2Fflemington">Flemington Racing Odds | Example Bookmaker</a>
+        </h2>
+        <div class="result__extras">
+          <div class="result__extras__url">
+            <span class="result__icon"><a rel="nofollow" href="https://duckduckgo.com/y.js?ad_domain=example-bookmaker.com.au"><img class="result__icon__img" width="16" height="16" alt="" src="//external-content.duckduckgo.com/ip3/www.example-bookmaker.com.au.ico"></a></span>
+            <a class="result__url" href="https://duckduckgo.com/y.js?ad_domain=example-bookmaker.com.au">www.example-bookmaker.com.au/racing/flemington</a>
+            <span class="result__type">Ad</span>
+          </div>
+        </div>
+        <a class="result__snippet" href="https://duckduckgo.com/y.js?ad_domain=example-bookmaker.com.au">Bet on every Flemington race. Fixed odds and tote. Gamble responsibly.</a>
+        <div class="clear"></div>
+      </div>
+    </div>
+
+    <div class="result results_links results_links_deep web-result ">
+      <div class="links_main links_deep result__body">
+        <h2 class="result__title">
+          <a rel="nofollow" class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.racing.com%2Fnews%2F2026%2D10%2D23%2Fflemington%2Dstable%2Dcomments%2Dsaturday&amp;rut=1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b">Flemington stable comments: every runner, every trainer's view - Racing.com</a>
+        </h2>
+        <div class="result__extras">
+          <div class="result__extras__url">
+            <span class="result__icon"><a rel="nofollow" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.racing.com%2Fnews%2F2026%2D10%2D23%2Fflemington%2Dstable%2Dcomments%2Dsaturday&amp;rut=1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"><img class="result__icon__img" width="16" height="16" alt="" src="//external-content.duckduckgo.com/ip3/www.racing.com.ico"></a></span>
+            <a class="result__url" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.racing.com%2Fnews%2F2026%2D10%2D23%2Fflemington%2Dstable%2Dcomments%2Dsaturday&amp;rut=1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b">www.racing.com/news/2026-10-23/flemington-stable-comments-saturday</a>
+          </div>
+        </div>
+        <a class="result__snippet" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.racing.com%2Fnews%2F2026%2D10%2D23%2Fflemington%2Dstable%2Dcomments%2Dsaturday&amp;rut=1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"><b>Stable comments</b> for Saturday's <b>Flemington</b> meeting. Race 7: Brass Lantern (M. Hartigan) - "Trialled well, first-up over 1400m is ideal, expect him to be competitive." Southern Compass - "Handles soft ground, fitter for the run."</a>
+        <div class="clear"></div>
+      </div>
+    </div>
+
+    <div class="result results_links results_links_deep web-result ">
+      <div class="links_main links_deep result__body">
+        <h2 class="result__title">
+          <a rel="nofollow" class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.racenet.com.au%2Fnews%2Fflemington%2Dstable%2Dmail%2Dsaturday%2D20261023&amp;rut=2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c">Stable mail: Flemington Saturday - who the trainers like | Racenet</a>
+        </h2>
+        <div class="result__extras">
+          <div class="result__extras__url">
+            <span class="result__icon"><a rel="nofollow" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.racenet.com.au%2Fnews%2Fflemington%2Dstable%2Dmail%2Dsaturday%2D20261023&amp;rut=2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c"><img class="result__icon__img" width="16" height="16" alt="" src="//external-content.duckduckgo.com/ip3/www.racenet.com.au.ico"></a></span>
+            <a class="result__url" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.racenet.com.au%2Fnews%2Fflemington%2Dstable%2Dmail%2Dsaturday%2D20261023&amp;rut=2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c">www.racenet.com.au/news/flemington-stable-mail-saturday-20261023</a>
+          </div>
+        </div>
+        <a class="result__snippet" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.racenet.com.au%2Fnews%2Fflemington%2Dstable%2Dmail%2Dsaturday%2D20261023&amp;rut=2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c">Oct 23, 2026 - The <b>stable</b> view on every runner at <b>Flemington</b> this Saturday, including Velvet Thunder's new rider booking and a confident report on Southern Compass.</a>
+        <div class="clear"></div>
+      </div>
+    </div>
+
+    <div class="result results_links results_links_deep web-result ">
+      <div class="links_main links_deep result__body">
+        <h2 class="result__title">
+          <a rel="nofollow" class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.punters.com.au%2Fnews%2Fflemington%2Dtrack%2Dsoft%2D5%2Drail%2Dout%2D6m%2Dsaturday_20261023%2F&amp;rut=3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d">Flemington track rated Soft 5, rail out 6m for Saturday - Punters</a>
+        </h2>
+        <div class="result__extras">
+          <div class="result__extras__url">
+            <span class="result__icon"><a rel="nofollow" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.punters.com.au%2Fnews%2Fflemington%2Dtrack%2Dsoft%2D5%2Drail%2Dout%2D6m%2Dsaturday_20261023%2F&amp;rut=3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d"><img class="result__icon__img" width="16" height="16" alt="" src="//external-content.duckduckgo.com/ip3/www.punters.com.au.ico"></a></span>
+            <a class="result__url" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.punters.com.au%2Fnews%2Fflemington%2Dtrack%2Dsoft%2D5%2Drail%2Dout%2D6m%2Dsaturday_20261023%2F&amp;rut=3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d">www.punters.com.au/news/flemington-track-soft-5-rail-out-6m-saturday_20261023/</a>
+          </div>
+        </div>
+        <a class="result__snippet" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.punters.com.au%2Fnews%2Fflemington%2Dtrack%2Dsoft%2D5%2Drail%2Dout%2D6m%2Dsaturday_20261023%2F&amp;rut=3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d">Penetrometer 5.12, 4mm overnight, rail out 6m entire circuit. Full <b>Flemington</b> track and weather report for Saturday 24 October.</a>
+        <div class="clear"></div>
+      </div>
+    </div>
+
+    <div class="nav-link">
+      <form action="/html/" method="post">
+        <input type="submit" class="btn btn--alt" value="Next">
+        <input type="hidden" name="q" value="Flemington stable comments 24 October">
+        <input type="hidden" name="s" value="23">
+        <input type="hidden" name="nextParams" value="">
+        <input type="hidden" name="v" value="l">
+        <input type="hidden" name="o" value="json">
+        <input type="hidden" name="dc" value="24">
+        <input type="hidden" name="api" value="d.js">
+        <input type="hidden" name="vqd" value="4-123456789012345678901234567890123456789">
+        <input type="hidden" name="kl" value="au-en">
+      </form>
+    </div>
+  </div>
+  <div class="feedback-btn"><a rel="nofollow" href="//duckduckgo.com/feedback.html">Feedback</a></div>
+</div>
+</body>
+</html>

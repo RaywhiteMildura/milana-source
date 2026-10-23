@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  _fixtureNote: REAL capture (not constructed), truncated to the first 3 of 63 items.
+  Copied byte-for-byte from https://github.com/nerevu/riko/blob/master/riko/data/  (file: news.google.com_rss_hl=en-US&gl=US&ceid=US_3Aen&q=enterprise+mashup.xml)
+  which is a saved response of GET https://news.google.com/rss/search?hl=en-US&gl=US&ceid=US:en&q=enterprise+mashup
+  Kept here to pin the exact field names/attributes Google emits. The AU edition differs only in hl/gl/ceid/<language>.
+-->
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+ <channel>
+  <generator>NFE/5.0</generator>
+  <title>"enterprise mashup" - Google News</title>
+  <link>https://news.google.com/search?hl=en-US&amp;gl=US&amp;ceid=US:en&amp;q=enterprise+mashup</link>
+  <language>en-US</language>
+  <webMaster>news-webmaster@google.com</webMaster>
+  <copyright>Copyright © 2026 Google. All rights reserved. This XML feed is made available solely for the purpose of rendering Google News results within a personal feed reader for personal, non-commercial use. Any other use of the feed is expressly prohibited. By accessing this feed or using these results in any manner whatsoever, you agree to be bound by the foregoing restrictions.</copyright>
+  <lastBuildDate>Sat, 06 Jun 2026 00:07:06 GMT</lastBuildDate>
+  <image>
+   <title>Google News</title>
+   <url>https://lh3.googleusercontent.com/-DR60l-K8vnyi99NZovm9HlXyZwQ85GMDxiwJWzoasZYCUrPuUM_P_4Rb7ei03j-0nRs0c4F=w256</url>
+   <link>https://news.google.com/</link>
+   <height>256</height>
+   <width>256</width>
+  </image>
+  <description>Google News</description>
+  <item>
+   <title>The 6 Best Enterprise Data Modeling Tools &amp; Software for 2026 - Solutions Review</title>
+   <link>https://news.google.com/rss/articles/CBMimAFBVV95cUxOZU51Vlo5akR2RlZzWkNBbFFMM21wQ1pYNEF3Mm9LMHJ4OGFHTlRvRVd3TG54dkMtWDdTdW93WjNRa2JtWDBYUG1rSGV3WGp1SnZzRkRkTzQ1WTV1S254VW1RVVpaV3VwaWJNR09qLTdncUVaenpJbks2Z3gxVklBbGx0bml0QUtjMVg0aks2ZVRSbHNkUEJpYw?oc=5</link>
+   <guid isPermaLink="false">CBMimAFBVV95cUxOZU51Vlo5akR2RlZzWkNBbFFMM21wQ1pYNEF3Mm9LMHJ4OGFHTlRvRVd3TG54dkMtWDdTdW93WjNRa2JtWDBYUG1rSGV3WGp1SnZzRkRkTzQ1WTV1S254VW1RVVpaV3VwaWJNR09qLTdncUVaenpJbks2Z3gxVklBbGx0bml0QUtjMVg0aks2ZVRSbHNkUEJpYw</guid>
+   <pubDate>Mon, 01 Dec 2025 08:00:00 GMT</pubDate>
+   <description>&lt;a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxOZU51Vlo5akR2RlZzWkNBbFFMM21wQ1pYNEF3Mm9LMHJ4OGFHTlRvRVd3TG54dkMtWDdTdW93WjNRa2JtWDBYUG1rSGV3WGp1SnZzRkRkTzQ1WTV1S254VW1RVVpaV3VwaWJNR09qLTdncUVaenpJbks2Z3gxVklBbGx0bml0QUtjMVg0aks2ZVRSbHNkUEJpYw?oc=5" target="_blank"&gt;The 6 Best Enterprise Data Modeling Tools &amp; Software for 2026&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;Solutions Review&lt;/font&gt;</description>
+   <source url="https://solutionsreview.com">Solutions Review</source>
+  </item>
+<item>
+   <title>The Great PSKY-WBD Mashup: It’s Not a Media Merger, It’s a Training Data Heist - TVREV</title>
+   <link>https://news.google.com/rss/articles/CBMiiwFBVV95cUxQRlF1UzZJT2tWcHAxOUx5WW5yYlA3d0RtdUJEVHdhUl9JZG1vc25SZTBrVm9TQllQa0d3WFk5WWtIVjNLUzhCclBySVdzNkJGeUZQeXphbDY3c1NtTVpNc29wVEdyUmx1VFpXNDhUUWtwbndRMjRzSFlES3U0Nks1MHJDQ2E4LVdnVEJn?oc=5</link>
+   <guid isPermaLink="false">CBMiiwFBVV95cUxQRlF1UzZJT2tWcHAxOUx5WW5yYlA3d0RtdUJEVHdhUl9JZG1vc25SZTBrVm9TQllQa0d3WFk5WWtIVjNLUzhCclBySVdzNkJGeUZQeXphbDY3c1NtTVpNc29wVEdyUmx1VFpXNDhUUWtwbndRMjRzSFlES3U0Nks1MHJDQ2E4LVdnVEJn</guid>
+   <pubDate>Thu, 26 Feb 2026 08:00:00 GMT</pubDate>
+   <description>&lt;a href="https://news.google.com/rss/articles/CBMiiwFBVV95cUxQRlF1UzZJT2tWcHAxOUx5WW5yYlA3d0RtdUJEVHdhUl9JZG1vc25SZTBrVm9TQllQa0d3WFk5WWtIVjNLUzhCclBySVdzNkJGeUZQeXphbDY3c1NtTVpNc29wVEdyUmx1VFpXNDhUUWtwbndRMjRzSFlES3U0Nks1MHJDQ2E4LVdnVEJn?oc=5" target="_blank"&gt;The Great PSKY-WBD Mashup: It’s Not a Media Merger, It’s a Training Data Heist&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;TVREV&lt;/font&gt;</description>
+   <source url="https://www.tvrev.com">TVREV</source>
+  </item>
+<item>
+   <title>LaMelo Ball Is Releasing A What The Style PUMA MB.01 “Mash Up” - Sneaker News</title>
+   <link>https://news.google.com/rss/articles/CBMickFVX3lxTE14OFV0RjBrSUotRGdhTGkzLU9hNzJSVUxuRUE0OTZ5VzBtWTd3U1F5d3VudFBOZXpRT1ppSWhMOWlDNEFDSjZ3aWxnOVNpaDVIcWpzNFZPNnVUcVF4b0psUEs5TkJrTkFIMlVlb0JvZ01VQdIBckFVX3lxTE14OFV0RjBrSUotRGdhTGkzLU9hNzJSVUxuRUE0OTZ5VzBtWTd3U1F5d3VudFBOZXpRT1ppSWhMOWlDNEFDSjZ3aWxnOVNpaDVIcWpzNFZPNnVUcVF4b0psUEs5TkJrTkFIMlVlb0JvZ01VQQ?oc=5</link>
+   <guid isPermaLink="false">CBMickFVX3lxTE14OFV0RjBrSUotRGdhTGkzLU9hNzJSVUxuRUE0OTZ5VzBtWTd3U1F5d3VudFBOZXpRT1ppSWhMOWlDNEFDSjZ3aWxnOVNpaDVIcWpzNFZPNnVUcVF4b0psUEs5TkJrTkFIMlVlb0JvZ01VQdIBckFVX3lxTE14OFV0RjBrSUotRGdhTGkzLU9hNzJSVUxuRUE0OTZ5VzBtWTd3U1F5d3VudFBOZXpRT1ppSWhMOWlDNEFDSjZ3aWxnOVNpaDVIcWpzNFZPNnVUcVF4b0psUEs5TkJrTkFIMlVlb0JvZ01VQQ</guid>
+   <pubDate>Fri, 25 Jul 2025 07:00:00 GMT</pubDate>
+   <description>&lt;a href="https://news.google.com/rss/articles/CBMickFVX3lxTE14OFV0RjBrSUotRGdhTGkzLU9hNzJSVUxuRUE0OTZ5VzBtWTd3U1F5d3VudFBOZXpRT1ppSWhMOWlDNEFDSjZ3aWxnOVNpaDVIcWpzNFZPNnVUcVF4b0psUEs5TkJrTkFIMlVlb0JvZ01VQdIBckFVX3lxTE14OFV0RjBrSUotRGdhTGkzLU9hNzJSVUxuRUE0OTZ5VzBtWTd3U1F5d3VudFBOZXpRT1ppSWhMOWlDNEFDSjZ3aWxnOVNpaDVIcWpzNFZPNnVUcVF4b0psUEs5TkJrTkFIMlVlb0JvZ01VQQ?oc=5" target="_blank"&gt;LaMelo Ball Is Releasing A What The Style PUMA MB.01 “Mash Up”&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;Sneaker News&lt;/font&gt;</description>
+   <source url="https://sneakernews.com">Sneaker News</source>
+  </item>
+ </channel>
+</rss>

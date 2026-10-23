@@ -1,0 +1,6158 @@
+{
+ "_fixtureNote": "RaceLens weather venue table, compiled 2026-10-23. Coordinates: see each venue's coord.source/confidence (Wikipedia-sourced = high; memory = low, cross-checked against the locality centroid). BOM stations: nearest AWS computed with the haversine formula from github.com/opennem/opennem opennem/data/bom_stations.json (790 stations: name, BOM site id, lat/lng to 2 dp, fwo JSON feed URL) - distances are therefore accurate to ~1 km. TAB venueMnemonic is filled ONLY where a recorded response or community code evidences it; otherwise null - resolve at runtime from TAB's meetings list using `aliases`. `sampleOpenMeteoResponse` is the constructed Flemington forecast (also saved as open-meteo-forecast.flemington-2026-10-24.json).",
+ "generatedAt": "2026-10-23T11:30:00+11:00",
+ "coordinateConfidenceLegend": {
+  "high": "Wikipedia infobox / on-course BOM station",
+  "medium": "independent community table or transport/heritage marker agreeing within ~1 km, or a station proxy <1 km from the course",
+  "low": "model memory, within ~6 km of the locality centroid; fine for a 10-15 km weather grid, verify before finer use"
+ },
+ "timezoneByState": {
+  "VIC": "Australia/Melbourne",
+  "NSW": "Australia/Sydney",
+  "ACT": "Australia/Sydney",
+  "QLD": "Australia/Brisbane",
+  "SA": "Australia/Adelaide",
+  "WA": "Australia/Perth",
+  "TAS": "Australia/Hobart",
+  "NT": "Australia/Darwin"
+ },
+ "bomFwoProductsByState": {
+  "VIC": {
+   "allStations": "IDV60801",
+   "capitalCity": "IDV60901",
+   "stationListXml": "IDV60920"
+  },
+  "NSW": {
+   "allStations": "IDN60801",
+   "capitalCity": "IDN60901",
+   "stationListXml": "IDN60920"
+  },
+  "ACT": {
+   "allStations": "IDN60801",
+   "capitalCity": "IDN60903",
+   "stationListXml": "IDN60920"
+  },
+  "QLD": {
+   "allStations": "IDQ60801",
+   "capitalCity": "IDQ60901",
+   "stationListXml": "IDQ60920"
+  },
+  "SA": {
+   "allStations": "IDS60801",
+   "capitalCity": "IDS60901",
+   "stationListXml": "IDS60920"
+  },
+  "WA": {
+   "allStations": "IDW60801",
+   "capitalCity": "IDW60901",
+   "stationListXml": "IDW60920"
+  },
+  "TAS": {
+   "allStations": "IDT60801",
+   "capitalCity": "IDT60901",
+   "stationListXml": "IDT60920"
+  },
+  "NT": {
+   "allStations": "IDD60801",
+   "capitalCity": "IDD60901",
+   "stationListXml": "IDD60920"
+  }
+ },
+ "venues": [
+  {
+   "key": "flemington",
+   "name": "Flemington",
+   "aliases": [
+    "Flemington",
+    "Headquarters"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.79028,
+   "lon": 144.9125,
+   "coord": {
+    "source": "wikipedia",
+    "confidence": "high",
+    "description": "Wikipedia infobox coordinates (via web search snippet)",
+    "coordCheck": {
+     "locality": "Flemington",
+     "localityCentroid": [
+      -37.7833,
+      144.9277
+     ],
+     "postcodes": [
+      "3031"
+     ],
+     "distanceKm": 1.5
+    }
+   },
+   "bomStations": [
+    {
+     "name": "ESSENDON AIRPORT",
+     "bomSiteId": "086038",
+     "wmoId": 95866,
+     "distanceKm": 6.7,
+     "lat": -37.73,
+     "lon": 144.91,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95866.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95866.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95866.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MELBOURNE (OLYMPIC PARK)",
+     "bomSiteId": "086338",
+     "wmoId": 95936,
+     "distanceKm": 7.4,
+     "lat": -37.83,
+     "lon": 144.98,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95936.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95936.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95936.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "ST KILDA HARBOUR - RMYS",
+     "bomSiteId": "086220",
+     "wmoId": 95864,
+     "distanceKm": 8.8,
+     "lat": -37.86,
+     "lon": 144.96,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95864.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95864.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95864.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": "FLM",
+    "confidence": "high",
+    "evidence": "real TAB race card 2019-04-25 (research/fixtures/tab/race_2019-04-25_R_FLM_1_paying_real.json; go-swagger issue 1932)"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "caulfield",
+   "name": "Caulfield",
+   "aliases": [
+    "Caulfield",
+    "Caulfield Heath"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.881,
+   "lon": 145.04,
+   "coord": {
+    "source": "wikipedia",
+    "confidence": "high",
+    "description": "Wikipedia infobox coordinates (via web search snippet)",
+    "coordCheck": {
+     "locality": "Caulfield East",
+     "localityCentroid": [
+      -37.8792,
+      145.0444
+     ],
+     "postcodes": [
+      "3145"
+     ],
+     "distanceKm": 0.4
+    }
+   },
+   "bomStations": [
+    {
+     "name": "ST KILDA HARBOUR - RMYS",
+     "bomSiteId": "086220",
+     "wmoId": 95864,
+     "distanceKm": 7.4,
+     "lat": -37.86,
+     "lon": 144.96,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95864.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95864.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95864.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MELBOURNE (OLYMPIC PARK)",
+     "bomSiteId": "086338",
+     "wmoId": 95936,
+     "distanceKm": 7.7,
+     "lat": -37.83,
+     "lon": 144.98,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95936.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95936.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95936.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MOORABBIN AIRPORT",
+     "bomSiteId": "086077",
+     "wmoId": 94870,
+     "distanceKm": 12.2,
+     "lat": -37.98,
+     "lon": 145.1,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94870.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94870.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94870.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "The inner \"Caulfield Heath\" track is on the same site.",
+   "surface": "turf"
+  },
+  {
+   "key": "moonee-valley",
+   "name": "Moonee Valley",
+   "aliases": [
+    "Moonee Valley",
+    "The Valley",
+    "Moonee Valley Racecourse"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.7656,
+   "lon": 144.93,
+   "coord": {
+    "source": "memory+kelvin",
+    "confidence": "medium",
+    "description": "Model memory, agrees within 1 km with an independent community table (Kelvin1761/Kelvin-Agents generate_meeting_intel.py: -37.7656,144.9287) and the Moonee Ponds locality centroid",
+    "coordCheck": {
+     "locality": "Moonee Ponds",
+     "localityCentroid": [
+      -37.7675,
+      144.9199
+     ],
+     "postcodes": [
+      "3039"
+     ],
+     "distanceKm": 0.9
+    }
+   },
+   "bomStations": [
+    {
+     "name": "ESSENDON AIRPORT",
+     "bomSiteId": "086038",
+     "wmoId": 95866,
+     "distanceKm": 4.3,
+     "lat": -37.73,
+     "lon": 144.91,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95866.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95866.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95866.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MELBOURNE (OLYMPIC PARK)",
+     "bomSiteId": "086338",
+     "wmoId": 95936,
+     "distanceKm": 8.4,
+     "lat": -37.83,
+     "lon": 144.98,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95936.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95936.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95936.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "ST KILDA HARBOUR - RMYS",
+     "bomSiteId": "086220",
+     "wmoId": 95864,
+     "distanceKm": 10.8,
+     "lat": -37.86,
+     "lon": 144.96,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95864.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95864.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95864.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "sandown",
+   "name": "Sandown (Hillside/Lakeside)",
+   "aliases": [
+    "Sandown",
+    "Sandown Hillside",
+    "Sandown Lakeside",
+    "Sandown-Hillside",
+    "Sandown-Lakeside",
+    "Ladbrokes Park"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.95222,
+   "lon": 145.1638,
+   "coord": {
+    "source": "wikipedia-heritage-grandstand",
+    "confidence": "high",
+    "description": "Wikipedia (Victorian Heritage Register list) coordinates of the Sandown Park Racecourse grandstand, 594-659 Princes Hwy Springvale",
+    "coordCheck": {
+     "locality": "Springvale",
+     "localityCentroid": [
+      -37.9473,
+      145.1541
+     ],
+     "postcodes": [
+      "3171"
+     ],
+     "distanceKm": 1.0
+    }
+   },
+   "bomStations": [
+    {
+     "name": "MOORABBIN AIRPORT",
+     "bomSiteId": "086077",
+     "wmoId": 94870,
+     "distanceKm": 6.4,
+     "lat": -37.98,
+     "lon": 145.1,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94870.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94870.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94870.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SCORESBY RESEARCH INSTITUTE",
+     "bomSiteId": "086104",
+     "wmoId": 95867,
+     "distanceKm": 12.4,
+     "lat": -37.87,
+     "lon": 145.26,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95867.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95867.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95867.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "FERNY CREEK",
+     "bomSiteId": "086266",
+     "wmoId": 94872,
+     "distanceKm": 18.7,
+     "lat": -37.87,
+     "lon": 145.35,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94872.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94872.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94872.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Two track layouts (Hillside and Lakeside) share the one site; TAB/racing.com name meetings \"Sandown-Hillside\" / \"Sandown-Lakeside\".",
+   "surface": "turf"
+  },
+  {
+   "key": "randwick",
+   "name": "Randwick",
+   "aliases": [
+    "Randwick",
+    "Royal Randwick",
+    "Randwick Kensington",
+    "Kensington"
+   ],
+   "state": "NSW",
+   "timezone": "Australia/Sydney",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -33.91083,
+   "lon": 151.23028,
+   "coord": {
+    "source": "wikipedia",
+    "confidence": "high",
+    "description": "Wikipedia infobox coordinates (via web search snippet)",
+    "coordCheck": {
+     "locality": "Randwick",
+     "localityCentroid": [
+      -33.9132,
+      151.242
+     ],
+     "postcodes": [
+      "2031"
+     ],
+     "distanceKm": 1.1
+    }
+   },
+   "bomStations": [
+    {
+     "name": "FORT DENISON",
+     "bomSiteId": "066022",
+     "wmoId": 94769,
+     "distanceKm": 5.7,
+     "lat": -33.86,
+     "lon": 151.23,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94769.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94769.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94769.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SYDNEY (OBSERVATORY HILL)",
+     "bomSiteId": "066214",
+     "wmoId": 94768,
+     "distanceKm": 6.3,
+     "lat": -33.86,
+     "lon": 151.2,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94768.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94768.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94768.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SYDNEY AIRPORT AMO",
+     "bomSiteId": "066037",
+     "wmoId": 94767,
+     "distanceKm": 7.1,
+     "lat": -33.95,
+     "lon": 151.17,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94767.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94767.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94767.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": "RAN",
+    "confidence": "low",
+    "evidence": "bencousins22/tab-mcp tests/conftest.py uses RAN for Randwick (test fixture, not a recorded response; the same file wrongly uses FLE for Flemington)"
+   },
+   "notes": "The inner \"Kensington\" track is on the same site and is named separately in meeting lists.",
+   "surface": "turf"
+  },
+  {
+   "key": "rosehill",
+   "name": "Rosehill",
+   "aliases": [
+    "Rosehill",
+    "Rosehill Gardens"
+   ],
+   "state": "NSW",
+   "timezone": "Australia/Sydney",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -33.82417,
+   "lon": 151.02667,
+   "coord": {
+    "source": "wikipedia",
+    "confidence": "high",
+    "description": "Wikipedia infobox coordinates (via web search snippet)",
+    "coordCheck": {
+     "locality": "Rosehill",
+     "localityCentroid": [
+      -33.824,
+      151.0212
+     ],
+     "postcodes": [
+      "2142"
+     ],
+     "distanceKm": 0.5
+    }
+   },
+   "bomStations": [
+    {
+     "name": "PARRAMATTA NORTH (MASONS DRIVE)",
+     "bomSiteId": "066124",
+     "wmoId": 94764,
+     "distanceKm": 3.8,
+     "lat": -33.79,
+     "lon": 151.02,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94764.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94764.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94764.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SYDNEY OLYMPIC PARK AWS (ARCHERY CENTRE)",
+     "bomSiteId": "066212",
+     "wmoId": 95765,
+     "distanceKm": 4.1,
+     "lat": -33.83,
+     "lon": 151.07,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95765.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.95765.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.95765.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "BANKSTOWN AIRPORT AWS",
+     "bomSiteId": "066137",
+     "wmoId": 94765,
+     "distanceKm": 11.5,
+     "lat": -33.92,
+     "lon": 150.98,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94765.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94765.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94765.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "warwick-farm",
+   "name": "Warwick Farm",
+   "aliases": [
+    "Warwick Farm"
+   ],
+   "state": "NSW",
+   "timezone": "Australia/Sydney",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -33.91083,
+   "lon": 150.94528,
+   "coord": {
+    "source": "wikipedia",
+    "confidence": "high",
+    "description": "Wikipedia infobox coordinates (via web search snippet)",
+    "coordCheck": {
+     "locality": "Warwick Farm",
+     "localityCentroid": [
+      -33.9113,
+      150.9382
+     ],
+     "postcodes": [
+      "2170"
+     ],
+     "distanceKm": 0.7
+    }
+   },
+   "bomStations": [
+    {
+     "name": "BANKSTOWN AIRPORT AWS",
+     "bomSiteId": "066137",
+     "wmoId": 94765,
+     "distanceKm": 3.4,
+     "lat": -33.92,
+     "lon": 150.98,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94765.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94765.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94765.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "HOLSWORTHY AERODROME AWS",
+     "bomSiteId": "066161",
+     "wmoId": 95761,
+     "distanceKm": 8.8,
+     "lat": -33.99,
+     "lon": 150.95,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95761.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.95761.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.95761.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "HORSLEY PARK EQUESTRIAN CENTRE AWS",
+     "bomSiteId": "067119",
+     "wmoId": 94760,
+     "distanceKm": 10.4,
+     "lat": -33.85,
+     "lon": 150.86,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94760.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94760.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94760.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "canterbury",
+   "name": "Canterbury",
+   "aliases": [
+    "Canterbury",
+    "Canterbury Park"
+   ],
+   "state": "NSW",
+   "timezone": "Australia/Sydney",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -33.906824,
+   "lon": 151.115398,
+   "coord": {
+    "source": "wikipedia",
+    "confidence": "high",
+    "description": "Wikipedia infobox coordinates (via web search snippet)",
+    "coordCheck": {
+     "locality": "Canterbury",
+     "localityCentroid": [
+      -33.9126,
+      151.118
+     ],
+     "postcodes": [
+      "2193"
+     ],
+     "distanceKm": 0.7
+    }
+   },
+   "bomStations": [
+    {
+     "name": "CANTERBURY RACECOURSE AWS",
+     "bomSiteId": "066194",
+     "wmoId": 94766,
+     "distanceKm": 0.6,
+     "lat": -33.91,
+     "lon": 151.11,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94766.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94766.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94766.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SYDNEY AIRPORT AMO",
+     "bomSiteId": "066037",
+     "wmoId": 94767,
+     "distanceKm": 7.0,
+     "lat": -33.95,
+     "lon": 151.17,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94767.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94767.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94767.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SYDNEY (OBSERVATORY HILL)",
+     "bomSiteId": "066214",
+     "wmoId": 94768,
+     "distanceKm": 9.4,
+     "lat": -33.86,
+     "lon": 151.2,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94768.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94768.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94768.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "BOM site 066194 \"Canterbury Racecourse AWS\" is on the course (0.6 km from the Wikipedia point).",
+   "surface": "turf"
+  },
+  {
+   "key": "kembla-grange",
+   "name": "Kembla Grange",
+   "aliases": [
+    "Kembla Grange",
+    "Kembla"
+   ],
+   "state": "NSW",
+   "timezone": "Australia/Sydney",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -34.47,
+   "lon": 150.8181,
+   "coord": {
+    "source": "wikipedia-railway-station-proxy",
+    "confidence": "medium",
+    "description": "Wikipedia coordinates of Kembla Grange railway station, which is across the road from the racecourse",
+    "coordCheck": {
+     "locality": "Kembla Grange",
+     "localityCentroid": [
+      -34.4705,
+      150.797
+     ],
+     "postcodes": [
+      "2526"
+     ],
+     "distanceKm": 1.9
+    }
+   },
+   "bomStations": [
+    {
+     "name": "PORT KEMBLA NTC AWS",
+     "bomSiteId": "068253",
+     "wmoId": 95745,
+     "distanceKm": 8.4,
+     "lat": -34.47,
+     "lon": 150.91,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95745.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.95745.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.95745.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SHELLHARBOUR AIRPORT",
+     "bomSiteId": "068241",
+     "wmoId": 95748,
+     "distanceKm": 10.3,
+     "lat": -34.56,
+     "lon": 150.79,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95748.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.95748.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.95748.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "BELLAMBI AWS",
+     "bomSiteId": "068228",
+     "wmoId": 94749,
+     "distanceKm": 15.1,
+     "lat": -34.37,
+     "lon": 150.93,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94749.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94749.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94749.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Street address 601 Princes Hwy, Kembla Grange NSW 2526.",
+   "surface": "turf"
+  },
+  {
+   "key": "newcastle",
+   "name": "Newcastle",
+   "aliases": [
+    "Newcastle",
+    "Broadmeadow",
+    "Newcastle Broadmeadow"
+   ],
+   "state": "NSW",
+   "timezone": "Australia/Sydney",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -32.92944,
+   "lon": 151.74111,
+   "coord": {
+    "source": "wikipedia",
+    "confidence": "high",
+    "description": "Wikipedia infobox coordinates (via web search snippet)",
+    "coordCheck": {
+     "locality": "Broadmeadow",
+     "localityCentroid": [
+      -32.9252,
+      151.7342
+     ],
+     "postcodes": [
+      "2292"
+     ],
+     "distanceKm": 0.8
+    }
+   },
+   "bomStations": [
+    {
+     "name": "NEWCASTLE UNIVERSITY",
+     "bomSiteId": "061390",
+     "wmoId": 94781,
+     "distanceKm": 5.3,
+     "lat": -32.89,
+     "lon": 151.71,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94781.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94781.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94781.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "NEWCASTLE NOBBYS SIGNAL STATION AWS",
+     "bomSiteId": "061055",
+     "wmoId": 94774,
+     "distanceKm": 5.6,
+     "lat": -32.92,
+     "lon": 151.8,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94774.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94774.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94774.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "WILLIAMTOWN RAAF",
+     "bomSiteId": "061078",
+     "wmoId": 94776,
+     "distanceKm": 18.0,
+     "lat": -32.79,
+     "lon": 151.84,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94776.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94776.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94776.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "gosford",
+   "name": "Gosford",
+   "aliases": [
+    "Gosford"
+   ],
+   "state": "NSW",
+   "timezone": "Australia/Sydney",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -33.429,
+   "lon": 151.324,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "West Gosford",
+     "localityCentroid": [
+      -33.415,
+      151.318
+     ],
+     "postcodes": [
+      "2250"
+     ],
+     "distanceKm": 1.7
+    }
+   },
+   "bomStations": [
+    {
+     "name": "GOSFORD AWS",
+     "bomSiteId": "061425",
+     "wmoId": 94782,
+     "distanceKm": 3.6,
+     "lat": -33.44,
+     "lon": 151.36,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94782.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94782.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94782.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MANGROVE MOUNTAIN AWS",
+     "bomSiteId": "061375",
+     "wmoId": 95774,
+     "distanceKm": 18.7,
+     "lat": -33.29,
+     "lon": 151.21,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95774.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.95774.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.95774.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "NORAH HEAD AWS",
+     "bomSiteId": "061366",
+     "wmoId": 95770,
+     "distanceKm": 29.0,
+     "lat": -33.28,
+     "lon": 151.58,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95770.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.95770.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.95770.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": "GOS",
+    "confidence": "low",
+    "evidence": "GOS seen for the Gosford GREYHOUND meeting (2017-09-12, research/fixtures/tab); thoroughbred code unverified"
+   },
+   "notes": "Gosford AWS (site 061425) is 3.6 km away. Note: the Wikipedia hit for \"Gosford Showground\" (-33.414,151.341) is the greyhound/speedway venue, NOT the racecourse.",
+   "surface": "turf"
+  },
+  {
+   "key": "hawkesbury",
+   "name": "Hawkesbury",
+   "aliases": [
+    "Hawkesbury",
+    "Clarendon"
+   ],
+   "state": "NSW",
+   "timezone": "Australia/Sydney",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -33.608,
+   "lon": 150.784,
+   "coord": {
+    "source": "memory+wikipedia-station-proxy",
+    "confidence": "medium",
+    "description": "Clarendon railway station (opened 1870 as \"Hawkesbury Racecourse\" station) is at -33.6089,150.7881 per Wikipedia; venue point from memory, <1 km away",
+    "coordCheck": {
+     "locality": "Clarendon",
+     "localityCentroid": [
+      -33.6117,
+      150.7871
+     ],
+     "postcodes": [
+      "2756"
+     ],
+     "distanceKm": 0.5
+    }
+   },
+   "bomStations": [
+    {
+     "name": "RICHMOND RAAF",
+     "bomSiteId": "067105",
+     "wmoId": 95753,
+     "distanceKm": 1.0,
+     "lat": -33.6,
+     "lon": 150.78,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95753.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.95753.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.95753.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PENRITH LAKES AWS",
+     "bomSiteId": "067113",
+     "wmoId": 94763,
+     "distanceKm": 15.7,
+     "lat": -33.72,
+     "lon": 150.68,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94763.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94763.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94763.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PORTABLE RFSNSW55",
+     "bomSiteId": "250101",
+     "wmoId": 99997,
+     "distanceKm": 21.9,
+     "lat": -33.67,
+     "lon": 150.56,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.99997.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.99997.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.99997.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": "HAW",
+    "confidence": "low",
+    "evidence": "cited in research/tab.md from community code; not seen in a recorded response"
+   },
+   "notes": "Street address 1 Racecourse Rd, Clarendon NSW 2756. Richmond RAAF AWS is 1 km away.",
+   "surface": "turf"
+  },
+  {
+   "key": "eagle-farm",
+   "name": "Eagle Farm",
+   "aliases": [
+    "Eagle Farm"
+   ],
+   "state": "QLD",
+   "timezone": "Australia/Brisbane",
+   "timezoneNote": "AEST, no DST",
+   "lat": -27.428337,
+   "lon": 153.06713,
+   "coord": {
+    "source": "translink-marker",
+    "confidence": "medium",
+    "description": "Translink event-transport page marker for Eagle Farm Racecourse (-27.428337,153.067130)",
+    "coordCheck": {
+     "locality": "Ascot",
+     "localityCentroid": [
+      -27.6247,
+      152.516
+     ],
+     "postcodes": [
+      "4007",
+      "4359"
+     ],
+     "distanceKm": 58.6
+    }
+   },
+   "bomStations": [
+    {
+     "name": "BRISBANE",
+     "bomSiteId": "040913",
+     "wmoId": 94576,
+     "distanceKm": 6.3,
+     "lat": -27.48,
+     "lon": 153.04,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94576.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94576.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94576.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "BRISBANE AERO",
+     "bomSiteId": "040842",
+     "wmoId": 94578,
+     "distanceKm": 7.5,
+     "lat": -27.39,
+     "lon": 153.13,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94578.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94578.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94578.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "ARCHERFIELD AIRPORT",
+     "bomSiteId": "040211",
+     "wmoId": 94575,
+     "distanceKm": 16.7,
+     "lat": -27.57,
+     "lon": 153.01,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94575.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94575.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94575.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "The locality-centroid check matched a different \"Ascot, QLD\"; the venue coordinate itself is from a Translink marker and agrees with Doomben being ~1 km east.",
+   "surface": "turf"
+  },
+  {
+   "key": "doomben",
+   "name": "Doomben",
+   "aliases": [
+    "Doomben"
+   ],
+   "state": "QLD",
+   "timezone": "Australia/Brisbane",
+   "timezoneNote": "AEST, no DST",
+   "lat": -27.4263194,
+   "lon": 153.0760333,
+   "coord": {
+    "source": "wikipedia",
+    "confidence": "high",
+    "description": "Wikipedia infobox coordinates (via web search snippet)",
+    "coordCheck": {
+     "locality": "Ascot",
+     "localityCentroid": [
+      -27.6247,
+      152.516
+     ],
+     "postcodes": [
+      "4007",
+      "4359"
+     ],
+     "distanceKm": 59.5
+    }
+   },
+   "bomStations": [
+    {
+     "name": "BRISBANE AERO",
+     "bomSiteId": "040842",
+     "wmoId": 94578,
+     "distanceKm": 6.7,
+     "lat": -27.39,
+     "lon": 153.13,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94578.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94578.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94578.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "BRISBANE",
+     "bomSiteId": "040913",
+     "wmoId": 94576,
+     "distanceKm": 6.9,
+     "lat": -27.48,
+     "lon": 153.04,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94576.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94576.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94576.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "ARCHERFIELD AIRPORT",
+     "bomSiteId": "040211",
+     "wmoId": 94575,
+     "distanceKm": 17.3,
+     "lat": -27.57,
+     "lon": 153.01,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94575.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94575.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94575.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": "DBN",
+    "confidence": "low",
+    "evidence": "research/tab.md lists DBN/DBM from community code; unverified"
+   },
+   "notes": "Locality-centroid check matched a different \"Ascot, QLD\" (ignore the 59 km figure); Wikipedia coordinate is precise.",
+   "surface": "turf"
+  },
+  {
+   "key": "gold-coast",
+   "name": "Gold Coast",
+   "aliases": [
+    "Gold Coast",
+    "Aquis Park",
+    "Bundall",
+    "Southport"
+   ],
+   "state": "QLD",
+   "timezone": "Australia/Brisbane",
+   "timezoneNote": "AEST, no DST",
+   "lat": -28.0029,
+   "lon": 153.405,
+   "coord": {
+    "source": "wikipedia",
+    "confidence": "high",
+    "description": "Wikipedia infobox coordinates (via web search snippet)",
+    "coordCheck": {
+     "locality": "Bundall",
+     "localityCentroid": [
+      -28.012,
+      153.405
+     ],
+     "postcodes": [
+      "4217"
+     ],
+     "distanceKm": 1.0
+    }
+   },
+   "bomStations": [
+    {
+     "name": "GOLD COAST SEAWAY",
+     "bomSiteId": "040764",
+     "wmoId": 94580,
+     "distanceKm": 7.4,
+     "lat": -27.94,
+     "lon": 153.43,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94580.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94580.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94580.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "COOLANGATTA",
+     "bomSiteId": "040717",
+     "wmoId": 94592,
+     "distanceKm": 21.2,
+     "lat": -28.17,
+     "lon": 153.51,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94592.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94592.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94592.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "CANUNGRA (DEFENCE)",
+     "bomSiteId": "140008",
+     "wmoId": 94418,
+     "distanceKm": 21.5,
+     "lat": -28.04,
+     "lon": 153.19,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94418.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94418.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94418.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Wikipedia (Gold Coast Turf Club) gives -28.0029,153.4050; the Bundall article gives -28.005,153.408 for the track centre (~0.5 km apart).",
+   "surface": "turf"
+  },
+  {
+   "key": "sunshine-coast",
+   "name": "Sunshine Coast",
+   "aliases": [
+    "Sunshine Coast",
+    "Corbould Park",
+    "Caloundra"
+   ],
+   "state": "QLD",
+   "timezone": "Australia/Brisbane",
+   "timezoneNote": "AEST, no DST",
+   "lat": -26.773,
+   "lon": 153.068,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Meridan Plains",
+     "localityCentroid": [
+      -26.7628,
+      153.099
+     ],
+     "postcodes": [
+      "4551"
+     ],
+     "distanceKm": 3.3
+    }
+   },
+   "bomStations": [
+    {
+     "name": "SUNSHINE COAST AIRPORT",
+     "bomSiteId": "040861",
+     "wmoId": 94569,
+     "distanceKm": 19.4,
+     "lat": -26.6,
+     "lon": 153.09,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94569.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94569.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94569.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "NAMBOUR DAFF - HILLSIDE",
+     "bomSiteId": "040988",
+     "wmoId": 95572,
+     "distanceKm": 19.5,
+     "lat": -26.64,
+     "lon": 152.94,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.95572.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.95572.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.95572.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "BEERBURRUM FOREST STATION",
+     "bomSiteId": "040284",
+     "wmoId": 95566,
+     "distanceKm": 23.4,
+     "lat": -26.96,
+     "lon": 152.96,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.95566.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.95566.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.95566.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": "SSC",
+    "confidence": "medium",
+    "evidence": "real 2023-09-24 runner response recorded by mattcs2401/RaceDay (research/fixtures/tab/runner_2023-09-24_R_SSC_1_real.json)"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "ipswich",
+   "name": "Ipswich",
+   "aliases": [
+    "Ipswich",
+    "Bundamba"
+   ],
+   "state": "QLD",
+   "timezone": "Australia/Brisbane",
+   "timezoneNote": "AEST, no DST",
+   "lat": -27.609,
+   "lon": 152.813,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Bundamba",
+     "localityCentroid": [
+      -27.6,
+      152.8167
+     ],
+     "postcodes": [
+      "4304"
+     ],
+     "distanceKm": 1.1
+    }
+   },
+   "bomStations": [
+    {
+     "name": "AMBERLEY AMO",
+     "bomSiteId": "040004",
+     "wmoId": 94568,
+     "distanceKm": 10.4,
+     "lat": -27.63,
+     "lon": 152.71,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94568.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94568.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94568.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "GREENBANK (DEFENCE)",
+     "bomSiteId": "140009",
+     "wmoId": 94419,
+     "distanceKm": 19.6,
+     "lat": -27.69,
+     "lon": 152.99,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94419.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94419.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94419.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "ARCHERFIELD AIRPORT",
+     "bomSiteId": "040211",
+     "wmoId": 94575,
+     "distanceKm": 19.9,
+     "lat": -27.57,
+     "lon": 153.01,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94575.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94575.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94575.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "toowoomba",
+   "name": "Toowoomba",
+   "aliases": [
+    "Toowoomba",
+    "Clifford Park"
+   ],
+   "state": "QLD",
+   "timezone": "Australia/Brisbane",
+   "timezoneNote": "AEST, no DST",
+   "lat": -27.545,
+   "lon": 151.97,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Toowoomba City",
+     "localityCentroid": [
+      -27.5598,
+      151.9507
+     ],
+     "postcodes": [
+      "4350"
+     ],
+     "distanceKm": 2.5
+    }
+   },
+   "bomStations": [
+    {
+     "name": "TOOWOOMBA AIRPORT",
+     "bomSiteId": "041529",
+     "wmoId": 95551,
+     "distanceKm": 5.9,
+     "lat": -27.54,
+     "lon": 151.91,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.95551.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.95551.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.95551.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "WELLCAMP AIRPORT",
+     "bomSiteId": "541150",
+     "wmoId": 99435,
+     "distanceKm": 18.7,
+     "lat": -27.55,
+     "lon": 151.78,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.99435.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.99435.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.99435.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "OAKEY AERO",
+     "bomSiteId": "041359",
+     "wmoId": 94552,
+     "distanceKm": 27.8,
+     "lat": -27.4,
+     "lon": 151.74,
+     "fwoProduct": "IDQ60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94552.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDQ60801/IDQ60801.94552.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDQ60801/IDQ60801.94552.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "morphettville",
+   "name": "Morphettville",
+   "aliases": [
+    "Morphettville",
+    "Morphettville Parks"
+   ],
+   "state": "SA",
+   "timezone": "Australia/Adelaide",
+   "timezoneNote": "ACST/ACDT (DST), UTC+9:30/+10:30",
+   "lat": -34.979,
+   "lon": 138.543,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Morphettville",
+     "localityCentroid": [
+      -34.989,
+      138.539
+     ],
+     "postcodes": [
+      "5043"
+     ],
+     "distanceKm": 1.2
+    }
+   },
+   "bomStations": [
+    {
+     "name": "ADELAIDE AIRPORT",
+     "bomSiteId": "023034",
+     "wmoId": 94672,
+     "distanceKm": 3.8,
+     "lat": -34.95,
+     "lon": 138.52,
+     "fwoProduct": "IDS60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDS60801/IDS60801.94672.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDS60801/IDS60801.94672.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDS60801/IDS60801.94672.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "ADELAIDE (WEST TERRACE / NGAYIRDAPIRA)",
+     "bomSiteId": "023000",
+     "wmoId": 94648,
+     "distanceKm": 6.4,
+     "lat": -34.93,
+     "lon": 138.58,
+     "fwoProduct": "IDS60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDS60801/IDS60801.94648.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDS60801/IDS60801.94648.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDS60801/IDS60801.94648.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MOUNT LOFTY",
+     "bomSiteId": "023842",
+     "wmoId": 95678,
+     "distanceKm": 15.2,
+     "lat": -34.98,
+     "lon": 138.71,
+     "fwoProduct": "IDS60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDS60801/IDS60801.95678.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDS60801/IDS60801.95678.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDS60801/IDS60801.95678.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "The inner \"Morphettville Parks\" track is on the same site.",
+   "surface": "turf"
+  },
+  {
+   "key": "murray-bridge",
+   "name": "Murray Bridge",
+   "aliases": [
+    "Murray Bridge",
+    "Murray Bridge Gifford Hill",
+    "Gifford Hill"
+   ],
+   "state": "SA",
+   "timezone": "Australia/Adelaide",
+   "timezoneNote": "ACST/ACDT (DST), UTC+9:30/+10:30",
+   "lat": -35.1575,
+   "lon": 139.26,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Murray Bridge",
+     "localityCentroid": [
+      -35.1311,
+      139.2651
+     ],
+     "postcodes": [
+      "5253",
+      "5254"
+     ],
+     "distanceKm": 3.0
+    }
+   },
+   "bomStations": [
+    {
+     "name": "MURRAY BRIDGE",
+     "bomSiteId": "024521",
+     "wmoId": 95812,
+     "distanceKm": 4.2,
+     "lat": -35.12,
+     "lon": 139.26,
+     "fwoProduct": "IDS60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDS60801/IDS60801.95812.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDS60801/IDS60801.95812.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDS60801/IDS60801.95812.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PALLAMANA AERODROME",
+     "bomSiteId": "024584",
+     "wmoId": 95818,
+     "distanceKm": 11.2,
+     "lat": -35.06,
+     "lon": 139.23,
+     "fwoProduct": "IDS60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDS60801/IDS60801.95818.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDS60801/IDS60801.95818.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDS60801/IDS60801.95818.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "STRATHALBYN RACECOURSE",
+     "bomSiteId": "024580",
+     "wmoId": 94814,
+     "distanceKm": 36.3,
+     "lat": -35.28,
+     "lon": 138.89,
+     "fwoProduct": "IDS60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDS60801/IDS60801.94814.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDS60801/IDS60801.94814.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDS60801/IDS60801.94814.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "gawler",
+   "name": "Gawler",
+   "aliases": [
+    "Gawler",
+    "Gawler & Barossa",
+    "Gawler and Barossa",
+    "Evanston"
+   ],
+   "state": "SA",
+   "timezone": "Australia/Adelaide",
+   "timezoneNote": "ACST/ACDT (DST), UTC+9:30/+10:30",
+   "lat": -34.625,
+   "lon": 138.735,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Evanston",
+     "localityCentroid": [
+      -34.6161,
+      138.7317
+     ],
+     "postcodes": [
+      "5116"
+     ],
+     "distanceKm": 1.0
+    }
+   },
+   "bomStations": [
+    {
+     "name": "ROSEWORTHY AWS",
+     "bomSiteId": "023122",
+     "wmoId": 95671,
+     "distanceKm": 13.7,
+     "lat": -34.51,
+     "lon": 138.68,
+     "fwoProduct": "IDS60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDS60801/IDS60801.95671.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDS60801/IDS60801.95671.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDS60801/IDS60801.95671.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "EDINBURGH RAAF",
+     "bomSiteId": "023083",
+     "wmoId": 95676,
+     "distanceKm": 14.1,
+     "lat": -34.71,
+     "lon": 138.62,
+     "fwoProduct": "IDS60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDS60801/IDS60801.95676.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDS60801/IDS60801.95676.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDS60801/IDS60801.95676.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MOUNT CRAWFORD AWS",
+     "bomSiteId": "023878",
+     "wmoId": 94678,
+     "distanceKm": 21.3,
+     "lat": -34.73,
+     "lon": 138.93,
+     "fwoProduct": "IDS60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDS60801/IDS60801.94678.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDS60801/IDS60801.94678.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDS60801/IDS60801.94678.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "ascot",
+   "name": "Ascot",
+   "aliases": [
+    "Ascot",
+    "Ascot WA",
+    "Perth Ascot"
+   ],
+   "state": "WA",
+   "timezone": "Australia/Perth",
+   "timezoneNote": "AWST, no DST, UTC+8",
+   "lat": -31.933,
+   "lon": 115.927,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Ascot",
+     "localityCentroid": [
+      -31.9355,
+      115.9297
+     ],
+     "postcodes": [
+      "6104"
+     ],
+     "distanceKm": 0.4
+    }
+   },
+   "bomStations": [
+    {
+     "name": "PERTH AIRPORT",
+     "bomSiteId": "009021",
+     "wmoId": 94610,
+     "distanceKm": 5.0,
+     "lat": -31.93,
+     "lon": 115.98,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.94610.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.94610.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.94610.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PERTH METRO",
+     "bomSiteId": "009225",
+     "wmoId": 94608,
+     "distanceKm": 5.6,
+     "lat": -31.92,
+     "lon": 115.87,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.94608.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.94608.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.94608.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "INNER DOLPHIN PYLON",
+     "bomSiteId": "009091",
+     "wmoId": 95620,
+     "distanceKm": 11.1,
+     "lat": -31.99,
+     "lon": 115.83,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.95620.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.95620.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.95620.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "belmont",
+   "name": "Belmont",
+   "aliases": [
+    "Belmont",
+    "Belmont Park",
+    "Belmont Park WA"
+   ],
+   "state": "WA",
+   "timezone": "Australia/Perth",
+   "timezoneNote": "AWST, no DST, UTC+8",
+   "lat": -31.956,
+   "lon": 115.893,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Burswood",
+     "localityCentroid": [
+      -31.9633,
+      115.8968
+     ],
+     "postcodes": [
+      "6100"
+     ],
+     "distanceKm": 0.9
+    }
+   },
+   "bomStations": [
+    {
+     "name": "PERTH METRO",
+     "bomSiteId": "009225",
+     "wmoId": 94608,
+     "distanceKm": 4.6,
+     "lat": -31.92,
+     "lon": 115.87,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.94608.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.94608.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.94608.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "INNER DOLPHIN PYLON",
+     "bomSiteId": "009091",
+     "wmoId": 95620,
+     "distanceKm": 7.0,
+     "lat": -31.99,
+     "lon": 115.83,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.95620.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.95620.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.95620.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PERTH AIRPORT",
+     "bomSiteId": "009021",
+     "wmoId": 94610,
+     "distanceKm": 8.7,
+     "lat": -31.93,
+     "lon": 115.98,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.94610.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.94610.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.94610.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "pinjarra",
+   "name": "Pinjarra",
+   "aliases": [
+    "Pinjarra",
+    "Pinjarra Park"
+   ],
+   "state": "WA",
+   "timezone": "Australia/Perth",
+   "timezoneNote": "AWST, no DST, UTC+8",
+   "lat": -32.634,
+   "lon": 115.89,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Pinjarra",
+     "localityCentroid": [
+      -32.627,
+      115.8789
+     ],
+     "postcodes": [
+      "6208"
+     ],
+     "distanceKm": 1.3
+    }
+   },
+   "bomStations": [
+    {
+     "name": "DWELLINGUP",
+     "bomSiteId": "009538",
+     "wmoId": 94620,
+     "distanceKm": 18.0,
+     "lat": -32.71,
+     "lon": 116.06,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.94620.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.94620.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.94620.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MANDURAH",
+     "bomSiteId": "009977",
+     "wmoId": 94605,
+     "distanceKm": 21.1,
+     "lat": -32.52,
+     "lon": 115.71,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.94605.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.94605.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.94605.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "KARNET",
+     "bomSiteId": "009111",
+     "wmoId": 95614,
+     "distanceKm": 28.0,
+     "lat": -32.44,
+     "lon": 116.08,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.95614.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.95614.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.95614.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "bunbury",
+   "name": "Bunbury",
+   "aliases": [
+    "Bunbury"
+   ],
+   "state": "WA",
+   "timezone": "Australia/Perth",
+   "timezoneNote": "AWST, no DST, UTC+8",
+   "lat": -33.36,
+   "lon": 115.674,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Bunbury",
+     "localityCentroid": [
+      -33.321,
+      115.6383
+     ],
+     "postcodes": [
+      "6230",
+      "6231"
+     ],
+     "distanceKm": 5.5
+    }
+   },
+   "bomStations": [
+    {
+     "name": "BUNBURY",
+     "bomSiteId": "009965",
+     "wmoId": 94604,
+     "distanceKm": 3.2,
+     "lat": -33.36,
+     "lon": 115.64,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.94604.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.94604.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.94604.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "DONNYBROOK",
+     "bomSiteId": "009534",
+     "wmoId": 95622,
+     "distanceKm": 27.0,
+     "lat": -33.57,
+     "lon": 115.82,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.95622.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.95622.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.95622.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "BUSSELTON JETTY",
+     "bomSiteId": "009937",
+     "wmoId": 95602,
+     "distanceKm": 43.1,
+     "lat": -33.63,
+     "lon": 115.34,
+     "fwoProduct": "IDW60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDW60801/IDW60801.95602.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDW60801/IDW60801.95602.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDW60801/IDW60801.95602.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "hobart",
+   "name": "Hobart (Elwick)",
+   "aliases": [
+    "Hobart",
+    "Elwick",
+    "Tasracing Park Elwick"
+   ],
+   "state": "TAS",
+   "timezone": "Australia/Hobart",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -42.8245,
+   "lon": 147.266,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Glenorchy",
+     "localityCentroid": [
+      -42.8331,
+      147.2758
+     ],
+     "postcodes": [
+      "7010"
+     ],
+     "distanceKm": 1.2
+    }
+   },
+   "bomStations": [
+    {
+     "name": "KUNANYI (MOUNT WELLINGTON PINNACLE)",
+     "bomSiteId": "094087",
+     "wmoId": 95979,
+     "distanceKm": 8.7,
+     "lat": -42.9,
+     "lon": 147.24,
+     "fwoProduct": "IDT60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDT60801/IDT60801.95979.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDT60801/IDT60801.95979.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDT60801/IDT60801.95979.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "HOBART (ELLERSLIE ROAD)",
+     "bomSiteId": "094029",
+     "wmoId": 94970,
+     "distanceKm": 9.0,
+     "lat": -42.89,
+     "lon": 147.33,
+     "fwoProduct": "IDT60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDT60801/IDT60801.94970.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDT60801/IDT60801.94970.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDT60801/IDT60801.94970.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "HOBART AIRPORT",
+     "bomSiteId": "094008",
+     "wmoId": 94975,
+     "distanceKm": 19.1,
+     "lat": -42.83,
+     "lon": 147.5,
+     "fwoProduct": "IDT60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDT60801/IDT60801.94975.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDT60801/IDT60801.94975.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDT60801/IDT60801.94975.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Tasracing Park, Elwick (Glenorchy). Nearest BOM AWS is Hobart (Ellerslie Rd) 9 km away.",
+   "surface": "turf"
+  },
+  {
+   "key": "launceston",
+   "name": "Launceston",
+   "aliases": [
+    "Launceston",
+    "Mowbray"
+   ],
+   "state": "TAS",
+   "timezone": "Australia/Hobart",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -41.412,
+   "lon": 147.151,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Mowbray",
+     "localityCentroid": [
+      -41.409,
+      147.143
+     ],
+     "postcodes": [
+      "7248"
+     ],
+     "distanceKm": 0.7
+    }
+   },
+   "bomStations": [
+    {
+     "name": "LAUNCESTON (TI TREE BEND)",
+     "bomSiteId": "091237",
+     "wmoId": 94969,
+     "distanceKm": 2.7,
+     "lat": -41.42,
+     "lon": 147.12,
+     "fwoProduct": "IDT60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDT60801/IDT60801.94969.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDT60801/IDT60801.94969.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDT60801/IDT60801.94969.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "LAUNCESTON AIRPORT",
+     "bomSiteId": "091311",
+     "wmoId": 95966,
+     "distanceKm": 16.4,
+     "lat": -41.55,
+     "lon": 147.22,
+     "fwoProduct": "IDT60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDT60801/IDT60801.95966.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDT60801/IDT60801.95966.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDT60801/IDT60801.95966.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "CRESSY RESEARCH STATION",
+     "bomSiteId": "091306",
+     "wmoId": 95969,
+     "distanceKm": 35.8,
+     "lat": -41.73,
+     "lon": 147.08,
+     "fwoProduct": "IDT60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDT60801/IDT60801.95969.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDT60801/IDT60801.95969.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDT60801/IDT60801.95969.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Tasmanian Turf Club, Mowbray. BOM \"Launceston (Ti Tree Bend)\" is 2.7 km away.",
+   "surface": "turf"
+  },
+  {
+   "key": "canberra",
+   "name": "Canberra",
+   "aliases": [
+    "Canberra",
+    "Thoroughbred Park",
+    "Canberra Acton"
+   ],
+   "state": "ACT",
+   "timezone": "Australia/Sydney",
+   "timezoneNote": "AEST/AEDT (DST)",
+   "lat": -35.259,
+   "lon": 149.1335,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Lyneham",
+     "localityCentroid": [
+      -35.25,
+      149.1292
+     ],
+     "postcodes": [
+      "2602"
+     ],
+     "distanceKm": 1.1
+    }
+   },
+   "bomStations": [
+    {
+     "name": "CANBERRA AIRPORT",
+     "bomSiteId": "070351",
+     "wmoId": 94926,
+     "distanceKm": 8.3,
+     "lat": -35.31,
+     "lon": 149.2,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94926.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94926.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94926.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "ACT PCS2",
+     "bomSiteId": "250105",
+     "wmoId": 99146,
+     "distanceKm": 10.9,
+     "lat": -35.33,
+     "lon": 149.05,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.99146.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.99146.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.99146.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "KOWEN FOREST (PCS)",
+     "bomSiteId": "250071",
+     "wmoId": 99764,
+     "distanceKm": 17.9,
+     "lat": -35.31,
+     "lon": 149.32,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.99764.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.99764.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.99764.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "darwin",
+   "name": "Darwin (Fannie Bay)",
+   "aliases": [
+    "Darwin",
+    "Fannie Bay"
+   ],
+   "state": "NT",
+   "timezone": "Australia/Darwin",
+   "timezoneNote": "ACST, no DST, UTC+9:30",
+   "lat": -12.423,
+   "lon": 130.842,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Fannie Bay",
+     "localityCentroid": [
+      -12.425,
+      130.8364
+     ],
+     "postcodes": [
+      "0820"
+     ],
+     "distanceKm": 0.6
+    }
+   },
+   "bomStations": [
+    {
+     "name": "DARWIN AIRPORT",
+     "bomSiteId": "014015",
+     "wmoId": 94120,
+     "distanceKm": 5.2,
+     "lat": -12.42,
+     "lon": 130.89,
+     "fwoProduct": "IDD60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDD60801/IDD60801.94120.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDD60801/IDD60801.94120.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDD60801/IDD60801.94120.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "DARWIN NTC AWS",
+     "bomSiteId": "014072",
+     "wmoId": 95122,
+     "distanceKm": 5.3,
+     "lat": -12.47,
+     "lon": 130.85,
+     "fwoProduct": "IDD60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDD60801/IDD60801.95122.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDD60801/IDD60801.95122.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDD60801/IDD60801.95122.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "CHARLES POINT",
+     "bomSiteId": "014031",
+     "wmoId": 99510,
+     "distanceKm": 23.3,
+     "lat": -12.39,
+     "lon": 130.63,
+     "fwoProduct": "IDD60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDD60801/IDD60801.99510.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDD60801/IDD60801.99510.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDD60801/IDD60801.99510.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Darwin Turf Club, Fannie Bay. Dry-season racing (Jun-Aug) - humidity/heat rather than rain is the usual factor.",
+   "surface": "turf"
+  },
+  {
+   "key": "alice-springs",
+   "name": "Alice Springs",
+   "aliases": [
+    "Alice Springs",
+    "Pioneer Park"
+   ],
+   "state": "NT",
+   "timezone": "Australia/Darwin",
+   "timezoneNote": "ACST, no DST, UTC+9:30",
+   "lat": -23.756,
+   "lon": 133.87,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Alice Springs",
+     "localityCentroid": [
+      -23.698,
+      133.8807
+     ],
+     "postcodes": [
+      "0870",
+      "0871",
+      "0872"
+     ],
+     "distanceKm": 6.5
+    }
+   },
+   "bomStations": [
+    {
+     "name": "ALICE SPRINGS AIRPORT",
+     "bomSiteId": "015590",
+     "wmoId": 94326,
+     "distanceKm": 5.3,
+     "lat": -23.8,
+     "lon": 133.89,
+     "fwoProduct": "IDD60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDD60801/IDD60801.94326.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDD60801/IDD60801.94326.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDD60801/IDD60801.94326.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "ARLTUNGA",
+     "bomSiteId": "015594",
+     "wmoId": 95323,
+     "distanceKm": 88.9,
+     "lat": -23.46,
+     "lon": 134.68,
+     "fwoProduct": "IDD60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDD60801/IDD60801.95323.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDD60801/IDD60801.95323.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDD60801/IDD60801.95323.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "TERRITORY GRAPE FARM",
+     "bomSiteId": "015643",
+     "wmoId": 94328,
+     "distanceKm": 147.1,
+     "lat": -22.45,
+     "lon": 133.64,
+     "fwoProduct": "IDD60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDD60801/IDD60801.94328.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDD60801/IDD60801.94328.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDD60801/IDD60801.94328.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Pioneer Park is south of the town centre near the airport road; the 6.5 km centroid distance is expected.",
+   "surface": "turf"
+  },
+  {
+   "key": "geelong",
+   "name": "Geelong",
+   "aliases": [
+    "Geelong"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -38.17,
+   "lon": 144.38,
+   "coord": {
+    "source": "bom-station-at-venue",
+    "confidence": "high",
+    "description": "BOM automatic weather station \"GEELONG RACECOURSE\" (site 087184) is on the course; coordinates from BOM station list",
+    "coordCheck": {
+     "locality": "Breakwater",
+     "localityCentroid": [
+      -38.182,
+      144.375
+     ],
+     "postcodes": [
+      "3219"
+     ],
+     "distanceKm": 1.4
+    }
+   },
+   "bomStations": [
+    {
+     "name": "GEELONG RACECOURSE",
+     "bomSiteId": "087184",
+     "wmoId": 94857,
+     "distanceKm": 0.0,
+     "lat": -38.17,
+     "lon": 144.38,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94857.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94857.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94857.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "AVALON AIRPORT",
+     "bomSiteId": "087113",
+     "wmoId": 94854,
+     "distanceKm": 17.9,
+     "lat": -38.03,
+     "lon": 144.48,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94854.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94854.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94854.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SHEOAKS",
+     "bomSiteId": "087168",
+     "wmoId": 94863,
+     "distanceKm": 36.3,
+     "lat": -37.91,
+     "lon": 144.13,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94863.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94863.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94863.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "BOM site 087184 is on the racecourse itself (0 km): observations here ARE on-course observations.",
+   "surface": "turf"
+  },
+  {
+   "key": "ballarat",
+   "name": "Ballarat",
+   "aliases": [
+    "Ballarat",
+    "Dowling Forest",
+    "Sportsbet-Ballarat"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.478,
+   "lon": 143.796,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Miners Rest",
+     "localityCentroid": [
+      -37.4717,
+      143.7912
+     ],
+     "postcodes": [
+      "3352"
+     ],
+     "distanceKm": 0.8
+    }
+   },
+   "bomStations": [
+    {
+     "name": "BALLARAT AERODROME",
+     "bomSiteId": "089002",
+     "wmoId": 94852,
+     "distanceKm": 3.6,
+     "lat": -37.51,
+     "lon": 143.79,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94852.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94852.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94852.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MARYBOROUGH",
+     "bomSiteId": "088043",
+     "wmoId": 94849,
+     "distanceKm": 46.8,
+     "lat": -37.06,
+     "lon": 143.73,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94849.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94849.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94849.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SHEOAKS",
+     "bomSiteId": "087168",
+     "wmoId": 94863,
+     "distanceKm": 56.3,
+     "lat": -37.91,
+     "lon": 144.13,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94863.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94863.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94863.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Dowling Forest racecourse at Miners Rest, 8 km north of Ballarat. A synthetic (Polytrack) track is on the same site - see ballarat-synthetic.",
+   "surface": "turf"
+  },
+  {
+   "key": "ballarat-synthetic",
+   "name": "Ballarat Synthetic",
+   "aliases": [
+    "Ballarat Synthetic",
+    "Ballarat (Synthetic)",
+    "Sportsbet-Ballarat Synthetic"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.478,
+   "lon": 143.796,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Miners Rest",
+     "localityCentroid": [
+      -37.4717,
+      143.7912
+     ],
+     "postcodes": [
+      "3352"
+     ],
+     "distanceKm": 0.8
+    }
+   },
+   "bomStations": [
+    {
+     "name": "BALLARAT AERODROME",
+     "bomSiteId": "089002",
+     "wmoId": 94852,
+     "distanceKm": 3.6,
+     "lat": -37.51,
+     "lon": 143.79,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94852.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94852.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94852.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MARYBOROUGH",
+     "bomSiteId": "088043",
+     "wmoId": 94849,
+     "distanceKm": 46.8,
+     "lat": -37.06,
+     "lon": 143.73,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94849.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94849.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94849.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SHEOAKS",
+     "bomSiteId": "087168",
+     "wmoId": 94863,
+     "distanceKm": 56.3,
+     "lat": -37.91,
+     "lon": 144.13,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94863.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94863.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94863.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Synthetic (all-weather) track on the same site as Ballarat; rain affects it far less than turf - treat track-condition drift as ~0 but still flag heavy rain for visibility/footing.",
+   "surface": "synthetic"
+  },
+  {
+   "key": "bendigo",
+   "name": "Bendigo",
+   "aliases": [
+    "Bendigo"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -36.712,
+   "lon": 144.308,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Ascot",
+     "localityCentroid": [
+      -37.0551,
+      144.0677
+     ],
+     "postcodes": [
+      "3364",
+      "3551"
+     ],
+     "distanceKm": 43.7
+    }
+   },
+   "bomStations": [
+    {
+     "name": "BENDIGO AIRPORT",
+     "bomSiteId": "081123",
+     "wmoId": 94855,
+     "distanceKm": 3.7,
+     "lat": -36.74,
+     "lon": 144.33,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94855.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94855.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94855.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "REDESDALE",
+     "bomSiteId": "088051",
+     "wmoId": 94859,
+     "distanceKm": 39.1,
+     "lat": -37.02,
+     "lon": 144.52,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94859.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94859.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94859.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PUCKAPUNYAL WEST (DEFENCE)",
+     "bomSiteId": "088166",
+     "wmoId": 94856,
+     "distanceKm": 59.1,
+     "lat": -37.02,
+     "lon": 144.85,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94856.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94856.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94856.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Racecourse is in the suburb of Ascot (Bendigo); the centroid check matched a different Ascot in VIC (ignore the 43 km figure). Bendigo Airport AWS is 3.7 km away, consistent.",
+   "surface": "turf"
+  },
+  {
+   "key": "cranbourne",
+   "name": "Cranbourne",
+   "aliases": [
+    "Cranbourne"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -38.119,
+   "lon": 145.285,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Cranbourne",
+     "localityCentroid": [
+      -38.105,
+      145.279
+     ],
+     "postcodes": [
+      "3977"
+     ],
+     "distanceKm": 1.6
+    }
+   },
+   "bomStations": [
+    {
+     "name": "FRANKSTON (BALLAM PARK)",
+     "bomSiteId": "086388",
+     "wmoId": 94876,
+     "distanceKm": 11.5,
+     "lat": -38.15,
+     "lon": 145.16,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94876.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94876.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94876.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "FRANKSTON BEACH",
+     "bomSiteId": "086371",
+     "wmoId": 94871,
+     "distanceKm": 14.8,
+     "lat": -38.15,
+     "lon": 145.12,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94871.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94871.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94871.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MOORABBIN AIRPORT",
+     "bomSiteId": "086077",
+     "wmoId": 94870,
+     "distanceKm": 22.4,
+     "lat": -37.98,
+     "lon": 145.1,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94870.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94870.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94870.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "pakenham",
+   "name": "Pakenham",
+   "aliases": [
+    "Pakenham",
+    "Tynong",
+    "Sportsbet-Pakenham",
+    "Racing.com Park"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -38.093,
+   "lon": 145.622,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Tynong",
+     "localityCentroid": [
+      -38.0833,
+      145.6167
+     ],
+     "postcodes": [
+      "3813"
+     ],
+     "distanceKm": 1.2
+    }
+   },
+   "bomStations": [
+    {
+     "name": "NILMA NORTH (WARRAGUL)",
+     "bomSiteId": "085313",
+     "wmoId": 99806,
+     "distanceKm": 32.5,
+     "lat": -38.13,
+     "lon": 145.99,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.99806.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.99806.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.99806.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "FERNY CREEK",
+     "bomSiteId": "086266",
+     "wmoId": 94872,
+     "distanceKm": 34.4,
+     "lat": -37.87,
+     "lon": 145.35,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94872.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94872.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94872.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SCORESBY RESEARCH INSTITUTE",
+     "bomSiteId": "086104",
+     "wmoId": 95867,
+     "distanceKm": 40.3,
+     "lat": -37.87,
+     "lon": 145.26,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95867.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95867.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95867.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Racecourse is at Tynong (not Pakenham township). A synthetic track is on the same site - see pakenham-synthetic.",
+   "surface": "turf"
+  },
+  {
+   "key": "pakenham-synthetic",
+   "name": "Pakenham Synthetic",
+   "aliases": [
+    "Pakenham Synthetic",
+    "Pakenham (Synthetic)",
+    "Sportsbet-Pakenham Synthetic"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -38.093,
+   "lon": 145.622,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Tynong",
+     "localityCentroid": [
+      -38.0833,
+      145.6167
+     ],
+     "postcodes": [
+      "3813"
+     ],
+     "distanceKm": 1.2
+    }
+   },
+   "bomStations": [
+    {
+     "name": "NILMA NORTH (WARRAGUL)",
+     "bomSiteId": "085313",
+     "wmoId": 99806,
+     "distanceKm": 32.5,
+     "lat": -38.13,
+     "lon": 145.99,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.99806.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.99806.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.99806.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "FERNY CREEK",
+     "bomSiteId": "086266",
+     "wmoId": 94872,
+     "distanceKm": 34.4,
+     "lat": -37.87,
+     "lon": 145.35,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94872.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94872.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94872.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SCORESBY RESEARCH INSTITUTE",
+     "bomSiteId": "086104",
+     "wmoId": 95867,
+     "distanceKm": 40.3,
+     "lat": -37.87,
+     "lon": 145.26,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95867.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95867.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95867.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Synthetic (all-weather) track on the same site as Pakenham; rain affects it far less than turf - treat track-condition drift as ~0 but still flag heavy rain for visibility/footing.",
+   "surface": "synthetic"
+  },
+  {
+   "key": "mornington",
+   "name": "Mornington",
+   "aliases": [
+    "Mornington"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -38.229,
+   "lon": 145.074,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Mornington",
+     "localityCentroid": [
+      -38.2277,
+      145.0604
+     ],
+     "postcodes": [
+      "3931"
+     ],
+     "distanceKm": 1.2
+    }
+   },
+   "bomStations": [
+    {
+     "name": "FRANKSTON BEACH",
+     "bomSiteId": "086371",
+     "wmoId": 94871,
+     "distanceKm": 9.7,
+     "lat": -38.15,
+     "lon": 145.12,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94871.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94871.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94871.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "FRANKSTON (BALLAM PARK)",
+     "bomSiteId": "086388",
+     "wmoId": 94876,
+     "distanceKm": 11.6,
+     "lat": -38.15,
+     "lon": 145.16,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94876.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94876.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94876.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "CERBERUS",
+     "bomSiteId": "086361",
+     "wmoId": 94898,
+     "distanceKm": 17.3,
+     "lat": -38.36,
+     "lon": 145.18,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94898.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94898.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94898.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "sale",
+   "name": "Sale",
+   "aliases": [
+    "Sale",
+    "Greenwattle"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -38.087,
+   "lon": 147.062,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Sale",
+     "localityCentroid": [
+      -38.1026,
+      147.073
+     ],
+     "postcodes": [
+      "3850",
+      "3853"
+     ],
+     "distanceKm": 2.0
+    }
+   },
+   "bomStations": [
+    {
+     "name": "EAST SALE AIRPORT",
+     "bomSiteId": "085314",
+     "wmoId": 95907,
+     "distanceKm": 7.0,
+     "lat": -38.1,
+     "lon": 147.14,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95907.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95907.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95907.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MOUNT MOORNAPA",
+     "bomSiteId": "085296",
+     "wmoId": 95913,
+     "distanceKm": 38.1,
+     "lat": -37.75,
+     "lon": 147.14,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95913.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95913.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95913.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "BAIRNSDALE AIRPORT",
+     "bomSiteId": "085279",
+     "wmoId": 94912,
+     "distanceKm": 50.1,
+     "lat": -37.88,
+     "lon": 147.57,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94912.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94912.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94912.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "kilmore",
+   "name": "Kilmore",
+   "aliases": [
+    "Kilmore"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.303,
+   "lon": 144.962,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Kilmore",
+     "localityCentroid": [
+      -37.3017,
+      144.9497
+     ],
+     "postcodes": [
+      "3764"
+     ],
+     "distanceKm": 1.1
+    }
+   },
+   "bomStations": [
+    {
+     "name": "KILMORE GAP",
+     "bomSiteId": "088162",
+     "wmoId": 94860,
+     "distanceKm": 8.6,
+     "lat": -37.38,
+     "lon": 144.97,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94860.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94860.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94860.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PUCKAPUNYAL WEST (DEFENCE)",
+     "bomSiteId": "088166",
+     "wmoId": 94856,
+     "distanceKm": 33.0,
+     "lat": -37.02,
+     "lon": 144.85,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94856.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94856.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94856.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PUCKAPUNYAL LYON HILL (DEFENCE)",
+     "bomSiteId": "088167",
+     "wmoId": 94858,
+     "distanceKm": 41.1,
+     "lat": -36.94,
+     "lon": 145.05,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94858.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94858.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94858.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "seymour",
+   "name": "Seymour",
+   "aliases": [
+    "Seymour"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.028,
+   "lon": 145.139,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Seymour",
+     "localityCentroid": [
+      -37.0161,
+      145.162
+     ],
+     "postcodes": [
+      "3660",
+      "3661"
+     ],
+     "distanceKm": 2.4
+    }
+   },
+   "bomStations": [
+    {
+     "name": "PUCKAPUNYAL LYON HILL (DEFENCE)",
+     "bomSiteId": "088167",
+     "wmoId": 94858,
+     "distanceKm": 12.6,
+     "lat": -36.94,
+     "lon": 145.05,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94858.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94858.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94858.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MANGALORE AIRPORT",
+     "bomSiteId": "088109",
+     "wmoId": 94874,
+     "distanceKm": 16.0,
+     "lat": -36.89,
+     "lon": 145.19,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94874.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94874.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94874.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PUCKAPUNYAL WEST (DEFENCE)",
+     "bomSiteId": "088166",
+     "wmoId": 94856,
+     "distanceKm": 25.7,
+     "lat": -37.02,
+     "lon": 144.85,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94856.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94856.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94856.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "wangaratta",
+   "name": "Wangaratta",
+   "aliases": [
+    "Wangaratta"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -36.376,
+   "lon": 146.303,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Wangaratta",
+     "localityCentroid": [
+      -36.3713,
+      146.3218
+     ],
+     "postcodes": [
+      "3676",
+      "3677"
+     ],
+     "distanceKm": 1.8
+    }
+   },
+   "bomStations": [
+    {
+     "name": "WANGARATTA AERO",
+     "bomSiteId": "082138",
+     "wmoId": 94889,
+     "distanceKm": 4.9,
+     "lat": -36.42,
+     "lon": 146.31,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94889.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94889.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94889.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "BENALLA AIRPORT",
+     "bomSiteId": "082170",
+     "wmoId": 94884,
+     "distanceKm": 33.3,
+     "lat": -36.55,
+     "lon": 146.0,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94884.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94884.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94884.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "RUTHERGLEN RESEARCH",
+     "bomSiteId": "082039",
+     "wmoId": 95837,
+     "distanceKm": 35.9,
+     "lat": -36.1,
+     "lon": 146.51,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95837.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95837.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95837.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "mildura",
+   "name": "Mildura",
+   "aliases": [
+    "Mildura"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -34.23,
+   "lon": 142.167,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Irymple",
+     "localityCentroid": [
+      -34.2495,
+      142.1594
+     ],
+     "postcodes": [
+      "3498"
+     ],
+     "distanceKm": 2.3
+    }
+   },
+   "bomStations": [
+    {
+     "name": "MILDURA AIRPORT",
+     "bomSiteId": "076031",
+     "wmoId": 94693,
+     "distanceKm": 7.2,
+     "lat": -34.24,
+     "lon": 142.09,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94693.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94693.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94693.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "OUYEN (POST OFFICE)",
+     "bomSiteId": "076047",
+     "wmoId": 94831,
+     "distanceKm": 94.3,
+     "lat": -35.07,
+     "lon": 142.31,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94831.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94831.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94831.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "BOM lists Mildura Airport in BOTH IDV60801 (VIC) and IDN60801 (NSW) products - border stations are duplicated.",
+   "surface": "turf"
+  },
+  {
+   "key": "swan-hill",
+   "name": "Swan Hill",
+   "aliases": [
+    "Swan Hill"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -35.346,
+   "lon": 143.54,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Swan Hill",
+     "localityCentroid": [
+      -35.3396,
+      143.5525
+     ],
+     "postcodes": [
+      "3585"
+     ],
+     "distanceKm": 1.3
+    }
+   },
+   "bomStations": [
+    {
+     "name": "SWAN HILL AERODROME",
+     "bomSiteId": "077094",
+     "wmoId": 94843,
+     "distanceKm": 3.8,
+     "lat": -35.38,
+     "lon": 143.54,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94843.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94843.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94843.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "KERANG",
+     "bomSiteId": "080023",
+     "wmoId": 94844,
+     "distanceKm": 54.0,
+     "lat": -35.72,
+     "lon": 143.92,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94844.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94844.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94844.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Swan Hill Aerodrome appears in both IDV60801 and IDN60801.",
+   "surface": "turf"
+  },
+  {
+   "key": "warrnambool",
+   "name": "Warrnambool",
+   "aliases": [
+    "Warrnambool"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -38.373,
+   "lon": 142.456,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Warrnambool",
+     "localityCentroid": [
+      -38.3687,
+      142.4982
+     ],
+     "postcodes": [
+      "3280"
+     ],
+     "distanceKm": 3.7
+    }
+   },
+   "bomStations": [
+    {
+     "name": "WARRNAMBOOL AIRPORT NDB",
+     "bomSiteId": "090186",
+     "wmoId": 94837,
+     "distanceKm": 9.2,
+     "lat": -38.29,
+     "lon": 142.45,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94837.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94837.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94837.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PORT FAIRY AWS",
+     "bomSiteId": "090175",
+     "wmoId": 94830,
+     "distanceKm": 19.8,
+     "lat": -38.39,
+     "lon": 142.23,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94830.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94830.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94830.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MORTLAKE RACECOURSE",
+     "bomSiteId": "090176",
+     "wmoId": 94840,
+     "distanceKm": 43.4,
+     "lat": -38.07,
+     "lon": 142.77,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94840.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94840.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94840.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "hamilton",
+   "name": "Hamilton",
+   "aliases": [
+    "Hamilton"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.754,
+   "lon": 142.017,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Hamilton",
+     "localityCentroid": [
+      -37.7456,
+      142.0179
+     ],
+     "postcodes": [
+      "3300"
+     ],
+     "distanceKm": 0.9
+    }
+   },
+   "bomStations": [
+    {
+     "name": "HAMILTON AIRPORT",
+     "bomSiteId": "090173",
+     "wmoId": 94829,
+     "distanceKm": 12.2,
+     "lat": -37.65,
+     "lon": 142.06,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94829.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94829.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94829.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "CASTERTON",
+     "bomSiteId": "090182",
+     "wmoId": 95825,
+     "distanceKm": 63.5,
+     "lat": -37.58,
+     "lon": 141.33,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95825.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95825.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95825.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "DARTMOOR",
+     "bomSiteId": "090194",
+     "wmoId": 95822,
+     "distanceKm": 69.0,
+     "lat": -37.92,
+     "lon": 141.26,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95822.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95822.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95822.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "echuca",
+   "name": "Echuca",
+   "aliases": [
+    "Echuca"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -36.14,
+   "lon": 144.742,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Echuca",
+     "localityCentroid": [
+      -36.146,
+      144.7448
+     ],
+     "postcodes": [
+      "3564"
+     ],
+     "distanceKm": 0.7
+    }
+   },
+   "bomStations": [
+    {
+     "name": "ECHUCA AERODROME",
+     "bomSiteId": "080015",
+     "wmoId": 94861,
+     "distanceKm": 2.7,
+     "lat": -36.16,
+     "lon": 144.76,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94861.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94861.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94861.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "KYABRAM",
+     "bomSiteId": "080091",
+     "wmoId": 95833,
+     "distanceKm": 36.2,
+     "lat": -36.34,
+     "lon": 145.06,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95833.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95833.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95833.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "TATURA INST SUSTAINABLE AG",
+     "bomSiteId": "081049",
+     "wmoId": 95836,
+     "distanceKm": 57.9,
+     "lat": -36.44,
+     "lon": 145.27,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95836.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95836.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95836.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "kyneton",
+   "name": "Kyneton",
+   "aliases": [
+    "Kyneton"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.247,
+   "lon": 144.446,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Kyneton",
+     "localityCentroid": [
+      -37.2333,
+      144.45
+     ],
+     "postcodes": [
+      "3444"
+     ],
+     "distanceKm": 1.6
+    }
+   },
+   "bomStations": [
+    {
+     "name": "REDESDALE",
+     "bomSiteId": "088051",
+     "wmoId": 94859,
+     "distanceKm": 26.1,
+     "lat": -37.02,
+     "lon": 144.52,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94859.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94859.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94859.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "PUCKAPUNYAL WEST (DEFENCE)",
+     "bomSiteId": "088166",
+     "wmoId": 94856,
+     "distanceKm": 43.8,
+     "lat": -37.02,
+     "lon": 144.85,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94856.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94856.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94856.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "KILMORE GAP",
+     "bomSiteId": "088162",
+     "wmoId": 94860,
+     "distanceKm": 48.6,
+     "lat": -37.38,
+     "lon": 144.97,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94860.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94860.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94860.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "werribee",
+   "name": "Werribee",
+   "aliases": [
+    "Werribee"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.906,
+   "lon": 144.665,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Werribee",
+     "localityCentroid": [
+      -37.8998,
+      144.6641
+     ],
+     "postcodes": [
+      "3030"
+     ],
+     "distanceKm": 0.7
+    }
+   },
+   "bomStations": [
+    {
+     "name": "LAVERTON RAAF",
+     "bomSiteId": "087031",
+     "wmoId": 94865,
+     "distanceKm": 9.8,
+     "lat": -37.86,
+     "lon": 144.76,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94865.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94865.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94865.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "AVALON AIRPORT",
+     "bomSiteId": "087113",
+     "wmoId": 94854,
+     "distanceKm": 21.3,
+     "lat": -38.03,
+     "lon": 144.48,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94854.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94854.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94854.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "FAWKNER BEACON",
+     "bomSiteId": "086376",
+     "wmoId": 95872,
+     "distanceKm": 23.8,
+     "lat": -37.95,
+     "lon": 144.93,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95872.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95872.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95872.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "yarra-valley",
+   "name": "Yarra Valley (Yarra Glen)",
+   "aliases": [
+    "Yarra Valley",
+    "Yarra Glen"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.665,
+   "lon": 145.37,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Yarra Glen",
+     "localityCentroid": [
+      -37.6489,
+      145.3719
+     ],
+     "postcodes": [
+      "3775"
+     ],
+     "distanceKm": 1.8
+    }
+   },
+   "bomStations": [
+    {
+     "name": "COLDSTREAM",
+     "bomSiteId": "086383",
+     "wmoId": 94864,
+     "distanceKm": 7.1,
+     "lat": -37.72,
+     "lon": 145.41,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94864.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94864.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94864.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "FERNY CREEK",
+     "bomSiteId": "086266",
+     "wmoId": 94872,
+     "distanceKm": 22.9,
+     "lat": -37.87,
+     "lon": 145.35,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94872.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94872.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94872.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "SCORESBY RESEARCH INSTITUTE",
+     "bomSiteId": "086104",
+     "wmoId": 95867,
+     "distanceKm": 24.8,
+     "lat": -37.87,
+     "lon": 145.26,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95867.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95867.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95867.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "moe",
+   "name": "Moe",
+   "aliases": [
+    "Moe"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -38.166,
+   "lon": 146.252,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Moe",
+     "localityCentroid": [
+      -38.1722,
+      146.2678
+     ],
+     "postcodes": [
+      "3825"
+     ],
+     "distanceKm": 1.5
+    }
+   },
+   "bomStations": [
+    {
+     "name": "LATROBE VALLEY AIRPORT",
+     "bomSiteId": "085280",
+     "wmoId": 94891,
+     "distanceKm": 19.7,
+     "lat": -38.21,
+     "lon": 146.47,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94891.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94891.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94891.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "NILMA NORTH (WARRAGUL)",
+     "bomSiteId": "085313",
+     "wmoId": 99806,
+     "distanceKm": 23.3,
+     "lat": -38.13,
+     "lon": 145.99,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.99806.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.99806.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.99806.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MOUNT BAW BAW",
+     "bomSiteId": "085291",
+     "wmoId": 95901,
+     "distanceKm": 36.3,
+     "lat": -37.84,
+     "lon": 146.27,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95901.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95901.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95901.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "traralgon",
+   "name": "Traralgon",
+   "aliases": [
+    "Traralgon"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -38.205,
+   "lon": 146.565,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Traralgon",
+     "localityCentroid": [
+      -38.2034,
+      146.5198
+     ],
+     "postcodes": [
+      "3844"
+     ],
+     "distanceKm": 4.0
+    }
+   },
+   "bomStations": [
+    {
+     "name": "LATROBE VALLEY AIRPORT",
+     "bomSiteId": "085280",
+     "wmoId": 94891,
+     "distanceKm": 8.3,
+     "lat": -38.21,
+     "lon": 146.47,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94891.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94891.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94891.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "YARRAM AIRPORT",
+     "bomSiteId": "085151",
+     "wmoId": 95890,
+     "distanceKm": 42.6,
+     "lat": -38.56,
+     "lon": 146.75,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95890.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95890.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95890.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MOUNT BAW BAW",
+     "bomSiteId": "085291",
+     "wmoId": 95901,
+     "distanceKm": 48.1,
+     "lat": -37.84,
+     "lon": 146.27,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95901.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95901.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95901.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "bairnsdale",
+   "name": "Bairnsdale",
+   "aliases": [
+    "Bairnsdale"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.82,
+   "lon": 147.632,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Bairnsdale",
+     "localityCentroid": [
+      -37.8333,
+      147.6167
+     ],
+     "postcodes": [
+      "3875"
+     ],
+     "distanceKm": 2.0
+    }
+   },
+   "bomStations": [
+    {
+     "name": "BAIRNSDALE AIRPORT",
+     "bomSiteId": "085279",
+     "wmoId": 94912,
+     "distanceKm": 8.6,
+     "lat": -37.88,
+     "lon": 147.57,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94912.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94912.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94912.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "LAKES ENTRANCE (EASTERN BEACH ROAD)",
+     "bomSiteId": "084150",
+     "wmoId": 95904,
+     "distanceKm": 33.7,
+     "lat": -37.87,
+     "lon": 148.01,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95904.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95904.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95904.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MOUNT NOWA NOWA",
+     "bomSiteId": "084144",
+     "wmoId": 94930,
+     "distanceKm": 42.8,
+     "lat": -37.69,
+     "lon": 148.09,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94930.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94930.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94930.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "donald",
+   "name": "Donald",
+   "aliases": [
+    "Donald"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -36.368,
+   "lon": 142.964,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Donald",
+     "localityCentroid": [
+      -36.3694,
+      142.982
+     ],
+     "postcodes": [
+      "3480"
+     ],
+     "distanceKm": 1.6
+    }
+   },
+   "bomStations": [
+    {
+     "name": "CHARLTON",
+     "bomSiteId": "080128",
+     "wmoId": 94839,
+     "distanceKm": 34.2,
+     "lat": -36.28,
+     "lon": 143.33,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94839.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94839.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94839.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "WARRACKNABEAL AIRPORT",
+     "bomSiteId": "078018",
+     "wmoId": 94920,
+     "distanceKm": 49.0,
+     "lat": -36.32,
+     "lon": 142.42,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94920.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94920.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94920.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "LONGERENONG",
+     "bomSiteId": "079028",
+     "wmoId": 95835,
+     "distanceKm": 68.2,
+     "lat": -36.67,
+     "lon": 142.3,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95835.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95835.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95835.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "horsham",
+   "name": "Horsham",
+   "aliases": [
+    "Horsham"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -36.698,
+   "lon": 142.194,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Horsham",
+     "localityCentroid": [
+      -36.7194,
+      142.191
+     ],
+     "postcodes": [
+      "3400",
+      "3401",
+      "3402"
+     ],
+     "distanceKm": 2.4
+    }
+   },
+   "bomStations": [
+    {
+     "name": "HORSHAM AERODROME",
+     "bomSiteId": "079100",
+     "wmoId": 95839,
+     "distanceKm": 3.8,
+     "lat": -36.67,
+     "lon": 142.17,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95839.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95839.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95839.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "LONGERENONG",
+     "bomSiteId": "079028",
+     "wmoId": 95835,
+     "distanceKm": 10.0,
+     "lat": -36.67,
+     "lon": 142.3,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95835.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95835.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95835.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "WARRACKNABEAL AIRPORT",
+     "bomSiteId": "078018",
+     "wmoId": 94920,
+     "distanceKm": 46.6,
+     "lat": -36.32,
+     "lon": 142.42,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94920.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94920.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94920.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "ararat",
+   "name": "Ararat",
+   "aliases": [
+    "Ararat"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.286,
+   "lon": 142.948,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Ararat",
+     "localityCentroid": [
+      -37.2846,
+      142.9316
+     ],
+     "postcodes": [
+      "3377"
+     ],
+     "distanceKm": 1.5
+    }
+   },
+   "bomStations": [
+    {
+     "name": "ARARAT PRISON",
+     "bomSiteId": "089085",
+     "wmoId": 94834,
+     "distanceKm": 2.9,
+     "lat": -37.28,
+     "lon": 142.98,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94834.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94834.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94834.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "BEN NEVIS",
+     "bomSiteId": "079101",
+     "wmoId": 94835,
+     "distanceKm": 23.2,
+     "lat": -37.23,
+     "lon": 143.2,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94835.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94835.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94835.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "STAWELL AERODROME",
+     "bomSiteId": "079105",
+     "wmoId": 94836,
+     "distanceKm": 30.3,
+     "lat": -37.07,
+     "lon": 142.74,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94836.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94836.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94836.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "stawell",
+   "name": "Stawell",
+   "aliases": [
+    "Stawell"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -37.042,
+   "lon": 142.77,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Stawell",
+     "localityCentroid": [
+      -37.0518,
+      142.7777
+     ],
+     "postcodes": [
+      "3380"
+     ],
+     "distanceKm": 1.3
+    }
+   },
+   "bomStations": [
+    {
+     "name": "STAWELL AERODROME",
+     "bomSiteId": "079105",
+     "wmoId": 94836,
+     "distanceKm": 4.1,
+     "lat": -37.07,
+     "lon": 142.74,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94836.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94836.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94836.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "MOUNT WILLIAM",
+     "bomSiteId": "079103",
+     "wmoId": 94833,
+     "distanceKm": 32.4,
+     "lat": -37.3,
+     "lon": 142.6,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94833.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94833.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94833.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "ARARAT PRISON",
+     "bomSiteId": "089085",
+     "wmoId": 94834,
+     "distanceKm": 32.4,
+     "lat": -37.28,
+     "lon": 142.98,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94834.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94834.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94834.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "benalla",
+   "name": "Benalla",
+   "aliases": [
+    "Benalla"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -36.542,
+   "lon": 145.996,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Benalla",
+     "localityCentroid": [
+      -36.5702,
+      145.9689
+     ],
+     "postcodes": [
+      "3671",
+      "3672",
+      "3673"
+     ],
+     "distanceKm": 4.0
+    }
+   },
+   "bomStations": [
+    {
+     "name": "BENALLA AIRPORT",
+     "bomSiteId": "082170",
+     "wmoId": 94884,
+     "distanceKm": 1.0,
+     "lat": -36.55,
+     "lon": 146.0,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94884.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94884.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94884.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "WANGARATTA AERO",
+     "bomSiteId": "082138",
+     "wmoId": 94889,
+     "distanceKm": 31.2,
+     "lat": -36.42,
+     "lon": 146.31,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94889.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.94889.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.94889.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "STRATHBOGIE",
+     "bomSiteId": "082042",
+     "wmoId": 95843,
+     "distanceKm": 41.7,
+     "lat": -36.85,
+     "lon": 145.73,
+     "fwoProduct": "IDV60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.95843.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDV60801/IDV60801.95843.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDV60801/IDV60801.95843.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": null,
+   "surface": "turf"
+  },
+  {
+   "key": "wodonga",
+   "name": "Wodonga",
+   "aliases": [
+    "Wodonga"
+   ],
+   "state": "VIC",
+   "timezone": "Australia/Melbourne",
+   "timezoneNote": "AEST/AEDT (DST first Sunday Oct - first Sunday Apr)",
+   "lat": -36.137,
+   "lon": 146.88,
+   "coord": {
+    "source": "memory",
+    "confidence": "low",
+    "description": "Model memory; cross-checked against the locality centroid from matthewproctor/australianpostcodes (distance shown in coordCheck) - verify with the Open-Meteo geocoding API or a map before relying on it for anything finer than a ~10 km weather grid",
+    "coordCheck": {
+     "locality": "Wodonga",
+     "localityCentroid": [
+      -36.1241,
+      146.8818
+     ],
+     "postcodes": [
+      "3689",
+      "3690"
+     ],
+     "distanceKm": 1.4
+    }
+   },
+   "bomStations": [
+    {
+     "name": "ALBURY AIRPORT AWS",
+     "bomSiteId": "072160",
+     "wmoId": 95896,
+     "distanceKm": 9.7,
+     "lat": -36.07,
+     "lon": 146.95,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95896.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.95896.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.95896.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    },
+    {
+     "name": "HUME RESERVOIR",
+     "bomSiteId": "072023",
+     "wmoId": 94901,
+     "distanceKm": 14.1,
+     "lat": -36.1,
+     "lon": 147.03,
+     "fwoProduct": "IDN60801",
+     "fwoJsonUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94901.json",
+     "fwoJsonUrlHttps": "https://www.bom.gov.au/fwo/IDN60801/IDN60801.94901.json",
+     "fwoPageUrl": "https://www.bom.gov.au/products/IDN60801/IDN60801.94901.shtml",
+     "source": "opennem/opennem bom_stations.json (station name, BOM site id, lat/lng, json_feed URL); distance computed here"
+    }
+   ],
+   "tab": {
+    "venueMnemonic": null,
+    "confidence": "unknown",
+    "evidence": "not evidenced; resolve at runtime from TAB /racing/dates/{date}/meetings by matching meetingName/location against aliases"
+   },
+   "notes": "Nearest AWS is Albury Airport (NSW side); appears in both IDN60801 and IDV60801.",
+   "surface": "turf"
+  }
+ ],
+ "sampleOpenMeteoRequest": "https://api.open-meteo.com/v1/forecast?latitude=-37.7903&longitude=144.9125&hourly=precipitation,precipitation_probability,temperature_2m,wind_speed_10m,wind_direction_10m&daily=precipitation_sum&past_days=3&timezone=Australia%2FMelbourne",
+ "sampleOpenMeteoResponse": {
+  "_fixtureNote": "CONSTRUCTED by RaceLens research on 2026-10-23 (no live call possible from the research container). Shape follows the Open-Meteo OpenAPI spec (openapi/forecast.yml) and real responses in this folder. Request: GET https://api.open-meteo.com/v1/forecast?latitude=-37.7903&longitude=144.9125&hourly=precipitation,precipitation_probability,temperature_2m,wind_speed_10m,wind_direction_10m&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&past_days=3&forecast_days=7&timezone=Australia%2FMelbourne  (Flemington, race day 2026-10-24, fetched 2026-10-23 ~09:00 AEDT). Values are plausible spring weather, NOT a real forecast. Times are LOCAL (Australia/Melbourne) with no offset suffix, exactly as the API returns them when timezone= is set.",
+  "latitude": -37.8,
+  "longitude": 144.9,
+  "generationtime_ms": 0.4210472106933594,
+  "utc_offset_seconds": 39600,
+  "timezone": "Australia/Melbourne",
+  "timezone_abbreviation": "GMT+11",
+  "elevation": 23.0,
+  "hourly_units": {
+   "time": "iso8601",
+   "precipitation": "mm",
+   "precipitation_probability": "%",
+   "temperature_2m": "°C",
+   "wind_speed_10m": "km/h",
+   "wind_direction_10m": "°"
+  },
+  "hourly": {
+   "time": [
+    "2026-10-20T00:00",
+    "2026-10-20T01:00",
+    "2026-10-20T02:00",
+    "2026-10-20T03:00",
+    "2026-10-20T04:00",
+    "2026-10-20T05:00",
+    "2026-10-20T06:00",
+    "2026-10-20T07:00",
+    "2026-10-20T08:00",
+    "2026-10-20T09:00",
+    "2026-10-20T10:00",
+    "2026-10-20T11:00",
+    "2026-10-20T12:00",
+    "2026-10-20T13:00",
+    "2026-10-20T14:00",
+    "2026-10-20T15:00",
+    "2026-10-20T16:00",
+    "2026-10-20T17:00",
+    "2026-10-20T18:00",
+    "2026-10-20T19:00",
+    "2026-10-20T20:00",
+    "2026-10-20T21:00",
+    "2026-10-20T22:00",
+    "2026-10-20T23:00",
+    "2026-10-21T00:00",
+    "2026-10-21T01:00",
+    "2026-10-21T02:00",
+    "2026-10-21T03:00",
+    "2026-10-21T04:00",
+    "2026-10-21T05:00",
+    "2026-10-21T06:00",
+    "2026-10-21T07:00",
+    "2026-10-21T08:00",
+    "2026-10-21T09:00",
+    "2026-10-21T10:00",
+    "2026-10-21T11:00",
+    "2026-10-21T12:00",
+    "2026-10-21T13:00",
+    "2026-10-21T14:00",
+    "2026-10-21T15:00",
+    "2026-10-21T16:00",
+    "2026-10-21T17:00",
+    "2026-10-21T18:00",
+    "2026-10-21T19:00",
+    "2026-10-21T20:00",
+    "2026-10-21T21:00",
+    "2026-10-21T22:00",
+    "2026-10-21T23:00",
+    "2026-10-22T00:00",
+    "2026-10-22T01:00",
+    "2026-10-22T02:00",
+    "2026-10-22T03:00",
+    "2026-10-22T04:00",
+    "2026-10-22T05:00",
+    "2026-10-22T06:00",
+    "2026-10-22T07:00",
+    "2026-10-22T08:00",
+    "2026-10-22T09:00",
+    "2026-10-22T10:00",
+    "2026-10-22T11:00",
+    "2026-10-22T12:00",
+    "2026-10-22T13:00",
+    "2026-10-22T14:00",
+    "2026-10-22T15:00",
+    "2026-10-22T16:00",
+    "2026-10-22T17:00",
+    "2026-10-22T18:00",
+    "2026-10-22T19:00",
+    "2026-10-22T20:00",
+    "2026-10-22T21:00",
+    "2026-10-22T22:00",
+    "2026-10-22T23:00",
+    "2026-10-23T00:00",
+    "2026-10-23T01:00",
+    "2026-10-23T02:00",
+    "2026-10-23T03:00",
+    "2026-10-23T04:00",
+    "2026-10-23T05:00",
+    "2026-10-23T06:00",
+    "2026-10-23T07:00",
+    "2026-10-23T08:00",
+    "2026-10-23T09:00",
+    "2026-10-23T10:00",
+    "2026-10-23T11:00",
+    "2026-10-23T12:00",
+    "2026-10-23T13:00",
+    "2026-10-23T14:00",
+    "2026-10-23T15:00",
+    "2026-10-23T16:00",
+    "2026-10-23T17:00",
+    "2026-10-23T18:00",
+    "2026-10-23T19:00",
+    "2026-10-23T20:00",
+    "2026-10-23T21:00",
+    "2026-10-23T22:00",
+    "2026-10-23T23:00",
+    "2026-10-24T00:00",
+    "2026-10-24T01:00",
+    "2026-10-24T02:00",
+    "2026-10-24T03:00",
+    "2026-10-24T04:00",
+    "2026-10-24T05:00",
+    "2026-10-24T06:00",
+    "2026-10-24T07:00",
+    "2026-10-24T08:00",
+    "2026-10-24T09:00",
+    "2026-10-24T10:00",
+    "2026-10-24T11:00",
+    "2026-10-24T12:00",
+    "2026-10-24T13:00",
+    "2026-10-24T14:00",
+    "2026-10-24T15:00",
+    "2026-10-24T16:00",
+    "2026-10-24T17:00",
+    "2026-10-24T18:00",
+    "2026-10-24T19:00",
+    "2026-10-24T20:00",
+    "2026-10-24T21:00",
+    "2026-10-24T22:00",
+    "2026-10-24T23:00",
+    "2026-10-25T00:00",
+    "2026-10-25T01:00",
+    "2026-10-25T02:00",
+    "2026-10-25T03:00",
+    "2026-10-25T04:00",
+    "2026-10-25T05:00",
+    "2026-10-25T06:00",
+    "2026-10-25T07:00",
+    "2026-10-25T08:00",
+    "2026-10-25T09:00",
+    "2026-10-25T10:00",
+    "2026-10-25T11:00",
+    "2026-10-25T12:00",
+    "2026-10-25T13:00",
+    "2026-10-25T14:00",
+    "2026-10-25T15:00",
+    "2026-10-25T16:00",
+    "2026-10-25T17:00",
+    "2026-10-25T18:00",
+    "2026-10-25T19:00",
+    "2026-10-25T20:00",
+    "2026-10-25T21:00",
+    "2026-10-25T22:00",
+    "2026-10-25T23:00",
+    "2026-10-26T00:00",
+    "2026-10-26T01:00",
+    "2026-10-26T02:00",
+    "2026-10-26T03:00",
+    "2026-10-26T04:00",
+    "2026-10-26T05:00",
+    "2026-10-26T06:00",
+    "2026-10-26T07:00",
+    "2026-10-26T08:00",
+    "2026-10-26T09:00",
+    "2026-10-26T10:00",
+    "2026-10-26T11:00",
+    "2026-10-26T12:00",
+    "2026-10-26T13:00",
+    "2026-10-26T14:00",
+    "2026-10-26T15:00",
+    "2026-10-26T16:00",
+    "2026-10-26T17:00",
+    "2026-10-26T18:00",
+    "2026-10-26T19:00",
+    "2026-10-26T20:00",
+    "2026-10-26T21:00",
+    "2026-10-26T22:00",
+    "2026-10-26T23:00",
+    "2026-10-27T00:00",
+    "2026-10-27T01:00",
+    "2026-10-27T02:00",
+    "2026-10-27T03:00",
+    "2026-10-27T04:00",
+    "2026-10-27T05:00",
+    "2026-10-27T06:00",
+    "2026-10-27T07:00",
+    "2026-10-27T08:00",
+    "2026-10-27T09:00",
+    "2026-10-27T10:00",
+    "2026-10-27T11:00",
+    "2026-10-27T12:00",
+    "2026-10-27T13:00",
+    "2026-10-27T14:00",
+    "2026-10-27T15:00",
+    "2026-10-27T16:00",
+    "2026-10-27T17:00",
+    "2026-10-27T18:00",
+    "2026-10-27T19:00",
+    "2026-10-27T20:00",
+    "2026-10-27T21:00",
+    "2026-10-27T22:00",
+    "2026-10-27T23:00",
+    "2026-10-28T00:00",
+    "2026-10-28T01:00",
+    "2026-10-28T02:00",
+    "2026-10-28T03:00",
+    "2026-10-28T04:00",
+    "2026-10-28T05:00",
+    "2026-10-28T06:00",
+    "2026-10-28T07:00",
+    "2026-10-28T08:00",
+    "2026-10-28T09:00",
+    "2026-10-28T10:00",
+    "2026-10-28T11:00",
+    "2026-10-28T12:00",
+    "2026-10-28T13:00",
+    "2026-10-28T14:00",
+    "2026-10-28T15:00",
+    "2026-10-28T16:00",
+    "2026-10-28T17:00",
+    "2026-10-28T18:00",
+    "2026-10-28T19:00",
+    "2026-10-28T20:00",
+    "2026-10-28T21:00",
+    "2026-10-28T22:00",
+    "2026-10-28T23:00",
+    "2026-10-29T00:00",
+    "2026-10-29T01:00",
+    "2026-10-29T02:00",
+    "2026-10-29T03:00",
+    "2026-10-29T04:00",
+    "2026-10-29T05:00",
+    "2026-10-29T06:00",
+    "2026-10-29T07:00",
+    "2026-10-29T08:00",
+    "2026-10-29T09:00",
+    "2026-10-29T10:00",
+    "2026-10-29T11:00",
+    "2026-10-29T12:00",
+    "2026-10-29T13:00",
+    "2026-10-29T14:00",
+    "2026-10-29T15:00",
+    "2026-10-29T16:00",
+    "2026-10-29T17:00",
+    "2026-10-29T18:00",
+    "2026-10-29T19:00",
+    "2026-10-29T20:00",
+    "2026-10-29T21:00",
+    "2026-10-29T22:00",
+    "2026-10-29T23:00"
+   ],
+   "precipitation": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.6,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.9,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.3,
+    0.3,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.7,
+    0.7,
+    0.7,
+    0.7,
+    0.7,
+    0.7,
+    0.7,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.4,
+    0.4,
+    0.4,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "precipitation_probability": [
+    0,
+    0,
+    0,
+    0,
+    100,
+    100,
+    100,
+    100,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    100,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    0,
+    0,
+    0,
+    0,
+    100,
+    0,
+    0,
+    0,
+    0,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    0,
+    0,
+    25,
+    25,
+    0,
+    0,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    28,
+    28,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    28,
+    28,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    10,
+    0,
+    0,
+    30,
+    30,
+    30,
+    0,
+    0,
+    10,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+   ],
+   "temperature_2m": [
+    10.3,
+    9.3,
+    9.4,
+    9.1,
+    9.5,
+    9.4,
+    10.5,
+    10.9,
+    12.2,
+    13.0,
+    13.7,
+    15.1,
+    15.4,
+    16.0,
+    16.4,
+    16.6,
+    16.5,
+    16.2,
+    15.7,
+    14.9,
+    14.0,
+    12.8,
+    11.7,
+    11.2,
+    10.0,
+    9.4,
+    8.6,
+    8.1,
+    8.5,
+    9.0,
+    10.1,
+    11.3,
+    12.7,
+    14.5,
+    16.2,
+    17.5,
+    18.9,
+    19.4,
+    20.5,
+    20.3,
+    20.0,
+    19.6,
+    18.9,
+    17.4,
+    16.2,
+    14.4,
+    12.7,
+    11.5,
+    12.1,
+    11.2,
+    11.6,
+    11.4,
+    11.4,
+    11.8,
+    12.1,
+    12.3,
+    13.2,
+    13.4,
+    13.9,
+    15.0,
+    15.3,
+    15.9,
+    15.9,
+    16.2,
+    15.6,
+    15.5,
+    15.1,
+    14.7,
+    14.4,
+    13.7,
+    13.0,
+    12.6,
+    9.8,
+    8.8,
+    8.2,
+    7.9,
+    8.0,
+    8.8,
+    9.8,
+    10.7,
+    12.0,
+    13.4,
+    15.1,
+    16.7,
+    17.7,
+    18.5,
+    19.0,
+    19.1,
+    18.8,
+    18.5,
+    17.7,
+    16.6,
+    15.3,
+    13.4,
+    12.4,
+    10.9,
+    10.9,
+    10.0,
+    9.9,
+    9.7,
+    9.7,
+    10.3,
+    10.7,
+    11.8,
+    12.9,
+    14.3,
+    15.3,
+    16.2,
+    17.4,
+    17.8,
+    18.4,
+    19.0,
+    18.4,
+    17.9,
+    17.6,
+    16.7,
+    15.6,
+    14.4,
+    12.9,
+    11.8,
+    10.9,
+    10.6,
+    10.1,
+    10.1,
+    10.1,
+    10.8,
+    10.9,
+    11.3,
+    11.9,
+    12.5,
+    13.2,
+    14.2,
+    14.3,
+    14.8,
+    14.9,
+    14.9,
+    15.0,
+    14.6,
+    14.2,
+    13.7,
+    13.5,
+    13.0,
+    12.2,
+    11.7,
+    9.7,
+    8.4,
+    7.9,
+    7.9,
+    8.0,
+    8.7,
+    9.8,
+    11.2,
+    12.5,
+    14.0,
+    15.3,
+    16.8,
+    18.3,
+    18.8,
+    19.9,
+    19.7,
+    19.5,
+    19.0,
+    18.0,
+    17.0,
+    15.1,
+    13.6,
+    12.3,
+    10.6,
+    11.6,
+    10.4,
+    9.7,
+    9.4,
+    9.9,
+    10.5,
+    11.7,
+    13.1,
+    14.8,
+    16.5,
+    18.0,
+    19.7,
+    21.4,
+    22.2,
+    23.3,
+    23.4,
+    23.0,
+    22.6,
+    21.4,
+    20.2,
+    18.3,
+    16.5,
+    14.7,
+    12.8,
+    12.9,
+    12.2,
+    12.1,
+    12.4,
+    12.4,
+    12.6,
+    13.1,
+    13.2,
+    14.4,
+    15.1,
+    15.6,
+    16.5,
+    17.0,
+    17.0,
+    17.5,
+    17.4,
+    17.4,
+    17.2,
+    16.6,
+    16.1,
+    15.4,
+    15.1,
+    14.3,
+    13.5,
+    12.1,
+    11.3,
+    10.7,
+    10.3,
+    10.5,
+    11.3,
+    11.8,
+    13.2,
+    14.4,
+    15.5,
+    17.1,
+    18.6,
+    19.3,
+    20.4,
+    20.6,
+    21.1,
+    21.1,
+    20.5,
+    19.3,
+    18.6,
+    16.9,
+    15.9,
+    14.5,
+    13.0
+   ],
+   "wind_speed_10m": [
+    5.8,
+    7.1,
+    9.6,
+    13.7,
+    20.2,
+    22.7,
+    24.1,
+    28.0,
+    20.2,
+    20.5,
+    20.6,
+    19.9,
+    20.6,
+    17.0,
+    12.8,
+    18.8,
+    7.5,
+    6.2,
+    3.6,
+    3.8,
+    2.9,
+    1.0,
+    3.4,
+    3.0,
+    6.1,
+    8.1,
+    10.1,
+    12.1,
+    16.1,
+    16.5,
+    20.5,
+    20.0,
+    22.8,
+    22.2,
+    22.6,
+    21.8,
+    18.9,
+    18.7,
+    12.7,
+    12.9,
+    7.6,
+    7.9,
+    4.7,
+    2.7,
+    0.8,
+    2.5,
+    2.2,
+    2.5,
+    5.0,
+    5.5,
+    10.1,
+    12.7,
+    12.6,
+    16.2,
+    17.2,
+    21.9,
+    22.3,
+    26.2,
+    25.7,
+    24.8,
+    23.9,
+    24.8,
+    20.9,
+    13.0,
+    11.0,
+    7.8,
+    5.5,
+    10.4,
+    2.5,
+    0.7,
+    3.0,
+    5.2,
+    3.9,
+    7.1,
+    7.6,
+    10.4,
+    14.6,
+    17.9,
+    20.6,
+    20.7,
+    21.5,
+    20.1,
+    23.0,
+    21.2,
+    18.8,
+    15.6,
+    15.0,
+    12.2,
+    8.9,
+    7.2,
+    4.9,
+    1.5,
+    1.3,
+    1.0,
+    1.1,
+    3.4,
+    3.6,
+    8.7,
+    11.0,
+    13.3,
+    15.0,
+    17.9,
+    18.5,
+    18.9,
+    20.6,
+    20.4,
+    20.3,
+    21.0,
+    17.3,
+    18.1,
+    21.3,
+    19.2,
+    7.8,
+    5.3,
+    5.5,
+    1.7,
+    2.9,
+    2.7,
+    1.4,
+    4.7,
+    3.9,
+    8.3,
+    16.2,
+    19.1,
+    22.2,
+    23.8,
+    25.8,
+    25.6,
+    27.1,
+    20.6,
+    20.3,
+    22.5,
+    17.8,
+    18.3,
+    16.0,
+    11.8,
+    7.9,
+    5.5,
+    6.5,
+    4.5,
+    1.2,
+    2.0,
+    1.5,
+    4.0,
+    6.5,
+    8.6,
+    8.7,
+    12.4,
+    14.9,
+    15.3,
+    19.7,
+    21.4,
+    19.7,
+    21.4,
+    22.3,
+    19.3,
+    20.5,
+    16.8,
+    13.9,
+    11.5,
+    7.7,
+    6.2,
+    3.3,
+    4.4,
+    1.6,
+    2.5,
+    1.4,
+    2.2,
+    6.1,
+    6.8,
+    8.9,
+    13.1,
+    13.9,
+    16.6,
+    19.7,
+    21.4,
+    21.8,
+    22.8,
+    22.7,
+    21.8,
+    20.9,
+    16.7,
+    15.3,
+    10.7,
+    8.8,
+    7.7,
+    6.7,
+    2.7,
+    3.3,
+    3.1,
+    1.3,
+    1.8,
+    3.5,
+    7.5,
+    9.5,
+    13.7,
+    14.5,
+    16.8,
+    18.0,
+    20.7,
+    21.0,
+    21.6,
+    20.5,
+    21.4,
+    18.6,
+    16.6,
+    16.4,
+    12.5,
+    9.5,
+    6.0,
+    11.2,
+    8.9,
+    8.7,
+    3.1,
+    1.2,
+    4.8,
+    6.7,
+    7.1,
+    8.6,
+    10.9,
+    16.2,
+    18.1,
+    19.9,
+    22.4,
+    20.2,
+    23.3,
+    21.8,
+    18.9,
+    18.2,
+    17.7,
+    12.7,
+    11.2,
+    11.4,
+    8.4,
+    5.3,
+    4.9,
+    4.1,
+    3.9,
+    4.1,
+    3.5
+   ],
+   "wind_direction_10m": [
+    190,
+    213,
+    191,
+    200,
+    182,
+    199,
+    193,
+    217,
+    190,
+    221,
+    203,
+    190,
+    195,
+    213,
+    199,
+    224,
+    201,
+    218,
+    198,
+    209,
+    189,
+    202,
+    197,
+    202,
+    218,
+    222,
+    194,
+    186,
+    197,
+    222,
+    215,
+    189,
+    212,
+    210,
+    184,
+    209,
+    186,
+    180,
+    179,
+    180,
+    196,
+    202,
+    201,
+    192,
+    219,
+    216,
+    208,
+    183,
+    327,
+    347,
+    349,
+    325,
+    340,
+    1,
+    345,
+    358,
+    343,
+    318,
+    343,
+    349,
+    322,
+    359,
+    342,
+    319,
+    329,
+    324,
+    358,
+    316,
+    321,
+    346,
+    357,
+    352,
+    214,
+    188,
+    186,
+    188,
+    213,
+    182,
+    212,
+    187,
+    219,
+    203,
+    185,
+    215,
+    207,
+    209,
+    208,
+    178,
+    186,
+    207,
+    212,
+    210,
+    216,
+    193,
+    189,
+    178,
+    193,
+    202,
+    207,
+    198,
+    182,
+    180,
+    200,
+    222,
+    212,
+    186,
+    214,
+    195,
+    201,
+    179,
+    197,
+    221,
+    202,
+    204,
+    221,
+    189,
+    208,
+    185,
+    191,
+    197,
+    341,
+    358,
+    329,
+    329,
+    349,
+    347,
+    357,
+    340,
+    333,
+    348,
+    343,
+    357,
+    336,
+    342,
+    343,
+    344,
+    330,
+    3,
+    334,
+    334,
+    339,
+    328,
+    342,
+    323,
+    176,
+    195,
+    203,
+    206,
+    191,
+    192,
+    202,
+    207,
+    215,
+    213,
+    208,
+    186,
+    189,
+    216,
+    202,
+    206,
+    211,
+    222,
+    199,
+    193,
+    205,
+    206,
+    219,
+    201,
+    202,
+    176,
+    221,
+    205,
+    187,
+    194,
+    200,
+    209,
+    188,
+    221,
+    178,
+    182,
+    208,
+    182,
+    176,
+    221,
+    222,
+    193,
+    192,
+    216,
+    191,
+    211,
+    179,
+    180,
+    191,
+    197,
+    194,
+    195,
+    176,
+    195,
+    208,
+    187,
+    213,
+    187,
+    198,
+    181,
+    191,
+    197,
+    204,
+    223,
+    204,
+    217,
+    177,
+    179,
+    218,
+    194,
+    198,
+    219,
+    208,
+    176,
+    179,
+    181,
+    198,
+    205,
+    204,
+    197,
+    179,
+    224,
+    210,
+    210,
+    186,
+    213,
+    181,
+    190,
+    198,
+    185,
+    208,
+    190,
+    204,
+    200,
+    194,
+    195
+   ]
+  },
+  "daily_units": {
+   "time": "iso8601",
+   "precipitation_sum": "mm",
+   "precipitation_probability_max": "%",
+   "temperature_2m_max": "°C",
+   "temperature_2m_min": "°C",
+   "wind_speed_10m_max": "km/h",
+   "wind_gusts_10m_max": "km/h",
+   "wind_direction_10m_dominant": "°"
+  },
+  "daily": {
+   "time": [
+    "2026-10-20",
+    "2026-10-21",
+    "2026-10-22",
+    "2026-10-23",
+    "2026-10-24",
+    "2026-10-25",
+    "2026-10-26",
+    "2026-10-27",
+    "2026-10-28",
+    "2026-10-29"
+   ],
+   "precipitation_sum": [
+    3.0,
+    0.0,
+    6.3,
+    0.0,
+    0.6,
+    4.9,
+    0.0,
+    0.0,
+    1.2,
+    0.0
+   ],
+   "precipitation_probability_max": [
+    100,
+    0,
+    100,
+    5,
+    25,
+    63,
+    5,
+    5,
+    30,
+    5
+   ],
+   "temperature_2m_max": [
+    16.6,
+    20.5,
+    16.2,
+    19.1,
+    19.0,
+    15.0,
+    19.9,
+    23.4,
+    17.5,
+    21.1
+   ],
+   "temperature_2m_min": [
+    9.1,
+    8.1,
+    11.2,
+    7.9,
+    9.7,
+    10.1,
+    7.9,
+    9.4,
+    12.1,
+    10.3
+   ],
+   "wind_speed_10m_max": [
+    28.0,
+    22.8,
+    26.2,
+    23.0,
+    21.3,
+    27.1,
+    22.3,
+    22.8,
+    21.6,
+    23.3
+   ],
+   "wind_gusts_10m_max": [
+    46.2,
+    37.6,
+    43.2,
+    37.9,
+    35.1,
+    44.7,
+    36.8,
+    37.6,
+    35.6,
+    38.4
+   ],
+   "wind_direction_10m_dominant": [
+    201,
+    200,
+    324,
+    199,
+    199,
+    326,
+    202,
+    197,
+    197,
+    196
+   ]
+  }
+ }
+}

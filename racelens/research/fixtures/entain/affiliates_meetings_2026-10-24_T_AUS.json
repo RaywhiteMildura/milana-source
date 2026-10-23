@@ -1,0 +1,200 @@
+{
+  "_fixtureNote": "CONSTRUCTED by RaceLens research 2026-10-23 for venue Flemington, date 2026-10-24. Envelope + field names copied from the official nedscode affiliate-feeds docs (gh-pages index.html, 'Racing Meetings' example) and cross-checked against Josh9456/Racing-Form- live captures of 2026-10-23. Values are invented. The 'status' key on races is NOT in the 2020 docs but IS present in live 2026 captures (Open/Interim/...), so it is included.",
+  "header": {
+    "title": "Race Meetings",
+    "generated_time": "2026-10-23T22:05:11.482913604Z",
+    "url": "/affiliates/v1/racing/meetings?enc=json&date_from=2026-10-24&date_to=2026-10-24&category=T&country=AUS&limit=200"
+  },
+  "params": {
+    "enc": "json",
+    "id": "",
+    "date_from": "2026-10-24T00:00:00Z",
+    "date_to": "2026-10-24T00:00:00Z",
+    "type": "T",
+    "country": "AUS",
+    "limit": 200,
+    "offset": 0
+  },
+  "data": {
+    "meetings": [
+      {
+        "meeting": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+        "name": "Flemington",
+        "date": "2026-10-24T00:00:00Z",
+        "category": "T",
+        "category_name": "Thoroughbred Horse Racing",
+        "country": "AUS",
+        "state": "VIC",
+        "races": [
+          {
+            "id": "edb4b534-ac3f-57b5-a70c-9410e10d8bb7",
+            "race_number": 0,
+            "name": "Jockey Challenge - Flemington",
+            "start_time": "2026-10-24T01:40:00Z",
+            "track_condition": "",
+            "distance": 0,
+            "weather": "",
+            "country": "",
+            "state": "",
+            "status": "Open"
+          },
+          {
+            "id": "e143b009-7376-5899-982c-f79b4a46fbcd",
+            "race_number": 1,
+            "name": "Carbine Club 3yo Mdn Plate",
+            "start_time": "2026-10-24T01:40:00Z",
+            "track_condition": "Good4",
+            "distance": 1200,
+            "weather": "Fine",
+            "country": "AUS",
+            "state": "VIC",
+            "status": "Open"
+          },
+          {
+            "id": "b04b24ce-8208-5044-aead-1c122120b5c4",
+            "race_number": 2,
+            "name": "Macca's Run (Bm70) Hcp",
+            "start_time": "2026-10-24T02:15:00Z",
+            "track_condition": "Good4",
+            "distance": 1000,
+            "weather": "Fine",
+            "country": "AUS",
+            "state": "VIC",
+            "status": "Open"
+          },
+          {
+            "id": "dc9e5c73-b372-5850-b4ef-235347ed8c3c",
+            "race_number": 3,
+            "name": "Members Lounge Fillies & Mares (Bm78) Hcp",
+            "start_time": "2026-10-24T02:50:00Z",
+            "track_condition": "Good4",
+            "distance": 1400,
+            "weather": "Fine",
+            "country": "AUS",
+            "state": "VIC",
+            "status": "Open"
+          },
+          {
+            "id": "5dd91e10-8837-5f3e-b14e-3b8908527f41",
+            "race_number": 4,
+            "name": "Straight Six Sprint (Bm84) Hcp",
+            "start_time": "2026-10-24T03:25:00Z",
+            "track_condition": "Good4",
+            "distance": 1200,
+            "weather": "Fine",
+            "country": "AUS",
+            "state": "VIC",
+            "status": "Open"
+          },
+          {
+            "id": "68bf0618-0404-5527-a80f-1ebc03e2f5fe",
+            "race_number": 5,
+            "name": "Spring Staying Series Final (Bm90) Hcp",
+            "start_time": "2026-10-24T04:00:00Z",
+            "track_condition": "Good4",
+            "distance": 2500,
+            "weather": "Fine",
+            "country": "AUS",
+            "state": "VIC",
+            "status": "Open"
+          },
+          {
+            "id": "bdd0d2ee-f8f5-532b-8e6d-654c60cea8c4",
+            "race_number": 6,
+            "name": "Group 3 Harvest Stakes",
+            "start_time": "2026-10-24T04:40:00Z",
+            "track_condition": "Good4",
+            "distance": 1400,
+            "weather": "Fine",
+            "country": "AUS",
+            "state": "VIC",
+            "status": "Open"
+          },
+          {
+            "id": "0a5931c4-8552-5223-a15e-db35e53d55f3",
+            "race_number": 7,
+            "name": "Flemington Spring Classic (Bm84) Hcp",
+            "start_time": "2026-10-24T05:20:00Z",
+            "track_condition": "Good4",
+            "distance": 1600,
+            "weather": "Fine",
+            "country": "AUS",
+            "state": "VIC",
+            "status": "Open"
+          },
+          {
+            "id": "26577c0a-332c-505d-b8b9-8119a365fbf7",
+            "race_number": 8,
+            "name": "Riverbank Plate (Bm70) Hcp",
+            "start_time": "2026-10-24T06:00:00Z",
+            "track_condition": "Good4",
+            "distance": 1800,
+            "weather": "Fine",
+            "country": "AUS",
+            "state": "VIC",
+            "status": "Open"
+          },
+          {
+            "id": "9c2575c6-e9cc-5c2b-a472-24126d174c12",
+            "race_number": 9,
+            "name": "Ladbrokes Odds Boost Twilight (Bm64) Hcp",
+            "start_time": "2026-10-24T06:40:00Z",
+            "track_condition": "Good4",
+            "distance": 1100,
+            "weather": "Fine",
+            "country": "AUS",
+            "state": "VIC",
+            "status": "Open"
+          }
+        ]
+      },
+      {
+        "meeting": "3d7daef6-53e5-581b-a0ed-28dfda54ee53",
+        "name": "Doomben",
+        "date": "2026-10-24T00:00:00Z",
+        "category": "T",
+        "category_name": "Thoroughbred Horse Racing",
+        "country": "AUS",
+        "state": "QLD",
+        "races": [
+          {
+            "id": "25cf7338-d368-533c-a7d9-b348d1a3c8f5",
+            "race_number": 1,
+            "name": "TAB Mdn Plate",
+            "start_time": "2026-10-24T01:58:00Z",
+            "track_condition": "Soft5",
+            "distance": 1200,
+            "weather": "Overcast",
+            "country": "AUS",
+            "state": "QLD",
+            "status": "Open"
+          },
+          {
+            "id": "75548bb8-65eb-5a6a-8240-0f50a2cfc695",
+            "race_number": 2,
+            "name": "XXXX Gold (Bm65) Hcp",
+            "start_time": "2026-10-24T02:33:00Z",
+            "track_condition": "Soft5",
+            "distance": 1350,
+            "weather": "Overcast",
+            "country": "AUS",
+            "state": "QLD",
+            "status": "Open"
+          },
+          {
+            "id": "b3fcdf2a-be4b-521b-9962-1d6b6bebd60f",
+            "race_number": 3,
+            "name": "Brisbane Racing Club (Bm75) Hcp",
+            "start_time": "2026-10-24T03:08:00Z",
+            "track_condition": "Soft5",
+            "distance": 1600,
+            "weather": "Overcast",
+            "country": "AUS",
+            "state": "QLD",
+            "status": "Open"
+          }
+        ]
+      }
+    ]
+  }
+}

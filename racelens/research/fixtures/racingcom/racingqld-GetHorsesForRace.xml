@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CONSTRUCTED fixture. Models GET https://www.racingqueensland.com.au/OpenDataWebServices/Meetings.asmx/GetHorsesForRace?raceId=2041101
+  Evidenced (keiba, medium): Horses/Horse@Id (RQ's internal numeric "HORSES" id - stable across meetings), HorseName (or Name);
+  keiba docs mention "Jockey/@Id values may be nominations" so a Jockey element with an Id attribute is plausible. keiba also records that the
+  tested methods expose NO finish position / finish time field. Trainer/Barrier/Weight/Scratched children are guesses.
+  Companion operations: GetHorseDetailsInRace?raceId=&horseId= and GetRaceDetails?raceId= (shapes not evidenced).
+-->
+<Horses xmlns="http://www.racingqueensland.com.au/OpenDataWebServices/">
+  <Horse Id="884201">
+    <HorseName>Brisbane Belle</HorseName>
+    <SaddleclothNumber>1</SaddleclothNumber>
+    <Barrier>3</Barrier>
+    <Weight>57</Weight>
+    <Jockey Id="5102">Ryan Maloney</Jockey>
+    <Trainer Id="2201">Tony Gollan</Trainer>
+    <Scratched>false</Scratched>
+  </Horse>
+  <Horse Id="884202">
+    <HorseName>Hamilton Hill</HorseName>
+    <SaddleclothNumber>2</SaddleclothNumber>
+    <Barrier>6</Barrier>
+    <Weight>57</Weight>
+    <Jockey Id="5110">James Orman</Jockey>
+    <Trainer Id="2210">Chris Munce</Trainer>
+    <Scratched>false</Scratched>
+  </Horse>
+  <Horse Id="884203">
+    <HorseName>Ascot Lane</HorseName>
+    <SaddleclothNumber>3</SaddleclothNumber>
+    <Barrier>1</Barrier>
+    <Weight>55.5</Weight>
+    <Jockey Id="0"></Jockey>
+    <Trainer Id="2233">Steven O'Dea &amp; Matthew Hoysted</Trainer>
+    <Scratched>true</Scratched>
+  </Horse>
+</Horses>

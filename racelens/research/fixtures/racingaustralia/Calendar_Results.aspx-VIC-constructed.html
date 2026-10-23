@@ -1,0 +1,27 @@
+<!--
+  CONSTRUCTED fixture (not a live capture). Models GET https://www.racingaustralia.horse/FreeFields/Calendar_Results.aspx?State=VIC
+  (also https://mdata.racingnsw.com.au/FreeFields/Calendar_Results.aspx on the NSW mirror). EVIDENCED facts:
+   * rows carry an anchor to Results.aspx?Key=... ; the 2013-era RISA scraper (Tudman/ml_horses) selected the links by their
+     text "Available Now"; the 2026 trifecta-racing-mcp-agent reads cells[1] = meeting text and cells[2] = availability text
+     from each <tr> that contains "Results.aspx?Key=".
+   * The calendar is a ROLLING RECENT-RESULTS WINDOW (trifecta warns "If fewer than 3 months are returned, provide older
+     Results.aspx URLs as seeds"); Umanewsbot measured ~11 months of Results.aspx retention.
+  Everything else (classes, column labels) is invented.
+-->
+<!DOCTYPE html>
+<html>
+<head><title>Racing Australia - Results - Victoria</title></head>
+<body>
+<div class="page-content">
+<div class="top"><h2>Race Results - Victoria</h2></div>
+<table class="results-calendar" width="750" border="0" cellpadding="3" cellspacing="0">
+  <tr><th>Date</th><th>Meeting</th><th>Results</th></tr>
+  <tr class='OddRow'><td>Sat 24-Oct-2026</td><td>Flemington</td><td><a href='/FreeFields/Results.aspx?Key=2026Oct24,VIC,Flemington'>Available Now</a></td></tr>
+  <tr class='EvenRow'><td>Sat 24-Oct-2026</td><td>Sportsbet-Ballarat</td><td><a href='/FreeFields/Results.aspx?Key=2026Oct24%2CVIC%2CSportsbet-Ballarat'>Available Now</a></td></tr>
+  <tr class='OddRow'><td>Sat 24-Oct-2026</td><td>Southside Cranbourne (Trial)</td><td><a href='/FreeFields/Results.aspx?Key=2026Oct24%2CVIC%2CSouthside+Cranbourne%2CTrial'>Available Now</a></td></tr>
+  <tr class='EvenRow'><td>Fri 23-Oct-2026</td><td>Ladbrokes Geelong</td><td><a href='/FreeFields/Results.aspx?Key=2026Oct23%2CVIC%2CLadbrokes+Geelong'>Available Now</a></td></tr>
+  <tr class='OddRow'><td>Wed 21-Oct-2026</td><td>Sportsbet Sandown Hillside</td><td><a href='/FreeFields/Results.aspx?Key=2026Oct21%2CVIC%2CSportsbet+Sandown+Hillside'>Available Now</a></td></tr>
+</table>
+</div>
+</body>
+</html>

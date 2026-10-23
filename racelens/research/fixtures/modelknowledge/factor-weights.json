@@ -1,0 +1,51 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Suggested starting weights for RaceLens factor keys (src/server/core/factors.ts BASE_WEIGHTS). Not fitted to data; see research/modelknowledge.md section 13 for justification. Re-fit weekly from stored results.",
+  "version": "2026-10-23",
+  "scoreRange": [-1, 1],
+  "softmaxTemperature": 2.0,
+  "marketBlend": {
+    "method": "benter-log-linear",
+    "formula": "p_i ∝ exp(alpha*ln(p_fund_i) + beta*ln(p_mkt_i))",
+    "alpha": 0.4,
+    "beta": 0.6,
+    "betaByMarketState": {
+      "betfairLast5MinHighVolume": 0.75,
+      "betfairLast10Min": 0.65,
+      "fixedOddsRaceDay": 0.6,
+      "morningMarketOrThin": 0.4,
+      "noMarket": 0.0
+    },
+    "marketProbabilitySource": ["betfair_geometric_mid_best_back_lay", "fixed_odds_shin_normalised", "tote_win_normalised"],
+    "evidence": [
+      {"claim": "BSP calibration tracks implied probability closely except sub-$1.20 noise", "source": "https://github.com/betfair-down-under/autoHubTutorials/blob/master/analysingAndPredictingBSP/bsp.ipynb", "confidence": "high"},
+      {"claim": "Majority of Betfair volume traded in last 2-5 minutes; >10 min prices unreliable", "source": "https://github.com/betfair-down-under/autoHubTutorials/blob/master/analysingAndPredictingMarketMovments/movements.ipynb", "confidence": "high"},
+      {"claim": "Benter combined fundamental logit with public odds in a second stage", "source": "https://www.gwern.net/doc/statistics/decision/1994-benter.pdf", "confidence": "medium"}
+    ]
+  },
+  "weights": {
+    "recentForm":        {"current": 1.00, "suggested": 1.00, "confidence": "medium", "why": "Core of every published model; decay 0.4/0.25/0.15/0.12/0.08 over last 5 runs; normalise by class and margin."},
+    "classSuitability":  {"current": 0.70, "suggested": 0.85, "confidence": "medium", "why": "Apparent weight effects are mostly class effects (Doncaster 56.5kg carriers won 64% of head-to-heads).", "source": "https://www.racingandsports.com/news/racing/news/2018-04-04/weighing-up-the-doncaster/442952"},
+    "trackDistance":     {"current": 0.70, "suggested": 0.75, "confidence": "medium", "why": "Course/distance/track-condition records are standard AU form columns; shrink small samples (prior ~6 starts)."},
+    "wetForm":           {"current": 0.60, "suggested": 0.60, "confidence": "medium", "why": "Applies only when rating >= Soft 5; ramps 0.4 at Soft 5 to 1.0 at Heavy 10; sire fallback at quarter strength.", "gate": {"Good3": 0, "Good4": 0, "Soft5": 0.4, "Soft6": 0.55, "Soft7": 0.7, "Heavy8": 0.85, "Heavy9": 0.95, "Heavy10": 1.0}},
+    "barrier":           {"current": 0.55, "suggested": 0.50, "confidence": "low", "why": "Track-geometry priors (barrier-priors.json) plus day-pattern learning; weak on Flemington straight, strong at Moonee Valley 1200m and Caulfield 1600m."},
+    "pace":              {"current": 0.55, "suggested": 0.60, "confidence": "low", "why": "On-pace advantage pervasive on small tracks, slow tempo, rail out; make race-scenario aware (lone leader vs contested)."},
+    "jockey":            {"current": 0.45, "suggested": 0.35, "confidence": "medium", "why": "Real but priced and confounded with mount quality; hot-hand strategies return negative.", "source": "https://research.bond.edu.au/en/publications/do-australian-jockeys-have-hot-hands/"},
+    "trainer":           {"current": 0.40, "suggested": 0.35, "confidence": "medium", "why": "Elite stables 12-14% overall; stable first-up/second-up patterns belong in fitness."},
+    "weight":            {"current": 0.40, "suggested": 0.30, "confidence": "medium", "why": "Weak/confounded; use change vs last start and relative weight after apprentice claim."},
+    "fitness":           {"current": 0.50, "suggested": 0.55, "confidence": "medium", "why": "First-up 10-12%, second-up 10-12%, third-up 17-18% for big AU stables; DLR sweet spot 14-28 days.", "source": "https://www.racingandsports.com/news/racing/insight-analysis/2016-05-26/gary-crispes-fundamental-form-analysis-fitness-part-4/366983"},
+    "careerStrike":      {"current": 0.50, "suggested": 0.45, "confidence": "medium", "why": "Win% and place% informative but overlap with form/class; shrink for <6 starts."},
+    "sourceRatings":     {"current": 0.80, "suggested": 0.70, "confidence": "medium", "why": "Published ratings are strong but partly reflect the market; avoid double counting with the blend."},
+    "moneyMove":         {"current": 0.50, "suggested": 0.30, "confidence": "medium", "why": "Steamers win ~5.5% more often than drifters but lose more at BSP; the information is already in the blended market probability.", "source": "https://www.geegeez.co.uk/?p=2882585"},
+    "news":              {"current": 0.35, "suggested": 0.30, "confidence": "low", "why": "Matters mainly for scratch risk / stable intent; require 2-source verification."},
+    "gear":              {"current": 0.20, "suggested": 0.15, "confidence": "low", "why": "UK first-time blinkers 8.5% SR, -15.3% ROI on average; positive only when market-supported.", "source": "https://www.geegeez.co.uk/?p=2884279"},
+    "lineage":           {"current": 0.20, "suggested": 0.15, "confidence": "low", "why": "Fallback when form is missing (debut, first wet track, new distance)."}
+  },
+  "raceLevelModifiers": {
+    "fieldSizeEffect": {"<=8": 0.6, "9-12": 0.85, ">=13": 1.0, "appliesTo": ["barrier", "pace"]},
+    "conditionsVolatility": {
+      "description": "Shrink all fundamental scores toward 0 by this factor and add it to beta (capped 0.8).",
+      "Heavy8": 0.10, "Heavy9": 0.15, "Heavy10": 0.20, "railOutGe6m": 0.05, "downgradeDuringMeeting": 0.05, "lateScratchingsGe2": 0.05
+    }
+  },
+  "calibrationLoop": {"refitCadence": "weekly", "maxWeightChangePerFit": 0.2, "minRacesForVenuePrior": 300}
+}

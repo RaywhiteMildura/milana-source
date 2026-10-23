@@ -1,0 +1,62 @@
+{
+  "_fixtureNote": "Constructed to match the TAB form shape; values illustrative.",
+  "form": [
+    {
+      "runnerNumber": 1,
+      "runnerName": "QUICK STUDY",
+      "age": 2,
+      "sex": "Colt",
+      "colour": "Bay",
+      "sire": "ZOUSTAR",
+      "dam": "FAST STUDY",
+      "sireOfDam": "SNITZEL",
+      "country": "AUS",
+      "trainerName": "C Waller",
+      "trainerLocation": "Flemington",
+      "riderDriverName": "J MCDONALD",
+      "handicapWeight": 57,
+      "barrierNumber": 3,
+      "last20Starts": "1",
+      "daysSinceLastRun": 21,
+      "formComment": "Won debut impressively, worked brilliantly since.",
+      "blinkers": "First time",
+      "careerStats": { "numberOfStarts": 1, "numberOfWins": 1, "numberOfSeconds": 0, "numberOfThirds": 0, "prizeMoney": 60000 },
+      "trackStats": "1: 1-0-0",
+      "goodStats": { "starts": 1, "wins": 1, "placings": 0 },
+      "firstUpStats": { "starts": 1, "wins": 1, "seconds": 0, "thirds": 0 },
+      "previousStarts": [
+        {
+          "startDate": "2026-10-03",
+          "venueName": "CAULFIELD",
+          "distance": 1000,
+          "trackCondition": "GOOD4",
+          "finishingPosition": 1,
+          "numberOfStarters": 9,
+          "margin": "0.0",
+          "handicapWeight": 57,
+          "barrierNumber": 4,
+          "riderDriverName": "J MCDONALD",
+          "raceClass": "2YO MDN",
+          "prizeMoney": 60000,
+          "startingPrice": 2.4,
+          "time": "0:57.80",
+          "placeGetters": [{ "finishingPosition": 2, "name": "RUNNER UP" }, { "finishingPosition": 3, "name": "THIRD PLACE" }],
+          "inRun": "2-2",
+          "stewardsComment": "Led throughout."
+        }
+      ]
+    },
+    {
+      "runnerNumber": 3,
+      "runnerName": "SLOW BOAT",
+      "age": 2,
+      "sex": "Gelding",
+      "sire": "WRITTEN TYCOON",
+      "dam": "ANCHORED",
+      "careerStats": "1: 0-0-0",
+      "previousStarts": [
+        { "startDate": "26/09/2026", "venue": "Bendigo", "distance": 1000, "trackCondition": "Soft 6", "finishingPosition": 4, "numberOfStarters": 11, "margin": "3.2L", "handicapWeight": 56, "barrierNumber": 9, "riderDriverName": "B SHINN", "raceClass": "2YO MDN", "startingPrice": 15, "winner": "WINNER ONE" }
+      ]
+    }
+  ]
+}

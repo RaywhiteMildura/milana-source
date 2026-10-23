@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  _fixtureNote: CONSTRUCTED fixture for RaceLens. Not a live capture.
+  Shape copied field-for-field from a real Google News RSS search response
+  (https://github.com/nerevu/riko/blob/master/riko/data/ -> news.google.com_rss_...xml, see
+  google-news-rss.real-sample.xml next to this file). Horse, jockey and trainer names are fictional.
+  Request this fixture stands in for:
+    GET https://news.google.com/rss/search?q=Flemington+horse+racing+when:7d&hl=en-AU&gl=AU&ceid=AU:en
+  Notes on shape (all observed in the real sample):
+    * <title> is "Headline - Publisher"; the publisher is also in <source> (cleaner to read it there).
+    * <link> and <guid> are opaque Google redirect ids (/rss/articles/{id}?oc=5), NOT publisher URLs.
+    * <guid isPermaLink="false"> holds the bare id. <pubDate> is RFC-822 GMT.
+    * <description> is HTML-escaped: <a href=... target="_blank">Title</a>&nbsp;&nbsp;<font color="#6f6f6f">Publisher</font>
+    * <source url="https://publisher.tld">Publisher</source>
+    * No media:content / enclosure in search feeds (xmlns:media is declared but unused).
+-->
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+ <channel>
+  <generator>NFE/5.0</generator>
+  <title>"Flemington horse racing when:7d" - Google News</title>
+  <link>https://news.google.com/search?hl=en-AU&amp;gl=AU&amp;ceid=AU:en&amp;q=Flemington+horse+racing+when:7d</link>
+  <language>en-AU</language>
+  <webMaster>news-webmaster@google.com</webMaster>
+  <copyright>Copyright © 2026 Google. All rights reserved. This XML feed is made available solely for the purpose of rendering Google News results within a personal feed reader for personal, non-commercial use. Any other use of the feed is expressly prohibited. By accessing this feed or using these results in any manner whatsoever, you agree to be bound by the foregoing restrictions.</copyright>
+  <lastBuildDate>Fri, 23 Oct 2026 21:05:12 GMT</lastBuildDate>
+  <image>
+   <title>Google News</title>
+   <url>https://lh3.googleusercontent.com/-DR60l-K8vnyi99NZovm9HlXyZwQ85GMDxiwJWzoasZYCUrPuUM_P_4Rb7ei03j-0nRs0c4F=w256</url>
+   <link>https://news.google.com/</link>
+   <height>256</height>
+   <width>256</width>
+  </image>
+  <description>Google News</description>
+  <item>
+   <title>Flemington Saturday preview: Brass Lantern primed for Group 2 return after barrier trial win - Racing.com</title>
+   <link>https://news.google.com/rss/articles/CBMickFVX3lxTE1GbGVtaW5ndG9uU2F0dXJkYXlQcmV2aWV3QnJhc3NMYW50ZXJuUmFjaW5nQ29tMjAyNjEwMjNfMDAx?oc=5</link>
+   <guid isPermaLink="false">CBMickFVX3lxTE1GbGVtaW5ndG9uU2F0dXJkYXlQcmV2aWV3QnJhc3NMYW50ZXJuUmFjaW5nQ29tMjAyNjEwMjNfMDAx</guid>
+   <pubDate>Fri, 23 Oct 2026 19:40:00 GMT</pubDate>
+   <description>&lt;a href="https://news.google.com/rss/articles/CBMickFVX3lxTE1GbGVtaW5ndG9uU2F0dXJkYXlQcmV2aWV3QnJhc3NMYW50ZXJuUmFjaW5nQ29tMjAyNjEwMjNfMDAx?oc=5" target="_blank"&gt;Flemington Saturday preview: Brass Lantern primed for Group 2 return after barrier trial win&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;Racing.com&lt;/font&gt;</description>
+   <source url="https://www.racing.com">Racing.com</source>
+  </item>
+  <item>
+   <title>Stable confident Southern Compass can handle a Soft 5 at Flemington: 'He's never been better' - Racenet</title>
+   <link>https://news.google.com/rss/articles/CBMickFVX3lxTE1TdGFibGVDb25maWRlbnRTb3V0aGVybkNvbXBhc3NSYWNlbmV0MjAyNjEwMjNfMDAy?oc=5</link>
+   <guid isPermaLink="false">CBMickFVX3lxTE1TdGFibGVDb25maWRlbnRTb3V0aGVybkNvbXBhc3NSYWNlbmV0MjAyNjEwMjNfMDAy</guid>
+   <pubDate>Fri, 23 Oct 2026 08:15:00 GMT</pubDate>
+   <description>&lt;a href="https://news.google.com/rss/articles/CBMickFVX3lxTE1TdGFibGVDb25maWRlbnRTb3V0aGVybkNvbXBhc3NSYWNlbmV0MjAyNjEwMjNfMDAy?oc=5" target="_blank"&gt;Stable confident Southern Compass can handle a Soft 5 at Flemington: 'He's never been better'&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;Racenet&lt;/font&gt;</description>
+   <source url="https://www.racenet.com.au">Racenet</source>
+  </item>
+  <item>
+   <title>Flemington track rated Soft 5, rail out 6m for Saturday's meeting; penetrometer 5.12 - Punters</title>
+   <link>https://news.google.com/rss/articles/CBMickFVX3lxTE1GbGVtaW5ndG9uVHJhY2tTb2Z0NVJhaWxPdXQ2bVB1bnRlcnMyMDI2MTAyM18wMDM?oc=5</link>
+   <guid isPermaLink="false">CBMickFVX3lxTE1GbGVtaW5ndG9uVHJhY2tTb2Z0NVJhaWxPdXQ2bVB1bnRlcnMyMDI2MTAyM18wMDM</guid>
+   <pubDate>Fri, 23 Oct 2026 05:02:00 GMT</pubDate>
+   <description>&lt;a href="https://news.google.com/rss/articles/CBMickFVX3lxTE1GbGVtaW5ndG9uVHJhY2tTb2Z0NVJhaWxPdXQ2bVB1bnRlcnMyMDI2MTAyM18wMDM?oc=5" target="_blank"&gt;Flemington track rated Soft 5, rail out 6m for Saturday's meeting; penetrometer 5.12&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;Punters&lt;/font&gt;</description>
+   <source url="https://www.punters.com.au">Punters</source>
+  </item>
+  <item>
+   <title>Jockey T. Marsden replaces suspended rider on Velvet Thunder in Flemington feature - news.com.au</title>
+   <link>https://news.google.com/rss/articles/CBMickFVX3lxTE1Kb2NrZXlNYXJzZGVuVmVsdmV0VGh1bmRlck5ld3NDb21BdTIwMjYxMDIzXzAwNA?oc=5</link>
+   <guid isPermaLink="false">CBMickFVX3lxTE1Kb2NrZXlNYXJzZGVuVmVsdmV0VGh1bmRlck5ld3NDb21BdTIwMjYxMDIzXzAwNA</guid>
+   <pubDate>Thu, 22 Oct 2026 22:30:00 GMT</pubDate>
+   <description>&lt;a href="https://news.google.com/rss/articles/CBMickFVX3lxTE1Kb2NrZXlNYXJzZGVuVmVsdmV0VGh1bmRlck5ld3NDb21BdTIwMjYxMDIzXzAwNA?oc=5" target="_blank"&gt;Jockey T. Marsden replaces suspended rider on Velvet Thunder in Flemington feature&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;news.com.au&lt;/font&gt;</description>
+   <source url="https://www.news.com.au">news.com.au</source>
+  </item>
+  <item>
+   <title>Market watch: Brass Lantern firms from $4.60 to $3.80 as money arrives for Flemington Group 2 - The Age</title>
+   <link>https://news.google.com/rss/articles/CBMickFVX3lxTE1NYXJrZXRXYXRjaEJyYXNzTGFudGVybkZpcm1zVGhlQWdlMjAyNjEwMjNfMDA1?oc=5</link>
+   <guid isPermaLink="false">CBMickFVX3lxTE1NYXJrZXRXYXRjaEJyYXNzTGFudGVybkZpcm1zVGhlQWdlMjAyNjEwMjNfMDA1</guid>
+   <pubDate>Thu, 22 Oct 2026 07:00:00 GMT</pubDate>
+   <description>&lt;a href="https://news.google.com/rss/articles/CBMickFVX3lxTE1NYXJrZXRXYXRjaEJyYXNzTGFudGVybkZpcm1zVGhlQWdlMjAyNjEwMjNfMDA1?oc=5" target="_blank"&gt;Market watch: Brass Lantern firms from $4.60 to $3.80 as money arrives for Flemington Group 2&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;The Age&lt;/font&gt;</description>
+   <source url="https://www.theage.com.au">The Age</source>
+  </item>
+  <item>
+   <title>Stewards: Harbour Ledger scratched from Race 6 at Flemington on veterinary advice - Racing Victoria</title>
+   <link>https://news.google.com/rss/articles/CBMickFVX3lxTE1TdGV3YXJkc0hhcmJvdXJMZWRnZXJTY3JhdGNoZWRSYWNpbmdWaWN0b3JpYTIwMjYxMDIzXzAwNg?oc=5</link>
+   <guid isPermaLink="false">CBMickFVX3lxTE1TdGV3YXJkc0hhcmJvdXJMZWRnZXJTY3JhdGNoZWRSYWNpbmdWaWN0b3JpYTIwMjYxMDIzXzAwNg</guid>
+   <pubDate>Fri, 23 Oct 2026 20:55:00 GMT</pubDate>
+   <description>&lt;a href="https://news.google.com/rss/articles/CBMickFVX3lxTE1TdGV3YXJkc0hhcmJvdXJMZWRnZXJTY3JhdGNoZWRSYWNpbmdWaWN0b3JpYTIwMjYxMDIzXzAwNg?oc=5" target="_blank"&gt;Stewards: Harbour Ledger scratched from Race 6 at Flemington on veterinary advice&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color="#6f6f6f"&gt;Racing Victoria&lt;/font&gt;</description>
+   <source url="https://www.racingvictoria.com.au">Racing Victoria</source>
+  </item>
+ </channel>
+</rss>

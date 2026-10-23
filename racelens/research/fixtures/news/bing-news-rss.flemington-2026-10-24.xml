@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  _fixtureNote: CONSTRUCTED fixture for RaceLens. Not a live capture.
+  Shape copied from two real Bing News RSS captures in public repos:
+    https://github.com/prof18/RSS-Parser/blob/master/rssparser/src/commonTest/resources/feed-bing-image.xml  (copied verbatim as bing-news-rss.real-sample.xml)
+    https://github.com/shyamddesai/NewsBridgeAI/blob/main/RSS/Bing%20News.xml
+  Request this fixture stands in for:
+    GET https://www.bing.com/news/search?q=Flemington+horse+racing&format=rss&mkt=en-AU
+  Shape notes (all observed in the real captures):
+    * Root declares xmlns:News="<the request URL>"; child tags are News:Source, News:Image, News:ImageSize, News:ImageMaxWidth, News:ImageMaxHeight.
+    * Most <link>s are a Bing click-tracker: http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=<32hex>&url=<percent-encoded publisher URL>&c=<digits>&mkt=en-au
+      -> decode the url= param. tid/c change per response, so never hash the raw link for dedupe.
+    * Some items carry a DIRECT publisher <link> (item 2 below, as seen in the NewsBridgeAI capture).
+    * News:Image may be absolute (http://www.bing.com/th?id=...) or RELATIVE (/th?id=...) (item 2).
+    * <description> is plain text (may be truncated with "..."), <pubDate> RFC-822 GMT. No guid element.
+-->
+<rss version="2.0" xmlns:News="https://www.bing.com/news/search?q=Flemington+horse+racing&amp;format=rss&amp;mkt=en-AU">
+    <channel>
+        <title>Flemington horse racing - BingNews</title>
+        <link>https://www.bing.com/news/search?q=Flemington+horse+racing&amp;format=rss&amp;mkt=en-AU</link>
+        <description>Search results</description>
+        <image>
+            <url>http://www.bing.com/rsslogo.gif</url>
+            <title>Flemington horse racing</title>
+            <link>https://www.bing.com/news/search?q=Flemington+horse+racing&amp;format=rss&amp;mkt=en-AU</link>
+        </image>
+        <copyright>Copyright © 2026 Microsoft. All rights reserved. These XML results may not be used, reproduced or transmitted in any manner or for any purpose other than rendering Bing results within an RSS aggregator for your personal, non-commercial use. Any other use of these results requires express written permission from Microsoft Corporation. By accessing this web page or using these results in any manner whatsoever, you agree to be bound by the foregoing restrictions.</copyright>
+        <item>
+            <title>Stable confident Southern Compass can handle a Soft 5 at Flemington: 'He's never been better'</title>
+            <link>http://www.bing.com/news/apiclick.aspx?ref=FexRss&amp;aid=&amp;tid=9f2c1b7e4d3a4e0f8b6c5d4e3f2a1b0c&amp;url=https%3a%2f%2fwww.racenet.com.au%2fnews%2fstable-confident-southern-compass-soft-5-flemington-20261023&amp;c=1538402938475610283&amp;mkt=en-au</link>
+            <description>Trainer M. Hartigan says the five-year-old has thrived since his first-up third and expects the forecast Soft 5 surface at Flemington on Saturday to suit. "He's never been better," Hartigan said on Friday ...</description>
+            <pubDate>Fri, 23 Oct 2026 08:15:00 GMT</pubDate>
+            <News:Source>Racenet</News:Source>
+            <News:Image>http://www.bing.com/th?id=OVFT.a1b2c3d4e5f6g7h8i9j0k1&amp;pid=News</News:Image>
+            <News:ImageSize>w={0}&amp;h={1}&amp;c=14</News:ImageSize>
+            <News:ImageMaxWidth>700</News:ImageMaxWidth>
+            <News:ImageMaxHeight>394</News:ImageMaxHeight>
+        </item>
+        <item>
+            <title>Flemington track rated Soft 5, rail out 6m for Saturday's meeting</title>
+            <link>https://www.punters.com.au/news/flemington-track-soft-5-rail-out-6m-saturday_20261023/</link>
+            <description>Track manager reported a penetrometer reading of 5.12 on Friday morning with 4mm of rain overnight and a drying forecast. The rail is out 6m for the entire circuit ...</description>
+            <pubDate>Fri, 23 Oct 2026 05:02:00 GMT</pubDate>
+            <News:Source>Punters</News:Source>
+            <News:Image>/th?id=OVFT.l2m3n4o5p6q7r8s9t0u1v2&amp;pid=News</News:Image>
+            <News:ImageSize>w={0}&amp;h={1}&amp;c=14</News:ImageSize>
+            <News:ImageMaxWidth>700</News:ImageMaxWidth>
+            <News:ImageMaxHeight>474</News:ImageMaxHeight>
+        </item>
+        <item>
+            <title>Jockey T. Marsden replaces suspended rider on Velvet Thunder in Flemington feature</title>
+            <link>http://www.bing.com/news/apiclick.aspx?ref=FexRss&amp;aid=&amp;tid=0c1d2e3f4a5b4c6d8e9f0a1b2c3d4e5f&amp;url=https%3a%2f%2fwww.news.com.au%2fsport%2fsuperracing%2fjockey-marsden-replaces-suspended-rider-velvet-thunder-flemington%2fnews-story%2f0a1b2c3d4e5f60718293a4b5c6d7e8f9&amp;c=7761029384756102938&amp;mkt=en-au</link>
+            <description>Velvet Thunder's connections have turned to in-form hoop T. Marsden for Saturday's Group 2 at Flemington after the horse's regular rider copped a careless riding suspension at Caulfield ...</description>
+            <pubDate>Thu, 22 Oct 2026 22:30:00 GMT</pubDate>
+            <News:Source>news.com.au</News:Source>
+            <News:Image>http://www.bing.com/th?id=OVFT.w3x4y5z6a7b8c9d0e1f2g3&amp;pid=News</News:Image>
+            <News:ImageSize>w={0}&amp;h={1}&amp;c=14</News:ImageSize>
+            <News:ImageMaxWidth>700</News:ImageMaxWidth>
+            <News:ImageMaxHeight>394</News:ImageMaxHeight>
+        </item>
+        <item>
+            <title>Flemington Saturday preview: Brass Lantern primed for Group 2 return after barrier trial win</title>
+            <link>http://www.bing.com/news/apiclick.aspx?ref=FexRss&amp;aid=&amp;tid=5e6f7a8b9c0d4e1f2a3b4c5d6e7f8a9b&amp;url=https%3a%2f%2fwww.racing.com%2fnews%2f2026-10-23%2fflemington-saturday-preview-brass-lantern&amp;c=2938475610293847561&amp;mkt=en-au</link>
+            <description>Brass Lantern returns from a spell in Saturday's Group 2 at Flemington off a slick Cranbourne barrier trial, and the stable is adamant the 1400m is ideal first-up ...</description>
+            <pubDate>Fri, 23 Oct 2026 19:40:00 GMT</pubDate>
+            <News:Source>Racing.com</News:Source>
+            <News:Image>http://www.bing.com/th?id=OVFT.h4i5j6k7l8m9n0o1p2q3r4&amp;pid=News</News:Image>
+            <News:ImageSize>w={0}&amp;h={1}&amp;c=14</News:ImageSize>
+            <News:ImageMaxWidth>700</News:ImageMaxWidth>
+            <News:ImageMaxHeight>394</News:ImageMaxHeight>
+        </item>
+    </channel>
+</rss>

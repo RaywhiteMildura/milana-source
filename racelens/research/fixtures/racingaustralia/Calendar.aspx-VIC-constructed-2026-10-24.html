@@ -1,0 +1,76 @@
+<!--
+  CONSTRUCTED fixture (not a live capture). Models GET https://www.racingaustralia.horse/FreeFields/Calendar.aspx?State=VIC
+  (page title seen in search-engine index: "RACE FIELDS & FORM - Victoria"; the same page is mirrored at
+  https://m.racingaustralia.horse/FreeFields/Calendar.aspx?State=VIC and https://racing.racingnsw.com.au/FreeFields/Calendar.aspx?State=NSW).
+  EVIDENCED facts reproduced here:
+   * every public client only relies on anchors  href="/FreeFields/<Page>.aspx?Key=<YYYYMonDD>,<STATE>,<Venue>[,Trial|Picnic]"
+     where <Page> is one of Nominations | Weights | Acceptances | GearChanges | Scratchings | Form | Results | RaceProgram
+     (parsers: KaiYingWinning ra.js matchKey /Form\.aspx\?Key=([^"'&]+)/ ; Kelvin-Agents ra_fields.py href=["'](/FreeFields/\w+\.aspx\?Key=[^"']+)["'] ;
+      RatterAU/Bookie href="/FreeFields/[A-Za-z_]+\.aspx\?Key=([^"&]+)" ; SteamatipAi a[href*='Form.aspx'], a[href*='Results.aspx']).
+   * Kelvin-Agents notes the VIC calendar emits SINGLE-quoted hrefs (href='...') while NSW emits double quotes; both are used below on purpose.
+   * The Key's comma is sometimes emitted raw and sometimes %2C; venue spaces as %20 or +. All forms are accepted by the server.
+   * Search-engine snippet of the live page: "columns for nominations, weights, acceptances, gear, and scratchings".
+   * Venue names carry RA's sponsor spelling (Sportsbet-Ballarat, Sportsbet Sandown Hillside, Ladbrokes Geelong, The Valley, Southside Cranbourne).
+  Layout, class names of the table itself, labels and the "Field Limit"/"TAB" column are INVENTED - do not depend on them.
+-->
+<!DOCTYPE html>
+<html>
+<head><title>RACE FIELDS &amp; FORM - Victoria</title></head>
+<body>
+<div class="page-content">
+<div class="top"><h2>Race Fields &amp; Form - Victoria</h2>
+  <div class="state-nav">
+    <a href='/FreeFields/Calendar.aspx?State=NSW'>NSW</a> | <a href='/FreeFields/Calendar.aspx?State=VIC'>VIC</a> | <a href='/FreeFields/Calendar.aspx?State=QLD'>QLD</a> | <a href='/FreeFields/Calendar.aspx?State=SA'>SA</a> | <a href='/FreeFields/Calendar.aspx?State=WA'>WA</a> | <a href='/FreeFields/Calendar.aspx?State=TAS'>TAS</a> | <a href='/FreeFields/Calendar.aspx?State=ACT'>ACT</a> | <a href='/FreeFields/Calendar.aspx?State=NT'>NT</a>
+  </div>
+  <div class="other-calendars"><a href='/FreeFields/Calendar_Results.aspx?State=VIC'>Results Calendar</a> | <a href='/FreeFields/ScratchingReleaseInformation.aspx'>Scratching Release Information</a></div>
+</div>
+<table class="race-calendar" width="750" border="0" cellpadding="3" cellspacing="0">
+  <tr><th>Date</th><th>Meeting</th><th>Nominations</th><th>Weights</th><th>Acceptances</th><th>Gear</th><th>Scratchings</th><th>Form</th><th>Results</th></tr>
+  <tr class='OddRow'><td>Fri 23-Oct-2026</td><td>Ladbrokes Geelong</td>
+    <td><a href='/FreeFields/Nominations.aspx?Key=2026Oct23%2CVIC%2CLadbrokes+Geelong'>Noms</a></td>
+    <td><a href='/FreeFields/Weights.aspx?Key=2026Oct23%2CVIC%2CLadbrokes+Geelong'>Weights</a></td>
+    <td><a href='/FreeFields/Acceptances.aspx?Key=2026Oct23%2CVIC%2CLadbrokes+Geelong'>Accept</a></td>
+    <td><a href='/FreeFields/GearChanges.aspx?Key=2026Oct23%2CVIC%2CLadbrokes+Geelong'>Gear</a></td>
+    <td><a href='/FreeFields/Scratchings.aspx?Key=2026Oct23%2CVIC%2CLadbrokes+Geelong'>Scr</a></td>
+    <td><a href='/FreeFields/Form.aspx?Key=2026Oct23%2CVIC%2CLadbrokes+Geelong'>Form</a></td>
+    <td><a href='/FreeFields/Results.aspx?Key=2026Oct23%2CVIC%2CLadbrokes+Geelong'>Results</a></td></tr>
+  <tr class='EvenRow'><td>Sat 24-Oct-2026</td><td>Flemington</td>
+    <td><a href='/FreeFields/Nominations.aspx?Key=2026Oct24,VIC,Flemington'>Noms</a></td>
+    <td><a href='/FreeFields/Weights.aspx?Key=2026Oct24,VIC,Flemington'>Weights</a></td>
+    <td><a href='/FreeFields/Acceptances.aspx?Key=2026Oct24,VIC,Flemington'>Accept</a></td>
+    <td><a href='/FreeFields/GearChanges.aspx?Key=2026Oct24,VIC,Flemington'>Gear</a></td>
+    <td><a href='/FreeFields/Scratchings.aspx?Key=2026Oct24,VIC,Flemington'>Scr</a></td>
+    <td><a href='/FreeFields/Form.aspx?Key=2026Oct24,VIC,Flemington'>Form</a></td>
+    <td></td></tr>
+  <tr class='OddRow'><td>Sat 24-Oct-2026</td><td>Sportsbet-Ballarat</td>
+    <td><a href='/FreeFields/Nominations.aspx?Key=2026Oct24%2CVIC%2CSportsbet-Ballarat'>Noms</a></td>
+    <td><a href='/FreeFields/Weights.aspx?Key=2026Oct24%2CVIC%2CSportsbet-Ballarat'>Weights</a></td>
+    <td><a href='/FreeFields/Acceptances.aspx?Key=2026Oct24%2CVIC%2CSportsbet-Ballarat'>Accept</a></td>
+    <td><a href='/FreeFields/GearChanges.aspx?Key=2026Oct24%2CVIC%2CSportsbet-Ballarat'>Gear</a></td>
+    <td><a href='/FreeFields/Scratchings.aspx?Key=2026Oct24%2CVIC%2CSportsbet-Ballarat'>Scr</a></td>
+    <td><a href='/FreeFields/Form.aspx?Key=2026Oct24%2CVIC%2CSportsbet-Ballarat'>Form</a></td>
+    <td></td></tr>
+  <tr class='EvenRow'><td>Sat 24-Oct-2026</td><td>Southside Cranbourne (Trial)</td>
+    <td></td><td></td>
+    <td><a href='/FreeFields/Acceptances.aspx?Key=2026Oct24%2CVIC%2CSouthside+Cranbourne%2CTrial'>Accept</a></td>
+    <td></td><td></td><td></td><td></td></tr>
+  <tr class='OddRow'><td>Sun 25-Oct-2026</td><td>Bendigo</td>
+    <td><a href='/FreeFields/Nominations.aspx?Key=2026Oct25%2CVIC%2CBendigo'>Noms</a></td>
+    <td><a href='/FreeFields/Weights.aspx?Key=2026Oct25%2CVIC%2CBendigo'>Weights</a></td>
+    <td><a href='/FreeFields/Acceptances.aspx?Key=2026Oct25%2CVIC%2CBendigo'>Accept</a></td>
+    <td></td><td></td><td></td><td></td></tr>
+  <tr class='EvenRow'><td>Sun 25-Oct-2026</td><td>Sportsbet Sandown Hillside</td>
+    <td><a href='/FreeFields/Nominations.aspx?Key=2026Oct25%2CVIC%2CSportsbet+Sandown+Hillside'>Noms</a></td>
+    <td><a href='/FreeFields/Weights.aspx?Key=2026Oct25%2CVIC%2CSportsbet+Sandown+Hillside'>Weights</a></td>
+    <td></td><td></td><td></td><td></td><td></td></tr>
+  <tr class='OddRow'><td>Tue 27-Oct-2026</td><td>The Valley</td>
+    <td><a href="/FreeFields/Nominations.aspx?Key=2026Oct27%2CVIC%2CThe+Valley">Noms</a></td>
+    <td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr class='EvenRow'><td>Sun 01-Nov-2026</td><td>Hanging Rock (Picnic)</td>
+    <td><a href="/FreeFields/Nominations.aspx?Key=2026Nov01%2CVIC%2CHanging+Rock%2CPicnic">Noms</a></td>
+    <td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+<p class="copyright">VIC racing materials, including fields, form and horse racing results, is subject to copyright which is owned by RVL and other parties working with it.</p>
+</div>
+</body>
+</html>

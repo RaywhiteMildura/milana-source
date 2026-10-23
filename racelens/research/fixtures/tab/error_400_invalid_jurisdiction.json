@@ -1,0 +1,8 @@
+{
+  "_fixtureNote": "REAL body (verbatim from a developer's notes in github.com/mattcs2401/RaceDay 'RaceDay Notes.txt') returned with HTTP 400 when ?jurisdiction= is missing or not one of NSW, VIC, ACT, QLD, SA, NT, TAS. The '_fixtureNote' key is the only addition.",
+  "error": {
+    "details": [ { "path": "query.jurisdiction", "message": "should be NSW, VIC, ACT, QLD, SA, NT or TAS" } ],
+    "code": "INVALID_SYNTAX_ERROR",
+    "message": "Invalid query string"
+  }
+}

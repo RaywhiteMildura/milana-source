@@ -1,0 +1,39 @@
+{
+  "_fixtureNote": "CONSTRUCTED (Flemington 2026-10-24). GET https://api.beta.tab.com.au/v1/historical-results-service/VIC/racing/2026-10-24 (jurisdiction in the PATH, no query string). Keys actually read by three independent consumers (Tjorriemorrie/tabby 2017, xx36Mostafa/horse-racing-ml-pipeline 2025, hblunt/historical-sports-bet-extractor): meetings[].meetingName, raceType, venueMnemonic, weatherCondition, trackCondition, races[].raceNumber, races[].raceName, races[]._links.self. location/meetingDate/railPosition/sellCode and race raceStartTime/raceStatus/raceDistance are assumed by analogy with tab-info-service (bettRtab drops a sellCode column from this frame, so sellCode is present). NOTE the race URL path order: /{jurisdiction}/racing/{date}/{venueMnemonic}/{raceType}/races/{n} (venue BEFORE raceType) as recorded in 196 daily URL lists in xx36Mostafa/horse-racing-ml-pipeline and in TabAPIvbeta2 issue #15; always prefer _links.self and verify the returned meeting identity (issue #15 saw a 200 for a different meeting).",
+  "meetings": [
+    {
+      "meetingName": "FLEMINGTON",
+      "location": "VIC",
+      "raceType": "R",
+      "venueMnemonic": "FLM",
+      "meetingDate": "2026-10-24",
+      "weatherCondition": "FINE",
+      "trackCondition": "GOOD4",
+      "railPosition": "Out 3m 1000m-400m, True remainder",
+      "sellCode": { "meetingCode": "M", "scheduledType": "R" },
+      "races": [
+        { "raceNumber": 1, "raceName": "RACELENS MAIDEN PLATE", "raceStartTime": "2026-10-24T01:35:00.000Z", "raceStatus": "Paying", "raceDistance": 1400,
+          "_links": { "self": "https://api.beta.tab.com.au/v1/historical-results-service/VIC/racing/2026-10-24/FLM/R/races/1" } },
+        { "raceNumber": 2, "raceName": "SPRING FILLIES HANDICAP", "raceStartTime": "2026-10-24T02:10:00.000Z", "raceStatus": "Paying", "raceDistance": 1200,
+          "_links": { "self": "https://api.beta.tab.com.au/v1/historical-results-service/VIC/racing/2026-10-24/FLM/R/races/2" } },
+        { "raceNumber": 7, "raceName": "RACELENS FIXTURE HANDICAP", "raceStartTime": "2026-10-24T05:30:00.000Z", "raceStatus": "Paying", "raceDistance": 1600,
+          "_links": { "self": "https://api.beta.tab.com.au/v1/historical-results-service/VIC/racing/2026-10-24/FLM/R/races/7" } }
+      ]
+    },
+    {
+      "meetingName": "THE MEADOWS",
+      "location": "VIC",
+      "raceType": "G",
+      "venueMnemonic": "MEA",
+      "meetingDate": "2026-10-24",
+      "weatherCondition": "FINE",
+      "trackCondition": "GOOD",
+      "railPosition": null,
+      "sellCode": { "meetingCode": "M", "scheduledType": "G" },
+      "races": [
+        { "raceNumber": 1, "raceName": "MEADOWS GRADE 5", "raceStartTime": "2026-10-24T08:12:00.000Z", "raceStatus": "Paying", "raceDistance": 525,
+          "_links": { "self": "https://api.beta.tab.com.au/v1/historical-results-service/VIC/racing/2026-10-24/MEA/G/races/1" } }
+      ]
+    }
+  ]
+}

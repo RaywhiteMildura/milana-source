@@ -1,0 +1,5 @@
+{
+ "_fixtureNote": "CONSTRUCTED example of the HTTP 400 body. Schema {error:boolean, reason:string} is from openapi/forecast.yml (high). The exact wording of reasons is from memory (low) - e.g. an out-of-range latitude or a misspelt variable name.",
+ "error": true,
+ "reason": "Cannot initialize ForecastVariable from invalid String value precipitation_probabilty for key hourly"
+}

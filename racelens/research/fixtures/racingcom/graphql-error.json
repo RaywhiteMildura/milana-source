@@ -1,0 +1,30 @@
+{
+  "_fixtureNote": "CONSTRUCTED from the standard AWS AppSync error envelope (medium). Both known clients treat a response with errors[] and no data as fatal (KaiYingWinning: `if (j.errors && !j.data) throw`), and a response with errors[] AND partial data as usable. HTTP-level failures seen in the wild: 403/429 when hammered (back off 20s x attempt), 502/503/504 transient (retry with 1s x attempt). Two examples below: (1) bad/rotated api key -> HTTP 401 with UnauthorizedException; (2) validation error for a bad argument.",
+  "examples": [
+    {
+      "httpStatus": 401,
+      "body": {
+        "errors": [
+          {
+            "errorType": "UnauthorizedException",
+            "message": "You are not authorized to make this call."
+          }
+        ]
+      }
+    },
+    {
+      "httpStatus": 200,
+      "body": {
+        "data": null,
+        "errors": [
+          {
+            "path": [ "getRaceForm" ],
+            "locations": [ { "line": 1, "column": 6, "sourceName": null } ],
+            "errorType": "ValidationError",
+            "message": "Variable 'raceNumber' has coerced Null value for NonNull type 'Int!'"
+          }
+        ]
+      }
+    }
+  ]
+}

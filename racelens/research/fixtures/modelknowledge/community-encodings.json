@@ -1,0 +1,51 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Field conventions and heuristic constants READ from community GitHub code. 'confidence' here means confidence that the code says this; validity of the heuristics is low/unvalidated.",
+  "theformanalyst": {
+    "source": "https://raw.githubusercontent.com/Pardosa13/www.theformanalyst.com/main/chat_assistant.py",
+    "confidence": "high",
+    "last10": {"order": "most recent on the right", "x": "spell", "0": "finished 10th or worse"},
+    "recordFormat": "starts:wins-seconds-thirds e.g. 6:2-1-0",
+    "recordTypes": ["career", "firm", "good", "soft", "heavy", "synthetic", "track", "distance", "trackDistance", "firstUp", "secondUp"],
+    "trackConditionStorage": "category (firm/good/soft/heavy/synthetic), not number",
+    "speedMapLabels": ["LEADER", "ONPACE", "MIDFIELD", "BACKMARKER"],
+    "rail": {"true": "True", "metresOut": "+6m"},
+    "paceBias": {"min": -2, "max": 2, "neutral": 0},
+    "scores": {"analyzer": "rules-based, higher better", "ml": "0-100 rank within race", "mlWinProbability": "percent, sums to ~100 per race", "pfai": "PuntingForm AI rating", "assessedOdds": "site fair price; market longer = overlay"},
+    "classChangeBands": {"drop": ["30+", "20-29", "10-19", "<10"], "rise": ["20+", "10-19", "<10"]}
+  },
+  "veloOraclePrime": {
+    "source": "https://raw.githubusercontent.com/elpresidentepiff/velo-oracle-prime/main/app/services/feature_engineering.py",
+    "confidence": "high",
+    "validity": "low",
+    "goingMultipliers": {"Firm": 1.1, "Good": 1.0, "Good 4": 1.0, "Soft": 0.95, "Soft 5": 0.95, "Soft 6": 0.92, "Soft 7": 0.90, "Heavy": 0.85, "Heavy 8": 0.85, "Heavy 9": 0.82, "Heavy 10": 0.80},
+    "freshness": {"neutralDays": [14, 28], "penaltyPerDayUnder14": 0.03, "penaltyPerDayOver28": 0.01},
+    "barrier": {"optimalDraw": {"<1200": 3, "<1600": 5, ">=1600": 8}, "penaltyPerSlot": 0.05},
+    "weightPenalty": {"baselineKg": 56, "penaltyPerKg": 0.02},
+    "jockeyStrikeRateScale": 5, "trainerStrikeRateScale": 4,
+    "formDecay": [0.4, 0.3, 0.2, 0.1],
+    "combinedIndexWeights": {"speedNormalized": 0.3, "paceMapPosition": 0.2, "lateBurstIndex": 0.2, "trendScore": 0.15, "marketMovesAvg": 0.15}
+  },
+  "kelvinAgents": {
+    "source": "https://raw.githubusercontent.com/Kelvin1761/Kelvin-Agents/main/.agents/scripts/track_bias_tuner.py",
+    "confidence": "high",
+    "ratingMap": {"Firm 1": 1, "Firm 2": 2, "Good 3": 3, "Good 4": 4, "Soft 5": 5, "Soft 6": 6, "Soft 7": 7, "Heavy 8": 8, "Heavy 9": 9, "Heavy 10": 10},
+    "trackPredictor": {"drainageCoefficientDefault": 0.5, "learningRate": 0.05, "clamp": [0, 1]}
+  },
+  "racingComPastRunColumns": {
+    "source": "https://github.com/IanniMuliterno/HorseRace-from-scraping-to-analysis",
+    "confidence": "high",
+    "columns": ["POS", "HORSE/TRAINER/JOCKEY", "TRACK/DATE", "DIST/COND", "PRIZE/CLASS", "WGT", "800M/400M", "MARGIN", "RATING", "ODDS", "COM"]
+  },
+  "betfairStakingFunctions": {
+    "source": "https://raw.githubusercontent.com/betfair-down-under/autoHubTutorials/master/stakingMethodsAndBankrollManagement/stakingFunctions.py",
+    "confidence": "high",
+    "functions": {
+      "FixedStakesSim": "betPnl = stakeSize*(odds-1) on win else -stakeSize",
+      "ProportionalStakesSimA": "stake = max(stakepct*dynamicBank, ruin)",
+      "ProportionalStakesSimB": "stake = max((dynamicBank*winpct)/(odds-1), ruin)",
+      "Martingale": "stake = max((winamt - progressiveLoss)/(odds-1), ruin)",
+      "KellyStake": "stake = max((((odds-1)*p - (1-p))/(odds-1)) * dynamicBank * partialKelly, ruin)"
+    },
+    "simulation": {"betsCap": 50000, "runs": 10000}
+  }
+}

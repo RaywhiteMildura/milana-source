@@ -1,0 +1,38 @@
+<!--
+  CONSTRUCTED fixture. Models GET https://www.racingaustralia.horse/FreeFields/Scratchings.aspx?Key=2026Oct24,VIC,Flemington
+  (also https://mdata.racingnsw.com.au/FreeFields/Scratchings.aspx?Key=...). Scratchings change right up to race start: refetch, never cache.
+  EVIDENCED grammar (Kelvin-Agents ra_fields.py scratchings(), live 2026-08): walk every <tr>; a row with <=3 cells whose text contains
+  "Race N" starts a race; subsequent rows with >=2 cells carry the runner in cells[1] formatted like "6 BLENHEIM GIRL (5/8 0728)" -
+  number (optionally followed by "e" for emergency), UPPER-CASE horse name with optional country suffix, then a parenthesised stamp that
+  Kelvin discards (looks like day/month and 24h time of the scratching). lifebloods/test1 reads the page text after "Track Condition:".
+  The exact table classes, header wording and the meaning of the parenthesised stamp are NOT verified (low confidence) - inspect live.
+-->
+<!DOCTYPE html>
+<html>
+<head><title>Flemington: Victoria Racing Club Saturday, 24 October 2026 - Scratchings</title></head>
+<body>
+<div class="page-content">
+<div class="top">
+  <h2>Flemington: Victoria Racing Club <span class="race-venue-date">Saturday, 24 October 2026</span></h2>
+  <span class="meeting-type">Meeting Type: Metro (TAB MEETING)</span>
+</div>
+<div class='race-venue-bottom'>
+  <div class='col1'><b>Rail Position:</b> True Entire Circuit <b>Track Condition:</b> Good 4 <b>Weather:</b> Fine <b>Penetrometer:</b> 4.78</div>
+  <div class='col2'><b>Scratchings Last Published:</b> 24-Oct-2026 08:05AM</div>
+  <div class='comments'>Track upgraded from Good 4 to Good 3 at 11:05AM following penetrometer reading.</div>
+</div>
+<table width="750" border="0" cellpadding="3" cellspacing="0" class="race-scratchings">
+  <tr class="race-header"><th colspan="2"><span class='raceNum'>Race 1</span> - 12:40PM Maribyrnong Trial Stakes (1000 METRES)</th></tr>
+  <tr><th class="no">No.</th><th>Horse</th></tr>
+  <tr class='OddRow'><td class="no">6</td><td class="horse">6 MISSING ENTRY (24/10 0805)</td></tr>
+  <tr class='EvenRow'><td class="no">17e</td><td class="horse">17e SPARE PART (24/10 0810)</td></tr>
+  <tr class="race-header"><th colspan="2"><span class='raceNum'>Race 2</span> - 1:15PM Ascot Vale Plate (1200 METRES)</th></tr>
+  <tr><th class="no">No.</th><th>Horse</th></tr>
+  <tr class='OddRow'><td class="no"></td><td class="horse">No Scratchings</td></tr>
+  <tr class="race-header"><th colspan="2"><span class='raceNum'>Race 3</span> - 1:50PM Blazer Stakes (1400 METRES)</th></tr>
+  <tr><th class="no">No.</th><th>Horse</th></tr>
+  <tr class='OddRow'><td class="no">9</td><td class="horse">9 SOUTHERN CROSSING (NZ) (23/10 1631)</td></tr>
+</table>
+</div>
+</body>
+</html>

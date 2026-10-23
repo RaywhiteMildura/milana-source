@@ -1,0 +1,265 @@
+{
+  "_comment": "FICTIONAL news / rumour items for the RaceLens demo meeting (Flemington 2026-10-24). Outlets, URLs, horses and people are invented. `sentiment` is a curated -1..1 hint; `tags` are informal.",
+  "items": [
+    {
+      "id": "dn-001",
+      "title": "Demo Dynasty under an injury cloud ahead of Demo Plate",
+      "url": "https://demo-news.racelens.local/articles/demo-dynasty-injury-cloud",
+      "outlet": "Demo Racing Post",
+      "publishedAt": "2026-10-22T07:40:00+11:00",
+      "snippet": "Trainer Linda Okafor confirmed Group 1 contender Demo Dynasty pulled up with heat in a near-fore leg after Tuesday's gallop. A vet will inspect the five-year-old on Friday and connections say he is 'a 50-50 proposition' to take his place in Saturday's Demo Plate. Jockey B. Kowalski has been told to keep the ride open.",
+      "sentiment": -0.7,
+      "tags": ["negative", "injury", "race-9"]
+    },
+    {
+      "id": "dn-002",
+      "title": "Jockey replaced: Whitlam off Yarra Yarra Yonder, Marchetti takes the ride",
+      "url": "https://demo-news.racelens.local/articles/yarra-yarra-yonder-jockey-change",
+      "outlet": "Melbourne Racing Wire",
+      "publishedAt": "2026-10-22T16:05:00+11:00",
+      "snippet": "C. Whitlam has been replaced on Demo Mile hope Yarra Yarra Yonder after copping a careless riding suspension at Sandown. Trainer Declan Murtagh moved quickly to secure T. Marchetti, who rode the gelding to a Flemington win last preparation. Some form guides are still showing the original booking.",
+      "sentiment": -0.3,
+      "tags": ["negative", "jockey-change", "race-5"]
+    },
+    {
+      "id": "dn-003",
+      "title": "Supersonic Sue to be vetted on race morning after scratchy trackwork",
+      "url": "https://demo-news.racelens.local/articles/supersonic-sue-vet-check",
+      "outlet": "Track Talk Daily",
+      "publishedAt": "2026-10-23T09:15:00+11:00",
+      "snippet": "Stewards will inspect Flying Demo Stakes favourite Supersonic Sue on Saturday morning after she was reported to have travelled 'a touch scratchy' in her final piece of work. Trainer Fiona Macquarie played down concerns but admitted the mare 'did not feel her usual self' under M. Brannigan.",
+      "sentiment": -0.55,
+      "tags": ["negative", "vet", "race-7"]
+    },
+    {
+      "id": "dn-004",
+      "title": "Laser Lane withdrawn from Flying Demo Stakes with elevated temperature",
+      "url": "https://demo-news.racelens.local/articles/laser-lane-scratched",
+      "outlet": "Demo Racing Post",
+      "publishedAt": "2026-10-23T17:30:00+11:00",
+      "snippet": "Tony Barrasso has scratched Laser Lane from Saturday's Group 2 Flying Demo Stakes after the sprinter spiked a temperature on Friday afternoon. 'Nothing serious, but he is not going to the races like that,' Barrasso said. The scratching reduces the field to ten.",
+      "sentiment": -0.6,
+      "tags": ["negative", "scratching", "race-7"]
+    },
+    {
+      "id": "dn-005",
+      "title": "Keilor Kingpin scratched from Straight Six Sprint; emergency Last Minute Larry gains a start",
+      "url": "https://demo-news.racelens.local/articles/keilor-kingpin-scratched-emergency-in",
+      "outlet": "Melbourne Racing Wire",
+      "publishedAt": "2026-10-23T11:20:00+11:00",
+      "snippet": "Ruben Delgado's Keilor Kingpin is out of the BM90 Straight Six Sprint after a poor blood count, promoting first emergency Last Minute Larry into the field. Apprentice J. Pham retains the ride for Nick Thackeray and will claim 2kg.",
+      "sentiment": -0.2,
+      "tags": ["scratching", "emergency", "race-4"]
+    },
+    {
+      "id": "dn-006",
+      "title": "Sugarloaf Sprite worked brilliantly at Flemington on Tuesday",
+      "url": "https://demo-news.racelens.local/articles/sugarloaf-sprite-brilliant-gallop",
+      "outlet": "Punters' Ledger",
+      "publishedAt": "2026-10-20T12:10:00+11:00",
+      "snippet": "Maribyrnong Trial Stakes fancy Sugarloaf Sprite worked brilliantly over 800m on the course proper on Tuesday, clocking the fastest final 400m of the morning. Co-trainers Marcus & Priya Castellanos said the filly 'has come on a stack' since her debut. K. Lindqvist retains the ride from barrier three.",
+      "sentiment": 0.75,
+      "tags": ["positive", "trackwork", "race-1"]
+    },
+    {
+      "id": "dn-007",
+      "title": "Stable confident Nellie's Lantern can break through at Group level",
+      "url": "https://demo-news.racelens.local/articles/nellies-lantern-stable-confident",
+      "outlet": "Form Focus Radio",
+      "publishedAt": "2026-10-22T18:45:00+11:00",
+      "snippet": "Harriet Vane-Stokes is adamant Nellie's Lantern is ready to win a Group 3 after two luckless placings. 'She has drawn to get a nice run and S. Fairweather knows her well,' Vane-Stokes said of the Riverbend Stakes runner. 'If she gets clear air at the 300m, look out.'",
+      "sentiment": 0.6,
+      "tags": ["positive", "stable-confidence", "race-3"]
+    },
+    {
+      "id": "dn-008",
+      "title": "Tauranga Mist settles in at Werribee as Solberg targets Demo Plate",
+      "url": "https://demo-news.racelens.local/articles/tauranga-mist-werribee",
+      "outlet": "Demo Racing Post",
+      "publishedAt": "2026-10-21T08:30:00+11:00",
+      "snippet": "New Zealand mare Tauranga Mist has thrived since arriving at Werribee, according to trainer Ingrid Solberg, who says the Group 1 winner 'has never looked better'. J. Nakamura-Reid flies in to ride her in Saturday's Demo Plate over 2040m.",
+      "sentiment": 0.55,
+      "tags": ["positive", "international", "race-9"]
+    },
+    {
+      "id": "dn-009",
+      "title": "Vane-Stokes bullish on Marathon Mandolin in Westgate Cup",
+      "url": "https://demo-news.racelens.local/articles/marathon-mandolin-westgate-cup",
+      "outlet": "Track Talk Daily",
+      "publishedAt": "2026-10-22T10:00:00+11:00",
+      "snippet": "'He is a genuine 2500m horse and the small field suits him,' Harriet Vane-Stokes said of Marathon Mandolin, who will be ridden by D. Oyelaran in the Group 3 Westgate Cup. The stayer has won twice at Flemington and is reported to be in career-best order.",
+      "sentiment": 0.6,
+      "tags": ["positive", "race-6"]
+    },
+    {
+      "id": "dn-010",
+      "title": "Ironbark Avenue firms after impressive gallop; wide gate the only query",
+      "url": "https://demo-news.racelens.local/articles/ironbark-avenue-firms",
+      "outlet": "Punters' Ledger",
+      "publishedAt": "2026-10-23T13:45:00+11:00",
+      "snippet": "Demo Handicap favourite Ironbark Avenue has firmed sharply with bookmakers after an eye-catching gallop between races at Sandown. S. & J. Templeton's gelding is a confirmed get-back runner and barrier 11 is the only knock on him, with B. Kowalski to ride.",
+      "sentiment": 0.45,
+      "tags": ["positive", "market", "race-2"]
+    },
+    {
+      "id": "dn-011",
+      "title": "Sapphire Sonnet the one to beat in Riverbend Stakes, says Okafor",
+      "url": "https://demo-news.racelens.local/articles/sapphire-sonnet-riverbend",
+      "outlet": "Melbourne Racing Wire",
+      "publishedAt": "2026-10-23T07:55:00+11:00",
+      "snippet": "Linda Okafor expects Sapphire Sonnet to lob on the speed from barrier five and prove hard to run down in the Group 3 Riverbend Stakes for three-year-old fillies. T. Marchetti rides. 'She has been set for this and her work says she is ready,' Okafor said.",
+      "sentiment": 0.5,
+      "tags": ["positive", "race-3"]
+    },
+    {
+      "id": "dn-012",
+      "title": "Brunswick Bazaar's Rahimi happy with inside draw for Demo Handicap",
+      "url": "https://demo-news.racelens.local/articles/brunswick-bazaar-inside-draw",
+      "outlet": "Form Focus Radio",
+      "publishedAt": "2026-10-22T19:30:00+11:00",
+      "snippet": "Yusuf Rahimi says barrier four is ideal for Brunswick Bazaar, who likes to sit just off the speed. 'R. Tuilagi can put him exactly where he wants to be. He is a big price for a horse that has won four from ten,' Rahimi said.",
+      "sentiment": 0.35,
+      "tags": ["positive", "race-2"]
+    },
+    {
+      "id": "dn-013",
+      "title": "Lord Lygon weight query: handicapper confirms 57.5kg after clerical error",
+      "url": "https://demo-news.racelens.local/articles/lord-lygon-weight-query",
+      "outlet": "Demo Racing Post",
+      "publishedAt": "2026-10-21T15:20:00+11:00",
+      "snippet": "Racing Victoria's handicapping panel has confirmed Lord Lygon will carry 57.5kg in Saturday's Demo Handicap after an early acceptances sheet listed him at 58kg. Trainer Gordon Fairlie said the half-kilo 'matters at 1400m'. Some form guides have not yet updated.",
+      "sentiment": -0.1,
+      "tags": ["data-discrepancy", "race-2"]
+    },
+    {
+      "id": "dn-014",
+      "title": "Monarch's Mantle a fresh face for the Demo Plate",
+      "url": "https://demo-news.racelens.local/articles/monarchs-mantle-demo-plate",
+      "outlet": "Track Talk Daily",
+      "publishedAt": "2026-10-21T11:00:00+11:00",
+      "snippet": "Megan O'Driscoll will give Monarch's Mantle his first crack at Group 1 level in the Demo Plate with E. Sorensen aboard. 'He has done nothing wrong this preparation and 2040m at Flemington will suit,' O'Driscoll said.",
+      "sentiment": 0.2,
+      "tags": ["neutral", "race-9"]
+    },
+    {
+      "id": "dn-015",
+      "title": "Moorabool Meadow a late inclusion for Riverside Handicap after acceptances mix-up",
+      "url": "https://demo-news.racelens.local/articles/moorabool-meadow-late-inclusion",
+      "outlet": "Melbourne Racing Wire",
+      "publishedAt": "2026-10-22T12:35:00+11:00",
+      "snippet": "Colin & Dana Kirkwood's Moorabool Meadow was initially omitted from the Riverside Handicap field after an acceptances glitch and only appeared on the official card late on Wednesday. At least one bookmaker is yet to price the mare, who will be ridden by G. McAllister.",
+      "sentiment": 0.0,
+      "tags": ["data-discrepancy", "race-8"]
+    },
+    {
+      "id": "dn-016",
+      "title": "Steady Eddie's Dream has lost his way, admits Moretti",
+      "url": "https://demo-news.racelens.local/articles/steady-eddies-dream-lost-his-way",
+      "outlet": "Punters' Ledger",
+      "publishedAt": "2026-10-20T17:15:00+11:00",
+      "snippet": "Bianca Moretti concedes Steady Eddie's Dream 'has not been himself' this campaign and will have gear changes in the Riverside Handicap. 'If this does not spark him up he will be going for a spell,' she said.",
+      "sentiment": -0.5,
+      "tags": ["negative", "form", "race-8"]
+    },
+    {
+      "id": "dn-017",
+      "title": "Velvet Thunderclap trial catches the eye at Cranbourne",
+      "url": "https://demo-news.racelens.local/articles/velvet-thunderclap-trial",
+      "outlet": "Form Focus Radio",
+      "publishedAt": "2026-10-19T14:00:00+11:00",
+      "snippet": "Peter Hargreaves' two-year-old Velvet Thunderclap was the pick of the Cranbourne trials on Monday, cruising to the line under H. Castellano. The filly heads to the Maribyrnong Trial Stakes from barrier one.",
+      "sentiment": 0.5,
+      "tags": ["positive", "trial", "race-1"]
+    },
+    {
+      "id": "dn-018",
+      "title": "Flemington rail at +3m for Saturday; track rated Good 4 after midweek shower",
+      "url": "https://demo-news.racelens.local/articles/flemington-track-conditions-saturday",
+      "outlet": "Demo Racing Post",
+      "publishedAt": "2026-10-23T08:00:00+11:00",
+      "snippet": "Flemington track manager reports the rail will be in the +3m position for the entire circuit on Saturday. The track is rated a Good 4 after 7mm of rain on Thursday and is expected to hold that rating with a fine, mild forecast.",
+      "sentiment": 0.1,
+      "tags": ["conditions", "meeting"]
+    },
+    {
+      "id": "dn-019",
+      "title": "Demo Racing Club unveils new members' lounge",
+      "url": "https://demo-news.racelens.local/articles/members-lounge-unveiled",
+      "outlet": "Melbourne Racing Wire",
+      "publishedAt": "2026-10-20T09:00:00+11:00",
+      "snippet": "The Demo Racing Club has opened a refurbished members' lounge overlooking the mounting yard, with the first guests to enjoy it on Demo Plate day.",
+      "sentiment": 0.0,
+      "tags": ["irrelevant"]
+    },
+    {
+      "id": "dn-020",
+      "title": "Harness racing: Melton Cup field announced",
+      "url": "https://demo-news.racelens.local/articles/melton-cup-field",
+      "outlet": "Track Talk Daily",
+      "publishedAt": "2026-10-21T13:00:00+11:00",
+      "snippet": "A capacity field of twelve has been declared for Saturday night's Melton Cup, headed by last year's winner and two New Zealand raiders.",
+      "sentiment": 0.0,
+      "tags": ["irrelevant", "harness"]
+    },
+    {
+      "id": "dn-021",
+      "title": "Greyhound track upgrade at Ballarat approved",
+      "url": "https://demo-news.racelens.local/articles/ballarat-greyhound-upgrade",
+      "outlet": "Melbourne Racing Wire",
+      "publishedAt": "2026-10-19T10:30:00+11:00",
+      "snippet": "Council has approved a two-million-dollar upgrade to the Ballarat greyhound track, including a new lure system and improved kennels.",
+      "sentiment": 0.0,
+      "tags": ["irrelevant", "greyhounds"]
+    },
+    {
+      "id": "dn-022",
+      "title": "Spring carnival fashion: what to wear trackside this weekend",
+      "url": "https://demo-news.racelens.local/articles/spring-fashion-trackside",
+      "outlet": "Punters' Ledger",
+      "publishedAt": "2026-10-22T06:00:00+11:00",
+      "snippet": "With fine weather forecast for Flemington on Saturday, stylists recommend light layers and a wide-brimmed hat for a long day on the lawn.",
+      "sentiment": 0.0,
+      "tags": ["irrelevant", "fashion"]
+    },
+    {
+      "id": "dn-023",
+      "title": "Country racing: Sale meeting abandoned after storm",
+      "url": "https://demo-news.racelens.local/articles/sale-abandoned",
+      "outlet": "Demo Racing Post",
+      "publishedAt": "2026-10-19T15:45:00+11:00",
+      "snippet": "Sunday's Sale meeting was abandoned after race three when a thunderstorm left standing water on the track. Stewards declared the surface unsafe.",
+      "sentiment": -0.1,
+      "tags": ["irrelevant", "country"]
+    },
+    {
+      "id": "dn-024",
+      "title": "Weather: fine and 22 degrees forecast for Flemington on Saturday",
+      "url": "https://demo-news.racelens.local/articles/flemington-weather-saturday",
+      "outlet": "Track Talk Daily",
+      "publishedAt": "2026-10-23T06:30:00+11:00",
+      "snippet": "The Bureau expects a fine and mild day at Flemington with a top of 22 and a light to moderate northerly. Thursday's 7mm is not expected to affect the Good 4 rating.",
+      "sentiment": 0.1,
+      "tags": ["weather", "meeting"]
+    },
+    {
+      "id": "dn-025",
+      "title": "Pham's claim could be decisive on Last Minute Larry",
+      "url": "https://demo-news.racelens.local/articles/pham-claim-last-minute-larry",
+      "outlet": "Form Focus Radio",
+      "publishedAt": "2026-10-23T18:20:00+11:00",
+      "snippet": "Apprentice J. Pham's 2kg claim brings Last Minute Larry down to a very handy weight in the Straight Six Sprint now that the emergency has gained a start. Nick Thackeray says the gelding 'loves the straight and will be running on'.",
+      "sentiment": 0.35,
+      "tags": ["positive", "race-4"]
+    },
+    {
+      "id": "dn-026",
+      "title": "Rumour mill: Templeton stable denies Ironbark Avenue bleeding whispers",
+      "url": "https://demo-news.racelens.local/articles/ironbark-avenue-rumour",
+      "outlet": "Punters' Ledger",
+      "publishedAt": "2026-10-23T20:10:00+11:00",
+      "snippet": "Social media chatter that Ironbark Avenue bled at trackwork has been flatly denied by S. & J. Templeton. 'Total rubbish. He galloped on Thursday, scoped clean and is going to the races,' the stable said. Stewards have not been notified of any issue.",
+      "sentiment": -0.25,
+      "tags": ["rumour", "race-2"]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Allowances for 3yo vs older horses (Racing NSW policy table per search snippet; date of table unconfirmed) and sex allowance.",
+  "threeYearOldVsOlder": {
+    "1800mPlus": {"Aug-Oct": 3.5, "Nov-Jan": 2.5, "Feb-Apr": 1.5, "May-Jul": 1.0},
+    "0-1799m": {"Aug-Oct": 2.5, "Nov-Jan": 1.5, "Feb-Apr": 0.5, "May-Jul": 0.0},
+    "unit": "kg",
+    "source": "https://racingnsw.com.au/news/latest-news/rules-and-regulations",
+    "confidence": "medium"
+  },
+  "filliesAndMaresVsMales": {"kg": 2.0, "generalWfaRange": [1.5, 2.0], "sources": ["https://racingnsw.com.au/news/latest-news/rules-and-regulations", "https://thestraight.com.au/australian-racings-scale-of-injustice-boss-and-freedmans-call-for-change"], "confidence": "medium"},
+  "northernHemisphere3yo": {"ruleChange": "AR 170 from 2019-08-01 reduced allowances over 2000-3000m and 3000m+; no change <=2000m", "source": "https://www.bloodstock.com.au/news/story.php?id=33251", "confidence": "medium"},
+  "melbourneCupWinnersTo2013": {"byAge": {"3yo": 23, "3yoLast": 1941, "4yo": 44, "5yo": 43}, "bySex": {"mares": 13, "entires": 64, "geldings": 51, "colts": 21, "fillies": 3}, "source": "https://www.sportsnews.com.au/horse-racing/melbourne-cup-2013-statistics-history-and-culture/93320/amp", "confidence": "medium", "note": "dated"},
+  "suggestedScores": {"wellRated3yoInSpringOpenHandicap": 0.15, "ageGe8": -0.1, "mareVsMalesAtWfaAfterAllowance": 0.0, "confidence": "low"}
+}

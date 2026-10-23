@@ -1,0 +1,295 @@
+{
+  "_fixtureNote": "REAL recorded response (unmodified values) of GET https://api.beta.tab.com.au/v1/tab-info-service/racing/next-to-go/races?jurisdiction=NSW captured 2017-07-15 by github.com/shaunmarx/next-to-go (src/races/schema/data.json); first 10 of 29 races kept. Mixed R/G/H and AU/GBR meetings. Field set unchanged as of 2026 per other clients (meeting.trackCondition/weatherCondition/railPosition/sellCode, _links.self/form/bigBets).",
+  "races": [
+    {
+      "raceStartTime": "2017-07-15T13:10:00.000Z",
+      "raceNumber": 2,
+      "raceName": "TOTESCOOP6 HERITAGE HANDICAP",
+      "raceDistance": 1000,
+      "broadcastChannel": "Sky Racing 1",
+      "broadcastChannels": [
+        "Sky Racing 1"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "L",
+          "scheduledType": "G"
+        },
+        "raceType": "R",
+        "meetingName": "ASCOT UK",
+        "location": "GBR",
+        "weatherCondition": "OCAST",
+        "trackCondition": "GOOD",
+        "railPosition": "True",
+        "venueMnemonic": "ASC",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/ASC/races/2?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/ASC/races/2/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/ASC/races/2/big-bets?jurisdiction=NSW"
+      }
+    },
+    {
+      "raceStartTime": "2017-07-15T13:15:00.000Z",
+      "raceNumber": 2,
+      "raceName": "SPA AT BEDFORD LODGE HOTEL",
+      "raceDistance": 1400,
+      "broadcastChannel": "Sky Racing 1",
+      "broadcastChannels": [
+        "Sky Racing 1"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "E",
+          "scheduledType": "R"
+        },
+        "raceType": "R",
+        "meetingName": "NEWMARKET UK",
+        "location": "GBR",
+        "weatherCondition": "FINE",
+        "trackCondition": "GOOD",
+        "railPosition": "True",
+        "venueMnemonic": "NMT",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/NMT/races/2?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/NMT/races/2/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/NMT/races/2/big-bets?jurisdiction=NSW"
+      }
+    },
+    {
+      "raceStartTime": "2017-07-15T13:20:00.000Z",
+      "raceNumber": 7,
+      "raceName": "WWW.PERTHINTERDOMINION.COM.AU MS",
+      "raceDistance": 2130,
+      "broadcastChannel": "Sky Racing 1",
+      "broadcastChannels": [
+        "Sky Racing 1"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "W",
+          "scheduledType": "H"
+        },
+        "raceType": "H",
+        "meetingName": "GLOUCESTER PK",
+        "location": "WA",
+        "weatherCondition": "SHWRY",
+        "trackCondition": "DEAD",
+        "railPosition": null,
+        "venueMnemonic": "GLP",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/H/GLP/races/7?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/H/GLP/races/7/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/H/GLP/races/7/big-bets?jurisdiction=NSW"
+      }
+    },
+    {
+      "raceStartTime": "2017-07-15T13:25:00.000Z",
+      "raceNumber": 2,
+      "raceName": "MBNA FILLIES' HANDICAP",
+      "raceDistance": 1200,
+      "broadcastChannel": "Sky Racing 1",
+      "broadcastChannels": [
+        "Sky Racing 1"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "L",
+          "scheduledType": "H"
+        },
+        "raceType": "R",
+        "meetingName": "CHESTER",
+        "location": "GBR",
+        "weatherCondition": "OCAST",
+        "trackCondition": "GOOD",
+        "railPosition": "True",
+        "venueMnemonic": "CHR",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/CHR/races/2?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/CHR/races/2/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/CHR/races/2/big-bets?jurisdiction=NSW"
+      }
+    },
+    {
+      "raceStartTime": "2017-07-15T13:27:00.000Z",
+      "raceNumber": 8,
+      "raceName": "COMMUNITY NEWSPAPER GROUP",
+      "raceDistance": 520,
+      "broadcastChannel": "Sky Racing 1",
+      "broadcastChannels": [
+        "Sky Racing 1"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "W",
+          "scheduledType": "G"
+        },
+        "raceType": "G",
+        "meetingName": "CANNINGTON",
+        "location": "WA",
+        "weatherCondition": "SHWRY",
+        "trackCondition": "GOOD",
+        "railPosition": null,
+        "venueMnemonic": "CNP",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/G/CNP/races/8?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/G/CNP/races/8/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/G/CNP/races/8/big-bets?jurisdiction=NSW"
+      }
+    },
+    {
+      "raceStartTime": "2017-07-15T13:30:00.000Z",
+      "raceNumber": 2,
+      "raceName": "JOHN SMITH'S SILVER CUP STAKES",
+      "raceDistance": 2800,
+      "broadcastChannel": "Sky Racing 1",
+      "broadcastChannels": [
+        "Sky Racing 1"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "Y",
+          "scheduledType": "G"
+        },
+        "raceType": "R",
+        "meetingName": "YORK UK",
+        "location": "GBR",
+        "weatherCondition": "OCAST",
+        "trackCondition": "GOOD",
+        "railPosition": "True",
+        "venueMnemonic": "YUK",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/YUK/races/2?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/YUK/races/2/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/YUK/races/2/big-bets?jurisdiction=NSW"
+      }
+    },
+    {
+      "raceStartTime": "2017-07-15T13:31:00.000Z",
+      "raceNumber": 3,
+      "raceName": "HSW FASTIGHETER - LORDAGSLOPPET SS",
+      "raceDistance": 2640,
+      "broadcastChannel": "No Sky Vision",
+      "broadcastChannels": [
+        "No Sky Vision"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "H",
+          "scheduledType": "H"
+        },
+        "raceType": "H",
+        "meetingName": "ARJANG",
+        "location": "SWE",
+        "weatherCondition": "FINE",
+        "trackCondition": "FAST",
+        "railPosition": null,
+        "venueMnemonic": "ARJ",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/H/ARJ/races/3?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/H/ARJ/races/3/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/H/ARJ/races/3/big-bets?jurisdiction=NSW"
+      }
+    },
+    {
+      "raceStartTime": "2017-07-15T13:35:00.000Z",
+      "raceNumber": 8,
+      "raceName": "MERCURY SPRINT",
+      "raceDistance": 1200,
+      "broadcastChannel": "Sky Racing 2",
+      "broadcastChannels": [
+        "Sky Racing 2"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "J",
+          "scheduledType": "R"
+        },
+        "raceType": "R",
+        "meetingName": "GREYVILLE",
+        "location": "ZAF",
+        "weatherCondition": "FINE",
+        "trackCondition": "AWT",
+        "railPosition": "Out 5m entire circuit",
+        "venueMnemonic": "GYL",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/GYL/races/8?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/GYL/races/8/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/GYL/races/8/big-bets?jurisdiction=NSW"
+      }
+    },
+    {
+      "raceStartTime": "2017-07-15T13:40:00.000Z",
+      "raceNumber": 3,
+      "raceName": "PLAYBOY CLUB LONDON HANDICAP",
+      "raceDistance": 2000,
+      "broadcastChannel": "Sky Racing 1",
+      "broadcastChannels": [
+        "Sky Racing 1"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "L",
+          "scheduledType": "G"
+        },
+        "raceType": "R",
+        "meetingName": "ASCOT UK",
+        "location": "GBR",
+        "weatherCondition": "OCAST",
+        "trackCondition": "GOOD",
+        "railPosition": "True",
+        "venueMnemonic": "ASC",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/ASC/races/3?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/ASC/races/3/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/ASC/races/3/big-bets?jurisdiction=NSW"
+      }
+    },
+    {
+      "raceStartTime": "2017-07-15T13:45:00.000Z",
+      "raceNumber": 6,
+      "raceName": "CRAIG INTERNATIONAL FM 77 HANDICAP",
+      "raceDistance": 1400,
+      "broadcastChannel": "Sky Racing 2",
+      "broadcastChannels": [
+        "Sky Racing 2"
+      ],
+      "meeting": {
+        "sellCode": {
+          "meetingCode": "J",
+          "scheduledType": "H"
+        },
+        "raceType": "R",
+        "meetingName": "KENILWORTH",
+        "location": "ZAF",
+        "weatherCondition": "SHWRY",
+        "trackCondition": "GOOD",
+        "railPosition": "Winter course: Inside rail moved 3m from 800m to 400m with a 3m spur @ 400m",
+        "venueMnemonic": "KEN",
+        "meetingDate": "2017-07-15"
+      },
+      "_links": {
+        "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/KEN/races/6?jurisdiction=NSW",
+        "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/KEN/races/6/form?jurisdiction=NSW",
+        "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2017-07-15/meetings/R/KEN/races/6/big-bets?jurisdiction=NSW"
+      }
+    }
+  ]
+}

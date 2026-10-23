@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  _fixtureNote: CONSTRUCTED fixture for RaceLens. Not a live capture.
+  Stands in for: GET https://www.news.com.au/content-feeds/latest-news-sport/
+  The URL pattern https://www.news.com.au/content-feeds/latest-news-<section>/ is used by calibre's "The Oz" recipe and
+  other public crawlers (see research/news.md). Article links carry ?from=rss-basic (observed in rumca-js RSS-Link-Database captures).
+  Item shape (RSS 2.0 + media:content thumbnail) is MEDIUM confidence. Fictional horses/people.
+-->
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>news.com.au — Australia’s leading news site | Sport</title>
+    <link>https://www.news.com.au/sport</link>
+    <description>Latest sport news from news.com.au</description>
+    <language>en-au</language>
+    <lastBuildDate>Fri, 23 Oct 2026 22:40:02 +0000</lastBuildDate>
+    <item>
+      <title>Jockey T. Marsden replaces suspended rider on Velvet Thunder in Flemington feature</title>
+      <link>https://www.news.com.au/sport/superracing/jockey-marsden-replaces-suspended-rider-velvet-thunder-flemington/news-story/0a1b2c3d4e5f60718293a4b5c6d7e8f9?from=rss-basic</link>
+      <guid isPermaLink="false">0a1b2c3d4e5f60718293a4b5c6d7e8f9</guid>
+      <pubDate>Thu, 22 Oct 2026 22:30:00 +0000</pubDate>
+      <dc:creator>Superracing staff</dc:creator>
+      <category>Superracing</category>
+      <description>Velvet Thunder's connections have turned to in-form hoop T. Marsden for Saturday's Group 2 at Flemington after the horse's regular rider copped a careless riding suspension at Caulfield.</description>
+      <media:content url="https://content.api.news/v3/images/bin/0a1b2c3d4e5f60718293a4b5c6d7e8f9" type="image/jpeg" width="650" height="366">
+        <media:description>Velvet Thunder at trackwork</media:description>
+      </media:content>
+    </item>
+    <item>
+      <title>Flemington market watch: Brass Lantern firms as big bets land ahead of Group 2</title>
+      <link>https://www.news.com.au/sport/superracing/flemington-market-watch-brass-lantern-firms/news-story/1b2c3d4e5f60718293a4b5c6d7e8f9a0?from=rss-basic</link>
+      <guid isPermaLink="false">1b2c3d4e5f60718293a4b5c6d7e8f9a0</guid>
+      <pubDate>Fri, 23 Oct 2026 06:10:00 +0000</pubDate>
+      <dc:creator>Superracing staff</dc:creator>
+      <category>Superracing</category>
+      <description>Brass Lantern has firmed from $4.60 into $3.80 with corporate bookmakers after a wave of support on Friday for Saturday's Flemington Group 2.</description>
+      <media:content url="https://content.api.news/v3/images/bin/1b2c3d4e5f60718293a4b5c6d7e8f9a0" type="image/jpeg" width="650" height="366">
+        <media:description>Betting ring at Flemington</media:description>
+      </media:content>
+    </item>
+  </channel>
+</rss>

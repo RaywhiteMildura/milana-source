@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!--
+  _fixtureNote: CONSTRUCTED fixture for RaceLens. Not a live capture.
+  Represents the DuckDuckGo bot-check page that html.duckduckgo.com returns (often with HTTP 202, sometimes 200 or 403)
+  when it throttles automated searches, especially from datacenter / shared-egress IPs.
+  Marker strings below are the ones open-source scrapers test for (see research/news.md):
+    "anomaly-modal", "anomaly.js", "challenge-form", "bots use duckduckgo too", "please complete the following challenge".
+  A client must treat a 202 OR any body containing these markers as "blocked / rate-limited" and back off, never retry in a tight loop.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>DuckDuckGo</title>
+  <link rel="stylesheet" href="/dist/anomaly.css">
+  <script src="/dist/anomaly.js" defer></script>
+</head>
+<body class="anomaly-modal__page">
+  <div class="anomaly-modal__modal">
+    <div class="anomaly-modal__box">
+      <img class="anomaly-modal__logo" src="/assets/logo_homepage.normal.v108.svg" alt="DuckDuckGo">
+      <h1 class="anomaly-modal__title">Unfortunately, bots use DuckDuckGo too.</h1>
+      <p class="anomaly-modal__description">Please complete the following challenge to confirm this search was made by a human.</p>
+      <form id="challenge-form" class="anomaly-modal__form" method="post" action="/html/">
+        <div class="anomaly-modal__challenge" data-sitekey="0x4AAAAAAA-example"></div>
+        <input type="hidden" name="q" value="Flemington stable comments 24 October">
+        <input type="hidden" name="kl" value="au-en">
+        <input type="hidden" name="b" value="">
+        <button type="submit" class="anomaly-modal__submit">Continue</button>
+      </form>
+      <p class="anomaly-modal__footer">If this error persists, please let us know: <a href="mailto:ops@duckduckgo.com">ops@duckduckgo.com</a></p>
+    </div>
+  </div>
+</body>
+</html>

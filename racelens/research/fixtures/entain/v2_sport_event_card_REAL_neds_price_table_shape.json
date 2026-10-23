@@ -1,0 +1,117 @@
+{
+  "events": {
+    "a248f969-e7b1-43c9-a6a8-03178e3a3d68": {
+      "id": "a248f969-e7b1-43c9-a6a8-03178e3a3d68",
+      "name": "Fremantle vs Brisbane Lions",
+      "url": "/sports/australian-rules/afl/fremantle-vs-brisbane-lions/a248f969-e7b1-43c9-a6a8-03178e3a3d68",
+      "advertisedStart": "2026-09-26T04:30:00.000Z",
+      "eventType": "MATCH",
+      "eventTypeId": "6bfa0efc-05df-4ae1-9b1e-152365290cfd",
+      "bettingStatus": "OPEN",
+      "status": "OPEN",
+      "phase": null,
+      "hasLiveVision": false,
+      "inPlay": false,
+      "sportCategory": {
+        "id": "23d497e6-8aab-4309-905b-9421f42c9bc5",
+        "name": "Australian Rules",
+        "category": "AUSTRALIAN_RULES",
+        "icon": "sports/australian-rules",
+        "slug": "australian-rules",
+        "url": "/sports/australian-rules",
+        "hasRegions": false,
+        "eventCount": 0
+      },
+      "competition": {
+        "id": "ccff2e9a-5347-41aa-902a-bb6b1886d817",
+        "name": "AFL",
+        "url": "/sports/australian-rules/afl",
+        "hasInPlayEvents": false,
+        "region": null
+      },
+      "teams": [
+        {
+          "id": "SportingTeam:c15d681c-a6cb-40c2-9859-510b93afcb8d",
+          "name": "Fremantle",
+          "colour": "#2E0F4F",
+          "locale": "HOME",
+          "scores": [],
+          "scoresV2": null,
+          "icon": {
+            "web": "/images/neds/sprites/svg-sports-afl-icon.svg#fremantle-dockers"
+          }
+        },
+        {
+          "id": "SportingTeam:74e715c2-3fe2-4035-bac5-a024a4d54b26",
+          "name": "Brisbane Lions",
+          "colour": "#7A0C2E",
+          "locale": "AWAY",
+          "scores": [],
+          "scoresV2": null,
+          "icon": {
+            "web": "/images/neds/sprites/svg-sports-afl-icon.svg#brisbane-lions"
+          }
+        }
+      ],
+      "matchClock": null,
+      "marketCount": 299,
+      "markets": {
+        "nodes": [
+          {
+            "id": "SportingMarket:c462b870-16cc-43e7-9dda-a8dbcf9fbb05",
+            "name": "Match Betting",
+            "marketTypeId": "be25c37a-71ff-47f6-a1e2-02a494eb5a4d",
+            "handicap": null,
+            "isPrimary": true,
+            "isSuspended": false,
+            "status": "OPEN",
+            "liveBettingAvailable": true,
+            "allowsCashOut": false,
+            "sameGameMultiAvailable": true,
+            "allowOddsBoostExtra": false,
+            "additionalProductTypeIds": null,
+            "entrantCount": 2,
+            "entrants": {
+              "nodes": [
+                {
+                  "id": "SportingEntrant:23774be8-76a6-405b-9869-0c78afced3bc",
+                  "name": "Fremantle",
+                  "handicap": null,
+                  "isSuspended": false,
+                  "role": "HOME",
+                  "icon": {
+                    "web": "/images/neds/sprites/svg-sports-afl-icon.svg#fremantle-dockers"
+                  },
+                  "price": {
+                    "id": "23774be8-76a6-405b-9869-0c78afced3bc:940b8704-e497-4a76-b390-00918ff7d282:",
+                    "odds": {
+                      "numerator": 6,
+                      "denominator": 5
+                    }
+                  }
+                },
+                {
+                  "id": "SportingEntrant:cf5ce9f7-a882-4a07-8479-f1ad2686c4cd",
+                  "name": "Brisbane Lions",
+                  "handicap": null,
+                  "isSuspended": false,
+                  "role": "AWAY",
+                  "icon": {
+                    "web": "/images/neds/sprites/svg-sports-afl-icon.svg#brisbane-lions"
+                  },
+                  "price": {
+                    "id": "cf5ce9f7-a882-4a07-8479-f1ad2686c4cd:940b8704-e497-4a76-b390-00918ff7d282:",
+                    "odds": {
+                      "numerator": 17,
+                      "denominator": 25
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

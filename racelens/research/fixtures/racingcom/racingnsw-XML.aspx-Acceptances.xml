@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CONSTRUCTED fixture. Models GET https://racing.racingnsw.com.au/FreeFields/XML.aspx?Key=2026Oct24,NSW,Royal%20Randwick&stage=Acceptances
+  (Racing NSW mirror of the Racing Australia FreeFields app). The ONLY evidenced structure (RyzyO/tmstipping admin-dark-script.js,
+  fetchNswRunnerEntriesFromXml) is: <race number="N"> elements each containing <nomination horse="NAME" number="N" jockeynumber="SILKS_ID"/>
+  elements, where jockeynumber is the id used in https://racingaustralia.horse/JockeySilks/{id}.png and 0 means no silks/jockey.
+  Every other element/attribute below (meeting wrapper, trainer, jockey, barrier, weight, rating, scratched) is a plausible guess - inspect the
+  live response before relying on it. Other `stage` values (Nominations|Weights|Results) are unverified.
+-->
+<meeting key="2026Oct24,NSW,Royal Randwick" date="2026-10-24" state="NSW" venue="Royal Randwick" stage="Acceptances" trackcondition="Soft 5" rail="+4m Entire Circuit" weather="Overcast">
+  <race number="1" name="Breeders' Plate" distance="1000" time="11:50AM" class="2YO SW" prizemoney="300000">
+    <nomination number="1" horse="HARBOUR LIGHTS" jockeynumber="70211" jockey="James McDonald" trainer="Chris Waller" barrier="5" weight="57" rating="" scratched="N" />
+    <nomination number="2" horse="SYDNEY SIDER" jockeynumber="70344" jockey="Nash Rawiller" trainer="Gai Waterhouse &amp; Adrian Bott" barrier="2" weight="57" rating="" scratched="N" />
+    <nomination number="3" horse="RANDWICK ROAD" jockeynumber="0" jockey="" trainer="Bjorn Baker" barrier="9" weight="57" rating="" scratched="Y" />
+    <nomination number="4" horse="KENSINGTON KID" jockeynumber="70402" jockey="Tommy Berry" trainer="Annabel Neasham &amp; Rob Archibald" barrier="1" weight="57" rating="" scratched="N" />
+  </race>
+  <race number="2" name="Gimcrack Stakes" distance="1000" time="12:25PM" class="2YO F SW" prizemoney="300000">
+    <nomination number="1" horse="ALISON ROAD" jockeynumber="70118" jockey="Zac Lloyd" trainer="Ciaron Maher" barrier="4" weight="55" rating="" scratched="N" />
+    <nomination number="2" horse="HIGH STREET" jockeynumber="70501" jockey="Jason Collett" trainer="John O'Shea &amp; Tom Charlton" barrier="7" weight="55" rating="" scratched="N" />
+  </race>
+</meeting>

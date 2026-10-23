@@ -1,0 +1,23 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Australian Rules of Racing AR 92 apprentice claim structure as described by Racing SA, Racing Queensland/Bloodstock.com.au and Racing Victoria.",
+  "metropolitan": [
+    {"claimKg": 3.0, "untilMetroWins": 20},
+    {"claimKg": 2.0, "untilMetroWins": 50},
+    {"claimKg": 1.5, "untilMetroWins": 80}
+  ],
+  "countryNewApprentice": {"claimKg": 4.0, "untilWins": 5, "note": "A Principal Racing Authority may exempt its territory"},
+  "rules": {
+    "noClaimIn": ["Group", "Listed"],
+    "groupListedWinsCountAsMetro": true,
+    "victoriaAlignedFrom": "2023-24 season (tracks classed metropolitan / provincial / other)",
+    "saExample": {"metro": 3.0, "provincial": 2.0, "country": 0}
+  },
+  "notation": "(a) or (a2) / (a1.5) after the jockey name on form guides; effective weight = allotted weight - claim",
+  "sources": [
+    "https://racingsa.com.au/academy/about/claim-structure",
+    "https://www.bloodstock.com.au/news/story.php?id=33328",
+    "https://racingvictoria.com.au/news/2023-07-13/calculation-of-victorian-apprentice-jockey-claims-to-change",
+    "https://racingsa.com.au/blog/2020/06/04/2499/calendar"
+  ],
+  "confidence": "high"
+}

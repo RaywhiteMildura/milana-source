@@ -1,0 +1,8 @@
+<!-- CONSTRUCTED fixture (RaceLens research 2026-10-23): what a blocked BOM request looks like. BOM's edge returns HTTP 403 with a short HTML body (not JSON) when the request has no browser-like User-Agent (python-requests/urllib/curl defaults, empty UA) - reported in ropensci/bomrang#137 (2021) and widely since 2023. Treat ANY non-JSON body or status 403 as 'blocked', back off, and retry with a Chrome-like User-Agent and Accept: application/json. The exact HTML below is a generic nginx-style page; the real body may differ (low confidence on wording, medium on the 403 behaviour). -->
+<html>
+<head><title>403 Forbidden</title></head>
+<body>
+<center><h1>403 Forbidden</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "_fixtureNote": "CONSTRUCTED, LOW confidence on exact wording. Official docs: header.error is '(Optional) The details of any error that occurred'; HTTP 404 = 'Not Found -- The specified item could not be found', 429 = 'Too Many Requests -- make sure you have set your identification headers'. data may be null or absent on error.",
+  "header": {
+    "title": "Event Details: 00000000-0000-0000-0000-000000000000",
+    "generated_time": "2026-10-24T03:41:07.118442201Z",
+    "url": "/affiliates/v1/racing/events/00000000-0000-0000-0000-000000000000?enc=json",
+    "error": "event not found"
+  },
+  "params": {
+    "enc": "json",
+    "id": "00000000-0000-0000-0000-000000000000"
+  },
+  "data": null
+}

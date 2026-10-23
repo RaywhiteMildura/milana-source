@@ -1,0 +1,40 @@
+{
+ "_fixtureNote": "CONSTRUCTED. GET https://geocoding-api.open-meteo.com/v1/search?name=Flemington&count=5&language=en&format=json&countryCode=AU  Field names from the Open-Meteo geocoding docs page (open-meteo-website repo). Empty fields are omitted by the API. Geocoding returns suburbs/towns (GeoNames), not racecourses - good enough for a ~10 km weather grid, not for picking the nearest BOM station.",
+ "results": [
+  {
+   "id": 2166388,
+   "name": "Flemington",
+   "latitude": -37.78333,
+   "longitude": 144.93333,
+   "elevation": 27.0,
+   "feature_code": "PPLX",
+   "country_code": "AU",
+   "admin1_id": 2145234,
+   "admin2_id": 7839805,
+   "timezone": "Australia/Melbourne",
+   "population": 7690,
+   "postcodes": [
+    "3031"
+   ],
+   "country_id": 2077456,
+   "country": "Australia",
+   "admin1": "Victoria",
+   "admin2": "Melbourne"
+  },
+  {
+   "id": 5097598,
+   "name": "Flemington",
+   "latitude": 40.5123,
+   "longitude": -74.8593,
+   "elevation": 52.0,
+   "feature_code": "PPL",
+   "country_code": "US",
+   "timezone": "America/New_York",
+   "population": 4581,
+   "country_id": 6252001,
+   "country": "United States",
+   "admin1": "New Jersey"
+  }
+ ],
+ "generationtime_ms": 0.6029606
+}

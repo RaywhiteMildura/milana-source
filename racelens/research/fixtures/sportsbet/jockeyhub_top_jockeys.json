@@ -1,0 +1,41 @@
+{
+  "_fixtureNote": "CONSTRUCTED fixture (not a live capture). Venue Flemington / date 2026-10-24 and all ids, horses, jockeys, trainers and prices are invented. Field names, nesting and value formats follow the wire-verified shapes in research/sportsbet.md (sources cited there). Flemington competitionId 356 is invented. Endpoint: GET /apigw/sportsbook-racing/Sportsbook/Racing/JockeyHub/TopJockeys. Shape verified by sportsdata-mcp 2026-05-25.",
+  "jockeyList": [
+    {
+      "jockeyName": "L. Harcourt",
+      "country": "",
+      "rideCards": [
+        {
+          "eventId": 10950007,
+          "eventOutcome": "Velvet Thunder",
+          "startTimeInUnix": 1792818600,
+          "raceNumber": 7,
+          "trackName": "Flemington",
+          "trainer": "C. Maher & D. Eustace"
+        },
+        {
+          "eventId": 10950003,
+          "eventOutcome": "Rapid Verse",
+          "startTimeInUnix": 1792809600,
+          "raceNumber": 3,
+          "trackName": "Flemington",
+          "trainer": "P. Moody & K. Coleman"
+        }
+      ]
+    },
+    {
+      "jockeyName": "J. Allen",
+      "country": "",
+      "rideCards": [
+        {
+          "eventId": 10950007,
+          "eventOutcome": "Northern Ledger",
+          "startTimeInUnix": 1792818600,
+          "raceNumber": 7,
+          "trackName": "Flemington",
+          "trainer": "A. & S. Freedman"
+        }
+      ]
+    }
+  ]
+}

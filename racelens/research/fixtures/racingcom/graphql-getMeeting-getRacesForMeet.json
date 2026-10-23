@@ -1,0 +1,29 @@
+{
+  "_fixtureNote": "CONSTRUCTED. Shape of the combined query used by KaiYingWinning kyw-sync: { m: getMeeting(id:\"20261024-FLEM\"){ id date meetingName venueName state trackCondition trackRating railPosition weather racesCount status } races: getRacesForMeet(meetCode:\"20261024-FLEM\"){ id raceNumber name distance class raceStatus status hasResults resultsString trackCondition trackRating time runnersCount fieldCount totalPrizeMoney } }. Field names high confidence (kyw RACE_FIELDS). Scalar formats (distance with 'm', totalPrizeMoney with '$' and commas, time as ISO string) are inferred from client parsing code - treat as medium and parse tolerantly. Race 1 and 2 shown as finished (hasResults/resultsString), later races not yet run. Times: timezone semantics unverified; shown here as Melbourne local with offset.",
+  "data": {
+    "m": {
+      "id": "20261024-FLEM",
+      "date": "2026-10-24",
+      "meetingName": "Flemington",
+      "venueName": "Flemington",
+      "state": "VIC",
+      "trackCondition": "Good",
+      "trackRating": "4",
+      "railPosition": "True Entire Circuit",
+      "weather": "Fine",
+      "racesCount": 9,
+      "status": "Open"
+    },
+    "races": [
+      { "id": "FLEM-20261024-1", "raceNumber": 1, "name": "Maribyrnong Trial Stakes", "distance": "1000m", "class": "Listed", "raceStatus": "Results", "status": "Final", "hasResults": true, "resultsString": "3,1,7,5", "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T12:40:00+11:00", "runnersCount": 8, "fieldCount": 8, "totalPrizeMoney": "$200,000" },
+      { "id": "FLEM-20261024-2", "raceNumber": 2, "name": "Ascot Vale Plate", "distance": "1200m", "class": "BM78", "raceStatus": "Results", "status": "Final", "hasResults": true, "resultsString": "6-2-4-1", "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T13:15:00+11:00", "runnersCount": 11, "fieldCount": 12, "totalPrizeMoney": "$150,000" },
+      { "id": "FLEM-20261024-3", "raceNumber": 3, "name": "Carbine Club Stakes", "distance": "1600m", "class": "Group 3", "raceStatus": "Open", "status": "Open", "hasResults": false, "resultsString": null, "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T13:50:00+11:00", "runnersCount": 13, "fieldCount": 14, "totalPrizeMoney": "$300,000" },
+      { "id": "FLEM-20261024-4", "raceNumber": 4, "name": "Flemington Fillies Classic", "distance": "2000m", "class": "Group 3", "raceStatus": "Open", "status": "Open", "hasResults": false, "resultsString": null, "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T14:25:00+11:00", "runnersCount": 10, "fieldCount": 10, "totalPrizeMoney": "$300,000" },
+      { "id": "FLEM-20261024-5", "raceNumber": 5, "name": "Lexus Hotham Stakes", "distance": "2500m", "class": "Group 3", "raceStatus": "Open", "status": "Open", "hasResults": false, "resultsString": null, "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T15:00:00+11:00", "runnersCount": 12, "fieldCount": 12, "totalPrizeMoney": "$300,000" },
+      { "id": "FLEM-20261024-6", "raceNumber": 6, "name": "Coolmore Stud Stakes", "distance": "1200m", "class": "Group 1", "raceStatus": "Open", "status": "Open", "hasResults": false, "resultsString": null, "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T15:40:00+11:00", "runnersCount": 14, "fieldCount": 15, "totalPrizeMoney": "$2,000,000" },
+      { "id": "FLEM-20261024-7", "raceNumber": 7, "name": "Victoria Derby", "distance": "2500m", "class": "Group 1", "raceStatus": "Open", "status": "Open", "hasResults": false, "resultsString": null, "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T16:20:00+11:00", "runnersCount": 15, "fieldCount": 16, "totalPrizeMoney": "$2,000,000" },
+      { "id": "FLEM-20261024-8", "raceNumber": 8, "name": "Empire Rose Stakes", "distance": "1600m", "class": "Group 1", "raceStatus": "Open", "status": "Open", "hasResults": false, "resultsString": null, "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T17:00:00+11:00", "runnersCount": 12, "fieldCount": 12, "totalPrizeMoney": "$1,000,000" },
+      { "id": "FLEM-20261024-9", "raceNumber": 9, "name": "Kennedy Mile", "distance": "1600m", "class": "Open Hcp", "raceStatus": "Open", "status": "Open", "hasResults": false, "resultsString": null, "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T17:40:00+11:00", "runnersCount": 16, "fieldCount": 18, "totalPrizeMoney": "$500,000" }
+    ]
+  }
+}

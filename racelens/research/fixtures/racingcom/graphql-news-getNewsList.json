@@ -1,0 +1,41 @@
+{
+  "_fixtureNote": "CONSTRUCTED. Response shape for GET https://graphql.api.racing.com?query=<urlencoded GraphQL> with headers {x-api-key: da2-r5s52y73i5c7vi6vxflvfdufsa, content-type: application/json;charset=UTF-8}. Query text (verbatim from Islington036/HorseRacingNewsPortal international/config.js, medium): query GetNewsList { getNewsList(sites: [\"RDC\"], limit: 20) { id name short_title description article_type image_url thumbnail published modified article_date page_url site category { label url } image_object { width height alt src thumbnail_src } thumbnail_object { width height alt src thumbnail_src } } }. Articles below are invented.",
+  "data": {
+    "getNewsList": [
+      {
+        "id": "news-2026-10-23-0001",
+        "name": "Derby Day fields: Flemington track rated a Good 4 with true rail",
+        "short_title": "Derby Day fields released",
+        "description": "Final fields for Saturday's Victoria Derby meeting at Flemington have been declared, with the rail in the true position.",
+        "article_type": "News",
+        "image_url": "https://cdn.racing.com/-/media/news/2026/10/23/flemington-derby-day.jpg",
+        "thumbnail": "https://cdn.racing.com/-/media/news/2026/10/23/flemington-derby-day-thumb.jpg",
+        "published": "2026-10-23T09:15:00+11:00",
+        "modified": "2026-10-23T09:40:00+11:00",
+        "article_date": "2026-10-23",
+        "page_url": "/news/2026-10-23/derby-day-fields-flemington-good-4",
+        "site": "RDC",
+        "category": { "label": "Racing News", "url": "/news/racing-news" },
+        "image_object": { "width": 1920, "height": 1080, "alt": "Flemington straight", "src": "https://cdn.racing.com/-/media/news/2026/10/23/flemington-derby-day.jpg", "thumbnail_src": "https://cdn.racing.com/-/media/news/2026/10/23/flemington-derby-day-thumb.jpg" },
+        "thumbnail_object": { "width": 640, "height": 360, "alt": "Flemington straight", "src": "https://cdn.racing.com/-/media/news/2026/10/23/flemington-derby-day-thumb.jpg", "thumbnail_src": "https://cdn.racing.com/-/media/news/2026/10/23/flemington-derby-day-thumb.jpg" }
+      },
+      {
+        "id": "news-2026-10-23-0002",
+        "name": "Stewards: Kah to ride at Flemington after medical clearance",
+        "short_title": "Kah cleared to ride",
+        "description": "Racing Victoria stewards confirmed the jockey has been medically cleared for Saturday's engagements.",
+        "article_type": "News",
+        "image_url": null,
+        "thumbnail": null,
+        "published": "2026-10-23T11:02:00+11:00",
+        "modified": "2026-10-23T11:02:00+11:00",
+        "article_date": "2026-10-23",
+        "page_url": "/news/2026-10-23/kah-cleared-flemington",
+        "site": "RDC",
+        "category": { "label": "Stewards", "url": "/news/stewards" },
+        "image_object": null,
+        "thumbnail_object": null
+      }
+    ]
+  }
+}

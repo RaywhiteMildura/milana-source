@@ -1,0 +1,59 @@
+{
+  "_fixtureNote": "CONSTRUCTED, LOW CONFIDENCE. GET https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/7/form?jurisdiction=VIC . No recorded response of this endpoint was found. Shape assembled from: (a) sportsdata-agents form.py (2026-07) which reads the live key 'form' (falling back to 'formData') and per-runner runnerNumber, runnerName, barrierNumber, handicapWeight, riderDriverName, trainerName, last20Starts, formComment / formComments[].comment (prose sentences), techFormRating, daysSinceLastRun, runsSinceSpell, bestTime, age, isScratched; (b) sportsdata-mcp tab.yaml response_hint '{raceNumber, formData:[{runnerNumber, runnerName, pastPerformances:[]}]}'. Keys marked in '_uncertainKeys' were only ever read with fallbacks and may be absent or named differently. Pedigree (sire/dam), sex, colour, career/track/distance statistics were NOT evidenced anywhere and are deliberately omitted. One source says this route returns 401 on the anonymous tier and needs OAuth client credentials. Only two runners are included.",
+  "_uncertainKeys": ["formData", "barrier", "weight", "rider", "driver", "lastStarts", "formComment", "rating", "daysSinceLastRun", "runsSinceSpell", "bestTime", "age", "scratched", "pastPerformances"],
+  "raceNumber": 7,
+  "raceName": "RACELENS FIXTURE HANDICAP",
+  "raceStartTime": "2026-10-24T05:30:00.000Z",
+  "raceDistance": 1600,
+  "raceClassConditions": "BM84",
+  "meeting": { "meetingName": "FLEMINGTON", "venueMnemonic": "FLM", "meetingDate": "2026-10-24", "location": "VIC", "raceType": "R", "trackCondition": "GOOD4" },
+  "form": [
+    {
+      "runnerNumber": 1,
+      "runnerName": "SILVER CASCADE",
+      "barrierNumber": 6,
+      "handicapWeight": 58.5,
+      "riderDriverName": "J McDonald",
+      "trainerName": "C Waller",
+      "age": 5,
+      "last20Starts": "x3214x1x2x21x31",
+      "techFormRating": 94,
+      "daysSinceLastRun": 14,
+      "runsSinceSpell": 3,
+      "bestTime": "1:34.21",
+      "isScratched": false,
+      "formComment": "Resumed with a 3rd of 11 at Caulfield 1400m on October 10 before a strong 1st of 9 at Flemington over 1600m on October 17 on a Good 4. Third-up and well suited at the trip; drawn to get cover.",
+      "formComments": [
+        { "comment": "1st of 9 at Flemington BM78 on October 17 over 1600m, won by 1.2 len, 58kg, J McDonald, Good 4, barrier 5." },
+        { "comment": "3rd of 11 at Caulfield BM78 on October 10 over 1400m, 1.5 len, 58.5kg, J McDonald, Soft 5, barrier 9." },
+        { "comment": "Spelled 84 days after a 1st of 10 at Sandown-Hillside on July 18 over 1600m." }
+      ],
+      "pastPerformances": [
+        { "date": "2026-10-17", "venue": "FLEMINGTON", "raceNumber": 5, "distance": 1600, "trackCondition": "GOOD4", "class": "BM78", "position": 1, "fieldSize": 9, "margin": "1.2L", "weight": 58, "barrier": 5, "jockey": "J McDonald", "startingPrice": 3.6, "time": "1:35.02" },
+        { "date": "2026-10-10", "venue": "CAULFIELD", "raceNumber": 4, "distance": 1400, "trackCondition": "SOFT5", "class": "BM78", "position": 3, "fieldSize": 11, "margin": "1.5L", "weight": 58.5, "barrier": 9, "jockey": "J McDonald", "startingPrice": 5.0, "time": "1:24.60" }
+      ]
+    },
+    {
+      "runnerNumber": 4,
+      "runnerName": "GOLDEN SPUR",
+      "barrierNumber": 8,
+      "handicapWeight": 56.0,
+      "riderDriverName": "C Williams",
+      "trainerName": "M Price & M Kent Jnr",
+      "age": 6,
+      "last20Starts": "2135x468x45",
+      "techFormRating": 84,
+      "daysSinceLastRun": 21,
+      "runsSinceSpell": 2,
+      "bestTime": "1:35.10",
+      "isScratched": true,
+      "formComment": "Late scratching.",
+      "formComments": [],
+      "pastPerformances": []
+    }
+  ],
+  "_links": {
+    "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/7/form?jurisdiction=VIC",
+    "race": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/7?jurisdiction=VIC"
+  }
+}

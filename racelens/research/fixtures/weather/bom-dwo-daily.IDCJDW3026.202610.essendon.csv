@@ -1,0 +1,14 @@
+"CONSTRUCTED fixture (RaceLens 2026-10-23). Real product: BOM Daily Weather Observations (DWO), Essendon Airport VIC, October 2026 - HTML at https://www.bom.gov.au/climate/dwo/202610/html/IDCJDW3026.202610.shtml (page confirmed via search), CSV at http://www.bom.gov.au/climate/dwo/202610/text/IDCJDW3026.202610.csv (CSV path from memory - medium). Codes seen in search: IDCJDW3050 Melbourne (Olympic Park), IDCJDW3030 Geelong Racecourse, IDCJDW2025 Canterbury Racecourse, IDCJDW2124 Sydney, IDCJDW8014 Darwin, IDCJDW2801 Canberra. Rainfall is the 24 h to 9am of the listed date. Values invented. Real files start with several note lines then a blank line then the header; the header row below is from memory (medium)."
+"Essendon, Victoria"
+"October 2026 Daily Weather Observations"
+"Observations were drawn from Essendon Airport {station 086038}"
+"Prepared at 05:37 UTC on Sat 24 Oct 2026"
+
+,"Date","Minimum temperature (°C)","Maximum temperature (°C)","Rainfall (mm)","Evaporation (mm)","Sunshine (hours)","Direction of maximum wind gust ","Speed of maximum wind gust (km/h)","Time of maximum wind gust","9am Temperature (°C)","9am relative humidity (%)","9am cloud amount (oktas)","9am wind direction","9am wind speed (km/h)","9am MSL pressure (hPa)","3pm Temperature (°C)","3pm relative humidity (%)","3pm cloud amount (oktas)","3pm wind direction","3pm wind speed (km/h)","3pm MSL pressure (hPa)"
+,2026-10-18,11.3,24.1,0,,,N,43,13:51,16.2,58,,N,19,1019.4,23.0,31,,NNW,28,1014.9
+,2026-10-19,12.0,20.6,0,,,NW,46,02:10,15.1,62,,NW,24,1012.3,19.8,44,,W,26,1012.8
+,2026-10-20,9.1,16.8,3.2,,,SW,52,06:30,12.0,81,,SW,30,1015.7,16.1,55,,SSW,24,1018.9
+,2026-10-21,8.4,20.5,0,,,SSW,35,15:12,13.4,66,,S,15,1022.1,19.7,42,,S,20,1020.3
+,2026-10-22,11.2,15.9,0,,,W,57,12:44,13.0,88,,NW,22,1009.6,14.4,79,,WSW,33,1008.2
+,2026-10-23,8.0,19.2,6.4,,,SW,48,01:05,12.6,70,,SW,24,1016.0,18.5,47,,SW,22,1016.8
+,2026-10-24,9.6,,0,,,,,,15.0,61,,SW,19,1017.4,,,,,,

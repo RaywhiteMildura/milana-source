@@ -1,0 +1,11 @@
+{
+  "_fixtureNote": "HIGH confidence (verbatim from DanielTomaro13/sportsdata-mcp Entain.md, observed live). Returned by /gql/router when the sha256Hash is not currently registered by the gateway. Recover by POSTing the full query document with the same hash (Apollo APQ retry).",
+  "errors": [
+    {
+      "message": "PersistedQueryNotFound",
+      "extensions": {
+        "code": "PERSISTED_QUERY_NOT_FOUND"
+      }
+    }
+  ]
+}

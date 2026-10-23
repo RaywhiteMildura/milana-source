@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CONSTRUCTED fixture. Models GET https://www.racingqueensland.com.au/OpenDataWebServices/Meetings.asmx/GetMeetingsForDate?meetingDate=2026-10-24
+  (Racing Queensland Open Data Web Services; spec PDF https://www.racingqueensland.com.au/rq-open-data-web-services.pdf and WSDL at
+  .../Meetings.asmx?WSDL were unreachable from the research container). Element names Meetings/Meeting@Id/MeetingDate/TrackName/IsBarrierTrial
+  are those the zuizui0223/keiba parser reads and its test stubs emit (medium). Any further child elements are guesses. The real response is a
+  SOAP/ASMX document whose root element probably carries the ASMX namespace (keiba's parser strips namespaces and compares names case-insensitively).
+-->
+<Meetings xmlns="http://www.racingqueensland.com.au/OpenDataWebServices/">
+  <Meeting Id="131204">
+    <MeetingDate>2026-10-24</MeetingDate>
+    <TrackName>Eagle Farm</TrackName>
+    <IsBarrierTrial>false</IsBarrierTrial>
+    <ClubName>Brisbane Racing Club</ClubName>
+    <MeetingType>Metropolitan</MeetingType>
+  </Meeting>
+  <Meeting Id="131205">
+    <MeetingDate>2026-10-24</MeetingDate>
+    <TrackName>Ladbrokes Cannon Park</TrackName>
+    <IsBarrierTrial>false</IsBarrierTrial>
+    <ClubName>Cairns Jockey Club</ClubName>
+    <MeetingType>Provincial</MeetingType>
+  </Meeting>
+  <Meeting Id="131206">
+    <MeetingDate>2026-10-24</MeetingDate>
+    <TrackName>Doomben</TrackName>
+    <IsBarrierTrial>true</IsBarrierTrial>
+    <ClubName>Brisbane Racing Club</ClubName>
+    <MeetingType>Barrier Trial</MeetingType>
+  </Meeting>
+</Meetings>

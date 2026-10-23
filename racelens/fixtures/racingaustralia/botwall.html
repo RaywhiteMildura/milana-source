@@ -1,0 +1,16 @@
+<!--
+  CONSTRUCTED fixture (not a live capture). Models the verification interstitial that horseride records as
+  "blocked_by_source_verification" when racingaustralia.horse is hit too hard: a short HTML body with no
+  div.top / race-venue-date header. Wording is generic (Cloudflare-style); the adapter treats ANY page without
+  the RA meeting header, or shorter than 400 characters, or carrying challenge wording, as a bot wall.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head><title>Just a moment...</title><meta http-equiv="refresh" content="5"></head>
+<body>
+<div id="challenge"><h1>Just a moment...</h1>
+<p>Checking your browser before accessing racingaustralia.horse. Please enable JavaScript and cookies to continue.</p>
+<noscript>Enable JavaScript and cookies to continue</noscript>
+</div>
+</body>
+</html>

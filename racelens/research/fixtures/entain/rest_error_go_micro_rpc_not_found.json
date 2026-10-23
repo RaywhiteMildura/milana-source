@@ -1,0 +1,7 @@
+{
+  "_fixtureNote": "HIGH confidence (verbatim from DanielTomaro13/sportsdata-mcp Entain.md). go-micro gateway error envelope on api.ladbrokes.com.au / api.neds.com.au; 'id' leaks the upstream service (go.micro.api, neds.api.domain-featured, ...). Also seen: {code:400, detail:'filter is required', id:'neds.api.domain-featured', status:'Bad Request'} and {id:'go.micro.api', code:500, detail:'none available', status:'Internal Server Error'}.",
+  "code": 500,
+  "detail": "error during request: an error occurred while calling neds.api.racing.Racing.BatchGetMeetings: rpc: can't find method Racing.BatchGetMeetings",
+  "id": "go.micro.api",
+  "status": "Internal Server Error"
+}

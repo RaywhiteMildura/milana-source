@@ -1,0 +1,288 @@
+{
+  "_fixtureNote": "CONSTRUCTED, MEDIUM/LOW confidence on per-row fields. GET https://api.ladbrokes.com.au/v2/racing/meeting?date=2026-10-24&timezone=Australia%2FMelbourne. Top-level keys (compounds, domestic_countries, meetings, races, venues) and compounds[] row shape are verified in DanielTomaro13/sportsdata-mcp Entain.md (live 2026-05-25, ~415 KB). meetings[].category_id/name/race_ids and races[].number/advertised_start/name are the keys read by DanielTomaro13/sportsdata-agents corporate.py (live 2026-08-31; note 'number' NOT 'race_number'). l0rdwalker/betshock_v2 additionally reads meetings[].country=='AUS' and sends region=domestic. Everything else in a row (status, visible, feed ids, race_form, venues rows) is inferred from sibling endpoints and is LOW confidence.",
+  "compounds": {
+    "5f313902-85aa-50a3-a2c9-d7bdb1ddbeda": {
+      "id": "5f313902-85aa-50a3-a2c9-d7bdb1ddbeda",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "product_type_id": "e7388290-3a6e-4a6b-8c1d-0d2b5c9f7a21",
+      "name": "Quadrella",
+      "race_ids": [
+        "bdd0d2ee-f8f5-532b-8e6d-654c60cea8c4",
+        "0a5931c4-8552-5223-a15e-db35e53d55f3",
+        "26577c0a-332c-505d-b8b9-8119a365fbf7",
+        "9c2575c6-e9cc-5c2b-a472-24126d174c12"
+      ]
+    },
+    "abe644ed-7cff-52ff-9c09-f418057a9d18": {
+      "id": "abe644ed-7cff-52ff-9c09-f418057a9d18",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "product_type_id": "e7388290-3a6e-4a6b-8c1d-0d2b5c9f7a21",
+      "name": "EarlyQuadrella",
+      "race_ids": [
+        "b04b24ce-8208-5044-aead-1c122120b5c4",
+        "dc9e5c73-b372-5850-b4ef-235347ed8c3c",
+        "5dd91e10-8837-5f3e-b14e-3b8908527f41",
+        "68bf0618-0404-5527-a80f-1ebc03e2f5fe"
+      ]
+    },
+    "801e0ece-0e02-5be9-8467-2b1797f2dfb1": {
+      "id": "801e0ece-0e02-5be9-8467-2b1797f2dfb1",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "product_type_id": "0c3f4e62-7d7a-4d1c-9b65-5e1f2a3b4c5d",
+      "name": "DailyDouble",
+      "race_ids": [
+        "0a5931c4-8552-5223-a15e-db35e53d55f3",
+        "9c2575c6-e9cc-5c2b-a472-24126d174c12"
+      ]
+    }
+  },
+  "domestic_countries": "AUS,NZ,HK",
+  "meetings": {
+    "c1eb9968-e932-5b14-a0f8-d159722d5017": {
+      "id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Flemington",
+      "category_id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+      "country": "AUS",
+      "state": "VIC",
+      "venue_id": "ed806bb7-c901-546f-ad7d-58c04bcf427c",
+      "advertised_date": "2026-10-24T00:00:00Z",
+      "race_ids": [
+        "e143b009-7376-5899-982c-f79b4a46fbcd",
+        "b04b24ce-8208-5044-aead-1c122120b5c4",
+        "dc9e5c73-b372-5850-b4ef-235347ed8c3c",
+        "5dd91e10-8837-5f3e-b14e-3b8908527f41",
+        "68bf0618-0404-5527-a80f-1ebc03e2f5fe",
+        "bdd0d2ee-f8f5-532b-8e6d-654c60cea8c4",
+        "0a5931c4-8552-5223-a15e-db35e53d55f3",
+        "26577c0a-332c-505d-b8b9-8119a365fbf7",
+        "9c2575c6-e9cc-5c2b-a472-24126d174c12"
+      ],
+      "track_condition": "Good4",
+      "weather": "Fine",
+      "rail_position": "True Entire Circuit. (Pent: 4.98)",
+      "is_abandoned": false,
+      "visible": true,
+      "feed_id": "6067e8e3-758b-5b2c-8be6-e9ab3a4abddb"
+    },
+    "3d7daef6-53e5-581b-a0ed-28dfda54ee53": {
+      "id": "3d7daef6-53e5-581b-a0ed-28dfda54ee53",
+      "name": "Doomben",
+      "category_id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+      "country": "AUS",
+      "state": "QLD",
+      "venue_id": "091a3623-8b90-58f1-a7cd-03c9852aa7b8",
+      "advertised_date": "2026-10-24T00:00:00Z",
+      "race_ids": [
+        "25cf7338-d368-533c-a7d9-b348d1a3c8f5",
+        "75548bb8-65eb-5a6a-8240-0f50a2cfc695",
+        "b3fcdf2a-be4b-521b-9962-1d6b6bebd60f"
+      ],
+      "track_condition": "Soft5",
+      "weather": "Overcast",
+      "rail_position": "",
+      "is_abandoned": false,
+      "visible": true,
+      "feed_id": "9ca6fc35-a222-5406-a3df-f8837bc5763b"
+    }
+  },
+  "races": {
+    "e143b009-7376-5899-982c-f79b4a46fbcd": {
+      "id": "e143b009-7376-5899-982c-f79b4a46fbcd",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Carbine Club 3yo Mdn Plate",
+      "number": 1,
+      "advertised_start": "2026-10-24T01:40:00Z",
+      "actual_start": "2026-10-24T01:40:00Z",
+      "status": "OPEN",
+      "visible": true,
+      "feed_id": "f2add274-b741-51ba-bc4a-5b3f1e5579b8",
+      "feed_source_id": "82ad9e41-0e5c-4b1f-9f4a-2f3c0a8d1d11",
+      "auto_result": true,
+      "reminders_available": true,
+      "race_form": {
+        "distance": 1200,
+        "track_condition": "Good4",
+        "weather": "Fine",
+        "race_comment": ""
+      }
+    },
+    "b04b24ce-8208-5044-aead-1c122120b5c4": {
+      "id": "b04b24ce-8208-5044-aead-1c122120b5c4",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Macca's Run (Bm70) Hcp",
+      "number": 2,
+      "advertised_start": "2026-10-24T02:15:00Z",
+      "actual_start": "2026-10-24T02:15:00Z",
+      "status": "OPEN",
+      "visible": true,
+      "feed_id": "8cbdf7a9-7420-5012-96df-7d4152970bc0",
+      "feed_source_id": "82ad9e41-0e5c-4b1f-9f4a-2f3c0a8d1d11",
+      "auto_result": true,
+      "reminders_available": true,
+      "race_form": {
+        "distance": 1000,
+        "track_condition": "Good4",
+        "weather": "Fine",
+        "race_comment": ""
+      }
+    },
+    "dc9e5c73-b372-5850-b4ef-235347ed8c3c": {
+      "id": "dc9e5c73-b372-5850-b4ef-235347ed8c3c",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Members Lounge Fillies & Mares (Bm78) Hcp",
+      "number": 3,
+      "advertised_start": "2026-10-24T02:50:00Z",
+      "actual_start": "2026-10-24T02:50:00Z",
+      "status": "OPEN",
+      "visible": true,
+      "feed_id": "75be64d3-7b42-5221-a3d7-a1eaeb597e0e",
+      "feed_source_id": "82ad9e41-0e5c-4b1f-9f4a-2f3c0a8d1d11",
+      "auto_result": true,
+      "reminders_available": true,
+      "race_form": {
+        "distance": 1400,
+        "track_condition": "Good4",
+        "weather": "Fine",
+        "race_comment": ""
+      }
+    },
+    "5dd91e10-8837-5f3e-b14e-3b8908527f41": {
+      "id": "5dd91e10-8837-5f3e-b14e-3b8908527f41",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Straight Six Sprint (Bm84) Hcp",
+      "number": 4,
+      "advertised_start": "2026-10-24T03:25:00Z",
+      "actual_start": "2026-10-24T03:25:00Z",
+      "status": "OPEN",
+      "visible": true,
+      "feed_id": "4dc06d35-8c8d-5de0-b83e-a138ea648447",
+      "feed_source_id": "82ad9e41-0e5c-4b1f-9f4a-2f3c0a8d1d11",
+      "auto_result": true,
+      "reminders_available": true,
+      "race_form": {
+        "distance": 1200,
+        "track_condition": "Good4",
+        "weather": "Fine",
+        "race_comment": ""
+      }
+    },
+    "68bf0618-0404-5527-a80f-1ebc03e2f5fe": {
+      "id": "68bf0618-0404-5527-a80f-1ebc03e2f5fe",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Spring Staying Series Final (Bm90) Hcp",
+      "number": 5,
+      "advertised_start": "2026-10-24T04:00:00Z",
+      "actual_start": "2026-10-24T04:00:00Z",
+      "status": "OPEN",
+      "visible": true,
+      "feed_id": "764e0c5d-3c4a-5d27-9e40-44b19ca3b344",
+      "feed_source_id": "82ad9e41-0e5c-4b1f-9f4a-2f3c0a8d1d11",
+      "auto_result": true,
+      "reminders_available": true,
+      "race_form": {
+        "distance": 2500,
+        "track_condition": "Good4",
+        "weather": "Fine",
+        "race_comment": ""
+      }
+    },
+    "bdd0d2ee-f8f5-532b-8e6d-654c60cea8c4": {
+      "id": "bdd0d2ee-f8f5-532b-8e6d-654c60cea8c4",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Group 3 Harvest Stakes",
+      "number": 6,
+      "advertised_start": "2026-10-24T04:40:00Z",
+      "actual_start": "2026-10-24T04:40:00Z",
+      "status": "OPEN",
+      "visible": true,
+      "feed_id": "9a5d4f29-f828-5362-a569-c2d68b8c6322",
+      "feed_source_id": "82ad9e41-0e5c-4b1f-9f4a-2f3c0a8d1d11",
+      "auto_result": true,
+      "reminders_available": true,
+      "race_form": {
+        "distance": 1400,
+        "track_condition": "Good4",
+        "weather": "Fine",
+        "race_comment": ""
+      }
+    },
+    "0a5931c4-8552-5223-a15e-db35e53d55f3": {
+      "id": "0a5931c4-8552-5223-a15e-db35e53d55f3",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Flemington Spring Classic (Bm84) Hcp",
+      "number": 7,
+      "advertised_start": "2026-10-24T05:20:00Z",
+      "actual_start": "2026-10-24T05:20:00Z",
+      "status": "OPEN",
+      "visible": true,
+      "feed_id": "a0e06a0e-6d8d-51bd-985c-dab54570b762",
+      "feed_source_id": "82ad9e41-0e5c-4b1f-9f4a-2f3c0a8d1d11",
+      "auto_result": true,
+      "reminders_available": true,
+      "race_form": {
+        "distance": 1600,
+        "track_condition": "Good4",
+        "weather": "Fine",
+        "race_comment": ""
+      }
+    },
+    "26577c0a-332c-505d-b8b9-8119a365fbf7": {
+      "id": "26577c0a-332c-505d-b8b9-8119a365fbf7",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Riverbank Plate (Bm70) Hcp",
+      "number": 8,
+      "advertised_start": "2026-10-24T06:00:00Z",
+      "actual_start": "2026-10-24T06:00:00Z",
+      "status": "OPEN",
+      "visible": true,
+      "feed_id": "56f4a398-073c-5093-b12a-29ba796c320a",
+      "feed_source_id": "82ad9e41-0e5c-4b1f-9f4a-2f3c0a8d1d11",
+      "auto_result": true,
+      "reminders_available": true,
+      "race_form": {
+        "distance": 1800,
+        "track_condition": "Good4",
+        "weather": "Fine",
+        "race_comment": ""
+      }
+    },
+    "9c2575c6-e9cc-5c2b-a472-24126d174c12": {
+      "id": "9c2575c6-e9cc-5c2b-a472-24126d174c12",
+      "meeting_id": "c1eb9968-e932-5b14-a0f8-d159722d5017",
+      "name": "Ladbrokes Odds Boost Twilight (Bm64) Hcp",
+      "number": 9,
+      "advertised_start": "2026-10-24T06:40:00Z",
+      "actual_start": "2026-10-24T06:40:00Z",
+      "status": "OPEN",
+      "visible": true,
+      "feed_id": "5e5ecc4c-014d-50f6-b6f6-dca2a3c08af2",
+      "feed_source_id": "82ad9e41-0e5c-4b1f-9f4a-2f3c0a8d1d11",
+      "auto_result": true,
+      "reminders_available": true,
+      "race_form": {
+        "distance": 1100,
+        "track_condition": "Good4",
+        "weather": "Fine",
+        "race_comment": ""
+      }
+    }
+  },
+  "venues": {
+    "ed806bb7-c901-546f-ad7d-58c04bcf427c": {
+      "id": "ed806bb7-c901-546f-ad7d-58c04bcf427c",
+      "name": "Flemington",
+      "country": "AUS",
+      "state": "VIC",
+      "timezone": "Australia/Melbourne",
+      "slug": "flemington"
+    },
+    "091a3623-8b90-58f1-a7cd-03c9852aa7b8": {
+      "id": "091a3623-8b90-58f1-a7cd-03c9852aa7b8",
+      "name": "Doomben",
+      "country": "AUS",
+      "state": "QLD",
+      "timezone": "Australia/Brisbane",
+      "slug": "doomben"
+    }
+  }
+}

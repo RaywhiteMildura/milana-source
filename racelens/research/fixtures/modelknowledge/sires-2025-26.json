@@ -1,0 +1,25 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23 from search snippets (The Straight, TTR AusNZ, Breednet).",
+  "generalSiresPremiership2025_26": [
+    {"rank": 1, "sire": "Snitzel", "progenyEarnings": 26030662, "titleNumber": 5, "note": "posthumous; died June 2025; also 6th champion 2yo sire"},
+    {"rank": 2, "sire": "Zoustar", "progenyEarnings": 21800000},
+    {"rank": 3, "sire": "The Autumn Sun", "progenyEarnings": 18800000}
+  ],
+  "individualWinners2025_26": {"Zoustar": 169, "Capitalist": 169, "Toronado": 166, "finalOrderUnresolved": true},
+  "championFirstSeasonSire2025_26": "Home Affairs",
+  "recentChampions": {"2024-25": "Zoustar", "2021-22 to 2023-24": "I Am Invincible", "2020-21": "Written Tycoon"},
+  "sources": ["https://thestraight.com.au/snitzel-reclaims-sires-title-in-posthumous-premiership-triumph/", "https://www.ttrausnz.com.au/edition/2026-07-17/photo-finish-the-sires-premierships-coming-down-to-the-wire", "https://www.justhorseracing.com.au/news/breeding-news/zoustar-and-capitalist-fight-out-australias-individual-winners-premiership/901665/amp"],
+  "confidence": "medium",
+  "staminaInfluences": [
+    {"name": "Teofilo", "evidence": "sired three Melbourne Cup winners (Cross Counter, Twilight Payment, Without A Fight)", "source": "https://www.breednet.com.au/news/11980/melbourne-cup-pedigree-clues-to-find-the-winner", "confidence": "medium"},
+    {"name": "Galileo / Sadler's Wells line", "evidence": "main modern source of staying blood", "source": "https://www.breednet.com.au/news/34155/melbourne-cup-pedigree-analysis---do-it-yourself--", "confidence": "medium"},
+    {"name": "Zabeel", "evidence": "four Melbourne Cup winners", "source": "https://breednet.com.au/news/5641/bred-to-win-the-cup", "confidence": "medium"},
+    {"name": "Dansili (damsire)", "evidence": "credited with talented stayers", "confidence": "low"}
+  ],
+  "wetTrackSires": [
+    {"name": "Snitzel", "wetStrikeRate": 0.157, "confidence": "medium"},
+    {"name": "Zoustar", "note": "relatively weaker on wet (16.95% vs 20.56% good)", "confidence": "medium"},
+    {"name": "Shamus Award / So You Think / Pierro / Toronado", "note": "commonly cited wet sires - memory only", "confidence": "low"}
+  ],
+  "modelRule": "lineage factor is a fallback for runners without relevant form; weight 0.15"
+}

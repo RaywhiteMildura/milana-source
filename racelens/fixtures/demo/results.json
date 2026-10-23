@@ -1,0 +1,183 @@
+{
+  "_comment": "Results for the first three races of the FICTIONAL demo meeting. margins[i] = lengths behind the winner for placings[i]. finishingOrder is the complete order; placings are the first four.",
+  "meetingId": "2026-10-24:flemington",
+  "results": [
+    {
+      "raceNumber": 1,
+      "placings": [
+        [
+          6
+        ],
+        [
+          2
+        ],
+        [
+          9
+        ],
+        [
+          1
+        ]
+      ],
+      "finishingOrder": [
+        6,
+        2,
+        9,
+        1,
+        4,
+        8,
+        3,
+        10,
+        7,
+        5
+      ],
+      "margins": [
+        0,
+        1,
+        1.8,
+        2.4
+      ],
+      "time": "0:57.92",
+      "sectional600": "33.62",
+      "dividends": {
+        "win": 3.5,
+        "place": 1.7,
+        "quinella": 10.7,
+        "exacta": 20.3,
+        "trifecta": 597.8,
+        "first4": 5738.9
+      },
+      "inRunning": {
+        "1": "4-4-5",
+        "2": "2-2-2",
+        "6": "1-1-1",
+        "9": "6-6-4"
+      },
+      "winnerName": "Sugarloaf Sprite",
+      "winnerBarrier": 3,
+      "winnerSpeedMapPosition": "leader",
+      "favouriteNumber": 6,
+      "favouriteWon": true,
+      "note": "Favourite led throughout from barrier 3; runner-up sat second from barrier 1."
+    },
+    {
+      "raceNumber": 2,
+      "placings": [
+        [
+          8
+        ],
+        [
+          3
+        ],
+        [
+          1
+        ],
+        [
+          5
+        ]
+      ],
+      "finishingOrder": [
+        8,
+        3,
+        1,
+        5,
+        10,
+        2,
+        12,
+        4,
+        6,
+        11,
+        7,
+        9
+      ],
+      "margins": [
+        0,
+        0.5,
+        0.8,
+        2.3
+      ],
+      "time": "1:23.41",
+      "sectional600": "34.08",
+      "dividends": {
+        "win": 9,
+        "place": 3.25,
+        "quinella": 31.3,
+        "exacta": 59.5,
+        "trifecta": 254.4,
+        "first4": 2035.2
+      },
+      "inRunning": {
+        "1": "11-11-8",
+        "3": "1-1-2",
+        "5": "5-5-4",
+        "8": "2-2-1"
+      },
+      "winnerName": "Brunswick Bazaar",
+      "winnerBarrier": 4,
+      "winnerSpeedMapPosition": "on-pace",
+      "favouriteNumber": 1,
+      "favouriteWon": false,
+      "note": "Winner sat outside the leader from barrier 4; leader (barrier 2) held second; favourite ran on from last off a wide gate for third."
+    },
+    {
+      "raceNumber": 3,
+      "placings": [
+        [
+          2
+        ],
+        [
+          11
+        ],
+        [
+          6
+        ],
+        [
+          4
+        ]
+      ],
+      "finishingOrder": [
+        2,
+        11,
+        6,
+        4,
+        13,
+        1,
+        8,
+        3,
+        10,
+        14,
+        5,
+        12,
+        7,
+        9
+      ],
+      "margins": [
+        0,
+        0.75,
+        2,
+        2.3
+      ],
+      "time": "1:09.66",
+      "sectional600": "33.91",
+      "dividends": {
+        "win": 4,
+        "place": 1.85,
+        "quinella": 15.7,
+        "exacta": 29.8,
+        "trifecta": 594.5,
+        "first4": 3804.8
+      },
+      "inRunning": {
+        "2": "2-2-1",
+        "4": "3-3-3",
+        "6": "7-7-5",
+        "11": "1-1-2"
+      },
+      "winnerName": "Sapphire Sonnet",
+      "winnerBarrier": 5,
+      "winnerSpeedMapPosition": "on-pace",
+      "favouriteNumber": 2,
+      "favouriteWon": true,
+      "note": "Favourite trailed the leader from barrier 5 and took over at the 200m; leader from barrier 1 held second."
+    }
+  ]
+}

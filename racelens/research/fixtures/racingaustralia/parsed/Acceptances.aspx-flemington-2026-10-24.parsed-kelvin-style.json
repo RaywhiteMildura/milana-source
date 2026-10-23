@@ -1,0 +1,105 @@
+{
+  "1": {
+    "name": "aribyrnong Trial Stakes (1000 METRES) Times displayed in local time of Race Meeting",
+    "runners": [
+      {
+        "no": "1",
+        "horse": "TRUE LINE",
+        "jockey": "Jamie Kah",
+        "barrier": "4",
+        "weight": "58kg",
+        "probable_weight": "58kg",
+        "penalty": "",
+        "hcp_rating": "92",
+        "last10": "11"
+      },
+      {
+        "no": "2",
+        "horse": "HARBOUR SPRINT",
+        "jockey": "Craig Williams",
+        "barrier": "1",
+        "weight": "58kg",
+        "probable_weight": "58kg",
+        "penalty": "",
+        "hcp_rating": "",
+        "last10": "1"
+      },
+      {
+        "no": "3",
+        "horse": "GOLDEN STRAIGHT",
+        "jockey": "Mark Zahra",
+        "barrier": "8",
+        "weight": "56kg",
+        "probable_weight": "56kg",
+        "penalty": "",
+        "hcp_rating": "90",
+        "last10": "21"
+      },
+      {
+        "no": "6",
+        "horse": "MISSING ENTRY",
+        "jockey": "Blake Shinn",
+        "barrier": "7",
+        "weight": "58kg",
+        "probable_weight": "58kg",
+        "penalty": "",
+        "hcp_rating": "89",
+        "last10": "2x1"
+      },
+      {
+        "no": "17e",
+        "horse": "SPARE PART",
+        "jockey": "Celine Gaudray",
+        "barrier": "12",
+        "weight": "56kg",
+        "probable_weight": "54kg",
+        "penalty": "",
+        "hcp_rating": "",
+        "last10": "x4"
+      }
+    ],
+    "prize": 200000,
+    "grade": "LISTED"
+  },
+  "2": {
+    "name": "scot Vale Plate (1200 METRES) Times displayed in local time of Race Meeting",
+    "runners": [
+      {
+        "no": "1",
+        "horse": "ASCOT AVENUE",
+        "jockey": "Damian Lane",
+        "barrier": "6",
+        "weight": "61kg",
+        "probable_weight": "61kg",
+        "penalty": "",
+        "hcp_rating": "84",
+        "last10": "3x12104"
+      },
+      {
+        "no": "2",
+        "horse": "VALE VIEW",
+        "jockey": "Celine Gaudray",
+        "barrier": "11",
+        "weight": "59.5kg",
+        "probable_weight": "57.5kg",
+        "penalty": "1.5kg",
+        "hcp_rating": "81",
+        "last10": "21x5631"
+      },
+      {
+        "no": "4",
+        "horse": "RIVER BEND",
+        "jockey": "Harry Coffey",
+        "barrier": "2",
+        "weight": "58kg",
+        "probable_weight": "58kg",
+        "penalty": "",
+        "hcp_rating": "78",
+        "last10": "0x4421"
+      }
+    ],
+    "prize": 150000,
+    "grade": ""
+  },
+  "_fixtureNote": "Kelvin-Agents ra_fields.py acceptances() logic re-implemented 1:1 in JS and run on the constructed Acceptances fixture."
+}

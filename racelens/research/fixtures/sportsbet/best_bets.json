@@ -1,0 +1,49 @@
+{
+  "_fixtureNote": "CONSTRUCTED fixture (not a live capture). Venue Flemington / date 2026-10-24 and all ids, horses, jockeys, trainers and prices are invented. Field names, nesting and value formats follow the wire-verified shapes in research/sportsbet.md (sources cited there). Flemington competitionId 356 is invented. Endpoint: GET /apigw/sportsbook-racing/Sportsbook/Racing/BestBets (editorial tips, one book's opinion). Shape verified by sportsdata-mcp 2026-05-25.",
+  "meetings": [
+    {
+      "meetingId": 356,
+      "name": "Flemington",
+      "date": "2026-10-24",
+      "events": [
+        {
+          "eventId": 10950007,
+          "raceNumber": 7,
+          "startTime": 1792818600,
+          "tipsters": [
+            {
+              "name": "Scott McDonell",
+              "type": "MAIN",
+              "tips": [
+                {
+                  "type": "BEST",
+                  "sort": 1,
+                  "runnerNumber": 1,
+                  "name": "Velvet Thunder",
+                  "outcomeId": 1290000701,
+                  "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/058fbea5-5c9e-1137-c4a7-3ca0eb019730/116d3b1d-b098-8244-abd3-b795db498290.png"
+                },
+                {
+                  "type": "VALUE",
+                  "sort": 2,
+                  "runnerNumber": 3,
+                  "name": "Saltbush Queen",
+                  "outcomeId": 1290000703,
+                  "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/058fbea5-5c9e-1137-c4a7-3ca0eb019730/d67db19f-5c6d-4538-7808-2bc0e5b20752.png"
+                },
+                {
+                  "type": null,
+                  "sort": 3,
+                  "runnerNumber": 2,
+                  "name": "Northern Ledger",
+                  "outcomeId": 1290000702,
+                  "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/058fbea5-5c9e-1137-c4a7-3ca0eb019730/b1a5278a-2b35-734c-94b0-0880e7d8ac94.png"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

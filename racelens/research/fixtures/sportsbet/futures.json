@@ -1,0 +1,56 @@
+[
+  {
+    "_fixtureNote": "CONSTRUCTED fixture (not a live capture). Venue Flemington / date 2026-10-24 and all ids, horses, jockeys, trainers and prices are invented. Field names, nesting and value formats follow the wire-verified shapes in research/sportsbet.md (sources cited there). Flemington competitionId 356 is invented. Endpoint: GET /apigw/sportsbook-racing/Sportsbook/Racing/Futures - bare JSON ARRAY of future-event objects (classId 5 = Horse Racing: Futures - AUS/NZ). This note object would not be on the wire."
+  },
+  {
+    "id": 10960001,
+    "classId": 5,
+    "startTime": 1793678400,
+    "hasBIR": false,
+    "hasBIRStarted": false,
+    "numMarkets": 1,
+    "className": "Horse Racing: Futures - AUS/NZ",
+    "competitionId": 7710,
+    "competitionName": "Melbourne Cup - 3200m",
+    "bettingStatus": "PRICED",
+    "name": "Melbourne Cup - All In - Win Or Place",
+    "sort": 0,
+    "statusCode": "A",
+    "streamingAvailable": false,
+    "availableStreamingType": "sky",
+    "mbsAvailable": false,
+    "region": "Australia",
+    "regionGroup": "Aus/NZ",
+    "isInternational": false,
+    "topicLink": "Sportsbet/Sportsbook/Sports/5/Competitions/7710/Events/10960001",
+    "httpLink": "Sportsbook/Racing/Events/10960001/Racecard",
+    "markets": [
+      {
+        "id": 242600001,
+        "name": "Win or Place",
+        "marketType": "-",
+        "marketSort": "--",
+        "BIR": false,
+        "blurb": "Market is all, no refunds",
+        "livePriceAvailable": true,
+        "powerPlay": true,
+        "accMax": 25,
+        "accRestriction": "-",
+        "cashoutIcon": false,
+        "geolocationExclusion": [],
+        "statusCode": "A",
+        "sort": 0,
+        "mbsAvailable": false,
+        "topicLink": "Sportsbet/Sportsbook/Sports/5/Competitions/7710/Events/10960001/Markets/242600001",
+        "httpLink": "Sportsbook/Racing/Events/10960001/Markets/242600001"
+      }
+    ],
+    "type": "horse",
+    "category": "future",
+    "streaming": {
+      "replay": {
+        "provider": "sky"
+      }
+    }
+  }
+]

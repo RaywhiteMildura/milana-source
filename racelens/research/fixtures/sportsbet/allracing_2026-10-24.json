@@ -1,0 +1,479 @@
+{
+  "_fixtureNote": "CONSTRUCTED fixture (not a live capture). Venue Flemington / date 2026-10-24 and all ids, horses, jockeys, trainers and prices are invented. Field names, nesting and value formats follow the wire-verified shapes in research/sportsbet.md (sources cited there). Flemington competitionId 356 is invented. Endpoint: GET /apigw/sportsbook-racing/Sportsbook/Racing/AllRacing/2026-10-24. Trimmed to 2 horse meetings + 1 greyhound + 1 harness meeting; a real day has 20-60 meetings (~300 KB).",
+  "dates": [
+    {
+      "meetingDate": 1792760400,
+      "sections": [
+        {
+          "displayName": "Horses",
+          "displayOrder": 100,
+          "raceType": "horse",
+          "meetings": [
+            {
+              "id": 356,
+              "name": "Flemington",
+              "geolocationExclusion": [],
+              "classId": 1,
+              "isInternational": false,
+              "className": "Horses - Aus/NZ",
+              "regionName": "Australia",
+              "streamingAvailable": true,
+              "availableStreamingType": "sky",
+              "mbsAvailable": false,
+              "events": [
+                {
+                  "id": 10950001,
+                  "raceNumber": 1,
+                  "startTime": 1792805400,
+                  "name": "R1 Sportsbet Maiden Plate",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 10,
+                  "statusCode": "R",
+                  "streaming": {
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": false,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950001/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "RESULTED",
+                  "isInternational": false,
+                  "distance": "1200",
+                  "displayName": "R1 Flemington"
+                },
+                {
+                  "id": 10950002,
+                  "raceNumber": 2,
+                  "startTime": 1792807500,
+                  "name": "R2 Victorian Owners Hcp",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 20,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950002/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "1400",
+                  "displayName": "R2 Flemington"
+                },
+                {
+                  "id": 10950003,
+                  "raceNumber": 3,
+                  "startTime": 1792809600,
+                  "name": "R3 Straight Six Sprint (Bm78)",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 30,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950003/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "1200",
+                  "displayName": "R3 Flemington"
+                },
+                {
+                  "id": 10950004,
+                  "raceNumber": 4,
+                  "startTime": 1792811700,
+                  "name": "R4 Spring Fillies Stakes (G3)",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 40,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950004/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "1400",
+                  "displayName": "R4 Flemington"
+                },
+                {
+                  "id": 10950005,
+                  "raceNumber": 5,
+                  "startTime": 1792813800,
+                  "name": "R5 Carbine Club Hcp (Bm84)",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 50,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950005/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "1600",
+                  "displayName": "R5 Flemington"
+                },
+                {
+                  "id": 10950006,
+                  "raceNumber": 6,
+                  "startTime": 1792816200,
+                  "name": "R6 Riverbank Trophy (G2)",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 60,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950006/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "2000",
+                  "displayName": "R6 Flemington"
+                },
+                {
+                  "id": 10950007,
+                  "raceNumber": 7,
+                  "startTime": 1792818600,
+                  "name": "R7 Flemington Mile (G1)",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 70,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950007/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "1600",
+                  "displayName": "R7 Flemington"
+                },
+                {
+                  "id": 10950008,
+                  "raceNumber": 8,
+                  "startTime": 1792821000,
+                  "name": "R8 Twilight Sprint (Bm70)",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 80,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950008/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "1100",
+                  "displayName": "R8 Flemington"
+                }
+              ]
+            },
+            {
+              "id": 580,
+              "name": "Rosehill",
+              "geolocationExclusion": [],
+              "classId": 1,
+              "isInternational": false,
+              "className": "Horses - Aus/NZ",
+              "regionName": "Australia",
+              "streamingAvailable": true,
+              "availableStreamingType": "sky",
+              "mbsAvailable": false,
+              "events": [
+                {
+                  "id": 10950101,
+                  "raceNumber": 1,
+                  "startTime": 1792804800,
+                  "name": "R1 TAB Highway Hcp (C3)",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 10,
+                  "statusCode": "R",
+                  "streaming": {
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": false,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950101/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "RESULTED",
+                  "isInternational": false,
+                  "distance": "1200",
+                  "displayName": "R1 Flemington"
+                },
+                {
+                  "id": 10950102,
+                  "raceNumber": 2,
+                  "startTime": 1792806900,
+                  "name": "R2 Spring Maiden Plate",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 20,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950102/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "1400",
+                  "displayName": "R2 Flemington"
+                }
+              ]
+            },
+            {
+              "id": 583,
+              "name": "Ruakaka",
+              "geolocationExclusion": [],
+              "classId": 1,
+              "isInternational": false,
+              "className": "Horses - Aus/NZ",
+              "regionName": "New Zealand",
+              "streamingAvailable": false,
+              "availableStreamingType": "sky",
+              "mbsAvailable": false,
+              "events": [
+                {
+                  "id": 10950201,
+                  "raceNumber": 1,
+                  "startTime": 1792799100,
+                  "name": "R1 Bream Bay Mdn",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 10,
+                  "statusCode": "R",
+                  "streaming": {
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": false,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950201/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "horse",
+                  "category": "standard",
+                  "bettingStatus": "RESULTED",
+                  "isInternational": false,
+                  "distance": "1200",
+                  "displayName": "R1 Flemington"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "displayName": "Greyhounds",
+          "displayOrder": 200,
+          "raceType": "greyhound",
+          "meetings": [
+            {
+              "id": 7001,
+              "name": "The Meadows",
+              "geolocationExclusion": [],
+              "classId": 4,
+              "isInternational": false,
+              "className": "Greyhound Racing",
+              "regionName": "Australia",
+              "streamingAvailable": false,
+              "availableStreamingType": "sky",
+              "mbsAvailable": false,
+              "events": [
+                {
+                  "id": 10950301,
+                  "raceNumber": 1,
+                  "startTime": 1792829100,
+                  "name": "R1 Watchdog Maiden",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 10,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950301/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "greyhound",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "525",
+                  "displayName": "R1 The Meadows"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "displayName": "Harness",
+          "displayOrder": 300,
+          "raceType": "harness",
+          "meetings": [
+            {
+              "id": 8001,
+              "name": "Melton",
+              "geolocationExclusion": [],
+              "classId": 3,
+              "isInternational": false,
+              "className": "Harness Racing",
+              "regionName": "Australia",
+              "streamingAvailable": false,
+              "availableStreamingType": "sky",
+              "mbsAvailable": false,
+              "events": [
+                {
+                  "id": 10950401,
+                  "raceNumber": 1,
+                  "startTime": 1792828200,
+                  "name": "R1 Melton Pace",
+                  "hasBIR": true,
+                  "hasBIRStarted": false,
+                  "sort": 10,
+                  "statusCode": "A",
+                  "streaming": {
+                    "liveStream": {
+                      "provider": "sky",
+                      "channel": "1"
+                    },
+                    "replay": {
+                      "provider": "sky"
+                    }
+                  },
+                  "streamingAvailable": true,
+                  "availableStreamingType": "sky",
+                  "mbsAvailable": false,
+                  "httpLink": "Sportsbook/Racing/Events/10950401/Racecard",
+                  "regionGroup": "Aus/NZ",
+                  "type": "harness",
+                  "category": "standard",
+                  "bettingStatus": "PRICED",
+                  "isInternational": false,
+                  "distance": "2240",
+                  "displayName": "R1 Melton"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

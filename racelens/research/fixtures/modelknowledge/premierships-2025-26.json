@@ -1,0 +1,24 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23 from search snippets of season-end reports (season ended 2026-07-31). Items marked 'unresolved' need live lookup, e.g. https://t.racingaustralia.horse/FreeServices/Premierships.aspx?State=VIC",
+  "season": "2025-26",
+  "trainers": {
+    "nationalChampion": {"name": "Chris Waller", "wins": 379, "group1Wins": 22, "group1RacesInSeason": 76, "sydneyTitlesConsecutive": 16, "sources": ["https://www.ttrausnz.com.au/edition/2026-08-03/the-australian-season-that-was-202526-summary", "https://www.ttrausnz.com.au/edition/2026-07-31/the-season-in-numbers-who-dominated-australias-black-type"], "confidence": "medium"},
+    "melbourneMetro": {"name": "Ciaron Maher", "titleNumber": 6, "prevSeasonWins": 329.5, "prevSeasonStrikeRate": 0.136, "flemingtonRunners2025_26": 196, "sources": ["https://www.ttrausnz.com.au/edition/2026-08-03/the-australian-season-that-was-202526-summary", "https://cms.vrc.com.au/latest-news/202526-season-in-review-stars-stats-and-standouts/"], "confidence": "medium"},
+    "partialSeasonStrikeRates": {"asOf": "early 2026", "ChrisWaller": {"strikeRate": 0.126, "starts": 541}, "CiaronMaher": {"strikeRate": 0.119, "starts": 159}, "source": "https://proventhoroughbreds.com.au/?p=33456", "confidence": "low"},
+    "unresolved": ["Gai Waterhouse & Adrian Bott", "Anthony & Sam Freedman", "James Cummings", "Annabel Neasham & Rob Archibald", "Lindsay Park (Ben, Will & JD Hayes) final total"]
+  },
+  "jockeys": {
+    "sydneyMetro": {"name": "James McDonald", "winsAt2026_06_27": 88, "runnersUp": {"Zac Lloyd": 71, "Tommy Berry": 68}, "group1Wins": 17, "group1Note": "seasonal record, all for Waller", "sources": ["https://www.ttrausnz.com.au/edition/2026-06-27/premiership-races-heating-up-as-jockeys-eye-season-honours", "https://www.ttrausnz.com.au/edition/2026-07-31/the-season-in-numbers-who-dominated-australias-black-type"], "confidence": "medium"},
+    "melbourneMetro": {"name": "Craig Williams", "titleNumber": 10, "scobieBreasleyMedals": 6, "finalWinsTally": null, "source": "https://www.ttrausnz.com.au/edition/2026-08-10/daily-news-wrap", "confidence": "medium", "note": "single source"},
+    "brisbaneMetro": {"name": "Ben Thompson", "note": "first Brisbane title after Hong Kong return", "source": "https://www.justhorseracing.com.au/news/australian-racing/ben-thompson-headlines-dramatic-shake-up-in-brisbane-jockeys-premiership/901694", "confidence": "medium"},
+    "notableStrikeRates": [{"name": "Ryan Maloney", "metroWins": 34, "strikeRate": 0.279, "asOf": "2025-11", "source": "https://www.justhorseracing.com.au/news/australian-racing/ben-thompson-flying-high-in-brisbane/898450/amp", "confidence": "medium"}, {"name": "Damian Lane", "context": "Pakenham", "strikeRate": 0.22, "source": "https://www.racingandsports.com/news/betting/horse-racing-tips/2024-01-18/betfair-hub-expert-racing-tips-18th-january-2024/639523", "confidence": "low"}],
+    "apprentices": {
+      "victoria": {"name": "Luke Cartwright", "titles": ["Victorian Apprentice", "Metropolitan Apprentice"], "source": "https://www.ttrausnz.com.au/edition/2026-08-10/daily-news-wrap", "confidence": "medium"},
+      "sydney": {"name": "Siena Grima", "conflict": "same roundup credits Braith Nock with the NSW Apprentice Jockey Premiership; both on 31 metro wins in June", "confidence": "low"},
+      "brisbane": {"name": "Jace McMurray", "winsLateSeason": 37.5, "confidence": "low"}
+    },
+    "awards": {"scobieBreasley2024_25": "Blake Shinn (4th)", "vjaMostValuable2025_26": "Jamie Mott", "vjaRisingStar2025_26": "Logan Bates", "source": "https://www.racingvictoria.com.au/news/2025/08/09/another-win-for-shinn-as-blakes-brilliance-rewarded-with-fourth-scobie-breasley-medal", "confidence": "medium"},
+    "unresolved": ["Damian Lane", "Blake Shinn", "Mark Zahra", "Jamie Kah", "Ethan Brown", "national jockeys premiership"]
+  },
+  "tierGuidance": {"eliteMetroJockeyStrikeRate": [0.18, 0.28], "averageJockeyStrikeRate": [0.08, 0.10], "eliteTrainerOverallStrikeRate": [0.12, 0.14], "confidence": "low"}
+}

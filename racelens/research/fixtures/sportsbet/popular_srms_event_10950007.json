@@ -1,0 +1,39 @@
+{
+  "_fixtureNote": "CONSTRUCTED fixture (not a live capture). Venue Flemington / date 2026-10-24 and all ids, horses, jockeys, trainers and prices are invented. Field names, nesting and value formats follow the wire-verified shapes in research/sportsbet.md (sources cited there). Flemington competitionId 356 is invented. Endpoint: GET /apigw/sportsbook-racing/Sportsbook/Racing/PopularSrms?hierarchyLevel=event&ids=10950007&maxItems=5&minUniqueCount=5&sortBy=popularity&popularsrms=true. Shape verified by sportsdata-mcp 2026-05-25; `events[]` carries full market trees on the wire (trimmed here).",
+  "popularSRMs": [
+    {
+      "ranking": 1,
+      "backers": 7,
+      "lastPrices": [
+        6.2,
+        6.7
+      ],
+      "eventId": 10950007,
+      "marketIds": [
+        260900070,
+        260900071
+      ],
+      "selections": [
+        1290000701,
+        1290000702,
+        1290000708
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": 10950007,
+      "name": "R7 Flemington Mile (G1)",
+      "startTime": 1792818600,
+      "raceNumber": 7,
+      "statusCode": "A",
+      "mbs": false,
+      "competitionId": 356,
+      "competitionName": "Flemington",
+      "classId": 1,
+      "className": "Horses - Aus/NZ",
+      "streamingChannel": "1",
+      "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/356/Events/10950007"
+    }
+  ]
+}

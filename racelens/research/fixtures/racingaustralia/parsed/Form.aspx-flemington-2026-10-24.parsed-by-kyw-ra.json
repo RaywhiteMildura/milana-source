@@ -1,0 +1,1041 @@
+{
+  "_fixtureNote": "Output of the UNMODIFIED agends-afk/KaiYingWinning supabase/functions/kyw-sync/ra.js parseForm() run under Node 22 on fixtures/racingaustralia/Form.aspx-flemington-2026-10-24-constructed.html. Shows the normalised shape a RaceLens adapter can target. rec arrays are [starts, wins, placings(2nd+3rd)] as that app wants; time is seconds; prices[] opening..SP with sp = last; the emergency runner 17e is absent because that parser matches horse-number with \\d+ (use (\\d+)(e?) in RaceLens).",
+  "key": "2026Oct24,VIC,Flemington",
+  "date": "2026-10-24",
+  "state": "VIC",
+  "venue": "Flemington",
+  "condition": "Good 4",
+  "rail": "True Entire Circuit",
+  "weather": "Fine",
+  "races": [
+    {
+      "no": 1,
+      "name": "Maribyrnong Trial Stakes",
+      "time": "12:40PM",
+      "distance": 1000,
+      "class": null,
+      "conditions": "Prize money contribution totalling 3.5% will be directed to jockey, equine and participant welfare prior to distribution LISTED",
+      "prize": 200000,
+      "runners": [
+        {
+          "no": 1,
+          "name": "TRUE LINE",
+          "age": 2,
+          "colour": "bay",
+          "sex": "C",
+          "gear": "Blinkers FIRST TIME",
+          "trainer": "Ciaron Maher",
+          "stable": "Ballarat",
+          "jockey": "Jamie Kah",
+          "weight": 58,
+          "barrier": 4,
+          "rec": {
+            "career": [
+              4,
+              3,
+              1
+            ],
+            "firstUp": [
+              1,
+              1,
+              0
+            ],
+            "secondUp": [
+              1,
+              0,
+              1
+            ],
+            "track": [
+              1,
+              1,
+              0
+            ],
+            "dist": [
+              2,
+              2,
+              0
+            ],
+            "trackDist": [
+              1,
+              1,
+              0
+            ],
+            "firm": [
+              0,
+              0,
+              0
+            ],
+            "good": [
+              3,
+              2,
+              1
+            ],
+            "soft": [
+              1,
+              1,
+              0
+            ],
+            "heavy": [
+              0,
+              0,
+              0
+            ],
+            "synth": [
+              0,
+              0,
+              0
+            ]
+          },
+          "prize": 212400,
+          "runs": [
+            {
+              "trial": false,
+              "pos": 1,
+              "of": 9,
+              "venue": "CAUL",
+              "date": "2026-10-10",
+              "distance": 1000,
+              "cond": "Good4",
+              "cls": "2YO SW",
+              "prize": 150000,
+              "won": 90000,
+              "jockey": "Jamie Kah",
+              "weight": 57,
+              "claim": null,
+              "barrier": 2,
+              "first": "True Line",
+              "second": "Rail Runner",
+              "third": null,
+              "time": 57.45,
+              "l600": 33.8,
+              "margin": 0.75,
+              "p800": 3,
+              "p400": 1,
+              "prices": [
+                2.4,
+                2.3,
+                2.2,
+                2.1
+              ],
+              "sp": 2.1,
+              "eqFav": false
+            },
+            {
+              "trial": false,
+              "pos": 1,
+              "of": 7,
+              "venue": "FLEM",
+              "date": "2026-09-19",
+              "distance": 1000,
+              "cond": "Good3",
+              "cls": "2YO MDN-SW",
+              "prize": 75000,
+              "won": 41250,
+              "jockey": "Jamie Kah",
+              "weight": 57,
+              "claim": null,
+              "barrier": 5,
+              "first": "True Line",
+              "second": "Second Best",
+              "third": "Third Wheel",
+              "time": 56.98,
+              "l600": 33.52,
+              "margin": 1.5,
+              "p800": 2,
+              "p400": 1,
+              "prices": [
+                3.1,
+                2.8,
+                2.6,
+                2.5
+              ],
+              "sp": 2.5,
+              "eqFav": false
+            },
+            {
+              "trial": false,
+              "pos": 2,
+              "of": 8,
+              "venue": "MV",
+              "date": "2026-08-29",
+              "distance": 1000,
+              "cond": "Soft5",
+              "cls": "2YO MDN-SW",
+              "prize": 60000,
+              "won": 11400,
+              "jockey": "Mark Zahra",
+              "weight": 57,
+              "claim": 55,
+              "barrier": 1,
+              "first": "Quick Start",
+              "second": "True Line",
+              "third": null,
+              "time": 58.6,
+              "l600": 34.7,
+              "margin": 0.3,
+              "p800": 4,
+              "p400": 3,
+              "prices": [
+                4.8,
+                4.4,
+                4.2,
+                4
+              ],
+              "sp": 4,
+              "eqFav": true
+            },
+            {
+              "trial": true,
+              "pos": 1,
+              "of": 6,
+              "venue": "CRAN",
+              "date": "2026-08-15",
+              "distance": 800,
+              "cond": "Good4",
+              "cls": "2YO TRL",
+              "prize": 0,
+              "won": null,
+              "jockey": "Jamie Kah",
+              "weight": 0,
+              "claim": null,
+              "barrier": 3,
+              "first": "True Line",
+              "second": "Trial Horse",
+              "third": null,
+              "time": 47.1,
+              "l600": 34.1,
+              "margin": 2,
+              "p800": null,
+              "p400": null,
+              "prices": null,
+              "sp": null
+            }
+          ],
+          "scratched": false,
+          "last10": "11",
+          "hcp": 92,
+          "penalty": ""
+        },
+        {
+          "no": 2,
+          "name": "HARBOUR SPRINT (NZ)",
+          "age": 2,
+          "colour": "brown",
+          "sex": "C",
+          "gear": "Nil",
+          "trainer": "Anthony & Sam Freedman",
+          "stable": "Pinecliff",
+          "jockey": "Craig Williams",
+          "weight": 58,
+          "barrier": 1,
+          "rec": {
+            "career": [
+              1,
+              1,
+              0
+            ],
+            "firstUp": [
+              1,
+              1,
+              0
+            ],
+            "secondUp": [
+              0,
+              0,
+              0
+            ],
+            "track": [
+              0,
+              0,
+              0
+            ],
+            "dist": [
+              0,
+              0,
+              0
+            ],
+            "trackDist": [
+              0,
+              0,
+              0
+            ],
+            "firm": [
+              0,
+              0,
+              0
+            ],
+            "good": [
+              1,
+              1,
+              0
+            ],
+            "soft": [
+              0,
+              0,
+              0
+            ],
+            "heavy": [
+              0,
+              0,
+              0
+            ],
+            "synth": [
+              0,
+              0,
+              0
+            ]
+          },
+          "prize": 55000,
+          "runs": [
+            {
+              "trial": false,
+              "pos": 1,
+              "of": 12,
+              "venue": "SAND",
+              "date": "2026-10-07",
+              "distance": 1100,
+              "cond": "Good4",
+              "cls": "2YO MDN-SW",
+              "prize": 100000,
+              "won": 55000,
+              "jockey": "Craig Williams",
+              "weight": 57,
+              "claim": null,
+              "barrier": 9,
+              "first": "Harbour Sprint",
+              "second": "Lane Way",
+              "third": null,
+              "time": 64.9,
+              "l600": 34.15,
+              "margin": 2.25,
+              "p800": 1,
+              "p400": 1,
+              "prices": [
+                6,
+                5.5,
+                5,
+                4.6
+              ],
+              "sp": 4.6,
+              "eqFav": false
+            },
+            {
+              "trial": false,
+              "pos": 2,
+              "of": 5,
+              "venue": "FLEM",
+              "date": "2026-09-25",
+              "distance": 800,
+              "cond": "Good4",
+              "cls": "2YO JUMPOUT",
+              "prize": 0,
+              "won": null,
+              "jockey": "Craig Williams",
+              "weight": 0,
+              "claim": null,
+              "barrier": 2,
+              "first": "Fast Jumper",
+              "second": "Harbour Sprint",
+              "third": null,
+              "time": 48.2,
+              "l600": 35,
+              "margin": 1,
+              "p800": null,
+              "p400": null,
+              "prices": null,
+              "sp": null
+            }
+          ],
+          "scratched": false,
+          "last10": "1",
+          "hcp": null,
+          "penalty": ""
+        },
+        {
+          "no": 3,
+          "name": "GOLDEN STRAIGHT",
+          "age": 2,
+          "colour": "chestnut",
+          "sex": "F",
+          "gear": "Ear Muffs (Pre-Race Only) FIRST TIME, Tongue Tie FIRST TIME",
+          "trainer": "Chris Waller",
+          "stable": "Flemington",
+          "jockey": "Mark Zahra",
+          "weight": 56,
+          "barrier": 8,
+          "rec": {
+            "career": [
+              2,
+              1,
+              1
+            ],
+            "firstUp": [
+              1,
+              0,
+              1
+            ],
+            "secondUp": [
+              1,
+              1,
+              0
+            ],
+            "track": [
+              0,
+              0,
+              0
+            ],
+            "dist": [
+              1,
+              0,
+              1
+            ],
+            "trackDist": [
+              0,
+              0,
+              0
+            ],
+            "firm": [
+              0,
+              0,
+              0
+            ],
+            "good": [
+              1,
+              1,
+              0
+            ],
+            "soft": [
+              1,
+              0,
+              1
+            ],
+            "heavy": [
+              0,
+              0,
+              0
+            ],
+            "synth": [
+              0,
+              0,
+              0
+            ]
+          },
+          "prize": 92500,
+          "runs": [
+            {
+              "trial": false,
+              "pos": 1,
+              "of": 8,
+              "venue": "RAND",
+              "date": "2026-10-03",
+              "distance": 1100,
+              "cond": "Good4",
+              "cls": "2YO HCP",
+              "prize": 100000,
+              "won": 56500,
+              "jockey": "James McDonald",
+              "weight": 56,
+              "claim": null,
+              "barrier": 3,
+              "first": "Golden Straight",
+              "second": "Sydney Sider",
+              "third": null,
+              "time": 64.1,
+              "l600": 34.05,
+              "margin": 1.25,
+              "p800": 2,
+              "p400": 2,
+              "prices": [
+                3.5,
+                3.3,
+                3.2,
+                3
+              ],
+              "sp": 3,
+              "eqFav": false
+            },
+            {
+              "trial": false,
+              "pos": 2,
+              "of": 10,
+              "venue": "RAND",
+              "date": "2026-09-12",
+              "distance": 1000,
+              "cond": "Soft6",
+              "cls": "2YO MDN-SW",
+              "prize": 100000,
+              "won": 18000,
+              "jockey": "James McDonald",
+              "weight": 55,
+              "claim": null,
+              "barrier": 9,
+              "first": "Harbour Lights",
+              "second": "Golden Straight",
+              "third": null,
+              "time": 58.21,
+              "l600": 34.4,
+              "margin": 0.5,
+              "p800": 7,
+              "p400": 5,
+              "prices": [
+                6,
+                6.5,
+                7,
+                7.5
+              ],
+              "sp": 7.5,
+              "eqFav": false
+            }
+          ],
+          "scratched": false,
+          "last10": "21",
+          "hcp": 90,
+          "penalty": ""
+        },
+        {
+          "no": 6,
+          "name": "MISSING ENTRY",
+          "age": 2,
+          "colour": "brown",
+          "sex": "G",
+          "gear": "Nil",
+          "trainer": "Chris Waller",
+          "stable": "Flemington",
+          "jockey": "Blake Shinn",
+          "weight": 58,
+          "barrier": 7,
+          "rec": {
+            "career": [
+              3,
+              2,
+              1
+            ],
+            "firstUp": [
+              1,
+              1,
+              0
+            ],
+            "secondUp": [
+              1,
+              0,
+              0
+            ],
+            "track": [
+              1,
+              0,
+              1
+            ],
+            "dist": [
+              2,
+              1,
+              0
+            ],
+            "trackDist": [
+              0,
+              0,
+              0
+            ],
+            "firm": [
+              0,
+              0,
+              0
+            ],
+            "good": [
+              2,
+              2,
+              0
+            ],
+            "soft": [
+              1,
+              0,
+              1
+            ],
+            "heavy": [
+              0,
+              0,
+              0
+            ],
+            "synth": [
+              0,
+              0,
+              0
+            ]
+          },
+          "prize": 96000,
+          "runs": [
+            {
+              "trial": false,
+              "pos": 3,
+              "of": 11,
+              "venue": "FLEM",
+              "date": "2026-10-04",
+              "distance": 1100,
+              "cond": "Good3",
+              "cls": "2YO HCP",
+              "prize": 130000,
+              "won": 11700,
+              "jockey": "Blake Shinn",
+              "weight": 57.5,
+              "claim": null,
+              "barrier": 10,
+              "first": "Fast Lane",
+              "second": "Second Lane",
+              "third": "Missing Entry",
+              "time": 63.55,
+              "l600": 33.9,
+              "margin": 1.9,
+              "p800": 10,
+              "p400": 8,
+              "prices": [
+                12,
+                13,
+                14,
+                15
+              ],
+              "sp": 15,
+              "eqFav": false
+            }
+          ],
+          "scratched": true,
+          "last10": "2x1",
+          "hcp": 89,
+          "penalty": ""
+        }
+      ]
+    },
+    {
+      "no": 2,
+      "name": "Ascot Vale Plate",
+      "time": "1:15PM",
+      "distance": 1200,
+      "class": null,
+      "conditions": "Prize money contribution totalling 3.5% will be directed to jockey, equine and participant welfare prior to distribution",
+      "prize": 150000,
+      "runners": [
+        {
+          "no": 1,
+          "name": "ASCOT AVENUE",
+          "age": 5,
+          "colour": "bay",
+          "sex": "G",
+          "gear": "Nil",
+          "trainer": "Ciaron Maher",
+          "stable": "Ballarat",
+          "jockey": "Damian Lane",
+          "weight": 61,
+          "barrier": 6,
+          "rec": {
+            "career": [
+              21,
+              6,
+              7
+            ],
+            "firstUp": [
+              4,
+              2,
+              1
+            ],
+            "secondUp": [
+              4,
+              1,
+              1
+            ],
+            "track": [
+              5,
+              2,
+              2
+            ],
+            "dist": [
+              9,
+              3,
+              3
+            ],
+            "trackDist": [
+              3,
+              1,
+              1
+            ],
+            "firm": [
+              0,
+              0,
+              0
+            ],
+            "good": [
+              15,
+              5,
+              5
+            ],
+            "soft": [
+              5,
+              1,
+              2
+            ],
+            "heavy": [
+              1,
+              0,
+              0
+            ],
+            "synth": [
+              0,
+              0,
+              0
+            ]
+          },
+          "prize": 486300,
+          "runs": [
+            {
+              "trial": false,
+              "pos": 4,
+              "of": 12,
+              "venue": "CAUL",
+              "date": "2026-10-10",
+              "distance": 1200,
+              "cond": "Soft5",
+              "cls": "BM84",
+              "prize": 130000,
+              "won": 6500,
+              "jockey": "Damian Lane",
+              "weight": 60.5,
+              "claim": null,
+              "barrier": 12,
+              "first": "Caulfield Cat",
+              "second": "Heath Road",
+              "third": "Glen Eira",
+              "time": 70.55,
+              "l600": 34.95,
+              "margin": 1.4,
+              "p800": 9,
+              "p400": 7,
+              "prices": [
+                7,
+                7.5,
+                8,
+                8.5
+              ],
+              "sp": 8.5,
+              "eqFav": false
+            },
+            {
+              "trial": false,
+              "pos": 1,
+              "of": 10,
+              "venue": "FLEM",
+              "date": "2026-09-19",
+              "distance": 1200,
+              "cond": "Good4",
+              "cls": "BM78",
+              "prize": 130000,
+              "won": 71500,
+              "jockey": "Damian Lane",
+              "weight": 60,
+              "claim": null,
+              "barrier": 4,
+              "first": "Ascot Avenue",
+              "second": "Straight Shooter",
+              "third": null,
+              "time": 69.88,
+              "l600": 33.6,
+              "margin": 0.8,
+              "p800": 5,
+              "p400": 3,
+              "prices": [
+                4.6,
+                4.4,
+                4.2,
+                4.4
+              ],
+              "sp": 4.4,
+              "eqFav": false
+            },
+            {
+              "trial": false,
+              "pos": 10,
+              "of": 14,
+              "venue": "MV",
+              "date": "2026-06-07",
+              "distance": 1200,
+              "cond": "Heavy8",
+              "cls": "BM84",
+              "prize": 130000,
+              "won": 0,
+              "jockey": "Damian Lane",
+              "weight": 59,
+              "claim": null,
+              "barrier": 2,
+              "first": "Mud Lark",
+              "second": "Puddle Jumper",
+              "third": null,
+              "time": 74.1,
+              "l600": 37.2,
+              "margin": 8.5,
+              "p800": 3,
+              "p400": 4,
+              "prices": [
+                5,
+                6,
+                6.5,
+                7
+              ],
+              "sp": 7,
+              "eqFav": false
+            }
+          ],
+          "scratched": false,
+          "last10": "3x12104",
+          "hcp": 84,
+          "penalty": ""
+        },
+        {
+          "no": 2,
+          "name": "VALE VIEW",
+          "age": 4,
+          "colour": "grey",
+          "sex": "M",
+          "gear": "Cross-over Nose Band FIRST TIME",
+          "trainer": "Phillip Stokes",
+          "stable": "Pakenham",
+          "jockey": "Celine Gaudray",
+          "weight": 59.5,
+          "barrier": 11,
+          "rec": {
+            "career": [
+              13,
+              4,
+              4
+            ],
+            "firstUp": [
+              3,
+              1,
+              1
+            ],
+            "secondUp": [
+              3,
+              1,
+              1
+            ],
+            "track": [
+              2,
+              0,
+              1
+            ],
+            "dist": [
+              6,
+              2,
+              2
+            ],
+            "trackDist": [
+              1,
+              0,
+              1
+            ],
+            "firm": [
+              0,
+              0,
+              0
+            ],
+            "good": [
+              9,
+              3,
+              3
+            ],
+            "soft": [
+              4,
+              1,
+              1
+            ],
+            "heavy": [
+              0,
+              0,
+              0
+            ],
+            "synth": [
+              0,
+              0,
+              0
+            ]
+          },
+          "prize": 241900,
+          "runs": [
+            {
+              "trial": false,
+              "pos": 1,
+              "of": 9,
+              "venue": "PAKE",
+              "date": "2026-10-08",
+              "distance": 1200,
+              "cond": "Good4",
+              "cls": "BM70",
+              "prize": 50000,
+              "won": 27500,
+              "jockey": "Celine Gaudray",
+              "weight": 58,
+              "claim": 56,
+              "barrier": 3,
+              "first": "Vale View",
+              "second": "Pakenham Pride",
+              "third": null,
+              "time": 70.9,
+              "l600": 34.2,
+              "margin": 1,
+              "p800": 1,
+              "p400": 1,
+              "prices": [
+                3.2,
+                3,
+                2.9,
+                2.8
+              ],
+              "sp": 2.8,
+              "eqFav": false
+            }
+          ],
+          "scratched": false,
+          "last10": "21x5631",
+          "hcp": 81,
+          "penalty": "1.5kg"
+        },
+        {
+          "no": 4,
+          "name": "RIVER BEND (NZ)",
+          "age": 6,
+          "colour": "bay",
+          "sex": "G",
+          "gear": "Blinkers OFF FIRST TIME, Winkers FIRST TIME",
+          "trainer": "Danny O'Brien",
+          "stable": "Flemington",
+          "jockey": "Harry Coffey",
+          "weight": 58,
+          "barrier": 2,
+          "rec": {
+            "career": [
+              28,
+              5,
+              10
+            ],
+            "firstUp": [
+              5,
+              0,
+              3
+            ],
+            "secondUp": [
+              5,
+              1,
+              1
+            ],
+            "track": [
+              6,
+              1,
+              2
+            ],
+            "dist": [
+              12,
+              3,
+              4
+            ],
+            "trackDist": [
+              3,
+              1,
+              1
+            ],
+            "firm": [
+              0,
+              0,
+              0
+            ],
+            "good": [
+              18,
+              3,
+              7
+            ],
+            "soft": [
+              8,
+              2,
+              3
+            ],
+            "heavy": [
+              2,
+              0,
+              0
+            ],
+            "synth": [
+              0,
+              0,
+              0
+            ]
+          },
+          "prize": 318750,
+          "runs": [
+            {
+              "trial": false,
+              "pos": 1,
+              "of": 14,
+              "venue": "BDGO",
+              "date": "2026-10-11",
+              "distance": 1300,
+              "cond": "Good4",
+              "cls": "BM70",
+              "prize": 50000,
+              "won": 27500,
+              "jockey": "Harry Coffey",
+              "weight": 60,
+              "claim": null,
+              "barrier": 8,
+              "first": "River Bend",
+              "second": "Bendigo Belle",
+              "third": null,
+              "time": 77.2,
+              "l600": 35.1,
+              "margin": 0.4,
+              "p800": 6,
+              "p400": 4,
+              "prices": [
+                9,
+                8.5,
+                8,
+                7.5
+              ],
+              "sp": 7.5,
+              "eqFav": false
+            },
+            {
+              "trial": false,
+              "pos": 2,
+              "of": 11,
+              "venue": "GEEL",
+              "date": "2026-09-25",
+              "distance": 1200,
+              "cond": "Soft7",
+              "cls": "BM70",
+              "prize": 50000,
+              "won": 9000,
+              "jockey": "Harry Coffey",
+              "weight": 59.5,
+              "claim": null,
+              "barrier": 1,
+              "first": "Wet Tracker",
+              "second": "River Bend",
+              "third": null,
+              "time": 72.8,
+              "l600": 36.4,
+              "margin": 0.2,
+              "p800": 3,
+              "p400": 2,
+              "prices": [
+                6,
+                6.5,
+                6,
+                5.5
+              ],
+              "sp": 5.5,
+              "eqFav": false
+            }
+          ],
+          "scratched": false,
+          "last10": "0x4421",
+          "hcp": 78,
+          "penalty": ""
+        }
+      ]
+    }
+  ]
+}

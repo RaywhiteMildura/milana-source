@@ -1,0 +1,69 @@
+{
+  "_fixtureNote": "CONSTRUCTED (invented results for Flemington 2026-10-24 Race 1, 8 runners). Shape of POST https://graphql.rmdprod.racing.com/ body: {\"query\":\"query Races($meetCode: ID!) { getRacesForMeet(meetCode: $meetCode) { id condition rdcClass raceNumber raceStatus distance time raceTime class group name prizeMoney tempo straight circumference meet { trackCondition trackRating weather state } stewardsReport { htmlCode } raceEntryTimes { horseCode horseName avgSpeedEarly avgSpeedMid avgSpeedLate overallPeakSpeed overallAvgSpeed sixHundredMetresTime standardTimeDifference splitTimes { avgSpeed distance index position time } } formRaceEntries { id position barrierNumber scratched raceEntryNumber weight horseName horseCountry horseCode trainerName jockeyName trainerCode jockeyCode margin winningTime positionAt800 positionAt400 positionAtSettled commentStewards gearChanges handicapRating startingPrice odds { providerCode oddsWin oddsPlace } horse { id stats { starts firsts seconds thirds } } } } }\",\"variables\":{\"meetCode\":\"20261024-FLEM\"}}. Field names verbatim from danielboasemammoth/racing-predictor src/lib/scrapers/racing-com.ts (medium; that client parses `position` > 50 as non-finish codes, `winningTime` as hundredths when > 1000, `prizeMoney` as an array of JSON strings each with a Value key, and joins meet.trackCondition + meet.trackRating). Only Race 1 is included to keep the file small; the live response lists every race of the meeting. A scratched runner (No. 6) shows scratched:true with position null. raceEntryTimes/splitTimes are only populated for meetings with sectional timing (Victoria).",
+  "data": {
+    "getRacesForMeet": [
+      {
+        "id": "FLEM-20261024-1",
+        "condition": "Good 4",
+        "rdcClass": "LR",
+        "raceNumber": 1,
+        "raceStatus": "Results",
+        "distance": "1000m",
+        "time": "2026-10-24T12:40:00+11:00",
+        "raceTime": "0:57.12",
+        "class": "Listed",
+        "group": "LR",
+        "name": "Maribyrnong Trial Stakes",
+        "prizeMoney": [
+          "{\"Position\":\"1\",\"Value\":\"120000\"}",
+          "{\"Position\":\"2\",\"Value\":\"36000\"}",
+          "{\"Position\":\"3\",\"Value\":\"18000\"}",
+          "{\"Position\":\"4\",\"Value\":\"9000\"}",
+          "{\"Position\":\"5\",\"Value\":\"5000\"}",
+          "{\"Position\":\"6\",\"Value\":\"4000\"}",
+          "{\"Position\":\"7\",\"Value\":\"4000\"}",
+          "{\"Position\":\"8\",\"Value\":\"4000\"}"
+        ],
+        "tempo": "Genuine",
+        "straight": "1200m",
+        "circumference": "2312m",
+        "meet": { "trackCondition": "Good", "trackRating": "4", "weather": "Fine", "state": "VIC" },
+        "stewardsReport": {
+          "htmlCode": "<p><strong>Race 1 - Maribyrnong Trial Stakes (1000m)</strong></p><p>GOLDEN STRAIGHT (M. Zahra) - Slow to begin. Raced wide without cover throughout.</p><p>SILVER RAIL (J. Kah) - Began awkwardly and lost ground (approx. 2L). Rider explained the filly travelled well but was unable to improve in the straight when held up for clear running between the 300m and 200m.</p><p>MISSING ENTRY (B. Shinn) - Scratched at 8.05am on veterinary advice (lame near fore).</p><p>A pre-race blood sample was taken from TRUE LINE.</p><p>Track: Good 4. Rail: True Entire Circuit. Weather: Fine.</p>"
+        },
+        "raceEntryTimes": [
+          { "horseCode": "H-00000011", "horseName": "TRUE LINE", "avgSpeedEarly": 62.1, "avgSpeedMid": 64.8, "avgSpeedLate": 61.9, "overallPeakSpeed": 67.3, "overallAvgSpeed": 63.0, "sixHundredMetresTime": "33.41", "standardTimeDifference": "-0.38",
+            "splitTimes": [ { "avgSpeed": 58.2, "distance": "800m", "index": 1, "position": 3, "time": "11.80" }, { "avgSpeed": 65.0, "distance": "600m", "index": 2, "position": 2, "time": "10.94" }, { "avgSpeed": 65.4, "distance": "400m", "index": 3, "position": 1, "time": "10.88" }, { "avgSpeed": 64.1, "distance": "200m", "index": 4, "position": 1, "time": "11.06" }, { "avgSpeed": 61.9, "distance": "Finish", "index": 5, "position": 1, "time": "11.47" } ] },
+          { "horseCode": "H-00000013", "horseName": "GOLDEN STRAIGHT", "avgSpeedEarly": 61.5, "avgSpeedMid": 64.9, "avgSpeedLate": 62.3, "overallPeakSpeed": 67.0, "overallAvgSpeed": 62.9, "sixHundredMetresTime": "33.35", "standardTimeDifference": "-0.33",
+            "splitTimes": [ { "avgSpeed": 57.9, "distance": "800m", "index": 1, "position": 6, "time": "11.92" }, { "avgSpeed": 65.1, "distance": "600m", "index": 2, "position": 5, "time": "10.92" }, { "avgSpeed": 65.6, "distance": "400m", "index": 3, "position": 3, "time": "10.85" }, { "avgSpeed": 64.5, "distance": "200m", "index": 4, "position": 2, "time": "11.00" }, { "avgSpeed": 62.3, "distance": "Finish", "index": 5, "position": 2, "time": "11.42" } ] }
+        ],
+        "formRaceEntries": [
+          { "id": "RE-1-1", "position": 1, "barrierNumber": 4, "scratched": false, "raceEntryNumber": 1, "weight": "58kg", "horseName": "TRUE LINE", "horseCountry": "AUS", "horseCode": "H-00000011", "trainerName": "Ciaron Maher", "jockeyName": "Jamie Kah", "trainerCode": "T-0001", "jockeyCode": "J-0001", "margin": "0", "winningTime": 5712, "positionAt800": 3, "positionAt400": 1, "positionAtSettled": 3, "commentStewards": null, "gearChanges": null, "handicapRating": "92", "startingPrice": "$2.60",
+            "odds": [ { "providerCode": "V", "oddsWin": "2.60", "oddsPlace": "1.20" }, { "providerCode": "SB", "oddsWin": "2.50", "oddsPlace": "1.22" } ],
+            "horse": { "id": "H-00000011", "stats": [ { "starts": "4", "firsts": "3", "seconds": "1", "thirds": "0" } ] } },
+          { "id": "RE-1-3", "position": 2, "barrierNumber": 8, "scratched": false, "raceEntryNumber": 3, "weight": "57kg", "horseName": "GOLDEN STRAIGHT", "horseCountry": "AUS", "horseCode": "H-00000013", "trainerName": "Chris Waller", "jockeyName": "Mark Zahra", "trainerCode": "T-0004", "jockeyCode": "J-0007", "margin": "0.3", "winningTime": 5712, "positionAt800": 6, "positionAt400": 3, "positionAtSettled": 6, "commentStewards": "Slow to begin. Raced wide without cover throughout.", "gearChanges": null, "handicapRating": "90", "startingPrice": "$6.00",
+            "odds": [ { "providerCode": "V", "oddsWin": "6.00", "oddsPlace": "1.90" }, { "providerCode": "SB", "oddsWin": "6.50", "oddsPlace": "2.00" } ],
+            "horse": { "id": "H-00000013", "stats": [ { "starts": "5", "firsts": "2", "seconds": "2", "thirds": "0" } ] } },
+          { "id": "RE-1-7", "position": 3, "barrierNumber": 2, "scratched": false, "raceEntryNumber": 7, "weight": "55.5kg", "horseName": "SILVER RAIL", "horseCountry": "NZ", "horseCode": "H-00000017", "trainerName": "Danny O'Brien", "jockeyName": "Jamie Kah", "trainerCode": "T-0003", "jockeyCode": "J-0001", "margin": "1.1", "winningTime": 5712, "positionAt800": 8, "positionAt400": 7, "positionAtSettled": 8, "commentStewards": "Began awkwardly and lost ground. Held up between the 300m and 200m.", "gearChanges": "Blinkers first time", "handicapRating": "86", "startingPrice": "$9.00",
+            "odds": [ { "providerCode": "V", "oddsWin": "9.00", "oddsPlace": "2.70" } ],
+            "horse": { "id": "H-00000017", "stats": [ { "starts": "3", "firsts": "1", "seconds": "0", "thirds": "1" } ] } },
+          { "id": "RE-1-5", "position": 4, "barrierNumber": 1, "scratched": false, "raceEntryNumber": 5, "weight": "56kg", "horseName": "RAILSIDE ROCKET", "horseCountry": "AUS", "horseCode": "H-00000015", "trainerName": "Peter G Moody & Katherine Coleman", "jockeyName": "Craig Williams", "trainerCode": "T-0002", "jockeyCode": "J-0002", "margin": "1.6", "winningTime": 5712, "positionAt800": 1, "positionAt400": 2, "positionAtSettled": 1, "commentStewards": null, "gearChanges": null, "handicapRating": "88", "startingPrice": "$4.40",
+            "odds": [ { "providerCode": "V", "oddsWin": "4.40", "oddsPlace": "1.60" } ],
+            "horse": { "id": "H-00000015", "stats": [ { "starts": "6", "firsts": "2", "seconds": "1", "thirds": "2" } ] } },
+          { "id": "RE-1-2", "position": 5, "barrierNumber": 6, "scratched": false, "raceEntryNumber": 2, "weight": "57.5kg", "horseName": "STRAIGHT TALKER", "horseCountry": "AUS", "horseCode": "H-00000012", "trainerName": "Phillip Stokes", "jockeyName": "Damian Lane", "trainerCode": "T-0006", "jockeyCode": "J-0004", "margin": "2.9", "winningTime": 5712, "positionAt800": 2, "positionAt400": 4, "positionAtSettled": 2, "commentStewards": null, "gearChanges": null, "handicapRating": "91", "startingPrice": "$7.50",
+            "odds": [ { "providerCode": "V", "oddsWin": "7.50", "oddsPlace": "2.30" } ],
+            "horse": { "id": "H-00000012", "stats": [ { "starts": "7", "firsts": "2", "seconds": "2", "thirds": "1" } ] } },
+          { "id": "RE-1-4", "position": 6, "barrierNumber": 3, "scratched": false, "raceEntryNumber": 4, "weight": "56.5kg", "horseName": "EPSOM ROAD", "horseCountry": "AUS", "horseCode": "H-00000014", "trainerName": "Ben, Will & JD Hayes", "jockeyName": "Blake Shinn", "trainerCode": "T-0005", "jockeyCode": "J-0005", "margin": "3.4", "winningTime": 5712, "positionAt800": 5, "positionAt400": 6, "positionAtSettled": 5, "commentStewards": null, "gearChanges": null, "handicapRating": "87", "startingPrice": "$21.00",
+            "odds": [ { "providerCode": "V", "oddsWin": "21.00", "oddsPlace": "5.00" } ],
+            "horse": { "id": "H-00000014", "stats": [ { "starts": "9", "firsts": "2", "seconds": "0", "thirds": "2" } ] } },
+          { "id": "RE-1-8", "position": 7, "barrierNumber": 5, "scratched": false, "raceEntryNumber": 8, "weight": "55kg", "horseName": "LAST OF THE STRAIGHT", "horseCountry": "AUS", "horseCode": "H-00000018", "trainerName": "Michael Freedman", "jockeyName": "Harry Coffey", "trainerCode": "T-0007", "jockeyCode": "J-0008", "margin": "6.2", "winningTime": 5712, "positionAt800": 7, "positionAt400": 8, "positionAtSettled": 7, "commentStewards": null, "gearChanges": null, "handicapRating": "80", "startingPrice": "$41.00",
+            "odds": [ { "providerCode": "V", "oddsWin": "41.00", "oddsPlace": "9.00" } ],
+            "horse": { "id": "H-00000018", "stats": [ { "starts": "11", "firsts": "1", "seconds": "1", "thirds": "1" } ] } },
+          { "id": "RE-1-6", "position": null, "barrierNumber": 7, "scratched": true, "raceEntryNumber": 6, "weight": "56kg", "horseName": "MISSING ENTRY", "horseCountry": "AUS", "horseCode": "H-00000016", "trainerName": "Chris Waller", "jockeyName": "Blake Shinn", "trainerCode": "T-0004", "jockeyCode": "J-0005", "margin": null, "winningTime": null, "positionAt800": null, "positionAt400": null, "positionAtSettled": null, "commentStewards": "Scratched at 8.05am on veterinary advice (lame near fore).", "gearChanges": null, "handicapRating": "89", "startingPrice": null,
+            "odds": [],
+            "horse": { "id": "H-00000016", "stats": [ { "starts": "5", "firsts": "2", "seconds": "0", "thirds": "1" } ] } }
+        ]
+      }
+    ]
+  }
+}

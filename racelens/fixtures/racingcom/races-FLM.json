@@ -1,0 +1,9 @@
+{
+  "_fixtureNote": "Constructed getRacesForMeet response.",
+  "data": {
+    "r": [
+      { "id": "RACE-FLM-1", "raceNumber": 1, "name": "Maribyrnong Trial Stakes", "distance": "1000m", "class": "Listed", "group": "Listed", "raceStatus": "Normal", "hasResults": false, "resultsString": "", "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T12:25:00", "totalPrizeMoney": "$200,000", "runnersCount": 10, "tempo": null },
+      { "id": "RACE-FLM-2", "raceNumber": 2, "name": "Fillies Classic", "distance": "1600m", "class": "Group 2", "group": "Group 2", "raceStatus": "Normal", "hasResults": false, "resultsString": "", "trackCondition": "Good", "trackRating": "4", "time": "2026-10-24T13:00:00", "totalPrizeMoney": "$300,000", "runnersCount": 12 }
+    ]
+  }
+}

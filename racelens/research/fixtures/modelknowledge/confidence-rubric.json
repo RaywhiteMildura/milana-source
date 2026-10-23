@@ -1,0 +1,21 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Suggested inputs, weights and thresholds for the RaceLens confidence label (Low/Fair/Good). Weights are design choices (low confidence); the rationale for each input is sourced in research/modelknowledge.md section 14.",
+  "inputs": {
+    "sourceAgreement":        {"weight": 0.25, "direction": "up", "definition": "share of card facts (runner no., barrier, jockey, weight, scratchings) matching across >=2 sources"},
+    "marketConcentration":    {"weight": 0.25, "direction": "up", "definition": "top market prob and gap to second; favourites win ~35% overall, clear short favourites far more"},
+    "modelMarketAgreement":   {"weight": 0.15, "direction": "up", "definition": "same top pick (0.5) + Spearman rho of rankings (0.5)"},
+    "formCompleteness":       {"weight": 0.10, "direction": "up", "definition": "share of runners with >=4 starts and today's distance/condition form"},
+    "conditionsVolatility":   {"weight": 0.10, "direction": "down", "definition": "Heavy 8-10, rail >=+6m, strong wind, downgrade during day, late scratchings"},
+    "fieldSizeScore":         {"weight": 0.10, "direction": "down as size grows", "definition": "1 - clamp((runners-6)/12, 0, 1)"},
+    "dayPatternSupport":      {"weight": 0.05, "direction": "up if pattern supports top pick, down if contradicts"}
+  },
+  "formula": "C = sum(weight_i * value_i) with volatility entering as (1 - volatility)",
+  "thresholds": {"Low": [0, 0.40], "Fair": [0.40, 0.62], "Good": [0.62, 1.0]},
+  "expectedPerformance": {"topPickWinRateOverall": [0.30, 0.38], "topPickTop3Rate": [0.60, 0.70], "goodLabelTargetWinRate": 0.45, "note": "if 'Good' back-tests below 45% top-pick win rate, lower thresholds"},
+  "displayRule": "show the two largest detractors in plain words",
+  "evidence": [
+    {"input": "marketConcentration", "source": "https://www.kruzey.com.au/betting-guides/australian-horse-racing-statistics-how-often-does-the-favourite-win/", "confidence": "medium"},
+    {"input": "conditionsVolatility", "source": "github.com/Kelvin1761/Kelvin-Agents gap report (heavy-track top-1 rates noisier)", "confidence": "low"},
+    {"input": "timeToJump", "source": "https://github.com/betfair-down-under/autoHubTutorials/blob/master/analysingAndPredictingMarketMovments/movements.ipynb", "confidence": "high"}
+  ]
+}

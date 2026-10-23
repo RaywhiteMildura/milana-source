@@ -1,0 +1,426 @@
+{
+  "status": 200,
+  "data": {
+    "next_to_go_ids": [
+      "ecb22271-1c20-41cc-b7cd-75b7370793d8",
+      "d44350b2-2d9d-4bf4-bc95-0225643be1e0",
+      "96321b96-2f60-47e0-9212-779bd4004b27",
+      "1d594c1e-f4e7-4f4f-8e45-b945abd15e29",
+      "bfc40ca9-5407-49ca-9e8e-f12ca17571f9",
+      "339b7930-4088-4f6c-a703-60a3b2db5938",
+      "2c393f3d-935f-49e4-a4a9-7ae70f62f5be",
+      "7a3191b4-0fbd-4a0b-b4cb-f13dca75ff72",
+      "b5c06896-8a6d-4f8c-8b86-cffe9107a068",
+      "f9a404c8-1214-4573-83da-3f88206b509e"
+    ],
+    "race_summaries": {
+      "1d594c1e-f4e7-4f4f-8e45-b945abd15e29": {
+        "race_id": "1d594c1e-f4e7-4f4f-8e45-b945abd15e29",
+        "race_name": "Race 10",
+        "race_number": 10,
+        "meeting_id": "cd135cde-98d6-4ebf-b478-8aba879cc941",
+        "meeting_name": "Kinsley Bags",
+        "category_id": "9daef0d7-bf3c-4f50-921d-8e818c60fe61",
+        "advertised_start": {
+          "seconds": 1768484520
+        },
+        "race_form": {
+          "distance": 268,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+            "name": "Good",
+            "short_name": "good"
+          },
+          "track_condition_id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+          "race_comment": "CRYSTAL OPAL (4) resumed with a plain effort to finish fourth, beaten 4 lengths, in a D4 at this track over 268m (17.26). Back in class and fitter. Gets chance to fire. DIVO (6) jumped from this trap last time and placed in a D4 at this track over 268m, finishing second (17.19). Has a very consistent record off this same box, including eight wins and 12 placings from 37 starts. Harder here but expected to measure up. CORRUPTOR (5) jumped from the outside last start and was game in defeat when a head second (17.16) behind De Girl Pippa at this track. Leading player again. LETTER FLASH (3) followed a moderate fifth at this track two runs ago with another plain effort last time to finish sixth, beaten 9 lengths, in a D4 at this track over 268m (17.46). This easier so don't rule her out. Something for the Multiples: JEANNIE JO (1)",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Kinsley Bags\",\"state\":\"UK\",\"country\":\"UK\",\"number\":10,\"race_name\":\"Race 10\",\"time\":\"2026-01-15T13:42:00Z\",\"class\":\"D5\",\"start_type\":\"\",\"prizemonies\":{\"1st\":80,\"2nd\":35,\"total_value\":513},\"localised_prizemonies\":{\"AUD\":{\"1st\":161,\"2nd\":70,\"3rd\":70,\"4th\":70,\"5th\":70,\"6th\":70,\"total_value\":513},\"NZD\":{\"1st\":187,\"2nd\":81,\"3rd\":81,\"4th\":81,\"5th\":81,\"6th\":81,\"total_value\":595}},\"rail_position\":\"\",\"track_direction\":\"Left\",\"track_surface\":\"All Weather\",\"group\":\"\",\"gait\":\"Gallop\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "CRYSTAL OPAL (4) resumed with a plain effort to finish fourth, beaten 4 lengths, in a D4 at this track over 268m (17.26). Back in class and fitter. Gets chance to fire. DIVO (6) jumped from this trap last time and placed in a D4 at this track over 268m, finishing second (17.19). Has a very consistent record off this same box, including eight wins and 12 placings from 37 starts. Harder here but expected to measure up. CORRUPTOR (5) jumped from the outside last start and was game in defeat when a head second (17.16) behind De Girl Pippa at this track. Leading player again. LETTER FLASH (3) followed a moderate fifth at this track two runs ago with another plain effort last time to finish sixth, beaten 9 lengths, in a D4 at this track over 268m (17.46). This easier so don't rule her out. Something for the Multiples: JEANNIE JO (1)"
+        },
+        "venue_id": "a7a87e51-8314-454f-afc4-3f27b22eb7d9",
+        "venue_name": "Kinsley Bags",
+        "venue_state": "UK",
+        "venue_country": "UK"
+      },
+      "2c393f3d-935f-49e4-a4a9-7ae70f62f5be": {
+        "race_id": "2c393f3d-935f-49e4-a4a9-7ae70f62f5be",
+        "race_name": "Race 11",
+        "race_number": 11,
+        "meeting_id": "b3035e22-3a6f-40ce-a233-446c286ada0c",
+        "meeting_name": "Sheffield Bags",
+        "category_id": "9daef0d7-bf3c-4f50-921d-8e818c60fe61",
+        "advertised_start": {
+          "seconds": 1768484820
+        },
+        "race_form": {
+          "distance": 500,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+            "name": "Good",
+            "short_name": "good"
+          },
+          "track_condition_id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+          "weather": {
+            "id": "5ba75165-3cec-11eb-88bb-36fbfdf5d97f",
+            "name": "OCAST",
+            "short_name": "ocast",
+            "icon_uri": "OCAST"
+          },
+          "weather_id": "5ba75165-3cec-11eb-88bb-36fbfdf5d97f",
+          "race_comment": "ACOMB OLGA (6) comes off an average run last start when sixth at this track over 500m behind Drumdoit Galaxy (29.94) in an A4. Placed at her previous run. Should be very hard to beat this time. SEANS CHANCE (5) turned in a good run last time, finishing in the placings (29.66) at this track in an A5. Lines up from trap 5 for the first time. Ran one of the fastest times on the program last start despite finishing in the minors. Expecting another good run. JOLLY OUTLOOK (2) doesn't show much early dash but winds into his races, hitting the line hard to place two back then came home strongly into second (29.65) in an A5 at this track last time. Overdue and gets his chance. SLIPPY SHANE (1) will need to run right up to last start to feature again.",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Sheffield Bags\",\"state\":\"UK\",\"country\":\"UK\",\"number\":11,\"race_name\":\"Race 11\",\"time\":\"2026-01-15T13:47:00Z\",\"class\":\"A5\",\"start_type\":\"\",\"prizemonies\":{\"total_value\":644},\"localised_prizemonies\":{\"AUD\":{\"1st\":241,\"2nd\":101,\"3rd\":101,\"4th\":101,\"5th\":101,\"total_value\":644},\"NZD\":{\"1st\":280,\"2nd\":117,\"3rd\":117,\"4th\":117,\"5th\":117,\"total_value\":747}},\"rail_position\":\"\",\"track_direction\":\"Left\",\"track_surface\":\"All Weather\",\"group\":\"\",\"gait\":\"\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "ACOMB OLGA (6) comes off an average run last start when sixth at this track over 500m behind Drumdoit Galaxy (29.94) in an A4. Placed at her previous run. Should be very hard to beat this time. SEANS CHANCE (5) turned in a good run last time, finishing in the placings (29.66) at this track in an A5. Lines up from trap 5 for the first time. Ran one of the fastest times on the program last start despite finishing in the minors. Expecting another good run. JOLLY OUTLOOK (2) doesn't show much early dash but winds into his races, hitting the line hard to place two back then came home strongly into second (29.65) in an A5 at this track last time. Overdue and gets his chance. SLIPPY SHANE (1) will need to run right up to last start to feature again."
+        },
+        "venue_id": "764e58a3-a0d2-4b09-b6a4-db218606f7d5",
+        "venue_name": "Sheffield Bags",
+        "venue_state": "UK",
+        "venue_country": "UK"
+      },
+      "339b7930-4088-4f6c-a703-60a3b2db5938": {
+        "race_id": "339b7930-4088-4f6c-a703-60a3b2db5938",
+        "race_name": "De Tourrettes-Sur-Loup Handicap",
+        "race_number": 6,
+        "meeting_id": "853d3385-4f79-47e9-b76f-d52d438f5ebe",
+        "meeting_name": "Cagnes Sur Mer",
+        "category_id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+        "advertised_start": {
+          "seconds": 1768484820
+        },
+        "race_form": {
+          "distance": 3200,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "906cd562-a37c-11e7-a5c6-0ab32e6ac8d2",
+            "name": "Soft",
+            "short_name": "soft"
+          },
+          "track_condition_id": "906cd562-a37c-11e7-a5c6-0ab32e6ac8d2",
+          "weather": {
+            "id": "01994c9e-3b74-11e8-a5eb-06a5c6d9a756",
+            "name": "Fine",
+            "short_name": "fine",
+            "icon_uri": "Fine"
+          },
+          "weather_id": "01994c9e-3b74-11e8-a5eb-06a5c6d9a756",
+          "race_comment": "BONNY WAY (9) backed up her pleasing stable debut second at Salon-de-Provence with a success in a 2600m Class Four handicap at Marseille-Vivaux thirty eight days ago. The five-year-old daughter of Galiway has winning course form and could well replicate now back up in class. BARBADIN (8) has been running poorly of late however as a result slips to a very dangerous rating. Booking of Cristian Demuro catches the eye and this previous course and distance winner cannot be ignored lightly. ZILCOVER (12) won a 2600m handicap at Marseille-Vivaux ten days ago. Might get involved. TIAMOWAY (2) needs to be included.",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Cagnes Sur Mer\",\"state\":\"FR\",\"country\":\"FR\",\"number\":6,\"race_name\":\"De Tourrettes-Sur-Loup Handicap\",\"time\":\"2026-01-15T13:47:00Z\",\"class\":\"HCP CL3\",\"start_type\":\"\",\"prizemonies\":{\"total_value\":42105},\"localised_prizemonies\":{\"AUD\":{\"1st\":21053,\"2nd\":8000,\"3rd\":5895,\"4th\":3789,\"5th\":1684,\"6th\":1053,\"7th\":632,\"total_value\":42105},\"NZD\":{\"1st\":24421,\"2nd\":9280,\"3rd\":6838,\"4th\":4395,\"5th\":1953,\"6th\":1221,\"7th\":733,\"total_value\":48842}},\"rail_position\":\"\",\"track_direction\":\"Left\",\"track_surface\":\"Turf\",\"group\":\"\",\"gait\":\"Gallop\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "BONNY WAY (9) backed up her pleasing stable debut second at Salon-de-Provence with a success in a 2600m Class Four handicap at Marseille-Vivaux thirty eight days ago. The five-year-old daughter of Galiway has winning course form and could well replicate now back up in class. BARBADIN (8) has been running poorly of late however as a result slips to a very dangerous rating. Booking of Cristian Demuro catches the eye and this previous course and distance winner cannot be ignored lightly. ZILCOVER (12) won a 2600m handicap at Marseille-Vivaux ten days ago. Might get involved. TIAMOWAY (2) needs to be included."
+        },
+        "venue_id": "ac2d5fbc-0c8f-47f9-bd46-5bee7cf20805",
+        "venue_name": "Cagnes Sur Mer",
+        "venue_state": "FR",
+        "venue_country": "FR"
+      },
+      "7a3191b4-0fbd-4a0b-b4cb-f13dca75ff72": {
+        "race_id": "7a3191b4-0fbd-4a0b-b4cb-f13dca75ff72",
+        "race_name": "525 Yds (A4)",
+        "race_number": 10,
+        "meeting_id": "52888410-a065-48f9-bba5-0728da34dc8d",
+        "meeting_name": "Waterford",
+        "category_id": "9daef0d7-bf3c-4f50-921d-8e818c60fe61",
+        "advertised_start": {
+          "seconds": 1768484820
+        },
+        "race_form": {
+          "distance": 480,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "9d03760c-88d2-4c89-9611-ae6eb7cdb76c",
+            "name": "Synthetic",
+            "short_name": "synthetic"
+          },
+          "track_condition_id": "9d03760c-88d2-4c89-9611-ae6eb7cdb76c",
+          "weather": {
+            "id": "5ba75165-3cec-11eb-88bb-36fbfdf5d97f",
+            "name": "OCAST",
+            "short_name": "ocast",
+            "icon_uri": "OCAST"
+          },
+          "weather_id": "5ba75165-3cec-11eb-88bb-36fbfdf5d97f",
+          "race_comment": "JACKTAVERN BUCKS (2) returned a better run last time, finishing in the money (29.95) at this track behind Hilldun Shadow in an A4. Settled off speed and worked to the line nicely. Leading chance again. SHE OUR SINEAD (4) got off the mark with her maiden victory last time at this track over 480m (29.57). Form should stack up. ALMIGHTY MIKIE (5) is overdue for a win after recording back to back placings, the latest jumping from this same trap when a 11 length third (30.37) in an A5 at this track. Harder here but will be in this for a long way. CRACK ON MACK (6) can play a role in the finish without surprising. Something for the Multiples: SNAEFELL (6)",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Waterford\",\"state\":\"IRE\",\"country\":\"IRE\",\"number\":10,\"race_name\":\"525 Yds (A4)\",\"time\":\"2026-01-15T13:47:00Z\",\"class\":\"A4\",\"start_type\":\"\",\"prizemonies\":{\"total_value\":596},\"localised_prizemonies\":{\"AUD\":{\"1st\":421,\"2nd\":105,\"3rd\":70,\"total_value\":596},\"NZD\":{\"1st\":488,\"2nd\":122,\"3rd\":81,\"total_value\":691}},\"rail_position\":\"\",\"track_direction\":\"Right\",\"track_surface\":\"All Weather\",\"group\":\"\",\"gait\":\"\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "JACKTAVERN BUCKS (2) returned a better run last time, finishing in the money (29.95) at this track behind Hilldun Shadow in an A4. Settled off speed and worked to the line nicely. Leading chance again. SHE OUR SINEAD (4) got off the mark with her maiden victory last time at this track over 480m (29.57). Form should stack up. ALMIGHTY MIKIE (5) is overdue for a win after recording back to back placings, the latest jumping from this same trap when a 11 length third (30.37) in an A5 at this track. Harder here but will be in this for a long way. CRACK ON MACK (6) can play a role in the finish without surprising. Something for the Multiples: SNAEFELL (6)"
+        },
+        "venue_id": "9967e496-90ed-4190-9252-224614083ea0",
+        "venue_name": "Waterford",
+        "venue_state": "IRE",
+        "venue_country": "IRE"
+      },
+      "96321b96-2f60-47e0-9212-779bd4004b27": {
+        "race_id": "96321b96-2f60-47e0-9212-779bd4004b27",
+        "race_name": "Clh Premier Print Maiden Hurdle (Gbb Race) (Div 2)",
+        "race_number": 3,
+        "meeting_id": "8ea3a0d4-c075-4601-b31e-3409d28bb4ac",
+        "meeting_name": "Ludlow",
+        "category_id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+        "advertised_start": {
+          "seconds": 1768484520
+        },
+        "race_form": {
+          "distance": 4274,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+            "name": "Good",
+            "short_name": "good"
+          },
+          "track_condition_id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+          "weather": {
+            "id": "187e38d4-ab03-11e7-85e3-0641c90711b8",
+            "name": "Showers",
+            "short_name": "showers",
+            "icon_uri": "Showers"
+          },
+          "weather_id": "187e38d4-ab03-11e7-85e3-0641c90711b8",
+          "race_comment": "KARA SACRE (6) is the latest import for Venetia Williams to wear the S Ricci silks having finished fourth at Listowel during May. Left Paul Nolan since and could be very competitive on his British debut. ISLAND BRIDGE (5) was disappointing beaten 5L when last seen at Leicester. Freshened since and could be more involved. PLAINS DRIFTER (11) finished runner-up on two of his three starts under rules. Offered something to work with at Market Rasen two months ago and is one to take very seriously. Watch the betting for the Ben Pauling trained newcomer MONDOUI'BOY (7) who makes just his third start under rules.",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Ludlow\",\"state\":\"GBR\",\"country\":\"UK\",\"number\":3,\"race_name\":\"Clh Premier Print Maiden Hurdle (Gbb Race) (Div 2)\",\"time\":\"2026-01-15T13:42:00Z\",\"class\":\"HDLE MDN, C4\",\"start_type\":\"\",\"prizemonies\":{\"total_value\":18450},\"localised_prizemonies\":{\"AUD\":{\"1st\":10958,\"2nd\":5048,\"3rd\":2523,\"4th\":1264,\"total_value\":18450},\"NZD\":{\"1st\":12711,\"2nd\":5856,\"3rd\":2927,\"4th\":1466,\"total_value\":21402}},\"rail_position\":\"\",\"track_direction\":\"Right\",\"track_surface\":\"Turf\",\"group\":\"\",\"gait\":\"Gallop\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "KARA SACRE (6) is the latest import for Venetia Williams to wear the S Ricci silks having finished fourth at Listowel during May. Left Paul Nolan since and could be very competitive on his British debut. ISLAND BRIDGE (5) was disappointing beaten 5L when last seen at Leicester. Freshened since and could be more involved. PLAINS DRIFTER (11) finished runner-up on two of his three starts under rules. Offered something to work with at Market Rasen two months ago and is one to take very seriously. Watch the betting for the Ben Pauling trained newcomer MONDOUI'BOY (7) who makes just his third start under rules."
+        },
+        "venue_id": "046aa1c3-5b72-487b-a9e0-4630cb8515ac",
+        "venue_name": "Ludlow",
+        "venue_state": "GBR",
+        "venue_country": "UK"
+      },
+      "b5c06896-8a6d-4f8c-8b86-cffe9107a068": {
+        "race_id": "b5c06896-8a6d-4f8c-8b86-cffe9107a068",
+        "race_name": "Get The Best Odds With Oddschecker Handicap Hurdle",
+        "race_number": 4,
+        "meeting_id": "551c0f0c-aafb-440c-8054-744395e480f5",
+        "meeting_name": "Wincanton",
+        "category_id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+        "advertised_start": {
+          "seconds": 1768485120
+        },
+        "race_form": {
+          "distance": 3063,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "906cd562-a37c-11e7-a5c6-0ab32e6ac8d2",
+            "name": "Soft",
+            "short_name": "soft"
+          },
+          "track_condition_id": "906cd562-a37c-11e7-a5c6-0ab32e6ac8d2",
+          "weather": {
+            "id": "5ba75165-3cec-11eb-88bb-36fbfdf5d97f",
+            "name": "OCAST",
+            "short_name": "ocast",
+            "icon_uri": "OCAST"
+          },
+          "weather_id": "5ba75165-3cec-11eb-88bb-36fbfdf5d97f",
+          "race_comment": "UGO BINGO (3) is becoming expensive to follow for supporters however does have previous course and distance winning form and rates a strong chance against this field. POSTPONED LEGACY (9) arrives bidding for a hat-trick after wins at Doncaster and Uttoxeter. This is a different type of track to those two and will need to find more improvement. WESTERN SOLDIER (6) rates highly being another previous course and distance winner. One to take seriously. MORNING MAYHEM (5) was impressive at Uttoxeter before being brought down when still prominent in latest at Fontwell Park. Market movement will be significant.",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Wincanton\",\"state\":\"GBR\",\"country\":\"UK\",\"number\":4,\"race_name\":\"Get The Best Odds With Oddschecker Handicap Hurdle\",\"time\":\"2026-01-15T13:52:00Z\",\"class\":\"HCP HDLE, C5\",\"start_type\":\"\",\"prizemonies\":{\"total_value\":15682},\"localised_prizemonies\":{\"AUD\":{\"1st\":9032,\"2nd\":4157,\"3rd\":2078,\"4th\":1040,\"5th\":519,\"total_value\":15682},\"NZD\":{\"1st\":10477,\"2nd\":4822,\"3rd\":2410,\"4th\":1206,\"5th\":602,\"total_value\":18191}},\"rail_position\":\"\",\"track_direction\":\"Right\",\"track_surface\":\"Turf\",\"group\":\"\",\"gait\":\"Gallop\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "UGO BINGO (3) is becoming expensive to follow for supporters however does have previous course and distance winning form and rates a strong chance against this field. POSTPONED LEGACY (9) arrives bidding for a hat-trick after wins at Doncaster and Uttoxeter. This is a different type of track to those two and will need to find more improvement. WESTERN SOLDIER (6) rates highly being another previous course and distance winner. One to take seriously. MORNING MAYHEM (5) was impressive at Uttoxeter before being brought down when still prominent in latest at Fontwell Park. Market movement will be significant."
+        },
+        "venue_id": "2afe66af-dd02-4344-b97c-36eff01d8443",
+        "venue_name": "Wincanton",
+        "venue_state": "GBR",
+        "venue_country": "UK"
+      },
+      "bfc40ca9-5407-49ca-9e8e-f12ca17571f9": {
+        "race_id": "bfc40ca9-5407-49ca-9e8e-f12ca17571f9",
+        "race_name": "Play Soccer 6, 10 And 13 Graduation Plate",
+        "race_number": 8,
+        "meeting_id": "b3359a0b-4280-40b2-b32a-21464c1135c1",
+        "meeting_name": "Vaal",
+        "category_id": "4a2788f8-e825-4d36-9894-efd4baf1cfae",
+        "advertised_start": {
+          "seconds": 1768484700
+        },
+        "race_form": {
+          "distance": 1450,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+            "name": "Good",
+            "short_name": "good"
+          },
+          "track_condition_id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+          "weather": {
+            "id": "08e5f78c-1a36-11eb-9269-cef03e67f1a3",
+            "name": "FINE",
+            "short_name": "fine",
+            "icon_uri": "FINE"
+          },
+          "weather_id": "08e5f78c-1a36-11eb-9269-cef03e67f1a3",
+          "race_comment": "WINDS OF CHANGE (1) is bursting to win after three runs back and placed last couple. Placed only try here. Gets chance to find form. KING HARALD (6) is better off over this trip and placed only try here. Will take running down. CLEVER TREVOR (3) was a determined winner latest and fitter again. Expected to go very well. I'M A FIREBALL (4) is a progressive type ready to win after two runs back. Genuine contender under these conditions. Something for the Multiples: RED PENNY (5)",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Vaal\",\"state\":\"ZAF\",\"country\":\"SAF\",\"number\":8,\"race_name\":\"Play Soccer 6, 10 And 13 Graduation Plate\",\"time\":\"2026-01-15T13:45:00Z\",\"class\":\"GPLATE\",\"start_type\":\"\",\"prizemonies\":{\"total_value\":10952},\"localised_prizemonies\":{\"AUD\":{\"1st\":6500,\"2nd\":2000,\"3rd\":1000,\"4th\":500,\"5th\":200,\"total_value\":10952},\"NZD\":{\"1st\":7540,\"2nd\":2320,\"3rd\":1160,\"4th\":580,\"5th\":232,\"total_value\":12704}},\"rail_position\":\"\",\"track_direction\":\"Right\",\"track_surface\":\"Turf\",\"group\":\"\",\"gait\":\"Gallop\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "WINDS OF CHANGE (1) is bursting to win after three runs back and placed last couple. Placed only try here. Gets chance to find form. KING HARALD (6) is better off over this trip and placed only try here. Will take running down. CLEVER TREVOR (3) was a determined winner latest and fitter again. Expected to go very well. I'M A FIREBALL (4) is a progressive type ready to win after two runs back. Genuine contender under these conditions. Something for the Multiples: RED PENNY (5)"
+        },
+        "venue_id": "aa633234-43ec-4be5-974f-df4019039d1c",
+        "venue_name": "Vaal",
+        "venue_state": "ZAF",
+        "venue_country": "SAF"
+      },
+      "d44350b2-2d9d-4bf4-bc95-0225643be1e0": {
+        "race_id": "d44350b2-2d9d-4bf4-bc95-0225643be1e0",
+        "race_name": "Prix Gelinotte - Attele",
+        "race_number": 8,
+        "meeting_id": "80a01177-89cd-4f80-bec7-35a2c6c8dbee",
+        "meeting_name": "Angers",
+        "category_id": "161d9be2-e909-4326-8c2c-35ed71fb460b",
+        "advertised_start": {
+          "seconds": 1768484460
+        },
+        "race_form": {
+          "distance": 2350,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+            "name": "Good",
+            "short_name": "good"
+          },
+          "track_condition_id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+          "weather": {
+            "id": "0b43a420-3b75-11e8-a5eb-06a5c6d9a756",
+            "name": "Overcast",
+            "short_name": "overcast",
+            "icon_uri": "Overcast"
+          },
+          "weather_id": "0b43a420-3b75-11e8-a5eb-06a5c6d9a756",
+          "race_comment": "NELSON DE CHANLECY (1) made the perfect start to his career debuting with a 3.25L victory at Bordeaux. Selected to maintain his unbeaten record. NORTHWOOD (4) left an early DQ on debut behind him racing 9.25L clear of his rivals in a fourteen runner contest at Argentan. Expected to play a leading role. Booster Winner colt NERPRUN (5) rates highly following a 9.25L second debuting in the previously mentioned Argentan event. NIARKOS DU CEBE (6) suffered an early DQ at Meslay-du-Maine on his first start. Consider a notable contender based on form shown finishing 1.25L second at Argentan recently.",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Angers\",\"state\":\"FR\",\"country\":\"FR\",\"number\":8,\"race_name\":\"Prix Gelinotte - Attele\",\"time\":\"2026-01-15T13:41:00Z\",\"class\":\"D8\",\"start_type\":\"Mobile\",\"prizemonies\":{\"total_value\":32456},\"localised_prizemonies\":{\"AUD\":{\"total_value\":32456},\"NZD\":{\"total_value\":37649}},\"rail_position\":\"\",\"track_direction\":\"Right\",\"track_surface\":\"Sand\",\"group\":\"\",\"gait\":\"H\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "NELSON DE CHANLECY (1) made the perfect start to his career debuting with a 3.25L victory at Bordeaux. Selected to maintain his unbeaten record. NORTHWOOD (4) left an early DQ on debut behind him racing 9.25L clear of his rivals in a fourteen runner contest at Argentan. Expected to play a leading role. Booster Winner colt NERPRUN (5) rates highly following a 9.25L second debuting in the previously mentioned Argentan event. NIARKOS DU CEBE (6) suffered an early DQ at Meslay-du-Maine on his first start. Consider a notable contender based on form shown finishing 1.25L second at Argentan recently."
+        },
+        "venue_id": "03766d5a-a17b-4898-b193-92844f8ad0af",
+        "venue_name": "Angers",
+        "venue_state": "FR",
+        "venue_country": "FR"
+      },
+      "ecb22271-1c20-41cc-b7cd-75b7370793d8": {
+        "race_id": "ecb22271-1c20-41cc-b7cd-75b7370793d8",
+        "race_name": "Race 10",
+        "race_number": 10,
+        "meeting_id": "b3035e22-3a6f-40ce-a233-446c286ada0c",
+        "meeting_name": "Sheffield Bags",
+        "category_id": "9daef0d7-bf3c-4f50-921d-8e818c60fe61",
+        "advertised_start": {
+          "seconds": 1768484340
+        },
+        "race_form": {
+          "distance": 280,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+            "name": "Good",
+            "short_name": "good"
+          },
+          "track_condition_id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+          "weather": {
+            "id": "5ba75165-3cec-11eb-88bb-36fbfdf5d97f",
+            "name": "OCAST",
+            "short_name": "ocast",
+            "icon_uri": "OCAST"
+          },
+          "weather_id": "5ba75165-3cec-11eb-88bb-36fbfdf5d97f",
+          "race_comment": "FIERY PA (3) was well supported last time but could only manage third (16.41), beaten 1.75 lengths. Sure to be about the mark. KNOCK ZIA (4) was a course and distance placegetter (16.33) last time also from the same draw, finishing a 3.5 lengths third in a D2. Should be in this for a long way. EASY NEXT ONE (6) scored her first victory last start at this track over 280m (16.25). The form from her last run is stacking up nicely. Leading chance again. ALANNAHS CASHOUT (2) has ability and can feature with the right run after missing a cheque here most recently.",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Sheffield Bags\",\"state\":\"UK\",\"country\":\"UK\",\"number\":10,\"race_name\":\"Race 10\",\"time\":\"2026-01-15T13:39:00Z\",\"class\":\"D2\",\"start_type\":\"\",\"prizemonies\":{\"total_value\":704},\"localised_prizemonies\":{\"AUD\":{\"1st\":201,\"2nd\":101,\"3rd\":101,\"4th\":101,\"5th\":101,\"6th\":101,\"total_value\":704},\"NZD\":{\"1st\":233,\"2nd\":117,\"3rd\":117,\"4th\":117,\"5th\":117,\"6th\":117,\"total_value\":817}},\"rail_position\":\"\",\"track_direction\":\"Left\",\"track_surface\":\"All Weather\",\"group\":\"\",\"gait\":\"Gallop\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "FIERY PA (3) was well supported last time but could only manage third (16.41), beaten 1.75 lengths. Sure to be about the mark. KNOCK ZIA (4) was a course and distance placegetter (16.33) last time also from the same draw, finishing a 3.5 lengths third in a D2. Should be in this for a long way. EASY NEXT ONE (6) scored her first victory last start at this track over 280m (16.25). The form from her last run is stacking up nicely. Leading chance again. ALANNAHS CASHOUT (2) has ability and can feature with the right run after missing a cheque here most recently."
+        },
+        "venue_id": "764e58a3-a0d2-4b09-b6a4-db218606f7d5",
+        "venue_name": "Sheffield Bags",
+        "venue_state": "UK",
+        "venue_country": "UK"
+      },
+      "f9a404c8-1214-4573-83da-3f88206b509e": {
+        "race_id": "f9a404c8-1214-4573-83da-3f88206b509e",
+        "race_name": "The Annadown Guggy 50 Races Up Stakes",
+        "race_number": 11,
+        "meeting_id": "ade09a87-b0bb-4def-abeb-6cd385c79820",
+        "meeting_name": "Nottingham Bags",
+        "category_id": "9daef0d7-bf3c-4f50-921d-8e818c60fe61",
+        "advertised_start": {
+          "seconds": 1768485120
+        },
+        "race_form": {
+          "distance": 500,
+          "distance_type": {
+            "id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+            "name": "Metres",
+            "short_name": "m"
+          },
+          "distance_type_id": "570775ae-09ec-42d5-989d-7c8f06366aa7",
+          "track_condition": {
+            "id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+            "name": "Good",
+            "short_name": "good"
+          },
+          "track_condition_id": "10a14653-a33d-11e7-810d-0a1a4ae29bd2",
+          "race_comment": "BLUE DANUBE (3) was well off top last time, finishing 6th (31.76) in an A3 at this track. Form here at this distance is strong including two wins. Has ability and looks hard to stop. BLACKBOY LIZZY (1) rocketed out of the inside draw with a scorching early sectional but swamped late when a close up fifth (30.47) at this track over 500m. Leading chance. THEQUIETMAN (4) has been a little hard to follow, finishing out of the placings latest but was in winning form two back scoring in a HCP at this track. Expected to do much better this time. DOTTIES IMAGE (2) can improve on an unplaced run here last time out.",
+          "additional_data": "{\"revealed_race_info\":{\"track_name\":\"Nottingham Bags\",\"state\":\"UK\",\"country\":\"UK\",\"number\":11,\"race_name\":\"The Annadown Guggy 50 Races Up Stakes\",\"time\":\"2026-01-15T13:52:00Z\",\"class\":\"A3\",\"start_type\":\"\",\"prizemonies\":{\"1st\":155,\"2nd\":60,\"total_value\":915},\"localised_prizemonies\":{\"AUD\":{\"1st\":312,\"2nd\":121,\"3rd\":121,\"4th\":121,\"5th\":121,\"6th\":121,\"total_value\":915},\"NZD\":{\"1st\":362,\"2nd\":140,\"3rd\":140,\"4th\":140,\"5th\":140,\"6th\":140,\"total_value\":1061}},\"rail_position\":\"\",\"track_direction\":\"Left\",\"track_surface\":\"All Weather\",\"group\":\"\",\"gait\":\"Gallop\",\"track_home_straight_metres\":0,\"track_circumference\":0,\"race_comment_provider\":\"racingandsports\"}}",
+          "generated": 1,
+          "silk_base_url": "drr38safykj6s.cloudfront.net",
+          "race_comment_alternative": "BLUE DANUBE (3) was well off top last time, finishing 6th (31.76) in an A3 at this track. Form here at this distance is strong including two wins. Has ability and looks hard to stop. BLACKBOY LIZZY (1) rocketed out of the inside draw with a scorching early sectional but swamped late when a close up fifth (30.47) at this track over 500m. Leading chance. THEQUIETMAN (4) has been a little hard to follow, finishing out of the placings latest but was in winning form two back scoring in a HCP at this track. Expected to do much better this time. DOTTIES IMAGE (2) can improve on an unplaced run here last time out."
+        },
+        "venue_id": "636a41e4-d85c-42e8-931c-f9a4f7ec013b",
+        "venue_name": "Nottingham Bags",
+        "venue_state": "UK",
+        "venue_country": "UK"
+      }
+    }
+  },
+  "message": "Next 10 races from each category"
+}

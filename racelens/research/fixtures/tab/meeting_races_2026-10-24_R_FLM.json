@@ -1,0 +1,18 @@
+{
+  "_fixtureNote": "CONSTRUCTED (Flemington 2026-10-24). GET https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races?jurisdiction=VIC&returnPromo=false&returnOffers=false . Swagger 'MeetingRaces' = {races: Race[]}; race summary fields as in meetings_2026-10-24_VIC.json. Abbreviated to three races.",
+  "races": [
+    { "raceNumber": 6, "raceName": "CARNIVAL PLATE", "raceStartTime": "2026-10-24T04:55:00.000Z", "raceDistance": 1100, "raceClassConditions": "2YO SW", "raceStatus": "Normal",
+      "hasParimutuel": true, "hasFixedOdds": true, "willHaveFixedOdds": true, "fixedOddsOnlineBetting": true, "allIn": false, "allowBundle": true, "cashOutEligibility": "Enabled",
+      "broadcastChannel": "Sky Racing 1", "broadcastChannels": ["Sky Racing 1"], "results": [], "scratchings": [],
+      "_links": { "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/6?jurisdiction=VIC", "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/6/form?jurisdiction=VIC", "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/6/big-bets?jurisdiction=VIC" } },
+    { "raceNumber": 7, "raceName": "RACELENS FIXTURE HANDICAP", "raceStartTime": "2026-10-24T05:30:00.000Z", "raceDistance": 1600, "raceClassConditions": "BM84", "raceStatus": "Normal",
+      "hasParimutuel": true, "hasFixedOdds": true, "willHaveFixedOdds": true, "fixedOddsOnlineBetting": true, "allIn": false, "allowBundle": true, "cashOutEligibility": "Enabled",
+      "broadcastChannel": "Sky Racing 1", "broadcastChannels": ["Sky Racing 1"], "results": [], "scratchings": [ { "runnerNumber": 4, "runnerName": "GOLDEN SPUR", "bettingStatus": "LateScratched" } ],
+      "_links": { "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/7?jurisdiction=VIC", "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/7/form?jurisdiction=VIC", "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/7/big-bets?jurisdiction=VIC" } },
+    { "raceNumber": 8, "raceName": "TWILIGHT MILE", "raceStartTime": "2026-10-24T06:10:00.000Z", "raceDistance": 1600, "raceClassConditions": "OPEN HCP", "raceStatus": "Normal",
+      "hasParimutuel": true, "hasFixedOdds": true, "willHaveFixedOdds": true, "fixedOddsOnlineBetting": true, "allIn": false, "allowBundle": true, "cashOutEligibility": "Enabled",
+      "broadcastChannel": "Sky Racing 1", "broadcastChannels": ["Sky Racing 1"], "results": [], "scratchings": [],
+      "_links": { "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/8?jurisdiction=VIC", "form": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/8/form?jurisdiction=VIC", "bigBets": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races/8/big-bets?jurisdiction=VIC" } }
+  ],
+  "_links": { "self": "https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/2026-10-24/meetings/R/FLM/races?jurisdiction=VIC" }
+}

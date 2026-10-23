@@ -1,0 +1,43 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Venue x distance barrier priors as a 'preferredBand' and 'effectStrength' (0 = ignore, 1 = strong). Mostly qualitative evidence (low confidence); hard numbers noted where they exist. Learn real effects from the results store (>=300 races per venue) before trusting these over the generic prior.",
+  "generic": {
+    "effectByDistance": {"<=1200": 0.6, "1300-1600": 0.5, "1700-2000": 0.4, ">2000": 0.25},
+    "fieldSizeScale": {"<=8": 0.6, "9-12": 0.85, ">=13": 1.0},
+    "communityHeuristic": {"optimalDraw": {"<1200": 3, "<1600": 5, ">=1600": 8}, "penaltyPerSlot": 0.05, "source": "https://raw.githubusercontent.com/elpresidentepiff/velo-oracle-prime/main/app/services/feature_engineering.py", "confidence": "low"}
+  },
+  "venues": {
+    "Flemington": {
+      "allDistances2023": {"mostWinningBarriers": [4, 6, 5], "source": "https://vrc.com.au/latest-news/flemington-2023-wrapped", "confidence": "medium"},
+      "1000-1200 (straight)": {"preferredBand": null, "effectStrength": 0.15, "note": "No turns; sources conflict (wide = better ground vs inside bias on some days, e.g. 2026 Newmarket); lack of early tempo often favours on-pace runners. Use day-pattern lane bias.", "sources": ["https://www.horise.com/guides/barrier-draws/", "https://www.anzbloodstocknews.com/?p=13492", "https://www.sportsnews.com.au/?p=610264"], "confidence": "low"},
+      "1400-1600": {"preferredBand": [3, 9], "effectStrength": 0.4, "note": "Midfield draws 'most ideal'; penalise >=12 and 1-2 in big fields", "source": "https://www.horise.com/guides/barrier-draws/", "confidence": "low"},
+      "1700-2000": {"preferredBand": [2, 10], "effectStrength": 0.3, "confidence": "low"},
+      "2400-3200": {"preferredBand": [9, 16], "effectStrength": 0.2, "note": "Melbourne Cup 1958-2024: barrier 11 most wins (7); original-draw wins 1-8: 21, 9-16: 27, 17-24: 19", "sources": ["https://vrc.com.au/latest-news/breaking-down-the-barriers", "https://cms.vrc.com.au/latest-news/luck-of-the-barrier-draw-in-the-melbourne-cup/"], "confidence": "medium"}
+    },
+    "Caulfield": {
+      "1000-1200": {"preferredBand": [1, 10], "effectStrength": 0.25, "note": "~650m straight running before the home turn; inside advantage described as minimal (one guide disagrees)", "sources": ["https://www.horise.com/track/caulfield", "https://www.horise.com/guides/track-bias/"], "confidence": "low"},
+      "1400-1600": {"preferredBand": [1, 8], "effectStrength": 0.7, "note": "Short run to first turn; barrier called 'the critical statistic' for the Caulfield Guineas", "source": "https://new.racingandsports.com/news/racing-and-sports-newsletter/article/2016-10-01/historical-analysis-of-the-caulfield-guineas/379548", "confidence": "medium"},
+      "1700-2000": {"preferredBand": [1, 9], "effectStrength": 0.5, "confidence": "low"},
+      "2400": {"preferredBand": [2, 12], "effectStrength": 0.25, "note": "Caulfield Cup since 1922: best barriers 8 wins each; barrier 1 one win (1941)", "source": "https://breednet.com.au/news/2290/Caulfield-Cup-barrier-draw-fast-facts", "confidence": "medium"}
+    },
+    "Randwick": {
+      "1000-1400": {"preferredBand": null, "effectStrength": 0.25, "note": "No statistics found; inside dominant when rail true, wide after rail moves / heavy", "source": "https://www.horise.com/guides/track-bias/", "confidence": "low"},
+      "1600": {"preferredBand": [8, 16], "effectStrength": 0.4, "note": "Epsom: winner from double-digit gate in 12 of past 19; Doncaster: 12 of past 20 winners from barrier 10+", "source": "https://old.racingandsports.com/news/racing/news/2023-09-28/eyes-out-wide-in-epsom-handicap/627680", "confidence": "medium"},
+      "1800-2400": {"preferredBand": null, "effectStrength": 0.2, "note": "Long uphill straight rewards backmarkers; wide draws often not a hindrance", "source": "https://www.theroar.com.au/?p=320314", "confidence": "low"}
+    },
+    "Moonee Valley": {
+      "1000-1200": {"preferredBand": [1, 6], "effectStrength": 0.8, "note": "~300m to first turn then ~200m before final bend; inside strongly favoured", "source": "https://www.horise.com/track/moonee-valley/", "confidence": "low"},
+      "1500-1600": {"preferredBand": [1, 9], "effectStrength": 0.4, "note": "Less influential than 1200m; an old newspaper claimed most mile winners came from near the outside", "sources": ["https://www.horise.com/track/moonee-valley/", "https://trove.nla.gov.au/newspaper/page/20678832"], "confidence": "low"},
+      "2040": {"preferredBand": [1, 7], "effectStrength": 0.5, "note": "Short run to first turn (Cox Plate trip)", "confidence": "low"},
+      "2500-3000": {"preferredBand": null, "effectStrength": 0.1, "confidence": "low"}
+    }
+  },
+  "railPosition": {
+    "encoding": {"true": "True", "metresOut": "+6m"},
+    "paceBiasScale": [-2, 2],
+    "qualitative": [
+      {"claim": "Rail out 9-10m at Eagle Farm midweeks showed a leaders bias attributed to slow tempo", "source": "https://www.horseracingonly.com.au/racing-article.aspx?id=2024", "confidence": "low"},
+      {"claim": "Flemington rail moves: faster inside section meant few could get there; bias 'never quite as pronounced as the initial perception'", "source": "https://www.anzbloodstocknews.com/?p=16512", "confidence": "low"}
+    ],
+    "modelRule": "No quantified AU study found; measure on the day from races 1-3 (winners' barrier groups and settling positions) via day patterns."
+  }
+}

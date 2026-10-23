@@ -1,0 +1,16 @@
+<!--
+  CONSTRUCTED fixture (not a live capture). Models the HTTP 200 body Racing Australia serves for a stage that is not
+  yet published (e.g. Form.aspx while the meeting is still at Acceptances): the Bookie client detects the phrase
+  "not currently available" and treats it as "not yet", not as an error. Layout is invented; only the phrase matters.
+-->
+<!DOCTYPE html>
+<html>
+<head><title>Racing Australia - Free Fields</title></head>
+<body>
+<div class="top"><h2>Free Fields</h2></div>
+<div class="content">
+  <p>The information you have requested is not currently available. Please check back later.</p>
+  <p><a href="/FreeFields/Calendar.aspx?State=VIC">Return to the calendar</a></p>
+</div>
+</body>
+</html>

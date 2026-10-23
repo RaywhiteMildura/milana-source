@@ -1,0 +1,48 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23 from search-snippet evidence; figures are as quoted by the cited pages, none fetched live.",
+  "favouriteWinRate": {
+    "australiaAllRaces": {"value": 0.3514, "races": 56616, "source": "https://www.kruzey.com.au/betting-guides/australian-horse-racing-statistics-how-often-does-the-favourite-win/", "confidence": "medium"},
+    "secondFavourite": {"value": 0.199, "source": "same", "confidence": "medium"},
+    "thirdFavourite": {"value": 0.134, "source": "same", "confidence": "medium"},
+    "flatStakeResult": {"value": -689, "unit": "AUD per 56,616 x $1 bets (~ -1.2% ROI)", "source": "same", "confidence": "low"},
+    "ukFavouritesSince2012": {"value": 0.331, "wins": 15785, "bets": 47683, "source": "https://www.geegeez.co.uk/?p=313804", "confidence": "medium"},
+    "top2CombinedCoffsHarbour": {"value": 0.439, "source": "https://www.breednet.com.au/news/884/greg-polson-previews-coffs-harbour-monday-august-28", "confidence": "low"},
+    "top3CombinedCoffsHarbour": {"value": 0.57, "source": "same", "confidence": "low"},
+    "melbourneCupFavouritesTo2013": {"value": 0.22, "wins": 34, "avgWinningFavOdds": "4.4/1", "source": "https://quadrant.org.au/?p=36214", "confidence": "medium"},
+    "group1Winners2025AvgBetfairPrice": {"value": 8.02, "favouritesWon": 32, "source": "https://www.sen.com.au/news/2025/12/18/horse-racing-betfair-bad-beats-longest-priced-winners-and-most-backed-horses", "confidence": "medium"}
+  },
+  "betfair202526": {
+    "races": 16891,
+    "winnerTraded101InPlayShare": 0.99,
+    "runnersTradedAtOrBelow120ThatLost": 2744,
+    "source": "https://www.sen.com.au/news/2026/08/03/betfairs-2025-2026-racing-review",
+    "confidence": "medium"
+  },
+  "favouriteLongshotBias": {
+    "flatStakeLossOnFavourites": {"value": -0.055, "sample": "5.6M US starts 1992-2001", "source": "https://www.nber.org/system/files/working_papers/w15923/w15923.pdf", "confidence": "high"},
+    "biasDeclinesOverTime": {"source": "https://irep.ntu.ac.uk/id/eprint/29387/", "confidence": "medium"},
+    "biasGoneInFinal30MinNZ": {"source": "https://mro.massey.ac.nz/bitstreams/f59655e6-3f82-4a5f-8ed3-edcb00ad28a3/download", "confidence": "medium"},
+    "australianBookmakerStudy": {"citation": "Bird & McCrae 1987 Management Science 33(12) 1552-1562", "source": "https://ideas.repec.org/a/inm/ormnsc/v33y1987i12p1552-1562.html", "confidence": "medium"},
+    "modelRule": "Do not add longshot bonuses; normalise bookmaker odds with Shin/power method; plain normalisation for Betfair."
+  },
+  "marketMovers": {
+    "steamersVsDrifters": {"steamerWinRateUplift": 0.055, "steamerBspLossPerPound": -0.13, "drifterBspLossPerPound": -0.01, "source": "https://www.geegeez.co.uk/?p=2882585", "confidence": "medium", "market": "UK"},
+    "doubleDrifters": {"winRate": "1 in 16", "AE": 0.81, "spLossPerPound": -0.34, "source": "https://www.geegeez.co.uk/the-truth-about-steamers-and-drifters/", "confidence": "medium", "market": "UK"},
+    "modelRule": "Firming updates the market probability used in the blend; it is not an ROI edge."
+  },
+  "betfairMicrostructure": {
+    "bspShareOfVolume": 0.07,
+    "volumeTiming": "doubles 10min->4min, doubles again by 1min, nearly doubles in final minute; majority in last 2-5 min",
+    "avgTradedPerRace": {"Flemington": 500000, "Bendigo": 120000},
+    "bspEstimateErrorAtOff": {"back_best": 0.0917, "ladder_mid": 0.0932, "geometric_mid": 0.0944, "lay_best": 0.1031, "near_price": 0.1213, "far_price": 0.5784},
+    "bspEstimateErrorLastTick": {"geometric_mid": 0.0396, "ladder_mid": 0.0425, "back_best": 0.0636, "near_price": 0.0771},
+    "source": "https://github.com/betfair-down-under/autoHubTutorials/blob/master/analysingAndPredictingBSP/bsp.ipynb",
+    "confidence": "high"
+  },
+  "fieldSize": {
+    "nationalAverage2023_24": 9.51, "nationalAverage2022_23": 9.42, "nsw2024_25": 9.35, "qld2024_25": 9.05,
+    "racesPerSeason2023_24": 19199, "starters2022_23": 183304,
+    "sources": ["https://thestraight.com.au/?p=18151", "https://www.tbnsw.com.au/?p=5779", "https://publishingservices.racingaustralia.horse/Newsletters/2025_Racing_Australia_Fact_Book/69/"],
+    "confidence": "medium"
+  }
+}

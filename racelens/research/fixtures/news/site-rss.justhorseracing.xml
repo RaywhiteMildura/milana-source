@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  _fixtureNote: CONSTRUCTED fixture for RaceLens. Not a live capture.
+  Stands in for: GET https://www.justhorseracing.com.au/feed/   (also /category/betting/feed, /news/australian-racing/feed)
+  The URL is listed by FeedSpot and used in public code (see research/news.md); the SHAPE is standard WordPress RSS 2.0
+  (content:encoded, dc:creator, category, guid isPermaLink="false", comments) which is MEDIUM confidence for this site.
+  Horse/trainer/jockey names are fictional.
+-->
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+<channel>
+	<title>Just Horse Racing</title>
+	<atom:link href="https://www.justhorseracing.com.au/feed/" rel="self" type="application/rss+xml" />
+	<link>https://www.justhorseracing.com.au</link>
+	<description>Australian Horse Racing News, Tips, Results, Fields and Odds</description>
+	<lastBuildDate>Fri, 23 Oct 2026 21:12:40 +0000</lastBuildDate>
+	<language>en-AU</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.8.3</generator>
+	<item>
+		<title>Flemington tips Saturday 24 October 2026: Brass Lantern the one to beat in Race 7</title>
+		<link>https://www.justhorseracing.com.au/news/australian-racing/flemington-tips-saturday-24-october-2026/</link>
+		<comments>https://www.justhorseracing.com.au/news/australian-racing/flemington-tips-saturday-24-october-2026/#respond</comments>
+		<dc:creator><![CDATA[JHR Staff]]></dc:creator>
+		<pubDate>Fri, 23 Oct 2026 20:30:11 +0000</pubDate>
+		<category><![CDATA[Australian Racing]]></category>
+		<category><![CDATA[Tips]]></category>
+		<category><![CDATA[Flemington]]></category>
+		<guid isPermaLink="false">https://www.justhorseracing.com.au/?p=9931027</guid>
+		<description><![CDATA[Our race-by-race Flemington tips for Saturday 24 October 2026. Brass Lantern (M. Hartigan / T. Marsden) heads our selections in the Group 2 over 1400m, with Southern Compass the value runner on a Soft 5.]]></description>
+		<content:encoded><![CDATA[<p>Flemington hosts a nine-race card on Saturday 24 October 2026 with the track rated a Soft 5 on Friday and the rail out 6m.</p>
+<h2>Race 7 – Group 2, 1400m</h2>
+<p><strong>1. Brass Lantern</strong> – Resumes off a sharp Cranbourne trial. The stable says 1400m first-up is ideal. <em>Top pick.</em></p>
+<p><strong>4. Southern Compass</strong> – Fitter for a first-up third, handles soft ground. <em>Each-way.</em></p>
+<p><strong>6. Velvet Thunder</strong> – New rider T. Marsden, drawn barrier 2. <em>Place.</em></p>
+<p>Scratchings: 9. Harbour Ledger (vet advice).</p>]]></content:encoded>
+		<wfw:commentRss>https://www.justhorseracing.com.au/news/australian-racing/flemington-tips-saturday-24-october-2026/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+	</item>
+	<item>
+		<title>Stable mail: trainers talk up their Flemington Saturday chances</title>
+		<link>https://www.justhorseracing.com.au/news/australian-racing/stable-mail-flemington-saturday-24-october/</link>
+		<comments>https://www.justhorseracing.com.au/news/australian-racing/stable-mail-flemington-saturday-24-october/#respond</comments>
+		<dc:creator><![CDATA[JHR Staff]]></dc:creator>
+		<pubDate>Fri, 23 Oct 2026 09:05:47 +0000</pubDate>
+		<category><![CDATA[Australian Racing]]></category>
+		<category><![CDATA[News]]></category>
+		<guid isPermaLink="false">https://www.justhorseracing.com.au/?p=9930988</guid>
+		<description><![CDATA[Trainer M. Hartigan is bullish about Southern Compass, while Velvet Thunder's camp is unfazed by a late jockey change ahead of Saturday's Flemington meeting.]]></description>
+		<content:encoded><![CDATA[<p>"He's never been better," Hartigan said of Southern Compass. "The Soft 5 is no worry, he's won on worse."</p>
+<p>Velvet Thunder's connections confirmed T. Marsden takes the ride after the regular jockey was suspended at Caulfield.</p>]]></content:encoded>
+		<wfw:commentRss>https://www.justhorseracing.com.au/news/australian-racing/stable-mail-flemington-saturday-24-october/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+	</item>
+</channel>
+</rss>

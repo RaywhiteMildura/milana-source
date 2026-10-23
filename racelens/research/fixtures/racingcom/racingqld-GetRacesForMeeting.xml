@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CONSTRUCTED fixture. Models GET https://www.racingqueensland.com.au/OpenDataWebServices/Meetings.asmx/GetRacesForMeeting?meetingId=131204
+  Evidenced element names (keiba parser + stubs, medium): Races/Race@Id, RaceNumber (or Number), RaceName, TrackRating, Distance ("950 metres" style
+  string), Class. keiba docs also mention race-level "TrackRating, Class, Distance" being retained. Other children are guesses.
+-->
+<Races xmlns="http://www.racingqueensland.com.au/OpenDataWebServices/">
+  <Race Id="2041101">
+    <RaceNumber>1</RaceNumber>
+    <RaceName>Brisbane Racing Club Two-Years-Old Handicap</RaceName>
+    <StartTime>2026-10-24T12:08:00</StartTime>
+    <Distance>1000 metres</Distance>
+    <Class>2YO Hcp</Class>
+    <TrackRating>Good 4</TrackRating>
+    <PrizeMoney>105000</PrizeMoney>
+  </Race>
+  <Race Id="2041102">
+    <RaceNumber>2</RaceNumber>
+    <RaceName>Eagle Farm Maiden Plate</RaceName>
+    <StartTime>2026-10-24T12:43:00</StartTime>
+    <Distance>1200 metres</Distance>
+    <Class>Maiden</Class>
+    <TrackRating>Good 4</TrackRating>
+    <PrizeMoney>85000</PrizeMoney>
+  </Race>
+</Races>

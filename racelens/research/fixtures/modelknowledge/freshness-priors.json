@@ -1,0 +1,21 @@
+{
+  "_fixtureNote": "CONSTRUCTED 2026-10-23. Fitness / freshness priors. Stable-level AU figures are 2016 and from two big Victorian stables; US bucket data from Equibase via Truenicks.",
+  "runsSinceSpell": {
+    "weir2016": {"firstStarter": 0.13, "firstUp": 0.12, "secondUp": 0.10, "thirdUp": 0.18, "fourthUp": 0.17, "source": "https://www.racingandsports.com/news/racing/insight-analysis/2016-05-26/gary-crispes-fundamental-form-analysis-fitness-part-4/366983", "confidence": "medium"},
+    "obrien2016": {"firstUp": 0.10, "firstUpMetro": 0.08, "secondUp": 0.12, "secondUpMetro": 0.10, "note": "third-up the ideal", "source": "https://new.racingandsports.com/news/racing/previews/2016-05-20/the-melbourne-mail-may-21/366415", "confidence": "medium"},
+    "suggestedScore": {"firstUp": -0.25, "secondUp": -0.1, "thirdUp": 0.25, "fourthUp": 0.2, "fifthPlus": 0.05, "confidence": "low", "note": "Override with the runner's own first-up/second-up record (starts:wins-seconds-thirds) when available"}
+  },
+  "daysSinceLastRun": {
+    "buckets": [
+      {"range": [1, 6], "label": "very quick back-up", "score": -0.1, "confidence": "low"},
+      {"range": [7, 13], "label": "quick back-up", "score": 0.05, "note": "US 1-7d bucket had highest win rate 16% / best ROI -22% (n=2,546)", "source": "https://www.truenicks.com/articles/292401/odds-and-trends-the-lowdown-on-layoffs", "confidence": "medium"},
+      {"range": [14, 28], "label": "ideal", "score": 0.2, "note": "Peak ~15-20 d (Berkeley) and up to ~3 weeks (Animals 2021)", "sources": ["https://saas.studentorg.berkeley.edu/rp/predicting-horse-races", "https://doaj.org/article/708927b1b54e4a45b800a9bb6d686bfe"], "confidence": "medium"},
+      {"range": [29, 60], "label": "freshened", "score": -0.05, "confidence": "low"},
+      {"range": [61, 120], "label": "let-up / needs run", "score": -0.15, "confidence": "low"},
+      {"range": [121, 10000], "label": "first-up from spell", "score": -0.25, "note": "US 181+ d bucket worst ROI -32%; check trials", "source": "https://www.truenicks.com/articles/292401/odds-and-trends-the-lowdown-on-layoffs", "confidence": "medium"}
+    ],
+    "communityHeuristic": {"neutralRange": [14, 28], "penaltyPerDayUnder14": 0.03, "penaltyPerDayOver28": 0.01, "source": "https://raw.githubusercontent.com/elpresidentepiff/velo-oracle-prime/main/app/services/feature_engineering.py", "confidence": "low"}
+  },
+  "fieldDefinitions": {"DLR": "days since last run", "DLW": "days since last win", "source": "https://files.racingandsports.com/en/user/products/horsestats_explanation.pdf", "confidence": "high"},
+  "debutants": {"usJuvenileMaidens": {"firstTimeStarters": 0.086, "experienced": 0.114, "source": "https://pastthewire.com/first-time-starter-success-in-two-year-old-maiden-special-weight-races", "confidence": "medium"}, "australia": {"value": null, "note": "No AU dataset found; use trials, stable and sire debut records; lower race confidence when >=3 debutants"}}
+}

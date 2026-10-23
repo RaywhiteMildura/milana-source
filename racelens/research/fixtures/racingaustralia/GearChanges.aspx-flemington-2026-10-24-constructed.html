@@ -1,0 +1,32 @@
+<!--
+  CONSTRUCTED fixture - LOW confidence. Models GET https://www.racingaustralia.horse/FreeFields/GearChanges.aspx?Key=2026Oct24,VIC,Flemington
+  The page EXISTS (search-engine indexed examples: ...GearChanges.aspx?Key=2026Jun01%2CNSW%2CWarren, ...Key=2026May03%2CWA%2CNortham,
+  ...Key=2026Mar31,QLD,Townsville, ...Key=2025Sep05,QLD,Birdsville; the search summary says each "lists runners by number with
+  equipment changes such as blinkers or tongue ties", and the Birdsville page said its gear-change data was unavailable).
+  No public parser of this page was found, so the markup below is INVENTED using the site's usual conventions; the gear vocabulary
+  ("Blinkers FIRST TIME", "Tongue Tie OFF FIRST TIME", "Cross-over Nose Band", "Ear Muffs (Pre-Race Only)", "Winkers", "Visors",
+  "Lugging Bit", "Nose Roll", "Pacifiers") is the standard Australian stewards' wording. The same gear text also appears per runner inside
+  Form.aspx as "Gear Changes: ..." (that location IS evidenced, see Form fixture).
+-->
+<!DOCTYPE html>
+<html>
+<head><title>Flemington: Victoria Racing Club Saturday, 24 October 2026 - Gear Changes</title></head>
+<body>
+<div class="page-content">
+<div class="top">
+  <h2>Flemington: Victoria Racing Club <span class="race-venue-date">Saturday, 24 October 2026</span></h2>
+  <span class="meeting-type">Meeting Type: Metro (TAB MEETING)</span>
+</div>
+<table width="750" border="0" cellpadding="3" cellspacing="0" class="race-gear-changes">
+  <tr class="race-header"><th colspan="3"><span class='raceNum'>Race 1</span> - 12:40PM Maribyrnong Trial Stakes (1000 METRES)</th></tr>
+  <tr><th class="no">No.</th><th>Horse</th><th>Gear Changes</th></tr>
+  <tr class='OddRow'><td class="no">1</td><td class="horse">TRUE LINE</td><td class="gear">Blinkers FIRST TIME</td></tr>
+  <tr class='EvenRow'><td class="no">3</td><td class="horse">GOLDEN STRAIGHT</td><td class="gear">Ear Muffs (Pre-Race Only) FIRST TIME, Tongue Tie FIRST TIME</td></tr>
+  <tr class="race-header"><th colspan="3"><span class='raceNum'>Race 2</span> - 1:15PM Ascot Vale Plate (1200 METRES)</th></tr>
+  <tr><th class="no">No.</th><th>Horse</th><th>Gear Changes</th></tr>
+  <tr class='OddRow'><td class="no">2</td><td class="horse">VALE VIEW</td><td class="gear">Cross-over Nose Band FIRST TIME</td></tr>
+  <tr class='EvenRow'><td class="no">4</td><td class="horse">RIVER BEND (NZ)</td><td class="gear">Blinkers OFF FIRST TIME, Winkers FIRST TIME</td></tr>
+</table>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!--
+  CONSTRUCTED fixture - MEDIUM/LOW confidence. Models GET https://www.racingaustralia.horse/FreeServices/Premierships.aspx?State=VIC[&Season=2025&Table=Trainer]
+  (URL and query params from SteamatipAi NetworkConfig.kt/ScrapingService.kt; default Table is the jockey premiership). That parser reads
+  the first <table> rows after the header as cells[0]=name, [1]=wins, [2]=seconds, [3]=thirds, [4]=fourths, [5]=fifths, [6]=prizemoney,
+  [7]=strike rate, [8]=starts (so the live table has >= 9 columns in that order). Column HEADINGS and classes below are invented.
+  Season runs 1 Aug - 31 Jul; "Season=2025" is interpreted by that client as the 2025/26 season (unverified).
+-->
+<!DOCTYPE html>
+<html>
+<head><title>Racing Australia - Premierships - Victoria</title></head>
+<body>
+<div class="page-content">
+<div class="top"><h2>Jockey Premiership - Victoria - Season 2026/2027 (Metropolitan and Country)</h2></div>
+<table width="750" border="0" cellpadding="3" cellspacing="0" class="premiership">
+  <tr><th>Jockey</th><th>1st</th><th>2nd</th><th>3rd</th><th>4th</th><th>5th</th><th>Prizemoney</th><th>Win %</th><th>Starts</th></tr>
+  <tr class='OddRow'><td>Jamie Kah</td><td>48</td><td>39</td><td>31</td><td>22</td><td>18</td><td>$5,812,400</td><td>19.2</td><td>250</td></tr>
+  <tr class='EvenRow'><td>Mark Zahra</td><td>41</td><td>33</td><td>28</td><td>19</td><td>15</td><td>$6,104,900</td><td>18.1</td><td>227</td></tr>
+  <tr class='OddRow'><td>Blake Shinn</td><td>39</td><td>35</td><td>24</td><td>21</td><td>17</td><td>$4,215,300</td><td>16.5</td><td>236</td></tr>
+  <tr class='EvenRow'><td>Damian Lane</td><td>36</td><td>30</td><td>26</td><td>18</td><td>14</td><td>$5,540,000</td><td>17.9</td><td>201</td></tr>
+  <tr class='OddRow'><td>Celine Gaudray</td><td>31</td><td>29</td><td>33</td><td>25</td><td>20</td><td>$2,301,750</td><td>11.4</td><td>272</td></tr>
+</table>
+</div>
+</body>
+</html>

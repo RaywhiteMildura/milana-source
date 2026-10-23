@@ -1,0 +1,261 @@
+<!--
+  CONSTRUCTED fixture (not a live capture). Models GET https://www.racingaustralia.horse/FreeFields/Form.aspx?Key=2026Oct24,VIC,Flemington
+  (live page ~870 KB, every race; also ...&recentForm=Y (SteamatipAi, tmstipping), /FreeFields/AllForm.aspx?Key=...&recentForm=N (horseride),
+  ...&BodyClass=PrintFriendly (same data, print CSS). Mirrors: racing.racingnsw.com.au, mdata.racingnsw.com.au, m.racingaustralia.horse).
+  This file carries 2 races; Race 1 has 5 runners incl. an emergency (17e) and a scratched runner, Race 2 has 3 runners.
+  NOTE: this comment deliberately avoids literal markup, because the public parsers are plain regexes over the whole document.
+  MARKUP PROVENANCE (class names, quoting style and text grammar are what public parsers written against the live page match):
+   * agends-afk/KaiYingWinning supabase/functions/kyw-sync/ra.js : div.race-venue-bottom (single-quoted class) up to div.comments ; bold labels
+     "Rail Position:", "Track Condition:", "Weather:" ; a[name=RaceN] anchors ; span.raceNum (single-quoted) "Race N" then " - h:mmAM/PM Name (D METRES)" ;
+     tr.race-info > td "Of $..." ; table.race-strip-fields rows tr.OddRow / tr.EvenRow (single-quoted, "Scratched" appended for scratchings) with td.no / td.last / td.hcp / td.penalty ;
+     runner blocks start with a table whose attribute order is border, cellspacing, cellpadding, class=horse-form-table ; span.horse-number, span.horse-name > a,
+     span.plain (age/colour/sex, three pedigree links, "Gear Changes:") ; bold "Trainer:" link + "(Stable)" ; bold "Jockey:" link text "Name 58kg" ; bold "Barrier:" N ;
+     bold "Record:", "1st Up:", "2nd Up:", "Track:", "Dist:", "Track/Dist:", "Firm:", "Good:", "Soft:", "Heavy:", "Synthetic:", "Prizemoney:" ;
+     table.horse-last-start rows tr.OddRow/EvenRow (single-quoted) with td.Pos "2 of 10" (red font T = trial, J = jump-out) and td.remain run line.
+   * desscartes/horseride australian-form.mjs : .race-venue-date must contain "24 October 2026"; table.horse-form-table ; .horse-info .horse-number/.horse-name ; horsecode query param ;
+     .plain a.GreenLink x3 => sire, dam, damsire (ONLY three links inside span.plain) ; "Record: N:W-S-T" ; table.horse-last-start td.Pos / td.remain ; a[href*=Meeting.aspx] ; a[href*=JockeyLastRuns].
+   * RatterAU/Bookie : div.Silks > img src https://racingaustralia.horse/JockeySilks/{id}.png within 600 chars before span.horse-number ; raceNum "Race N" - h:mm AM|PM ; "Key=2026Oct24,VIC," ; "TAB MEETING".
+   * RyzyO/tmstipping tests/ra-silks.test.js (trimmed from a REAL Rosehill 29 Aug 2026 Form.aspx): div.race-title-spacer, relative hrefs "../InteractiveForm/HorseFullForm.aspx?horsecode=...",
+     a.GreenLink single-quoted inside horse-name, span.horse-gear "(Blks)", &rsquo; entities in names, silks img width 46 height 60.
+   * Real Results.aspx captures: div.top > h2 + span.race-venue-date + span.meeting-type + div.printer-friendly, table attribute order (class last), race-info prize line grammar
+     "Of $200,000.1st $120,000, 2nd ..." (no space after the first full stop), welfare sentence, GROUP/LISTED token, bold "Track Name:" / "Track Type:" labels.
+   * Tudman/ml_horses (2013 RISA page): div.race-venue-bottom > div.col1 (Rail Position / Track Condition / Track Type / Weather / Penetrometer) + div.col2 ("... Last Published:") + div.comments.
+  Horse names, codes (base64 of invented ids), form lines and silks ids are INVENTED. The "e" suffix on an emergency number inside span.horse-number is LOW confidence
+  (evidenced on Results/Acceptances/Scratchings by Tudman 2013 and Kelvin 2026, not on Form.aspx); note kyw/Bookie regexes use \d+ and therefore drop that runner.
+-->
+<!DOCTYPE html>
+<html>
+<head><title>Flemington: Victoria Racing Club Saturday, 24 October 2026</title></head>
+<body>
+<div class="page-content">
+<div class="top">
+	<h2>
+		Flemington: Victoria Racing Club
+		<span class="race-venue-date">Saturday, 24 October 2026</span>
+	</h2>
+	<span class="meeting-type">Meeting Type: Metro (TAB MEETING)</span>
+	<br/>
+	<div class="printer-friendly">
+	<a href="?Key=2026Oct24,VIC,Flemington&amp;BodyClass=PrintFriendly" target="_blank"><img alt="Print Friendly Version" border="0" height="19" src="/design/images/print_friendly_btn.png" title="Print Friendly Version" width="30"/>Print Friendly</a>
+	</div>
+</div>
+<div class='race-venue-bottom'>
+	<div class='col1'><b>Rail Position:</b> True Entire Circuit<br/><b>Track Condition:</b> Good 4<br/><b>Track Type:</b> Turf<br/><b>Weather:</b> Fine<br/><b>Penetrometer:</b> 4.78</div>
+	<div class='col2'><b>Form Last Published:</b> 23-Oct-2026 04:31PM</div>
+	<div class='comments'>Track upgraded from Good 4 to Good 3 at 11:05AM following penetrometer reading. Rail true entire circuit.</div>
+</div>
+<br/>
+<a name="Race1"></a><div class="race-title-spacer"></div>
+<table width="750" border="0" cellspacing="0" cellpadding="5" class="race-title">
+	<tr>
+		<th><span class='raceNum'>Race 1</span> - 12:40PM Maribyrnong Trial Stakes (1000 METRES)
+		<span class="localtimedisplayed">Times displayed in local time of Race Meeting</span>
+		</th>
+	</tr>
+	<tr class="race-info">
+		<td><b>Of $200,000.1st $120,000, 2nd $36,000, 3rd $18,000, 4th $9,000, 5th $5,000, 6th $4,000, 7th $4,000, 8th $4,000</b><br/>Prize money contribution totalling 3.5% will be directed to jockey, equine and participant welfare prior to distribution LISTED<br/>Set Weights, Two-Years-Old, Apprentices cannot claim.<br/>This race carries a $10,000 Nominator Bonus only for qualified horses.<br/><br/><b>Track Name:</b> Main <b>Track Type:</b> Turf<br/>Field Limit: 16 + 4 EM</td>
+	</tr>
+</table>
+<br/>
+<table width="750" border="0" cellpadding="3" cellspacing="0" class="race-strip-fields">
+	<tr><th class="no">No.</th><th class="last">Last 10</th><th>Horse</th><th>Trainer</th><th>Jockey</th><th>Barrier</th><th>Weight</th><th class="penalty">Penalty</th><th class="hcp">Hcp Rating</th></tr>
+	<tr class='OddRow'><td class="no">1</td><td class="last">11</td><td class="horse"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxMQ%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0x" target="_blank">TRUE LINE</a></td><td class="trainer">Ciaron Maher</td><td class="jockey">Jamie Kah</td><td>4</td><td>58kg</td><td class="penalty"></td><td class="hcp">92</td></tr>
+	<tr class='EvenRow'><td class="no">2</td><td class="last">1</td><td class="horse"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxMg%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0y" target="_blank">HARBOUR SPRINT (NZ)</a></td><td class="trainer">Anthony &amp; Sam Freedman</td><td class="jockey">Craig Williams</td><td>1</td><td>58kg</td><td class="penalty"></td><td class="hcp"></td></tr>
+	<tr class='OddRow'><td class="no">3</td><td class="last">21</td><td class="horse"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxMw%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0z" target="_blank">GOLDEN STRAIGHT</a></td><td class="trainer">Chris Waller</td><td class="jockey">Mark Zahra</td><td>8</td><td>56kg</td><td class="penalty"></td><td class="hcp">90</td></tr>
+	<tr class='EvenRow Scratched'><td class="no">6</td><td class="last">2x1</td><td class="horse"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxNg%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS02" target="_blank">MISSING ENTRY</a></td><td class="trainer">Chris Waller</td><td class="jockey">Blake Shinn</td><td>7</td><td>58kg</td><td class="penalty"></td><td class="hcp">89</td></tr>
+	<tr class='OddRow'><td class="no">17e</td><td class="last">x4</td><td class="horse"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxNw%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0xNw" target="_blank">SPARE PART</a></td><td class="trainer">Danny O'Brien</td><td class="jockey">Celine Gaudray (a2)</td><td>12</td><td>56kg</td><td class="penalty"></td><td class="hcp"></td></tr>
+</table>
+<br/>
+
+<table border="0" cellspacing="0" cellpadding="0" class="horse-form-table"><tr><td colspan="5">
+	<div class='Silks'>
+		<img src="https://racingaustralia.horse/JockeySilks/64092.png" width="46" height="60">
+	</div>
+	<div class='horse-info'>
+		<span class="horse-number">1</span>
+		<span class="horse-name"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxMQ%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0x" target="_blank">TRUE LINE</a></span>
+		<span class="horse-gear">(Blks)</span>
+		<span class="plain">2 year old bay colt (male) <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=U0lSRTAwMQ%3d%3d">SNITZEL</a> x <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=REFNMDAx">STRAIGHT LINE</a> (<a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RFNJUkUwMDE%3d">REDOUTE'S CHOICE</a>)<br/>Owners: Mr C Maher, Mrs J Maher, Flemington Syndicate (Mgr: T Line)<br/>Colours: Navy Blue, White Stars, Red Sleeves And Cap<br/>Gear Changes: Blinkers FIRST TIME</span>
+	</div>
+	<div class='horse-details'>
+	<b>Trainer:</b> <a class="GreenLink" href="../InteractiveForm/TrainerLastRuns.aspx?trainercode=VDAwMDE%3d&amp;trainername=Ciaron+Maher" target="_blank">Ciaron Maher</a> (Ballarat)
+	<b>Jockey:</b> <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDE%3d" target="_blank">Jamie Kah 58kg</a>
+	<b>Barrier:</b> 4<br/>
+	<b>Record:</b> 4:3-1-0 <b>1st Up:</b> 1:1-0-0 <b>2nd Up:</b> 1:0-1-0 <b>Track:</b> 1:1-0-0 <b>Dist:</b> 2:2-0-0 <b>Track/Dist:</b> 1:1-0-0 <b>Firm:</b> 0:0-0-0 <b>Good:</b> 3:2-1-0 <b>Soft:</b> 1:1-0-0 <b>Heavy:</b> 0:0-0-0 <b>Synthetic:</b> 0:0-0-0 <b>Prizemoney:</b> $212,400<br/>
+	</div>
+	<table class="horse-last-start" width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr class='OddRow'><td class='Pos'>1 of 9</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=Q0FVTC0yMDI2MTAxMC0x">CAUL 10Oct26</a></b> 1000m Good4 2YO SW $150,000 ($90,000) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDE%3d">Jamie Kah</a> 57kg Barrier 2<br/>1st True Line 57kg, 2nd Rail Runner 57kg 0:57.45 (600m 33.80), 0.75L, 3rd@800m, 1st@400m, $2.40/$2.30/$2.20/$2.10F</td></tr>
+		<tr class='EvenRow'><td class='Pos'>1 of 7</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=RkxFTS0yMDI2MDkxOS0x">FLEM 19Sep26</a></b> 1000m Good3 2YO MDN-SW $75,000 ($41,250) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDE%3d">Jamie Kah</a> 57kg Barrier 5<br/>1st True Line 57kg, 2nd Second Best 55kg, 3rd Third Wheel 57kg 0:56.98 (600m 33.52), 1.5L, 2nd@800m, 1st@400m, $3.10/$2.80/$2.60/$2.50F</td></tr>
+		<tr class='OddRow'><td class='Pos'>2 of 8</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=TVYtMjAyNjA4MjktMQ">MV 29Aug26</a></b> 1000m Soft5 2YO MDN-SW $60,000 ($11,400) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDc%3d">Mark Zahra</a> 57kg (cd 55kg) Barrier 1<br/>1st Quick Start 57kg, 2nd True Line 57kg 0:58.60 (600m 34.70), 0.3L, 4th@800m, 3rd@400m, $4.80/$4.40/$4.20/$4EF</td></tr>
+		<tr class='EvenRow'><td class='Pos'><font color="#ff0000">T</font> 1 of 6</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=Q1JBTi0yMDI2MDgxNS1UMQ">CRAN 15Aug26</a></b> 800m Good4 2YO TRL $0 <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDE%3d">Jamie Kah</a> 0kg Barrier 3<br/>1st True Line 0kg, 2nd Trial Horse 0kg 0:47.10 (600m 34.10), 2.0L</td></tr>
+	</table>
+</td></tr></table>
+
+<table border="0" cellspacing="0" cellpadding="0" class="horse-form-table"><tr><td colspan="5">
+	<div class='Silks'>
+		<img src="https://racingaustralia.horse/JockeySilks/90159.png" width="46" height="60">
+	</div>
+	<div class='horse-info'>
+		<span class="horse-number">2</span>
+		<span class="horse-name"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxMg%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0y" target="_blank">HARBOUR SPRINT (NZ)</a></span>
+		<span class="plain">2 year old brown colt (male) <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=U0lSRTAwNw%3d%3d">SAVABEEL</a> x <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=REFNMDA3">HARBOUR LIGHTS</a> (<a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RFNJUkUwMDc%3d">ZABEEL</a>)<br/>Owners: Waikato Stud Syndicate<br/>Gear Changes: Nil</span>
+	</div>
+	<div class='horse-details'>
+	<b>Trainer:</b> <a class="GreenLink" href="../InteractiveForm/TrainerLastRuns.aspx?trainercode=VDAwMDI%3d&amp;trainername=Anthony+%26+Sam+Freedman" target="_blank">Anthony &amp; Sam Freedman</a> (Pinecliff)
+	<b>Jockey:</b> <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDI%3d" target="_blank">Craig Williams 58kg</a>
+	<b>Barrier:</b> 1<br/>
+	<b>Record:</b> 1:1-0-0 <b>1st Up:</b> 1:1-0-0 <b>2nd Up:</b> 0:0-0-0 <b>Track:</b> 0:0-0-0 <b>Dist:</b> 0:0-0-0 <b>Track/Dist:</b> 0:0-0-0 <b>Firm:</b> 0:0-0-0 <b>Good:</b> 1:1-0-0 <b>Soft:</b> 0:0-0-0 <b>Heavy:</b> 0:0-0-0 <b>Synthetic:</b> 0:0-0-0 <b>Prizemoney:</b> $55,000<br/>
+	</div>
+	<table class="horse-last-start" width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr class='OddRow'><td class='Pos'>1 of 12</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=U0FORC0yMDI2MTAwNy0y">SAND 07Oct26</a></b> 1100m Good4 2YO MDN-SW $100,000 ($55,000) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDI%3d">Craig Williams</a> 57kg Barrier 9<br/>1st Harbour Sprint 57kg, 2nd Lane Way 57kg 1:04.90 (600m 34.15), 2.25L, 1st@800m, 1st@400m, $6/$5.50/$5/$4.60</td></tr>
+		<tr class='EvenRow'><td class='Pos'><font color="#ff0000">J</font> 2 of 5</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=RkxFTS0yMDI2MDkyNS1KMQ">FLEM 25Sep26</a></b> 800m Good4 2YO JUMPOUT $0 <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDI%3d">Craig Williams</a> 0kg Barrier 2<br/>1st Fast Jumper 0kg, 2nd Harbour Sprint 0kg 0:48.20 (600m 35.00), 1.0L</td></tr>
+	</table>
+</td></tr></table>
+
+<table border="0" cellspacing="0" cellpadding="0" class="horse-form-table"><tr><td colspan="5">
+	<div class='Silks'>
+		<img src="https://racingaustralia.horse/JockeySilks/90305.png" width="46" height="60">
+	</div>
+	<div class='horse-info'>
+		<span class="horse-number">3</span>
+		<span class="horse-name"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxMw%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0z" target="_blank">GOLDEN STRAIGHT</a></span>
+		<span class="plain">2 year old chestnut filly (female) <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=U0lSRTAwMg%3d%3d">I AM INVINCIBLE</a> x <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=REFNMDAy">GOLDEN MILE</a> (<a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RFNJUkUwMDI%3d">LONHRO</a>)<br/>Owners: Golden Straight Syndicate (Mgr: G Straight)<br/>Gear Changes: Ear Muffs (Pre-Race Only) FIRST TIME, Tongue Tie FIRST TIME</span>
+	</div>
+	<div class='horse-details'>
+	<b>Trainer:</b> <a class="GreenLink" href="../InteractiveForm/TrainerLastRuns.aspx?trainercode=VDAwMDQ%3d&amp;trainername=Chris+Waller" target="_blank">Chris Waller</a> (Flemington)
+	<b>Jockey:</b> <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDc%3d" target="_blank">Mark Zahra 56kg</a>
+	<b>Barrier:</b> 8<br/>
+	<b>Record:</b> 2:1-1-0 <b>1st Up:</b> 1:0-1-0 <b>2nd Up:</b> 1:1-0-0 <b>Track:</b> 0:0-0-0 <b>Dist:</b> 1:0-1-0 <b>Track/Dist:</b> 0:0-0-0 <b>Firm:</b> 0:0-0-0 <b>Good:</b> 1:1-0-0 <b>Soft:</b> 1:0-1-0 <b>Heavy:</b> 0:0-0-0 <b>Synthetic:</b> 0:0-0-0 <b>Prizemoney:</b> $92,500<br/>
+	</div>
+	<table class="horse-last-start" width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr class='OddRow'><td class='Pos'>1 of 8</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=UkFORC0yMDI2MTAwMy0y">RAND 03Oct26</a></b> 1100m Good4 2YO HCP $100,000 ($56,500) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDk%3d">James McDonald</a> 56kg Barrier 3<br/>1st Golden Straight 56kg, 2nd Sydney Sider 57kg 1:04.10 (600m 34.05), 1.25L, 2nd@800m, 2nd@400m, $3.50/$3.30/$3.20/$3F</td></tr>
+		<tr class='EvenRow'><td class='Pos'>2 of 10</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=UkFORC0yMDI2MDkxMi00">RAND 12Sep26</a></b> 1000m Soft6 2YO MDN-SW $100,000 ($18,000) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDk%3d">James McDonald</a> 55kg Barrier 9<br/>1st Harbour Lights 56kg, 2nd Golden Straight 55kg 0:58.21 (600m 34.40), 0.5L, 7th@800m, 5th@400m, $6/$6.50/$7/$7.50</td></tr>
+	</table>
+</td></tr></table>
+
+<table border="0" cellspacing="0" cellpadding="0" class="horse-form-table"><tr><td colspan="5">
+	<div class='Silks'>
+		<img src="https://racingaustralia.horse/JockeySilks/11327.png" width="46" height="60">
+	</div>
+	<div class='horse-info'>
+		<span class="horse-number">6</span>
+		<span class="horse-name"><s><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxNg%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS02" target="_blank">MISSING ENTRY</a></s> <span class="scratched-note">Scratched 8:05AM</span></span>
+		<span class="plain">2 year old brown gelding (male) <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=U0lSRTAwMw%3d%3d">ZOUSTAR</a> x <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=REFNMDAz">LOST PROPERTY</a> (<a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RFNJUkUwMDM%3d">FASTNET ROCK</a>)<br/>Gear Changes: Nil</span>
+	</div>
+	<div class='horse-details'>
+	<b>Trainer:</b> <a class="GreenLink" href="../InteractiveForm/TrainerLastRuns.aspx?trainercode=VDAwMDQ%3d&amp;trainername=Chris+Waller" target="_blank">Chris Waller</a> (Flemington)
+	<b>Jockey:</b> <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDU%3d" target="_blank">Blake Shinn 58kg</a>
+	<b>Barrier:</b> 7<br/>
+	<b>Record:</b> 3:2-0-1 <b>1st Up:</b> 1:1-0-0 <b>2nd Up:</b> 1:0-0-0 <b>Track:</b> 1:0-0-1 <b>Dist:</b> 2:1-0-0 <b>Track/Dist:</b> 0:0-0-0 <b>Firm:</b> 0:0-0-0 <b>Good:</b> 2:2-0-0 <b>Soft:</b> 1:0-0-1 <b>Heavy:</b> 0:0-0-0 <b>Synthetic:</b> 0:0-0-0 <b>Prizemoney:</b> $96,000<br/>
+	</div>
+	<table class="horse-last-start" width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr class='OddRow'><td class='Pos'>3 of 11</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=RkxFTS0yMDI2MTAwNC0x">FLEM 04Oct26</a></b> 1100m Good3 2YO HCP $130,000 ($11,700) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDU%3d">Blake Shinn</a> 57.5kg Barrier 10<br/>1st Fast Lane 56kg, 2nd Second Lane 57kg, 3rd Missing Entry 57.5kg 1:03.55 (600m 33.90), 1.9L, 10th@800m, 8th@400m, $12/$13/$14/$15</td></tr>
+	</table>
+</td></tr></table>
+
+<table border="0" cellspacing="0" cellpadding="0" class="horse-form-table"><tr><td colspan="5">
+	<div class='Silks'>
+		<img src="https://racingaustralia.horse/JockeySilks/48283.png" width="46" height="60">
+	</div>
+	<div class='horse-info'>
+		<span class="horse-number">17e</span>
+		<span class="horse-name"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAxNw%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMS0xNw" target="_blank">SPARE PART</a></span>
+		<span class="plain">2 year old bay filly (female) <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=U0lSRTAwOA%3d%3d">WRITTEN TYCOON</a> x <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=REFNMDA4">SPARE CHANGE</a> (<a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RFNJUkUwMDg%3d">EXCEED AND EXCEL</a>)<br/>Gear Changes: Nil</span>
+	</div>
+	<div class='horse-details'>
+	<b>Trainer:</b> <a class="GreenLink" href="../InteractiveForm/TrainerLastRuns.aspx?trainercode=VDAwMDM%3d&amp;trainername=Danny+O%27Brien" target="_blank">Danny O'Brien</a> (Flemington)
+	<b>Jockey:</b> <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDM%3d" target="_blank">Celine Gaudray 56kg (a2)</a>
+	<b>Barrier:</b> 12<br/>
+	<b>Record:</b> 1:0-0-0 <b>1st Up:</b> 1:0-0-0 <b>2nd Up:</b> 0:0-0-0 <b>Track:</b> 0:0-0-0 <b>Dist:</b> 1:0-0-0 <b>Track/Dist:</b> 0:0-0-0 <b>Firm:</b> 0:0-0-0 <b>Good:</b> 1:0-0-0 <b>Soft:</b> 0:0-0-0 <b>Heavy:</b> 0:0-0-0 <b>Synthetic:</b> 0:0-0-0 <b>Prizemoney:</b> $2,000<br/>
+	</div>
+	<table class="horse-last-start" width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr class='OddRow'><td class='Pos'>4 of 9</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=QkRHTy0yMDI2MTAxMS0x">BDGO 11Oct26</a></b> 1000m Good4 2YO MDN-SW $40,000 ($2,000) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDM%3d">Celine Gaudray</a> 56kg (cd 54kg) Barrier 6<br/>1st Bendigo Star 57kg, 2nd Country Mile 55kg, 3rd Third Place 57kg 0:58.90 (600m 34.60), 3.1L, 6th@800m, 5th@400m, $21/$26/$31/$31</td></tr>
+	</table>
+</td></tr></table>
+
+<a name="Race2"></a><div class="race-title-spacer"></div>
+<table width="750" border="0" cellspacing="0" cellpadding="5" class="race-title">
+	<tr>
+		<th><span class='raceNum'>Race 2</span> - 1:15PM Ascot Vale Plate (1200 METRES)
+		<span class="localtimedisplayed">Times displayed in local time of Race Meeting</span>
+		</th>
+	</tr>
+	<tr class="race-info">
+		<td><b>Of $150,000.1st $82,500, 2nd $27,000, 3rd $13,500, 4th $6,750, 5th $3,750, 6th $3,000, 7th $3,000, 8th $3,000, 9th $3,000, 10th $3,000</b><br/>Prize money contribution totalling 3.5% will be directed to jockey, equine and participant welfare prior to distribution <br/>BENCHMARK 78, Handicap, Minimum Weight 54kg, Apprentices can claim.<br/><br/><b>Track Name:</b> Main <b>Track Type:</b> Turf<br/>Field Limit: 16 + 4 EM</td>
+	</tr>
+</table>
+<br/>
+<table width="750" border="0" cellpadding="3" cellspacing="0" class="race-strip-fields">
+	<tr><th class="no">No.</th><th class="last">Last 10</th><th>Horse</th><th>Trainer</th><th>Jockey</th><th>Barrier</th><th>Weight</th><th class="penalty">Penalty</th><th class="hcp">Hcp Rating</th></tr>
+	<tr class='OddRow'><td class="no">1</td><td class="last">3x12104</td><td class="horse"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAyMQ%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMi0x" target="_blank">ASCOT AVENUE</a></td><td class="trainer">Ciaron Maher</td><td class="jockey">Damian Lane</td><td>6</td><td>61kg</td><td class="penalty"></td><td class="hcp">84</td></tr>
+	<tr class='EvenRow'><td class="no">2</td><td class="last">21x5631</td><td class="horse"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAyMg%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMi0y" target="_blank">VALE VIEW</a></td><td class="trainer">Phillip Stokes</td><td class="jockey">Celine Gaudray (a2)</td><td>11</td><td>59.5kg</td><td class="penalty">1.5kg</td><td class="hcp">81</td></tr>
+	<tr class='OddRow'><td class="no">4</td><td class="last">0x4421</td><td class="horse"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAyNA%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMi00" target="_blank">RIVER BEND (NZ)</a></td><td class="trainer">Danny O'Brien</td><td class="jockey">Harry Coffey</td><td>2</td><td>58kg</td><td class="penalty"></td><td class="hcp">78</td></tr>
+</table>
+<br/>
+
+<table border="0" cellspacing="0" cellpadding="0" class="horse-form-table"><tr><td colspan="5">
+	<div class='Silks'>
+		<img src="https://racingaustralia.horse/JockeySilks/76710.png" width="46" height="60">
+	</div>
+	<div class='horse-info'>
+		<span class="horse-number">1</span>
+		<span class="horse-name"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAyMQ%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMi0x" target="_blank">ASCOT AVENUE</a></span>
+		<span class="plain">5 year old bay gelding (male) <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=U0lSRTAwNA%3d%3d">WRITTEN TYCOON</a> x <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=REFNMDA0">AVENUE OF STARS</a> (<a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RFNJUkUwMDQ%3d">ENCOSTA DE LAGO</a>)<br/>Gear Changes: Nil</span>
+	</div>
+	<div class='horse-details'>
+	<b>Trainer:</b> <a class="GreenLink" href="../InteractiveForm/TrainerLastRuns.aspx?trainercode=VDAwMDE%3d&amp;trainername=Ciaron+Maher" target="_blank">Ciaron Maher</a> (Ballarat)
+	<b>Jockey:</b> <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDQ%3d" target="_blank">Damian Lane 61kg</a>
+	<b>Barrier:</b> 6<br/>
+	<b>Record:</b> 21:6-4-3 <b>1st Up:</b> 4:2-0-1 <b>2nd Up:</b> 4:1-1-0 <b>Track:</b> 5:2-1-1 <b>Dist:</b> 9:3-2-1 <b>Track/Dist:</b> 3:1-1-0 <b>Firm:</b> 0:0-0-0 <b>Good:</b> 15:5-3-2 <b>Soft:</b> 5:1-1-1 <b>Heavy:</b> 1:0-0-0 <b>Synthetic:</b> 0:0-0-0 <b>Prizemoney:</b> $486,300<br/>
+	</div>
+	<table class="horse-last-start" width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr class='OddRow'><td class='Pos'>4 of 12</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=Q0FVTC0yMDI2MTAxMC03">CAUL 10Oct26</a></b> 1200m Soft5 BM84 $130,000 ($6,500) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDQ%3d">Damian Lane</a> 60.5kg Barrier 12<br/>1st Caulfield Cat 58kg, 2nd Heath Road 59kg, 3rd Glen Eira 57.5kg 1:10.55 (600m 34.95), 1.4L, 9th@800m, 7th@400m, $7/$7.50/$8/$8.50</td></tr>
+		<tr class='EvenRow'><td class='Pos'>1 of 10</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=RkxFTS0yMDI2MDkxOS01">FLEM 19Sep26</a></b> 1200m Good4 BM78 $130,000 ($71,500) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDQ%3d">Damian Lane</a> 60kg Barrier 4<br/>1st Ascot Avenue 60kg, 2nd Straight Shooter 58.5kg 1:09.88 (600m 33.60), 0.8L, 5th@800m, 3rd@400m, $4.60/$4.40/$4.20/$4.40</td></tr>
+		<tr class='OddRow'><td class='Pos'>10 of 14</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=TVYtMjAyNjA2MDctNw">MV 07Jun26</a></b> 1200m Heavy8 BM84 $130,000 ($0) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDQ%3d">Damian Lane</a> 59kg Barrier 2<br/>1st Mud Lark 57kg, 2nd Puddle Jumper 58kg 1:14.10 (600m 37.20), 8.5L, 3rd@800m, 4th@400m, $5/$6/$6.50/$7</td></tr>
+	</table>
+</td></tr></table>
+
+<table border="0" cellspacing="0" cellpadding="0" class="horse-form-table"><tr><td colspan="5">
+	<div class='Silks'>
+		<img src="https://racingaustralia.horse/JockeySilks/88473.png" width="46" height="60">
+	</div>
+	<div class='horse-info'>
+		<span class="horse-number">2</span>
+		<span class="horse-name"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAyMg%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMi0y" target="_blank">VALE VIEW</a></span>
+		<span class="plain">4 year old grey mare (female) <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=U0lSRTAwNQ%3d%3d">TOORAK TOFF</a> x <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=REFNMDA1">VALLEY VISTA</a> (<a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RFNJUkUwMDU%3d">GALILEO</a>)<br/>Gear Changes: Cross-over Nose Band FIRST TIME</span>
+	</div>
+	<div class='horse-details'>
+	<b>Trainer:</b> <a class="GreenLink" href="../InteractiveForm/TrainerLastRuns.aspx?trainercode=VDAwMDY%3d&amp;trainername=Phillip+Stokes" target="_blank">Phillip Stokes</a> (Pakenham)
+	<b>Jockey:</b> <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDM%3d" target="_blank">Celine Gaudray 59.5kg (a2)</a>
+	<b>Barrier:</b> 11<br/>
+	<b>Record:</b> 13:4-3-1 <b>1st Up:</b> 3:1-1-0 <b>2nd Up:</b> 3:1-0-1 <b>Track:</b> 2:0-1-0 <b>Dist:</b> 6:2-1-1 <b>Track/Dist:</b> 1:0-1-0 <b>Firm:</b> 0:0-0-0 <b>Good:</b> 9:3-2-1 <b>Soft:</b> 4:1-1-0 <b>Heavy:</b> 0:0-0-0 <b>Synthetic:</b> 0:0-0-0 <b>Prizemoney:</b> $241,900<br/>
+	</div>
+	<table class="horse-last-start" width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr class='OddRow'><td class='Pos'>1 of 9</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=UEFLRS0yMDI2MTAwOC00">PAKE 08Oct26</a></b> 1200m Good4 BM70 $50,000 ($27,500) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDM%3d">Celine Gaudray</a> 58kg (cd 56kg) Barrier 3<br/>1st Vale View 58kg, 2nd Pakenham Pride 59kg 1:10.90 (600m 34.20), 1.0L, 1st@800m, 1st@400m, $3.20/$3.00/$2.90/$2.80F</td></tr>
+	</table>
+</td></tr></table>
+
+<table border="0" cellspacing="0" cellpadding="0" class="horse-form-table"><tr><td colspan="5">
+	<div class='Silks'>
+		<img src="https://racingaustralia.horse/JockeySilks/9906.png" width="46" height="60">
+	</div>
+	<div class='horse-info'>
+		<span class="horse-number">4</span>
+		<span class="horse-name"><a class='GreenLink' href="../InteractiveForm/HorseFullForm.aspx?horsecode=RkxFTTAwMDAwMDAyNA%3d%3d&amp;stage=Form&amp;Key=2026Oct24,VIC,Flemington&amp;src=horseform&amp;raceentry=UkUtMi00" target="_blank">RIVER BEND (NZ)</a></span>
+		<span class="plain">6 year old bay gelding (male) <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=U0lSRTAwNg%3d%3d">SAVABEEL</a> x <a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=REFNMDA2">RIVER ROAD</a> (<a class="GreenLink" href="../InteractiveForm/HorseFullForm.aspx?horsecode=RFNJUkUwMDY%3d">ZABEEL</a>)<br/>Gear Changes: Blinkers OFF FIRST TIME, Winkers FIRST TIME</span>
+	</div>
+	<div class='horse-details'>
+	<b>Trainer:</b> <a class="GreenLink" href="../InteractiveForm/TrainerLastRuns.aspx?trainercode=VDAwMDM%3d&amp;trainername=Danny+O%27Brien" target="_blank">Danny O'Brien</a> (Flemington)
+	<b>Jockey:</b> <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDg%3d" target="_blank">Harry Coffey 58kg</a>
+	<b>Barrier:</b> 2<br/>
+	<b>Record:</b> 28:5-6-4 <b>1st Up:</b> 5:0-2-1 <b>2nd Up:</b> 5:1-1-0 <b>Track:</b> 6:1-2-0 <b>Dist:</b> 12:3-2-2 <b>Track/Dist:</b> 3:1-1-0 <b>Firm:</b> 0:0-0-0 <b>Good:</b> 18:3-4-3 <b>Soft:</b> 8:2-2-1 <b>Heavy:</b> 2:0-0-0 <b>Synthetic:</b> 0:0-0-0 <b>Prizemoney:</b> $318,750<br/>
+	</div>
+	<table class="horse-last-start" width="100%" border="0" cellpadding="2" cellspacing="0">
+		<tr class='OddRow'><td class='Pos'>1 of 14</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=QkRHTy0yMDI2MTAxMS02">BDGO 11Oct26</a></b> 1300m Good4 BM70 $50,000 ($27,500) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDg%3d">Harry Coffey</a> 60kg Barrier 8<br/>1st River Bend 60kg, 2nd Bendigo Belle 57kg 1:17.20 (600m 35.10), 0.4L, 6th@800m, 4th@400m, $9/$8.50/$8/$7.50</td></tr>
+		<tr class='EvenRow'><td class='Pos'>2 of 11</td><td class='remain'><b><a class="GreenLink" href="../InteractiveForm/Meeting.aspx?racecode=R0VFTC0yMDI2MDkyNS0z">GEEL 25Sep26</a></b> 1200m Soft7 BM70 $50,000 ($9,000) <a class="GreenLink" href="../InteractiveForm/JockeyLastRuns.aspx?jockeycode=SjAwMDg%3d">Harry Coffey</a> 59.5kg Barrier 1<br/>1st Wet Tracker 58kg, 2nd River Bend 59.5kg 1:12.80 (600m 36.40), 0.2L, 3rd@800m, 2nd@400m, $6/$6.50/$6/$5.50</td></tr>
+	</table>
+</td></tr></table>
+<p class="copyright">VIC racing materials, including fields, form and horse racing results, is subject to copyright which is owned by RVL and other parties working with it.</p>
+</div>
+</body>
+</html>

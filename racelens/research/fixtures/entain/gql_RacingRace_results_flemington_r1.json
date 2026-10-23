@@ -1,0 +1,180 @@
+{
+  "_fixtureNote": "CONSTRUCTED, MEDIUM/LOW confidence (shape from the RacingRace operation document in DanielTomaro13/sportsdata-mcp specs/entain.documents.json; no live sample seen). GET /gql/router?operationName=RacingRace&variables={\"raceId\":\"RacingRace:<uuid>\",\"shouldFetchPools\":false}. Use for official-ish results + dividends + margins once a race is Final. fixedWin/fixedPlace are fractional: decimal = numerator/denominator + 1.",
+  "data": {
+    "race": {
+      "id": "RacingRace:e143b009-7376-5899-982c-f79b4a46fbcd",
+      "results": {
+        "substitutions": [],
+        "exoticsAndCompounds": [
+          {
+            "name": "Exacta",
+            "entrantsSummary": "3-1",
+            "dividends": [
+              {
+                "description": "Exacta",
+                "dividend": 11.2,
+                "tote": "VIC",
+                "variant": "FINAL"
+              }
+            ]
+          },
+          {
+            "name": "Trifecta",
+            "entrantsSummary": "3-1-5",
+            "dividends": [
+              {
+                "description": "Trifecta",
+                "dividend": 54.6,
+                "tote": "VIC",
+                "variant": "FINAL"
+              }
+            ]
+          }
+        ],
+        "entrants": [
+          {
+            "id": "RacingEntrant:436e00cd-f3f8-51c5-8ac2-4bc9ffa77434",
+            "barrier": 1,
+            "barrierPosition": "1",
+            "name": "Quiet Thunder",
+            "number": 3,
+            "form": {
+              "trainer": {
+                "name": "Danny O'Brien"
+              },
+              "jockey": {
+                "name": "Craig Williams"
+              }
+            },
+            "results": {
+              "winDividends": [
+                {
+                  "dividend": 2.9,
+                  "tote": "VIC"
+                }
+              ],
+              "placeDividends": [
+                {
+                  "dividend": 1.3,
+                  "tote": "VIC"
+                }
+              ],
+              "fixedPlace": {
+                "numerator": 35,
+                "denominator": 100
+              },
+              "fixedWin": {
+                "numerator": 180,
+                "denominator": 100
+              },
+              "fixedTop3": null,
+              "position": 1
+            }
+          },
+          {
+            "id": "RacingEntrant:65bde04e-6380-5819-a509-f3217a66e212",
+            "barrier": 3,
+            "barrierPosition": "3",
+            "name": "Sunset Baron",
+            "number": 1,
+            "form": {
+              "trainer": {
+                "name": "Chris Waller"
+              },
+              "jockey": {
+                "name": "Jamie Kah"
+              }
+            },
+            "results": {
+              "winDividends": [],
+              "placeDividends": [
+                {
+                  "dividend": 1.5,
+                  "tote": "VIC"
+                }
+              ],
+              "fixedPlace": {
+                "numerator": 50,
+                "denominator": 100
+              },
+              "fixedWin": {
+                "numerator": 240,
+                "denominator": 100
+              },
+              "fixedTop3": null,
+              "position": 2
+            }
+          },
+          {
+            "id": "RacingEntrant:e894b457-053e-52a3-8584-a707752cdc35",
+            "barrier": 5,
+            "barrierPosition": "5",
+            "name": "Mister Kowloon",
+            "number": 5,
+            "form": {
+              "trainer": {
+                "name": "Mick Price & Michael Kent Jnr"
+              },
+              "jockey": {
+                "name": "Damian Lane"
+              }
+            },
+            "results": {
+              "winDividends": [],
+              "placeDividends": [
+                {
+                  "dividend": 2.2,
+                  "tote": "VIC"
+                }
+              ],
+              "fixedPlace": {
+                "numerator": 150,
+                "denominator": 100
+              },
+              "fixedWin": {
+                "numerator": 700,
+                "denominator": 100
+              },
+              "fixedTop3": null,
+              "position": 3
+            }
+          },
+          {
+            "id": "RacingEntrant:f19b77ca-42a4-5371-a3ef-8bba915bcaf7",
+            "barrier": 8,
+            "barrierPosition": "8",
+            "name": "Tin Soldier",
+            "number": 2,
+            "form": {
+              "trainer": {
+                "name": "Ciaron Maher"
+              },
+              "jockey": {
+                "name": "Blake Shinn"
+              }
+            },
+            "results": {
+              "winDividends": [],
+              "placeDividends": [],
+              "fixedPlace": {
+                "numerator": 90,
+                "denominator": 100
+              },
+              "fixedWin": {
+                "numerator": 400,
+                "denominator": 100
+              },
+              "fixedTop3": null,
+              "position": 4
+            }
+          }
+        ]
+      },
+      "meeting": {
+        "id": "RacingMeeting:c1eb9968-e932-5b14-a0f8-d159722d5017",
+        "name": "Flemington",
+        "meetingCode": "FLE"
+      }
+    }
+  }
+}

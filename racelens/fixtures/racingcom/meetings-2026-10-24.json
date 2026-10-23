@@ -1,0 +1,12 @@
+{
+  "_fixtureNote": "Constructed AppSync response for GetMeetingByDate; field names from working clients (research/racingcom.md §2.3).",
+  "data": {
+    "m": [
+      { "id": "MEET-FLM-20261024", "date": "2026-10-24", "meetingName": "Flemington", "venueName": "Flemington", "state": "VIC", "country": "AUS", "isTab": 1, "isTrial": false, "isJumpOut": false, "isPicnic": false, "railPosition": "+3m Entire Circuit", "trackCondition": "Good", "trackRating": "4", "weather": "Fine", "racesCount": 9, "status": "Acceptances", "meetUrl": "/form/2026-10-24/flemington" },
+      { "id": "MEET-RAN-20261024", "date": "2026-10-24", "meetingName": "Royal Randwick", "venueName": "Randwick", "state": "NSW", "country": "AUS", "isTab": 1, "isTrial": false, "isJumpOut": false, "isPicnic": false, "railPosition": "True", "trackCondition": "Soft", "trackRating": "5", "weather": "Overcast", "racesCount": 10 },
+      { "id": "MEET-CRN-TRIAL", "date": "2026-10-24", "meetingName": "Cranbourne Trials", "venueName": "Cranbourne", "state": "VIC", "country": "AUS", "isTab": 0, "isTrial": true, "isJumpOut": false, "isPicnic": false, "racesCount": 12 },
+      { "id": "MEET-HK", "date": "2026-10-24", "meetingName": "Sha Tin", "venueName": "Sha Tin", "state": "HK", "country": "HKG", "isTab": 1, "isTrial": false, "isJumpOut": false, "isPicnic": false, "racesCount": 10 },
+      { "id": "MEET-FLM-20261024", "date": "2026-10-24", "meetingName": "Flemington", "venueName": "Flemington", "state": "VIC", "country": "AUS", "isTab": 1, "isTrial": false, "isJumpOut": false, "isPicnic": false, "racesCount": 9 }
+    ]
+  }
+}

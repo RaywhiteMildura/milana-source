@@ -1,0 +1,26 @@
+{
+ "_fixtureNote": "REAL BOM 'fwo' JSON with an EMPTY data array (IDV60801.94824 Heywood VIC, issued 15 May 2024) from github.com/BunniYubel/CloudComputingA2 Data/IDV60801-94824; only this note added. Parsers must tolerate data: [] (station offline) and the double space in refresh_message ('Issued at  6:52 pm'). time_zone is 'EST'/'EDT' = BOM's labels for AEST/AEDT.",
+ "observations": {
+  "notice": [
+   {
+    "copyright": "Copyright Commonwealth of Australia 2024, Bureau of Meteorology. For more information see: http://www.bom.gov.au/other/copyright.shtml http://www.bom.gov.au/other/disclaimer.shtml",
+    "copyright_url": "http://www.bom.gov.au/other/copyright.shtml",
+    "disclaimer_url": "http://www.bom.gov.au/other/disclaimer.shtml",
+    "feedback_url": "http://www.bom.gov.au/other/feedback"
+   }
+  ],
+  "header": [
+   {
+    "refresh_message": "Issued at  6:52 pm EST Wednesday 15 May 2024",
+    "ID": "IDV60801",
+    "main_ID": "IDV60800",
+    "name": "Heywood",
+    "state_time_zone": "VIC",
+    "time_zone": "EST",
+    "product_name": "Weather Observations",
+    "state": "Victoria"
+   }
+  ],
+  "data": []
+ }
+}

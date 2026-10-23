@@ -1,0 +1,10 @@
+<!-- CONSTRUCTED fixture. When Akamai Bot Manager rejects a request (missing browser header bundle, replayed bot cookie, non-AU IP, suspicious TLS fingerprint) the response is HTTP 403 with an HTML body like this instead of JSON (reported by github.com/RatterAU/Bookie Feed.swift and github.com/vamuq999/voltara-racing route.ts, which checks text.startsWith("<")). Adapters must detect a non-JSON body, treat it as a block, discard the HTTP client/session and back off. The exact markup varies and is not known. -->
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Access Denied</title></head>
+<body>
+<h1>Access Denied</h1>
+<p>You don't have permission to access "http&#58;&#47;&#47;api&#46;beta&#46;tab&#46;com&#46;au&#47;v1&#47;tab-info-service&#47;racing&#47;dates&#47;2026-10-24&#47;meetings&#63;" on this server.</p>
+<p>Reference&#32;&#35;18&#46;5f0c1702&#46;1761278400&#46;1a2b3c4d</p>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "_fixtureNote": "Constructed: the same race after it has been run (Paying).",
+  "raceNumber": 1,
+  "raceName": "MARIBYRNONG TRIAL STAKES",
+  "raceStartTime": "2026-10-24T01:25:00.000Z",
+  "raceDistance": 1000,
+  "raceStatus": "Paying",
+  "runners": [
+    { "runnerNumber": 1, "runnerName": "QUICK STUDY", "barrierNumber": 3, "riderDriverName": "J MCDONALD", "trainerName": "C Waller", "handicapWeight": 57, "finishingPosition": 2, "fixedOdds": { "returnWin": 2.8, "bettingStatus": "Closed" }, "parimutuel": { "returnWin": 2.9, "returnPlace": 1.35 } },
+    { "runnerNumber": 3, "runnerName": "SLOW BOAT", "barrierNumber": 1, "riderDriverName": "B SHINN", "trainerName": "A & S Freedman", "handicapWeight": 55, "finishingPosition": 1, "fixedOdds": { "returnWin": 21, "bettingStatus": "Closed" }, "parimutuel": { "returnWin": 26.4, "returnPlace": 6.1 } }
+  ],
+  "results": [[3], [1]]
+}

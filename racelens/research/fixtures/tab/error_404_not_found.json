@@ -1,0 +1,8 @@
+{
+  "_fixtureNote": "CONSTRUCTED by analogy with the real 400 body. Error codes are real: 'RESOURCE_NOT_FOUND_ERROR' is what sportsdata-mcp's TAB.md reports for a 404 on tab-info-service (e.g. unknown race number or sending fixedOdds=true on a racecard); 'NOT_FOUND_ERROR' is the string bettRtab and TabAPIvbeta2 issue #15 see in historical-results-service 404 bodies. The 'details' and 'message' text are guesses.",
+  "error": {
+    "details": [],
+    "code": "RESOURCE_NOT_FOUND_ERROR",
+    "message": "Resource not found"
+  }
+}

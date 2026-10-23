@@ -1,0 +1,25 @@
+{
+  "_fixtureNote": "CONSTRUCTED fixture (not a live capture). Venue Flemington / date 2026-10-24 and all ids, horses, jockeys, trainers and prices are invented. Field names, nesting and value formats follow the wire-verified shapes in research/sportsbet.md (sources cited there). Flemington competitionId 356 is invented. Endpoint: GET /apigw/sportsbook-racing/Sportsbook/Racing/RacingMultisEvents (next-to-jump queue). `nextToJump` key verified by sportsdata-mcp; other keys may exist.",
+  "nextToJump": [
+    {
+      "id": 10950102,
+      "competitionId": 580,
+      "competitionName": "Rosehill",
+      "startTime": 1792806900,
+      "bettingStatus": "PRICED",
+      "competitionDisplayOrder": -301,
+      "status": "A",
+      "country": "Australia"
+    },
+    {
+      "id": 10950002,
+      "competitionId": 356,
+      "competitionName": "Flemington",
+      "startTime": 1792807500,
+      "bettingStatus": "PRICED",
+      "competitionDisplayOrder": -300,
+      "status": "A",
+      "country": "Australia"
+    }
+  ]
+}
