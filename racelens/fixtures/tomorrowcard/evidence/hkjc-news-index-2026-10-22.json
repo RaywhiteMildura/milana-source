@@ -1,0 +1,16 @@
+{
+ "_evidenceNote": "REAL capture of the HKJC Racing News English index page (titles only) as ingested by GitHub repo sleepingarhat/domain-brain (ingestion/chunks/20261022-170441-hkjc-news.json, commit 218de150). Lists 'Cox Plate Preview: Waller and McDonald chase history in G1 W.S. Cox Plate at Flemington' (22/10/2026), 'Cox Plate Day - Declared Runners', 'Cox Plate Day - Last 5 Performances', 'Cox Plate Day - Racing Colours' and the 19/10 simulcast notice.",
+ "sourceUrl": "https://raw.githubusercontent.com/sleepingarhat/domain-brain/218de15048827a89a6a07845d81b45354d751020/ingestion/chunks/20261022-170441-hkjc-news.json",
+ "items": [
+  {
+   "source_id": "hkjc-news",
+   "title": "Racing News – The Hong Kong Jockey Club",
+   "content": "來源: https://racingnews.hkjc.com/english/\n\nRacing News – The Hong Kong Jockey Club\nHome\n中文\nHorse Racing\nFootball\nMark Six\nHorse Racing\nRacing News\nRacing News\nCurrent\nArchive\nMedia Guide\nMedia Box\nTop News\nPhoto Release\nFont Size\nThe Latest\nCox Plate Preview\nWaller and McDonald chase history in G1 W.S. Cox Plate at Flemington\n22/10/2026 14:29\nRiding suspension –  Britney Wong\nApprentice Jockey Britney Wong was suspended from riding in races for a period of 4 Hong Kong racedays.\n22/10/2026 01:37\nRiding suspension –  Ellis Wong\nJockey Ellis Wong was suspended from riding in races for a period of 3 Hong Kong racedays.\n22/10/2026 01:37\nRiding suspension – Zac Purton\nJockey Zac Purton was suspended from riding in races for 1 Hong Kong raceday.\n19/10/2026 18:28\nSimulcast arrangement - Australia and Japan\nCox Plate Day and Kikuka Sho (Japanese St. Leger) to be beamed live for betting\n19/10/2026 14:32\nAll\nLocal\nSimulcast\nRace Card\nUpdates\nCirculars\nEvents\nGeneral\n[[Year\n2026]]\nOct\nSep\nAug\nJul\nJun\nMay\nApr\nMar\nFeb\nJan\n2025\nDec\nNov\nOct\nSeason\nAll News Releases\n2026\nOct\nSep\nAug\nJul\nJun\nMay\nApr\nMar\nFeb\nJan\n2025\nDec\nNov\nOct\nAll News Releases\nLocal Racing News\nSimulcast Racing News\nRace Card Updates\nRacing Circulars & Notices\nRacecourse Events\nGeneral News\n22/10/2026\nCox Plate Day - Last 5 Performances\n22/10/2026\nCox Plate Day – Racing Colours\n22/10/2026\nRace Times - Wednesday 28 October 2026\n22/10/2026\nRenovation Works - Sha Tin Turf Track\n22/10/2026\nSunday 25 October 2026 race meeting – Horses stabled in Conghua since last start\n22/10/2026\nWaller and McDonald chase history in G1 W.S. Cox Plate at Flemington\n22/10/2026\nSupplementary Circular – Horse Withdrawal for 25/10/2026 meeting\n22/10/2026\nNewnham wary as Crimson Flash faces Lukfook Jewellery Premier Bowl test\n22/10/2026\nCox Plate Day - Declared Runners\n22/10/2026\nSunday 25 October 2026 race meeting – Horse Parade Gear\n1\n2\n3\n…\n26\n»",
+   "content_hash": "cbd80fcfd571e469",
+   "metadata": {
+    "url": "https://racingnews.hkjc.com/english/",
+    "http_status": 200
+   }
+  }
+ ]
+}

@@ -471,9 +471,11 @@ export function mergeRaceRefresh(previous: Race, fresh: Race): Race {
   // Keep researched race facts when the refresh did not supply them.
   const defined: Partial<Race> = {};
   for (const [k, v] of Object.entries(fresh)) if (v !== undefined) (defined as Record<string, unknown>)[k] = v;
+  const finished = previous.status === 'final' && previous.results?.length;
   return {
     ...previous,
     ...defined,
+    ...(finished ? { status: previous.status, results: previous.results } : {}),
     sourceRefs: { ...previous.sourceRefs, ...fresh.sourceRefs },
     trackRating: fresh.trackRating ?? previous.trackRating,
     trackCondition: fresh.trackCondition || previous.trackCondition,

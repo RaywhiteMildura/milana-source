@@ -19,8 +19,8 @@ export interface SchedulerDeps {
 
 export class AutoRecheckScheduler {
   private timer?: NodeJS.Timeout;
-  /** raceKey → ISO of last automatic recheck */
-  private lastRun = new Map<string, string>();
+  /** `${pack}:${race}:initial|final` stages already fired */
+  private fired = new Set<string>();
 
   constructor(private readonly deps: SchedulerDeps) {}
 
@@ -43,12 +43,14 @@ export class AutoRecheckScheduler {
       if (!race.startTime || pack.results[race.number] || race.status === 'abandoned') continue;
       const start = new Date(race.startTime).getTime();
       const minsToJump = (start - now.getTime()) / 60000;
-      if (minsToJump > minutesBefore || minsToJump < -2) continue; // not yet, or already jumped
-      const key = `${pack.id}:${race.number}`;
-      const last = this.lastRun.get(key);
-      // One automatic check per race inside the window, plus one more inside the final 3 minutes.
-      const lastMins = last ? (now.getTime() - new Date(last).getTime()) / 60000 : Infinity;
-      if (lastMins === Infinity || (minsToJump <= 3 && lastMins > 2.5 && lastMins < minutesBefore)) due.push(race.number);
+      if (minsToJump <= 0 || minsToJump > minutesBefore) continue; // already jumped, or not yet in the window
+      // Exactly two automatic checks per race: one when it enters the window, one inside the final 3 minutes.
+      const stage = minsToJump <= 3 && minutesBefore > 3 ? 'final' : 'initial';
+      const key = `${pack.id}:${race.number}:${stage}`;
+      if (this.fired.has(key)) continue;
+      if (stage === 'final' && !this.fired.has(`${pack.id}:${race.number}:initial`)) this.fired.add(`${pack.id}:${race.number}:initial`);
+      this.fired.add(key);
+      due.push(race.number);
     }
     return due;
   }
@@ -63,14 +65,15 @@ export class AutoRecheckScheduler {
       if (!pack) continue;
       const due = this.dueRaces(pack, now, minutes);
       for (const raceNumber of due) {
-        this.lastRun.set(`${pack.id}:${raceNumber}`, now.toISOString());
         started++;
         this.deps.log?.info(`Auto pre-race check: ${pack.meeting.venue} R${raceNumber}`);
         this.deps.jobs.start('recheck', { meetingId: pack.id, raceNumber, plannedSteps: [['results', 'Results so far'], ['patterns', 'Day patterns'], ['repredict', 'Re-rating']] }, async (job) => {
-          const latest = this.deps.store.getPack(pack.id) || pack;
+          const latest = this.deps.store.getPack(pack.id);
+          if (!latest) return; // deleted meanwhile
           await recheckMeeting(this.deps.researchDeps(), latest, job, raceNumber);
-          latest.history[latest.history.length - 1].summary = `Automatic ${latest.history[latest.history.length - 1].summary.replace(/^Pre-race check/, 'pre-race check')}`;
-          this.deps.store.savePack(latest);
+          const last = latest.history[latest.history.length - 1];
+          if (last) last.summary = `Automatic ${last.summary.replace(/^Pre-race check/, 'pre-race check')}`;
+          if (this.deps.store.getPack(pack.id)) this.deps.store.savePack(latest);
         });
       }
     }

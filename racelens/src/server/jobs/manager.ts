@@ -70,9 +70,15 @@ export class JobManager {
     };
     this.jobs.set(progress.id, progress);
     this.order.unshift(progress.id);
-    while (this.order.length > this.maxHistory) {
-      const old = this.order.pop();
-      if (old) this.jobs.delete(old);
+    // Evict only finished jobs, oldest first; a queued or running job must stay pollable.
+    if (this.order.length > this.maxHistory) {
+      for (let i = this.order.length - 1; i >= 0 && this.order.length > this.maxHistory; i--) {
+        const j = this.jobs.get(this.order[i]);
+        if (j && (j.status === 'done' || j.status === 'error')) {
+          this.jobs.delete(this.order[i]);
+          this.order.splice(i, 1);
+        }
+      }
     }
 
     const handle = new JobHandle(progress, () => undefined);
@@ -95,10 +101,23 @@ export class JobManager {
           for (const s of progress.steps) if (s.status === 'running') s.status = 'error';
         } finally {
           progress.endedAt = new Date().toISOString();
+          if (this.running.get(key) === p) this.running.delete(key);
         }
       });
     this.running.set(key, p);
     return progress;
+  }
+
+  /** Run `fn` after any in-flight job for the same meeting (keeps pack writes serialised) and return its value. */
+  async exclusive<T>(meetingId: string, fn: () => Promise<T> | T): Promise<T> {
+    let out!: T;
+    const job = this.start('results', { meetingId }, async (job) => {
+      job.message('Applying change');
+      out = await fn();
+    });
+    const done = await this.wait(job.id, 120_000);
+    if (done.status === 'error') throw new Error(done.error || 'failed');
+    return out;
   }
 
   get(id: string): JobProgress | undefined {

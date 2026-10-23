@@ -317,13 +317,18 @@ export async function researchMeeting(deps: ResearchDeps, meeting: MeetingSummar
     settings: deps.settings,
   };
 
-  // Results already available (meeting partly run) ---------------------------
-  await collectResults(deps, pack, job, true);
-
+  // Rate every race first so races that have already been run get a scorecard, then learn from those results.
   job.start('predict', 'Rating every race and building betting structures');
-  pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
   predictAll(pack, deps.settings, now);
-  job.finish('predict', 'done', `${Object.keys(pack.predictions).length} races predicted${pack.dayPatterns.length ? `, ${pack.dayPatterns.length} day pattern(s) applied` : ''}`);
+  job.finish('predict', 'done', `${Object.keys(pack.predictions).length} races predicted`);
+
+  await collectResults(deps, pack, job, true);
+  pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
+  if (pack.dayPatterns.length) {
+    job.start('patterns', 'Applying patterns from today\'s results to the remaining races');
+    predictAll(pack, deps.settings, now);
+    job.finish('patterns', 'done', pack.dayPatterns.map((p) => p.label).join('; '));
+  }
 
   pack.history.push({ at: now.toISOString(), type: 'research', summary: `Full research: ${raws.length} source${raws.length === 1 ? '' : 's'} responded, verification ${(pack.verificationScore * 100).toFixed(0)}%` });
   job.message(`Done – ${pack.races.length} races researched`);
@@ -427,7 +432,7 @@ export function recordResult(pack: MeetingPack, raceNumber: number, result: Race
 export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job: JobHandle, raceNumber?: number): Promise<{ changes: string[]; refreshed: number[] }> {
   const now = deps.now?.() ?? new Date();
   const adapters = deps.registry.withCapability('racecard', deps.settings.disabledSources);
-  const targets = pack.races.filter((r) => (raceNumber ? r.number === raceNumber : !pack.results[r.number] && r.status !== 'abandoned'));
+  const targets = pack.races.filter((r) => !pack.results[r.number] && r.status !== 'abandoned' && (raceNumber ? r.number === raceNumber : true));
   const changes: string[] = [];
   const refreshed: number[] = [];
 

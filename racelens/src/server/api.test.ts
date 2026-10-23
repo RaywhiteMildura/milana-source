@@ -147,6 +147,47 @@ describe('RaceLens API (demo mode)', () => {
     await request(app).post(`/api/packs/${encodeURIComponent(meetingId)}/results/manual`).send({ raceNumber: 123, placings: [[1]] }).expect(400);
   });
 
+  it('re-running research keeps results and history, and refuses a pre-race check of a finished race', async () => {
+    const before: MeetingPack = (await request(app).get(`/api/packs/${encodeURIComponent(meetingId)}`)).body;
+    const resulted = Object.keys(before.results).map(Number);
+    expect(resulted.length).toBeGreaterThan(0);
+    const start = await request(app).post('/api/research').send({ date: DEMO_DATE, venueSlug: DEMO_VENUE_SLUG, force: true }).expect(200);
+    expect((await waitJob(start.body.jobId)).status).toBe('done');
+    const after: MeetingPack = (await request(app).get(`/api/packs/${encodeURIComponent(meetingId)}`)).body;
+    for (const n of resulted) {
+      expect(after.results[n]).toBeDefined();
+      expect(after.results[n].scorecard).toBeDefined();
+      expect(after.predictions[n]).toBeDefined();
+    }
+    expect(after.history.length).toBeGreaterThanOrEqual(before.history.length);
+    const res = await request(app).post(`/api/packs/${encodeURIComponent(meetingId)}/recheck`).send({ raceNumber: resulted[0] }).expect(400);
+    expect(res.body.error).toMatch(/already been run/);
+  });
+
+  it('a manual result entered while a job is running is not overwritten by that job', async () => {
+    const pack: MeetingPack = (await request(app).get(`/api/packs/${encodeURIComponent(meetingId)}`)).body;
+    const race = pack.races.find((r) => !pack.results[r.number])!;
+    const active = race.runners.filter((r) => !r.scratched).map((r) => r.number);
+    const job = await request(app).post(`/api/packs/${encodeURIComponent(meetingId)}/recheck`).send({}).expect(200);
+    const manual = await request(app)
+      .post(`/api/packs/${encodeURIComponent(meetingId)}/results/manual`)
+      .send({ raceNumber: race.number, placings: [[active[1]], [active[0]], [active[2]]] })
+      .expect(200);
+    expect(manual.body.results[race.number].source).toBe('manual');
+    await waitJob(job.body.jobId);
+    const after: MeetingPack = (await request(app).get(`/api/packs/${encodeURIComponent(meetingId)}`)).body;
+    expect(after.results[race.number]?.source).toBe('manual');
+    expect(after.results[race.number].placings[0]).toEqual([active[1]]);
+  });
+
+  it('answers malformed JSON and unknown API routes with JSON errors', async () => {
+    const bad = await request(app).post('/api/research').set('content-type', 'application/json').send('{"date": ').expect(400);
+    expect(bad.headers['content-type']).toMatch(/json/);
+    expect(bad.body.error).toMatch(/Bad request/);
+    const missing = await request(app).get('/api/nothing-here').expect(404);
+    expect(missing.body.error).toBe('not found');
+  });
+
   it('settings round-trip and validate', async () => {
     const res = await request(app).put('/api/settings').send({ bankroll: 1000, unitAmount: 25, riskProfile: 'aggressive', jurisdiction: 'NSW', bogus: 1 }).expect(200);
     expect(res.body).toMatchObject({ bankroll: 1000, unitAmount: 25, riskProfile: 'aggressive', jurisdiction: 'NSW' });

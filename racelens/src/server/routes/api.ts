@@ -146,6 +146,9 @@ export function createApi(deps: ApiDeps): Router {
       ];
       const job = deps.jobs.start('research', { meetingId, plannedSteps }, async (job) => {
         const pack = await researchMeeting(researchDeps(), meeting!, job);
+        // Re-running research must not throw away results, scorecards and the day's history.
+        const existing = deps.store.getPack(meetingId);
+        if (existing) carryOver(existing, pack, deps.store.getSettings(), deps.now?.() ?? new Date());
         deps.store.savePack(pack);
       });
       res.json({ jobId: job.id, meetingId });
@@ -171,7 +174,15 @@ export function createApi(deps: ApiDeps): Router {
     }
     res.json(pack);
   });
-  r.delete('/packs/:id', (req, res) => res.json({ ok: deps.store.deletePack(req.params.id as string) }));
+  r.delete(
+    '/packs/:id',
+    wrap(async (req, res) => {
+      const id = req.params.id as string;
+      // Through the per-meeting queue so an in-flight job cannot resurrect the file afterwards.
+      const ok = await deps.jobs.exclusive(id, () => deps.store.deletePack(id));
+      res.json({ ok });
+    }),
+  );
 
   r.get('/packs/:id/races/:n', (req, res) => {
     const pack = deps.store.getPack(req.params.id as string);
@@ -191,10 +202,12 @@ export function createApi(deps: ApiDeps): Router {
       if (!pack) throw new HttpProblem(404, 'pack not found');
       const raceNumber = (req.body || {}).raceNumber as number | undefined;
       if (raceNumber != null && !pack.races.some((x) => x.number === raceNumber)) throw new HttpProblem(400, 'unknown race number');
+      if (raceNumber != null && pack.results[raceNumber]) throw new HttpProblem(400, `Race ${raceNumber} has already been run – use Fetch results to update it`);
       const job = deps.jobs.start('recheck', { meetingId: pack.id, raceNumber, plannedSteps: [['results', 'Results so far'], ['patterns', 'Day patterns'], ['repredict', 'Re-rating']] }, async (job) => {
-        const latest = deps.store.getPack(pack.id) || pack;
+        const latest = deps.store.getPack(pack.id);
+        if (!latest) throw new Error('This meeting was deleted before the check ran');
         await recheckMeeting(researchDeps(), latest, job, raceNumber);
-        deps.store.savePack(latest);
+        if (deps.store.getPack(pack.id)) deps.store.savePack(latest);
       });
       res.json({ jobId: job.id });
     }),
@@ -207,13 +220,14 @@ export function createApi(deps: ApiDeps): Router {
       if (!pack) throw new HttpProblem(404, 'pack not found');
       const raceNumber = (req.body || {}).raceNumber as number | undefined;
       const job = deps.jobs.start('results', { meetingId: pack.id, raceNumber, plannedSteps: [['results', 'Fetching results'], ['patterns', 'Day patterns']] }, async (job) => {
-        const latest = deps.store.getPack(pack.id) || pack;
+        const latest = deps.store.getPack(pack.id);
+        if (!latest) throw new Error('This meeting was deleted before the results check ran');
         const newly = await collectResults(researchDeps(), latest, job, true, raceNumber);
         job.start('patterns', 'Updating day patterns');
         latest.dayPatterns = detectDayPatterns(latest.races, latest.results);
         if (newly.length) predictAll(latest, deps.store.getSettings(), deps.now?.() ?? new Date());
         job.finish('patterns', 'done', latest.dayPatterns.length ? latest.dayPatterns.map((p) => p.label).join('; ') : 'No strong patterns');
-        deps.store.savePack(latest);
+        if (deps.store.getPack(pack.id)) deps.store.savePack(latest);
         job.message(newly.length ? `Results recorded for R${newly.join(', R')}` : 'No new results available yet');
       });
       res.json({ jobId: job.id });
@@ -222,24 +236,33 @@ export function createApi(deps: ApiDeps): Router {
 
   r.post(
     '/packs/:id/results/manual',
-    wrap((req, res) => {
-      const pack = deps.store.getPack(req.params.id as string);
-      if (!pack) throw new HttpProblem(404, 'pack not found');
+    wrap(async (req, res) => {
+      const id = req.params.id as string;
+      const probe = deps.store.getPack(id);
+      if (!probe) throw new HttpProblem(404, 'pack not found');
       const { raceNumber, placings } = (req.body || {}) as { raceNumber?: number; placings?: number[][] };
-      const race = pack.races.find((x) => x.number === raceNumber);
-      if (!race) throw new HttpProblem(400, 'unknown race number');
+      const probeRace = probe.races.find((x) => x.number === raceNumber);
+      if (!probeRace) throw new HttpProblem(400, 'unknown race number');
       if (!Array.isArray(placings) || !placings.length || !placings.every((p) => Array.isArray(p) && p.every((n) => Number.isInteger(n) && n > 0))) throw new HttpProblem(400, 'placings must be number[][]');
-      const numbers = new Set(race.runners.map((x) => x.number));
+      const numbers = new Set(probeRace.runners.map((x) => x.number));
       const unknown = placings.flat().filter((n) => !numbers.has(n));
       if (unknown.length) throw new HttpProblem(400, `Unknown runner number(s): ${unknown.join(', ')}`);
-      const result: RaceResult = { raceNumber: race.number, placings, recordedAt: new Date().toISOString(), source: 'manual' };
-      recordResult(pack, race.number, result);
-      pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
-      predictAll(pack, deps.store.getSettings(), deps.now?.() ?? new Date());
-      deps.store.savePack(pack);
-      res.json(pack satisfies MeetingPack);
+      // Applied through the per-meeting queue so a running job cannot overwrite the typed-in result.
+      const updated = await deps.jobs.exclusive(id, () => {
+        const pack = deps.store.getPack(id);
+        if (!pack) throw new Error('pack not found');
+        const result: RaceResult = { raceNumber: probeRace.number, placings, recordedAt: new Date().toISOString(), source: 'manual', status: 'final', confirmedBy: ['manual'] };
+        recordResult(pack, probeRace.number, result, pack.results[probeRace.number] ? 'corrected' : 'new');
+        pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
+        predictAll(pack, deps.store.getSettings(), deps.now?.() ?? new Date());
+        deps.store.savePack(pack);
+        return pack;
+      });
+      res.json(updated satisfies MeetingPack);
     }),
   );
+
+  r.use((_req: Request, res: Response) => res.status(404).json({ error: 'not found' }));
 
   // Error handler ---------------------------------------------------------------
   r.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
@@ -251,6 +274,29 @@ export function createApi(deps: ApiDeps): Router {
   });
 
   return r;
+}
+
+/** Carry results, scorecards, history and the predictions of resulted races from an older pack into a re-researched one. */
+export function carryOver(existing: MeetingPack, pack: MeetingPack, settings: Settings, now: Date): void {
+  pack.history = [...existing.history, ...pack.history];
+  for (const [n, result] of Object.entries(existing.results)) {
+    const raceNumber = Number(n);
+    if (pack.results[raceNumber]) continue; // the new research already found (and cross-checked) it
+    if (existing.predictions[raceNumber]) pack.predictions[raceNumber] = existing.predictions[raceNumber];
+    recordResult(pack, raceNumber, result, 'confirmed');
+    pack.history.pop(); // recordResult logs a line; the original is already in the carried history
+  }
+  pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
+  predictAll(pack, settings, now);
+  void now;
+}
+
+/** Express-level JSON error handler for body-parser failures that never reach the API router. */
+export function jsonErrorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction): void {
+  void _next;
+  const e = err as { status?: number; statusCode?: number; message?: string; type?: string };
+  const status = e.status || e.statusCode || 500;
+  res.status(status).json({ error: status === 400 ? `Bad request: ${e.message || 'invalid JSON body'}` : e.message || 'Server error' });
 }
 
 export function todayLocal(d: Date, tz = 'Australia/Melbourne'): string {

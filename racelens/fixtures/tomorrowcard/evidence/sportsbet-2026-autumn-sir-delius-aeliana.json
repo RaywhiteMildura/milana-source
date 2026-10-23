@@ -1,0 +1,1792 @@
+{
+ "_evidenceNote": "EXTRACT of REAL Sportsbet race-card captures archived in GitHub repo kaballas/yy1 (src/get_data/data/race_<id>_class_1*.json, commit 0cd4af7b). Only the two Cox Plate 2026 runners of interest (Sir Delius, Aeliana) are kept in full; the rest of each field is summarised. Field names are Sportsbet's (statistics.total='starts:wins,seconds,thirds', recentStartsThoroughbreds[], sire, dam, age, sex, lastSix, dryRating/wetRating).",
+ "sourceUrlPattern": "https://raw.githubusercontent.com/kaballas/yy1/0cd4af7b284a99c492a8faaa7c67d7abf4c011d2/src/get_data/data/<file>",
+ "races": {
+  "Queen Elizabeth Stakes G1 2000m Randwick 2026-04-11": {
+   "racecardEvent": {
+    "name": "R9 Queen Elizabeth Stakes",
+    "displayName": "R9 Randwick",
+    "raceNumber": 9,
+    "distance": "2000",
+    "className": "Horses - Aus/NZ",
+    "startTime": 1775889300,
+    "trackStatus": "Good (4)",
+    "competitionName": "Randwick"
+   },
+   "field": [
+    {
+     "no": 1,
+     "name": "Dubai Honour",
+     "draw": 5,
+     "jockey": "Tom Marquand",
+     "trainer": "W J Haggas",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 2,
+     "name": "Sir Delius",
+     "draw": 3,
+     "jockey": "Craig Williams",
+     "trainer": "G Waterhouse & A Bott",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 3,
+     "name": "Light Infantry Man",
+     "draw": 1,
+     "jockey": "Ethan Brown",
+     "trainer": "C Maher",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 4,
+     "name": "Lindermann",
+     "draw": 6,
+     "jockey": "Nash Rawiller",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 5,
+     "name": "Wootton Verni",
+     "draw": 7,
+     "jockey": "Tommy Berry",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 6,
+     "name": "Caviar Heights",
+     "draw": 4,
+     "jockey": "Zac Lloyd",
+     "trainer": "W J Haggas",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 7,
+     "name": "Autumn Glow",
+     "draw": 2,
+     "jockey": "James Mc Donald",
+     "trainer": "C J Waller",
+     "weightGram": 57000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 8,
+     "name": "Aeliana",
+     "draw": 8,
+     "jockey": "Damian Lane",
+     "trainer": "C J Waller",
+     "weightGram": 57000,
+     "place": null,
+     "sp": null
+    }
+   ],
+   "profiles": {
+    "Sir Delius": {
+     "id": 1187345631,
+     "name": "Sir Delius",
+     "runnerNumber": 2,
+     "drawNumber": 3,
+     "shortForm": "1X33",
+     "jockey": "Craig Williams",
+     "weightGram": 59000,
+     "trainer": "G Waterhouse & A Bott",
+     "isOut": false,
+     "recentOddsFluctuations": [
+      6.5,
+      6,
+      6.5,
+      7,
+      7.5,
+      7,
+      7.5,
+      7,
+      7.5,
+      7
+     ],
+     "powerPlayPricing": {
+      "sPrice": 6.75,
+      "rPrice": 6.75,
+      "gPrice": 6.75,
+      "vPrice": 6.75,
+      "pPrice": 6.75,
+      "lPrice": 6.75,
+      "mPrice": 6.75,
+      "ePrice": 6.75
+     },
+     "marketMover": false,
+     "prices": [
+      {
+       "priceCode": "MDP",
+       "winPrice": 6.9,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345631/Prices/MDP"
+      },
+      {
+       "priceCode": "TF",
+       "winPrice": 7,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345631/Prices/TF"
+      },
+      {
+       "priceCode": "TMD",
+       "winPrice": 6.9,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345631/Prices/TMD"
+      },
+      {
+       "priceCode": "L",
+       "placePriceNum": 67,
+       "placePriceDen": 100,
+       "winPriceNum": 5,
+       "winPriceDen": 1,
+       "winPrice": 6,
+       "placePrice": 1.67,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345631/Prices/L"
+      }
+     ],
+     "result": "W",
+     "multiplesKey": "Sir Delius",
+     "sort": 20,
+     "statusCode": "S",
+     "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/008c12b3-40d8-48e4-b2ac-0716545eb6e1/ccdacfba-2148-44fa-8181-33b5c937dc29.png",
+     "statistics": {
+      "winPercentage": 50,
+      "placePercentage": 91.67,
+      "dryRating": "89",
+      "wetRating": "89",
+      "sire": "Frankel (GB)",
+      "dam": "Whatami (GB)",
+      "colour": "b",
+      "age": 5,
+      "sex": "h",
+      "overview": "Kept coming last time after settling last in small field. Ready to peak now and with minor improvement can go close.",
+      "overviewProvider": "BESTBETS_EDITORIAL",
+      "total": "12:6,2,3",
+      "distance": "3:2,0,1",
+      "track": "2:0,1,1",
+      "firm": "0:0,0,0",
+      "good": "3:2,1,0",
+      "soft": "7:2,1,3",
+      "heavy": "2:2,0,0",
+      "firstUp": "4:2,1,1",
+      "secondUp": "3:2,0,1",
+      "jumps": "0:0,0,0",
+      "distanceTrack": "0:0,0,0",
+      "expectedSettlingPosition": "Midfield",
+      "speed": 34,
+      "formFig": "211x33",
+      "thirdUp": "2:2,0,0",
+      "fourthUp": "1:0,0,1",
+      "horseJockey": "4:2,0,2",
+      "synthetic": "0:0,0,0",
+      "recentStartsThoroughbreds": [
+       {
+        "place": 3,
+        "totalRunners": 5,
+        "date": "21/03/2026",
+        "trackName": "Rosehill",
+        "distance": "2000m",
+        "trackStatus": "Soft",
+        "margin": "1.0L",
+        "jockey": "Craig Williams",
+        "weight": "59kg",
+        "barrier": 5,
+        "startingPrice": "$3.00",
+        "class": "Group 1",
+        "time": "02.02.85",
+        "last600": "0:35.30",
+        "first": "Aeliana (57kg)",
+        "second": "Lindermann (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 3,
+        "totalRunners": 9,
+        "date": "28/02/2026",
+        "trackName": "Randwick",
+        "distance": "1600m",
+        "trackStatus": "Soft",
+        "margin": "3.9L",
+        "jockey": "Craig Williams",
+        "weight": "59kg",
+        "barrier": 6,
+        "startingPrice": "$8.00",
+        "class": "Group 1",
+        "time": "01.35.55",
+        "last600": "0:33.27",
+        "first": "Autumn Glow (57kg)",
+        "second": "Aeliana (57kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 4,
+        "totalRunners": 7,
+        "date": "12/02/2026",
+        "trackName": "Rosehill",
+        "distance": "1000m",
+        "trackStatus": "Good",
+        "margin": "2.8L",
+        "jockey": "Craig Williams",
+        "weight": null,
+        "barrier": 7,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "01.00.12",
+        "last600": "0:33.99",
+        "first": "Yorkshire",
+        "second": "King Of Roseau",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 3,
+        "totalRunners": 7,
+        "date": "27/01/2026",
+        "trackName": "Randwick",
+        "distance": "1000m",
+        "trackStatus": "Good",
+        "margin": "1.4L",
+        "jockey": "Craig Williams",
+        "weight": null,
+        "barrier": 7,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.58.07",
+        "last600": "0:33.52",
+        "first": "Just Feelin' Lucky",
+        "second": "Lindermann",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 4,
+        "totalRunners": 6,
+        "date": "15/01/2026",
+        "trackName": "Randwick",
+        "distance": "850m",
+        "trackStatus": "Good",
+        "margin": "1.7L",
+        "jockey": "Craig Williams",
+        "weight": null,
+        "barrier": 7,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.52.41",
+        "last600": "0:34.86",
+        "first": "Shangri La Boy",
+        "second": "Apocalyptic",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 1,
+        "totalRunners": 14,
+        "date": "04/10/2025",
+        "trackName": "Flemington",
+        "distance": "2000m",
+        "trackStatus": "Good",
+        "margin": "1.8L",
+        "jockey": "Craig Williams",
+        "weight": "58kg",
+        "barrier": 14,
+        "startingPrice": "$7.00",
+        "class": "Group 1",
+        "time": "02.02.82",
+        "last600": "0:33.85",
+        "first": "Sir Delius (58kg)",
+        "second": "Antino (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       }
+      ],
+      "prizeMoney": 1696708,
+      "fluc1": 6,
+      "fluc2": 6.5,
+      "openPrice": 6.5,
+      "lastStart": {},
+      "lastSix": "211x33",
+      "awards": [
+       {
+        "type": "eliteWinner",
+        "rate": 50,
+        "awardTitle": "Proven Winner",
+        "awardDescription": "Good win rate: 50%",
+        "iconName": "starPerformer"
+       },
+       {
+        "type": "trackExpert",
+        "rate": 100,
+        "awardTitle": "Track Talent",
+        "awardDescription": "Solid top 3 record at track: 100%",
+        "iconName": "likesTheTrack"
+       },
+       {
+        "type": "distanceSuccess",
+        "rate": 66.67,
+        "awardTitle": "Striking Dist.",
+        "awardDescription": "Good distance record",
+        "iconName": "likesTheDistance"
+       },
+       {
+        "type": "likesTheWet",
+        "rate": 88.89,
+        "awardTitle": "Likes the Wet",
+        "awardDescription": "Likes wet conditions",
+        "iconName": "likesTheWet"
+       },
+       {
+        "type": "likesTheDry",
+        "rate": 100,
+        "awardTitle": "Likes the Dry",
+        "awardDescription": "Likes dry conditions",
+        "iconName": "sun"
+       },
+       {
+        "type": "perfectPrep1stUp",
+        "rate": 50,
+        "awardTitle": "Ready to Fire",
+        "awardDescription": "Past success 1st run back",
+        "iconName": "readyToFire"
+       },
+       {
+        "type": "perfectPrep2ndUp",
+        "rate": 66.67,
+        "awardTitle": "Ready to Fire",
+        "awardDescription": "Past success 2nd run back",
+        "iconName": "readyToFire"
+       },
+       {
+        "type": "perfectPrep3rdUp",
+        "rate": 100,
+        "awardTitle": "Ready to Fire",
+        "awardDescription": "Past success 3rd run back",
+        "iconName": "readyToFire"
+       },
+       {
+        "type": "lastSix",
+        "rate": 100,
+        "awardTitle": "In Form",
+        "awardDescription": "Good recent form",
+        "iconName": "inForm"
+       }
+      ],
+      "blinkers": false
+     },
+     "longFormLink": "https://www.sportsbetform.com.au/mobile/10350480/2/",
+     "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345631",
+     "resultConfirmed": true,
+     "trainerLocation": "Randwick",
+     "racingIQShortformAvailable": true,
+     "runnerCountry": "GB",
+     "place": 1,
+     "dividend": [
+      "SP:6.00",
+      "NSW/PL:6.95/1.35",
+      "TF:7.0",
+      "UNI/PL:6.95/1.35",
+      "TT+/MD:6.95/1.35",
+      "STAB/PL:6.95/1.35"
+     ]
+    },
+    "Aeliana": {
+     "id": 1187345650,
+     "name": "Aeliana",
+     "runnerNumber": 8,
+     "drawNumber": 8,
+     "shortForm": "2211",
+     "jockey": "Damian Lane",
+     "weightGram": 57000,
+     "trainer": "C J Waller",
+     "isOut": false,
+     "recentOddsFluctuations": [
+      7,
+      7.5,
+      7,
+      7.5,
+      7,
+      7.5,
+      8,
+      7.5,
+      7,
+      6.5
+     ],
+     "powerPlayPricing": {
+      "sPrice": 8.5,
+      "rPrice": 8.5,
+      "gPrice": 8.5,
+      "vPrice": 8.5,
+      "pPrice": 8.5,
+      "lPrice": 8.5,
+      "mPrice": 8.5,
+      "ePrice": 8.5
+     },
+     "marketMover": false,
+     "prices": [
+      {
+       "priceCode": "MDP",
+       "winPrice": 9.5,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345650/Prices/MDP"
+      },
+      {
+       "priceCode": "TMD",
+       "winPrice": 17.5,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345650/Prices/TMD"
+      },
+      {
+       "priceCode": "L",
+       "placePriceNum": 69,
+       "placePriceDen": 50,
+       "winPriceNum": 13,
+       "winPriceDen": 2,
+       "winPrice": 7.5,
+       "placePrice": 2.38,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345650/Prices/L"
+      },
+      {
+       "priceCode": "TF",
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345650/Prices/TF"
+      }
+     ],
+     "result": "V",
+     "multiplesKey": "Aeliana",
+     "sort": 80,
+     "statusCode": "S",
+     "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/008c12b3-40d8-48e4-b2ac-0716545eb6e1/49b119e6-e9f0-49e6-91f5-57b7b2a397aa.png",
+     "statistics": {
+      "winPercentage": 33.33,
+      "placePercentage": 72.22,
+      "dryRating": "93",
+      "wetRating": "93",
+      "sire": "Castelvecchio (AUS)",
+      "dam": "Temolie (AUS)",
+      "colour": "b",
+      "age": 4,
+      "sex": "m",
+      "overview": "Dug deep to reel in an International superstar in the Tancred. Been excellent in all four runs this time in. Top hope. ",
+      "overviewProvider": "BESTBETS_EDITORIAL",
+      "total": "18:6,6,1",
+      "distance": "4:1,1,0",
+      "track": "6:2,3,0",
+      "firm": "0:0,0,0",
+      "good": "12:2,4,1",
+      "soft": "5:4,1,0",
+      "heavy": "1:0,1,0",
+      "firstUp": "4:0,2,1",
+      "secondUp": "4:1,2,0",
+      "jumps": "0:0,0,0",
+      "distanceTrack": "0:0,0,0",
+      "expectedSettlingPosition": "Off Midfield",
+      "speed": 28,
+      "formFig": "6x2211",
+      "thirdUp": "4:1,1,0",
+      "fourthUp": "4:3,0,0",
+      "horseJockey": "0:0,0,0",
+      "synthetic": "0:0,0,0",
+      "recentStartsThoroughbreds": [
+       {
+        "place": 1,
+        "totalRunners": 8,
+        "date": "28/03/2026",
+        "trackName": "Rosehill",
+        "distance": "2400m",
+        "trackStatus": "Soft",
+        "margin": "0.2L",
+        "jockey": "J B Mc Donald",
+        "weight": "56.5kg",
+        "barrier": 7,
+        "startingPrice": "$1.70",
+        "class": "Group 1",
+        "time": "02.29.90",
+        "last600": "0:35.22",
+        "first": "Aeliana (56.5kg)",
+        "second": "Dubai Honour (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 1,
+        "totalRunners": 5,
+        "date": "21/03/2026",
+        "trackName": "Rosehill",
+        "distance": "2000m",
+        "trackStatus": "Soft",
+        "margin": "0.2L",
+        "jockey": "J B Mc Donald",
+        "weight": "57kg",
+        "barrier": 3,
+        "startingPrice": "$1.60",
+        "class": "Group 1",
+        "time": "02.02.85",
+        "last600": "0:35.30",
+        "first": "Aeliana (57kg)",
+        "second": "Lindermann (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 2,
+        "totalRunners": 9,
+        "date": "28/02/2026",
+        "trackName": "Randwick",
+        "distance": "1600m",
+        "trackStatus": "Soft",
+        "margin": "0.4L",
+        "jockey": "Zac Lloyd",
+        "weight": "57kg",
+        "barrier": 1,
+        "startingPrice": "$12.00",
+        "class": "Group 1",
+        "time": "01.35.55",
+        "last600": "0:33.27",
+        "first": "Autumn Glow (57kg)",
+        "second": "Aeliana (57kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 2,
+        "totalRunners": 10,
+        "date": "14/02/2026",
+        "trackName": "Randwick",
+        "distance": "1400m",
+        "trackStatus": "Good",
+        "margin": "2.8L",
+        "jockey": "Zac Lloyd",
+        "weight": "57kg",
+        "barrier": 7,
+        "startingPrice": "$14.00",
+        "class": "Group 2",
+        "time": "01.22.11",
+        "last600": "0:33.43",
+        "first": "Autumn Glow (57kg)",
+        "second": "Aeliana (57kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 6,
+        "totalRunners": 8,
+        "date": "27/01/2026",
+        "trackName": "Randwick",
+        "distance": "900m",
+        "trackStatus": "Good",
+        "margin": "6.6L",
+        "jockey": "Tyler Schiller",
+        "weight": null,
+        "barrier": 1,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.53.96",
+        "last600": "0:34.30",
+        "first": "Beiwacht",
+        "second": "Spring Lee",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 8,
+        "totalRunners": 8,
+        "date": "15/01/2026",
+        "trackName": "Randwick",
+        "distance": "850m",
+        "trackStatus": "Good",
+        "margin": "6.4L",
+        "jockey": "J R Collett",
+        "weight": null,
+        "barrier": 1,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.51.50",
+        "last600": "0:34.20",
+        "first": "Pallaton",
+        "second": "Insurrection",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       }
+      ],
+      "prizeMoney": 4444225,
+      "fluc1": 7.5,
+      "fluc2": 7,
+      "openPrice": 6.5,
+      "lastStart": {},
+      "lastSix": "6x2211",
+      "awards": [
+       {
+        "type": "podiumChamp",
+        "rate": 72.22,
+        "awardTitle": "Place Rate",
+        "awardDescription": "Solid top 3 record: 72.22%",
+        "iconName": "placePerformer"
+       },
+       {
+        "type": "trackExpert",
+        "rate": 83.33,
+        "awardTitle": "Track Talent",
+        "awardDescription": "Solid top 3 record at track: 83.33%",
+        "iconName": "likesTheTrack"
+       },
+       {
+        "type": "likesTheWet",
+        "rate": 100,
+        "awardTitle": "Likes the Wet",
+        "awardDescription": "Likes wet conditions",
+        "iconName": "likesTheWet"
+       },
+       {
+        "type": "perfectPrep4thUp",
+        "rate": 75,
+        "awardTitle": "Ready to Fire",
+        "awardDescription": "Past success 4th run back",
+        "iconName": "readyToFire"
+       },
+       {
+        "type": "lastSix",
+        "rate": 100,
+        "awardTitle": "In Form",
+        "awardDescription": "Good recent form",
+        "iconName": "inForm"
+       }
+      ],
+      "blinkers": false
+     },
+     "longFormLink": "https://www.sportsbetform.com.au/mobile/10350480/8/",
+     "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10350480/Markets/240209017/Selections/1187345650",
+     "resultConfirmed": true,
+     "trainerLocation": "Rosehill",
+     "racingIQShortformAvailable": true,
+     "runnerCountry": "NZ"
+    }
+   }
+  },
+  "Tancred Stakes G1 2400m Rosehill 2026-03-28": {
+   "racecardEvent": {
+    "name": "R8 Kia Tancred Stakes",
+    "displayName": "R8 Rosehill",
+    "raceNumber": 8,
+    "distance": "2400",
+    "className": "Horses - Aus/NZ",
+    "startTime": 1774676100,
+    "trackStatus": "Soft (6)",
+    "competitionName": "Rosehill"
+   },
+   "field": [
+    {
+     "no": 1,
+     "name": "Dubai Honour",
+     "draw": 8,
+     "jockey": "Tom Marquand",
+     "trainer": "W J Haggas",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 2,
+     "name": "Vauban",
+     "draw": 3,
+     "jockey": "Tim Clark",
+     "trainer": "G Waterhouse & A Bott",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 3,
+     "name": "Soul Of Spain",
+     "draw": 5,
+     "jockey": "Tommy Berry",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 4,
+     "name": "Wootton Verni",
+     "draw": 3,
+     "jockey": "Nash Rawiller",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 5,
+     "name": "Valiant King",
+     "draw": 4,
+     "jockey": "Kerrin Mc Evoy",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 6,
+     "name": "Zarir",
+     "draw": 1,
+     "jockey": "Sam Clipperton",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 7,
+     "name": "River Of Stars",
+     "draw": 2,
+     "jockey": "Jason Collett",
+     "trainer": "C J Waller",
+     "weightGram": 57000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 8,
+     "name": "Piggyback",
+     "draw": 6,
+     "jockey": "Zac Lloyd",
+     "trainer": "C Maher",
+     "weightGram": 57000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 9,
+     "name": "Aeliana",
+     "draw": 7,
+     "jockey": "James Mc Donald",
+     "trainer": "C J Waller",
+     "weightGram": 56500,
+     "place": null,
+     "sp": null
+    }
+   ],
+   "profiles": {
+    "Aeliana": {
+     "id": 1181260768,
+     "name": "Aeliana",
+     "runnerNumber": 9,
+     "drawNumber": 7,
+     "shortForm": "X221",
+     "jockey": "James Mc Donald",
+     "weightGram": 56500,
+     "trainer": "C J Waller",
+     "isOut": false,
+     "recentOddsFluctuations": [
+      1.65,
+      1.7,
+      1.75,
+      1.8,
+      1.85,
+      1.9,
+      1.85,
+      1.9,
+      1.95,
+      1.9
+     ],
+     "powerPlayPricing": {
+      "sPrice": 1.8,
+      "rPrice": 1.8,
+      "gPrice": 1.8,
+      "vPrice": 1.8,
+      "pPrice": 1.8,
+      "lPrice": 1.8,
+      "mPrice": 1.8,
+      "ePrice": 1.8
+     },
+     "marketMover": false,
+     "prices": [
+      {
+       "priceCode": "MDP",
+       "winPrice": 1.75,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/580/Events/10298478/Markets/239064142/Selections/1181260768/Prices/MDP"
+      },
+      {
+       "priceCode": "TF",
+       "winPrice": 1.9,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/580/Events/10298478/Markets/239064142/Selections/1181260768/Prices/TF"
+      },
+      {
+       "priceCode": "TMD",
+       "winPrice": 1.75,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/580/Events/10298478/Markets/239064142/Selections/1181260768/Prices/TMD"
+      },
+      {
+       "priceCode": "L",
+       "placePriceNum": 1,
+       "placePriceDen": 25,
+       "winPriceNum": 7,
+       "winPriceDen": 10,
+       "winPrice": 1.7,
+       "placePrice": 1.04,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/580/Events/10298478/Markets/239064142/Selections/1181260768/Prices/L"
+      }
+     ],
+     "result": "W",
+     "multiplesKey": "Aeliana",
+     "sort": 90,
+     "statusCode": "S",
+     "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/1a7894da-8f3a-4b24-9454-af40f42b9806/8801b5ca-d559-4bae-9551-9389012f8f14.png",
+     "statistics": {
+      "winPercentage": 29.41,
+      "placePercentage": 70.59,
+      "dryRating": "99",
+      "wetRating": "99",
+      "sire": "Castelvecchio (AUS)",
+      "dam": "Temolie (AUS)",
+      "colour": "b",
+      "age": 4,
+      "sex": "m",
+      "overview": "Backing up after pulling out enough to wear down Lindermann in the Ranvet. Best win was this trip in last year's Derby.",
+      "overviewProvider": "BESTBETS_EDITORIAL",
+      "total": "17:5,6,1",
+      "distance": "1:1,0,0",
+      "track": "3:1,1,1",
+      "firm": "0:0,0,0",
+      "good": "12:2,4,1",
+      "soft": "4:3,1,0",
+      "heavy": "1:0,1,0",
+      "firstUp": "4:0,2,1",
+      "secondUp": "4:1,2,0",
+      "jumps": "0:0,0,0",
+      "distanceTrack": "0:0,0,0",
+      "expectedSettlingPosition": "Off Pace",
+      "speed": 51,
+      "formFig": "56x221",
+      "thirdUp": "4:1,1,0",
+      "fourthUp": "3:2,0,0",
+      "horseJockey": "4:3,1,0",
+      "synthetic": "0:0,0,0",
+      "recentStartsThoroughbreds": [
+       {
+        "place": 1,
+        "totalRunners": 5,
+        "date": "21/03/2026",
+        "trackName": "Rosehill",
+        "distance": "2000m",
+        "trackStatus": "Soft",
+        "margin": "0.2L",
+        "jockey": "J B Mc Donald",
+        "weight": "57kg",
+        "barrier": 3,
+        "startingPrice": "$1.60",
+        "class": "Group 1",
+        "time": "02.02.85",
+        "last600": "0:35.30",
+        "first": "Aeliana (57kg)",
+        "second": "Lindermann (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 2,
+        "totalRunners": 9,
+        "date": "28/02/2026",
+        "trackName": "Randwick",
+        "distance": "1600m",
+        "trackStatus": "Soft",
+        "margin": "0.4L",
+        "jockey": "Zac Lloyd",
+        "weight": "57kg",
+        "barrier": 1,
+        "startingPrice": "$12.00",
+        "class": "Group 1",
+        "time": "01.35.55",
+        "last600": "0:33.27",
+        "first": "Autumn Glow (57kg)",
+        "second": "Aeliana (57kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 2,
+        "totalRunners": 10,
+        "date": "14/02/2026",
+        "trackName": "Randwick",
+        "distance": "1400m",
+        "trackStatus": "Good",
+        "margin": "2.8L",
+        "jockey": "Zac Lloyd",
+        "weight": "57kg",
+        "barrier": 7,
+        "startingPrice": "$14.00",
+        "class": "Group 2",
+        "time": "01.22.11",
+        "last600": "0:33.43",
+        "first": "Autumn Glow (57kg)",
+        "second": "Aeliana (57kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 6,
+        "totalRunners": 8,
+        "date": "27/01/2026",
+        "trackName": "Randwick",
+        "distance": "900m",
+        "trackStatus": "Good",
+        "margin": "6.6L",
+        "jockey": "Tyler Schiller",
+        "weight": null,
+        "barrier": 1,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.53.96",
+        "last600": "0:34.30",
+        "first": "Beiwacht",
+        "second": "Spring Lee",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 8,
+        "totalRunners": 8,
+        "date": "15/01/2026",
+        "trackName": "Randwick",
+        "distance": "850m",
+        "trackStatus": "Good",
+        "margin": "6.4L",
+        "jockey": "J R Collett",
+        "weight": null,
+        "barrier": 1,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.51.50",
+        "last600": "0:34.20",
+        "first": "Pallaton",
+        "second": "Insurrection",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 6,
+        "totalRunners": 8,
+        "date": "25/10/2025",
+        "trackName": "Moonee Valley",
+        "distance": "2040m",
+        "trackStatus": "Good",
+        "margin": "5.2L",
+        "jockey": "J Bowman",
+        "weight": "55.5kg",
+        "barrier": 7,
+        "startingPrice": "$8.00",
+        "class": "Group 1",
+        "time": "02.05.03",
+        "last600": "0:35.25",
+        "first": "Via Sistina (57kg)",
+        "second": "Buckaroo (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       }
+      ],
+      "prizeMoney": 3546025,
+      "fluc1": 1.7,
+      "fluc2": 1.65,
+      "openPrice": 1.75,
+      "lastStart": {},
+      "lastSix": "56x221",
+      "awards": [
+       {
+        "type": "podiumChamp",
+        "rate": 70.59,
+        "awardTitle": "Place Rate",
+        "awardDescription": "Solid top 3 record: 70.59%",
+        "iconName": "placePerformer"
+       },
+       {
+        "type": "trackExpert",
+        "rate": 100,
+        "awardTitle": "Track Talent",
+        "awardDescription": "Solid top 3 record at track: 100%",
+        "iconName": "likesTheTrack"
+       },
+       {
+        "type": "distanceSuccess",
+        "rate": 100,
+        "awardTitle": "Striking Dist.",
+        "awardDescription": "Good distance record",
+        "iconName": "likesTheDistance"
+       },
+       {
+        "type": "likesTheWet",
+        "rate": 100,
+        "awardTitle": "Likes the Wet",
+        "awardDescription": "Likes wet conditions",
+        "iconName": "likesTheWet"
+       },
+       {
+        "type": "perfectPrep4thUp",
+        "rate": 66.67,
+        "awardTitle": "Ready to Fire",
+        "awardDescription": "Past success 4th run back",
+        "iconName": "readyToFire"
+       },
+       {
+        "type": "lastSix",
+        "rate": 100,
+        "awardTitle": "In Form",
+        "awardDescription": "Good recent form",
+        "iconName": "inForm"
+       }
+      ],
+      "blinkers": false
+     },
+     "longFormLink": "https://www.sportsbetform.com.au/mobile/10298478/9/",
+     "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/580/Events/10298478/Markets/239064142/Selections/1181260768",
+     "resultConfirmed": true,
+     "trainerLocation": "Rosehill",
+     "racingIQShortformAvailable": true,
+     "runnerCountry": "NZ",
+     "place": 1,
+     "dividend": [
+      "SP:1.70",
+      "NSW/PL:1.75/1.01",
+      "TF:1.9",
+      "UNI/PL:1.75/1.01",
+      "TT+/MD:1.75/1.01",
+      "STAB/PL:1.75/1.01"
+     ]
+    }
+   }
+  },
+  "Verry Elleegant (Chipping Norton) Stakes G1 1600m Randwick 2026-02-28": {
+   "racecardEvent": {
+    "name": "R8 Tab Verry Elleegant Stakes",
+    "displayName": "R8 Randwick",
+    "raceNumber": 8,
+    "distance": "1600",
+    "className": "Horses - Aus/NZ",
+    "startTime": 1772257200,
+    "trackStatus": "Soft (5)",
+    "competitionName": "Randwick"
+   },
+   "field": [
+    {
+     "no": 1,
+     "name": "Ceolwulf",
+     "draw": 2,
+     "jockey": "Chad Schofield",
+     "trainer": "Joseph Pride",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 2,
+     "name": "Sir Delius",
+     "draw": 6,
+     "jockey": "Craig Williams",
+     "trainer": "G Waterhouse & A Bott",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 3,
+     "name": "Lindermann",
+     "draw": 8,
+     "jockey": "Nash Rawiller",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 4,
+     "name": "Wootton Verni",
+     "draw": 7,
+     "jockey": "Adam Hyeronimus",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 5,
+     "name": "Soul Of Spain",
+     "draw": 5,
+     "jockey": "Tommy Berry",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 6,
+     "name": "Valiant King",
+     "draw": 9,
+     "jockey": "Sam Clipperton",
+     "trainer": "C J Waller",
+     "weightGram": 59000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 7,
+     "name": "Trinity College",
+     "draw": 4,
+     "jockey": "Tim Clark",
+     "trainer": "C J Waller",
+     "weightGram": 58500,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 8,
+     "name": "Autumn Glow",
+     "draw": 3,
+     "jockey": "James Mc Donald",
+     "trainer": "C J Waller",
+     "weightGram": 57000,
+     "place": null,
+     "sp": null
+    },
+    {
+     "no": 9,
+     "name": "Aeliana",
+     "draw": 1,
+     "jockey": "Zac Lloyd",
+     "trainer": "C J Waller",
+     "weightGram": 57000,
+     "place": null,
+     "sp": null
+    }
+   ],
+   "profiles": {
+    "Sir Delius": {
+     "id": 1169872865,
+     "name": "Sir Delius",
+     "runnerNumber": 2,
+     "drawNumber": 6,
+     "shortForm": "211X",
+     "jockey": "Craig Williams",
+     "weightGram": 59000,
+     "trainer": "G Waterhouse & A Bott",
+     "isOut": false,
+     "recentOddsFluctuations": [
+      8.5,
+      8,
+      8.5,
+      8,
+      8.5,
+      8,
+      8.5,
+      8,
+      8.5,
+      8
+     ],
+     "powerPlayPricing": {
+      "sPrice": 9,
+      "rPrice": 9,
+      "gPrice": 9,
+      "vPrice": 9,
+      "pPrice": 9,
+      "lPrice": 9,
+      "mPrice": 9,
+      "ePrice": 9
+     },
+     "marketMover": false,
+     "prices": [
+      {
+       "priceCode": "MDP",
+       "winPrice": 10,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872865/Prices/MDP"
+      },
+      {
+       "priceCode": "TF",
+       "winPrice": 8,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872865/Prices/TF"
+      },
+      {
+       "priceCode": "TMD",
+       "winPrice": 10.5,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872865/Prices/TMD"
+      },
+      {
+       "priceCode": "L",
+       "placePriceNum": 9,
+       "placePriceDen": 20,
+       "winPriceNum": 7,
+       "winPriceDen": 1,
+       "winPrice": 8,
+       "placePrice": 1.45,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872865/Prices/L"
+      }
+     ],
+     "result": "P",
+     "multiplesKey": "Sir Delius",
+     "sort": 20,
+     "statusCode": "S",
+     "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/c7692a6f-815a-4e45-a0a0-97052a299b56/289120ce-19b8-40a6-bc00-2f0621692ed2.png",
+     "statistics": {
+      "winPercentage": 60,
+      "placePercentage": 90,
+      "dryRating": "94",
+      "wetRating": "94",
+      "sire": "Frankel (GB)",
+      "dam": "Whatami (GB)",
+      "colour": "b",
+      "age": 5,
+      "sex": "h",
+      "overview": "Resuming (21 weeks). Trials have been sound. Superb spring form before vets cut short his Cox Plate/cups campaign.",
+      "overviewProvider": "BESTBETS_EDITORIAL",
+      "total": "10:6,2,1",
+      "distance": "1:0,1,0",
+      "track": "1:0,1,0",
+      "firm": "0:0,0,0",
+      "good": "3:2,1,0",
+      "soft": "5:2,1,1",
+      "heavy": "2:2,0,0",
+      "firstUp": "3:2,1,0",
+      "secondUp": "2:2,0,0",
+      "jumps": "0:0,0,0",
+      "distanceTrack": "1:0,1,0",
+      "expectedSettlingPosition": "Pace",
+      "speed": 76,
+      "formFig": "1x211x",
+      "thirdUp": "2:2,0,0",
+      "fourthUp": "1:0,0,1",
+      "horseJockey": "2:2,0,0",
+      "synthetic": "0:0,0,0",
+      "recentStartsThoroughbreds": [
+       {
+        "place": 4,
+        "totalRunners": 7,
+        "date": "12/02/2026",
+        "trackName": "Rosehill",
+        "distance": "1000m",
+        "trackStatus": "Good",
+        "margin": "2.8L",
+        "jockey": "Craig Williams",
+        "weight": null,
+        "barrier": 7,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "01.00.12",
+        "last600": "0:33.99",
+        "first": "Yorkshire",
+        "second": "King Of Roseau",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 3,
+        "totalRunners": 7,
+        "date": "27/01/2026",
+        "trackName": "Randwick",
+        "distance": "1000m",
+        "trackStatus": "Good",
+        "margin": "1.4L",
+        "jockey": "Craig Williams",
+        "weight": null,
+        "barrier": 7,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.58.07",
+        "last600": "0:33.52",
+        "first": "Just Feelin' Lucky",
+        "second": "Lindermann",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 4,
+        "totalRunners": 6,
+        "date": "15/01/2026",
+        "trackName": "Randwick",
+        "distance": "850m",
+        "trackStatus": "Good",
+        "margin": "1.7L",
+        "jockey": "Craig Williams",
+        "weight": null,
+        "barrier": 7,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.52.41",
+        "last600": "0:34.86",
+        "first": "Shangri La Boy",
+        "second": "Apocalyptic",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 1,
+        "totalRunners": 14,
+        "date": "04/10/2025",
+        "trackName": "Flemington",
+        "distance": "2000m",
+        "trackStatus": "Good",
+        "margin": "1.8L",
+        "jockey": "Craig Williams",
+        "weight": "58kg",
+        "barrier": 14,
+        "startingPrice": "$7.00",
+        "class": "Group 1",
+        "time": "02.02.82",
+        "last600": "0:33.85",
+        "first": "Sir Delius (58kg)",
+        "second": "Antino (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 1,
+        "totalRunners": 11,
+        "date": "20/09/2025",
+        "trackName": "Caulfield",
+        "distance": "1800m",
+        "trackStatus": "Good",
+        "margin": "0.4L",
+        "jockey": "Craig Williams",
+        "weight": "59kg",
+        "barrier": 10,
+        "startingPrice": "$2.10",
+        "class": "Group 1",
+        "time": "01.49.12",
+        "last600": "0:35.19",
+        "first": "Sir Delius (59kg)",
+        "second": "Buckaroo (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 2,
+        "totalRunners": 12,
+        "date": "06/09/2025",
+        "trackName": "Randwick",
+        "distance": "1600m",
+        "trackStatus": "Good",
+        "margin": "0.2L",
+        "jockey": "Tim Clark",
+        "weight": "59kg",
+        "barrier": 10,
+        "startingPrice": "$5.50",
+        "class": "Group 2",
+        "time": "01.34.46",
+        "last600": "0:34.14",
+        "first": "Lindermann (59kg)",
+        "second": "Sir Delius (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       }
+      ],
+      "prizeMoney": 1504708,
+      "fluc1": 8,
+      "fluc2": 8.5,
+      "openPrice": 6.5,
+      "lastStart": {},
+      "lastSix": "1x211x",
+      "awards": [
+       {
+        "type": "eliteWinner",
+        "rate": 60,
+        "awardTitle": "Proven Winner",
+        "awardDescription": "Good win rate: 60%",
+        "iconName": "starPerformer"
+       },
+       {
+        "type": "trackExpert",
+        "rate": 100,
+        "awardTitle": "Track Talent",
+        "awardDescription": "Solid top 3 record at track: 100%",
+        "iconName": "likesTheTrack"
+       },
+       {
+        "type": "likesTheWet",
+        "rate": 85.71,
+        "awardTitle": "Likes the Wet",
+        "awardDescription": "Likes wet conditions",
+        "iconName": "likesTheWet"
+       },
+       {
+        "type": "likesTheDry",
+        "rate": 100,
+        "awardTitle": "Likes the Dry",
+        "awardDescription": "Likes dry conditions",
+        "iconName": "sun"
+       },
+       {
+        "type": "perfectPrep1stUp",
+        "rate": 66.67,
+        "awardTitle": "Ready to Fire",
+        "awardDescription": "Past success 1st run back",
+        "iconName": "readyToFire"
+       },
+       {
+        "type": "perfectPrep2ndUp",
+        "rate": 100,
+        "awardTitle": "Ready to Fire",
+        "awardDescription": "Past success 2nd run back",
+        "iconName": "readyToFire"
+       },
+       {
+        "type": "perfectPrep3rdUp",
+        "rate": 100,
+        "awardTitle": "Ready to Fire",
+        "awardDescription": "Past success 3rd run back",
+        "iconName": "readyToFire"
+       }
+      ],
+      "blinkers": false
+     },
+     "longFormLink": "https://www.sportsbetform.com.au/mobile/10197604/2/",
+     "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872865",
+     "resultConfirmed": true,
+     "trainerLocation": "Randwick",
+     "racingIQShortformAvailable": true,
+     "runnerCountry": "GB",
+     "place": 3,
+     "dividend": [
+      "SP:8.00",
+      "NSW:1.55",
+      "UNI:1.55",
+      "MDP:1.55",
+      "STAB:1.55"
+     ]
+    },
+    "Aeliana": {
+     "id": 1169872872,
+     "name": "Aeliana",
+     "runnerNumber": 9,
+     "drawNumber": 1,
+     "shortForm": "56X2",
+     "jockey": "Zac Lloyd",
+     "weightGram": 57000,
+     "trainer": "C J Waller",
+     "isOut": false,
+     "recentOddsFluctuations": [
+      13,
+      12,
+      13,
+      12,
+      11,
+      10,
+      12,
+      13
+     ],
+     "powerPlayPricing": {
+      "sPrice": 14,
+      "rPrice": 14,
+      "gPrice": 14,
+      "vPrice": 14,
+      "pPrice": 14,
+      "lPrice": 14,
+      "mPrice": 14,
+      "ePrice": 14
+     },
+     "marketMover": false,
+     "prices": [
+      {
+       "priceCode": "MDP",
+       "winPrice": 15.5,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872872/Prices/MDP"
+      },
+      {
+       "priceCode": "TF",
+       "winPrice": 12,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872872/Prices/TF"
+      },
+      {
+       "priceCode": "TMD",
+       "winPrice": 16,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872872/Prices/TMD"
+      },
+      {
+       "priceCode": "L",
+       "placePriceNum": 7,
+       "placePriceDen": 10,
+       "winPriceNum": 11,
+       "winPriceDen": 1,
+       "winPrice": 12,
+       "placePrice": 1.7,
+       "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872872/Prices/L"
+      }
+     ],
+     "result": "P",
+     "multiplesKey": "Aeliana",
+     "sort": 90,
+     "statusCode": "S",
+     "mobileSilkImage": "https://assets.sbstatic.com.au/silks/AAP/c7692a6f-815a-4e45-a0a0-97052a299b56/bfe2e535-8125-4062-a494-3b222c31f11e.png",
+     "statistics": {
+      "winPercentage": 26.67,
+      "placePercentage": 66.67,
+      "dryRating": "90",
+      "wetRating": "90",
+      "sire": "Castelvecchio (AUS)",
+      "dam": "Temolie (AUS)",
+      "colour": "b",
+      "age": 4,
+      "sex": "m",
+      "overview": "Excellent return, but beaten again first up by a top-class mare. Good second off a slow pace second up in spring. Danger.",
+      "overviewProvider": "BESTBETS_EDITORIAL",
+      "total": "15:4,5,1",
+      "distance": "4:1,2,0",
+      "track": "5:2,2,0",
+      "firm": "0:0,0,0",
+      "good": "12:2,4,1",
+      "soft": "2:2,0,0",
+      "heavy": "1:0,1,0",
+      "firstUp": "4:0,2,1",
+      "secondUp": "3:1,1,0",
+      "jumps": "0:0,0,0",
+      "distanceTrack": "1:0,0,0",
+      "expectedSettlingPosition": "Midfield",
+      "speed": 43,
+      "formFig": "2256x2",
+      "thirdUp": "3:0,1,0",
+      "fourthUp": "3:2,0,0",
+      "horseJockey": "1:0,1,0",
+      "synthetic": "0:0,0,0",
+      "recentStartsThoroughbreds": [
+       {
+        "place": 2,
+        "totalRunners": 10,
+        "date": "14/02/2026",
+        "trackName": "Randwick",
+        "distance": "1400m",
+        "trackStatus": "Good",
+        "margin": "2.8L",
+        "jockey": "Zac Lloyd",
+        "weight": "57kg",
+        "barrier": 7,
+        "startingPrice": "$14.00",
+        "class": "Group 2",
+        "time": "01.22.11",
+        "last600": "0:33.43",
+        "first": "Autumn Glow (57kg)",
+        "second": "Aeliana (57kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 6,
+        "totalRunners": 8,
+        "date": "27/01/2026",
+        "trackName": "Randwick",
+        "distance": "900m",
+        "trackStatus": "Good",
+        "margin": "6.6L",
+        "jockey": "Tyler Schiller",
+        "weight": null,
+        "barrier": 1,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.53.96",
+        "last600": "0:34.30",
+        "first": "Beiwacht",
+        "second": "Spring Lee",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 8,
+        "totalRunners": 8,
+        "date": "15/01/2026",
+        "trackName": "Randwick",
+        "distance": "850m",
+        "trackStatus": "Good",
+        "margin": "6.4L",
+        "jockey": "J R Collett",
+        "weight": null,
+        "barrier": 1,
+        "startingPrice": null,
+        "class": "Barrier Trial-Open",
+        "time": "00.51.50",
+        "last600": "0:34.20",
+        "first": "Pallaton",
+        "second": "Insurrection",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 6,
+        "totalRunners": 8,
+        "date": "25/10/2025",
+        "trackName": "Moonee Valley",
+        "distance": "2040m",
+        "trackStatus": "Good",
+        "margin": "5.2L",
+        "jockey": "J Bowman",
+        "weight": "55.5kg",
+        "barrier": 7,
+        "startingPrice": "$8.00",
+        "class": "Group 1",
+        "time": "02.05.03",
+        "last600": "0:35.25",
+        "first": "Via Sistina (57kg)",
+        "second": "Buckaroo (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 5,
+        "totalRunners": 14,
+        "date": "04/10/2025",
+        "trackName": "Flemington",
+        "distance": "2000m",
+        "trackStatus": "Good",
+        "margin": "2.7L",
+        "jockey": "Damian Lane",
+        "weight": "55kg",
+        "barrier": 5,
+        "startingPrice": "$3.70",
+        "class": "Group 1",
+        "time": "02.02.82",
+        "last600": "0:33.85",
+        "first": "Sir Delius (58kg)",
+        "second": "Antino (59kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       },
+       {
+        "place": 2,
+        "totalRunners": 6,
+        "date": "13/09/2025",
+        "trackName": "Flemington",
+        "distance": "1600m",
+        "trackStatus": "Good",
+        "margin": "1.5L",
+        "jockey": "Damian Lane",
+        "weight": "56.5kg",
+        "barrier": 5,
+        "startingPrice": "$5.00",
+        "class": "Group 1",
+        "time": "01.38.75",
+        "last600": "0:32.66",
+        "first": "Mr Brightside (59kg)",
+        "second": "Aeliana (56.5kg)",
+        "raceReplay": {
+         "isReplayAvailable": true,
+         "provider": "SKY"
+        }
+       }
+      ],
+      "prizeMoney": 2769025,
+      "fluc1": 12,
+      "fluc2": 13,
+      "openPrice": 13,
+      "lastStart": {},
+      "lastSix": "2256x2",
+      "awards": [
+       {
+        "type": "trackExpert",
+        "rate": 80,
+        "awardTitle": "Track Talent",
+        "awardDescription": "Solid top 3 record at track: 80%",
+        "iconName": "likesTheTrack"
+       },
+       {
+        "type": "likesTheWet",
+        "rate": 100,
+        "awardTitle": "Likes the Wet",
+        "awardDescription": "Likes wet conditions",
+        "iconName": "likesTheWet"
+       },
+       {
+        "type": "perfectPrep4thUp",
+        "rate": 66.67,
+        "awardTitle": "Ready to Fire",
+        "awardDescription": "Past success 4th run back",
+        "iconName": "readyToFire"
+       },
+       {
+        "type": "lastSix",
+        "rate": 100,
+        "awardTitle": "In Form",
+        "awardDescription": "Good recent form",
+        "iconName": "inForm"
+       }
+      ],
+      "blinkers": false
+     },
+     "longFormLink": "https://www.sportsbetform.com.au/mobile/10197604/9/",
+     "topicLink": "Sportsbet/Sportsbook/Sports/1/Competitions/570/Events/10197604/Markets/236807169/Selections/1169872872",
+     "resultConfirmed": true,
+     "trainerLocation": "Rosehill",
+     "racingIQShortformAvailable": true,
+     "runnerCountry": "NZ",
+     "place": 2,
+     "dividend": [
+      "SP:12.00",
+      "NSW:1.65",
+      "UNI:1.65",
+      "MDP:1.65",
+      "STAB:1.65"
+     ]
+    }
+   }
+  }
+ }
+}

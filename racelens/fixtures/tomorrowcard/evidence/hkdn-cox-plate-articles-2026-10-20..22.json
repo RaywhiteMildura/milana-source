@@ -1,0 +1,960 @@
+{
+ "_evidenceNote": "REAL captures (excerpts + machine 'knowledge' summaries) of hkdnracing.com (HK Daily News racing, Traditional Chinese) Cox Plate 2026 articles dated 2026-10-20 and 2026-10-22, archived in GitHub repo sleepingarhat/domain-brain (ingestion/chunks/2026102*-style-*.json). 'exemplars' are sentences the same repo stores for style retrieval; most match the articles verbatim but the repo mixes in LLM-generated style samples (e.g. an entry about a horse 'Gobi Desert' and one saying the retired Via Sistina galloped), so treat exemplar sentences as MEDIUM confidence unless corroborated elsewhere. Chinese horse names used: 國民樂派=Sir Delius, 陽光小姐=Aeliana, 天鳥俠義=Birdman (inferred), 戰跡=Warwoven (inferred: 'Caulfield Guineas winner'), 加碼一擲=Caulfield Guineas runner-up (unresolved), 輕取勝/川河陸駒/聖喬治=Ciaron Maher runners (unresolved), 中土世界=Middle Earth, 精緻之道=Via Sistina, 夏姆斯獎=Shamus Award, 活侯夫人及布特=Waterhouse & Bott, 華禮納=Chris Waller, 馬漢雅=Ciaron Maher, 麥道朗=James McDonald, 苗傑美=Jamie Melham, 苗康文=Ben Melham (inferred), 金美琪=Rachel King (inferred).",
+ "sourceRepo": "https://github.com/sleepingarhat/domain-brain",
+ "chunks": [
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "一場足以名留青史的覺士盾",
+   "content": "來源: https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020\n\n一場足以名留青史的覺士盾\n2026-10-20\n兩匹代表華禮納馬房出戰覺士盾的賽駒，於費明頓進行最後操練後，均令練馬師感到滿意。\n「陽光小姐」由麥道朗策騎，而「天鳥俠義」則由苗康文主轡，兩駒將於週六角逐覺士盾（2040米），並於週二早上各自在跑道外側單獨進行操練。\n兩駒其後均落實角逐本週六舉行的一級賽覺士盾（2040米），此賽今年因滿利谷進行重建而移師費明頓上演。\n一級賽覺士盾共有12匹賽駒獲接納",
+   "content_hash": "31741d7df5a20ae4",
+   "metadata": {
+    "kind": "style_article",
+    "purpose": "style",
+    "commentator": "hkdn-教父",
+    "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+    "title": "一場足以名留青史的覺士盾",
+    "domain_tags": [
+     "style",
+     "commentary",
+     "cantonese"
+    ],
+    "excerpt_only": true,
+    "full_chars": 1147
+   },
+   "_chunkFile": "20261021-080650-style-excerpts.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "[知識] 一場足以名留青史的覺士盾",
+   "content": "【知識摘要·非原文】來源: https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020\n標題: 一場足以名留青史的覺士盾\n主題標籤: 晨操與試閘, 場地與途程, 檔位與冷熱偏, 班次與評分, 騎師練馬師\n要點: 一場足以名留青史的覺士盾 2026-10-20 兩匹代表華禮納馬房出戰覺士盾的賽駒，於費明頓進行最後操練後，均令練馬師感到滿意。；「陽光小姐」由麥道朗策騎，而「天鳥俠義」則由苗康文主轡，兩駒將於週六角逐覺士盾（2040米），並於週二早上各自在跑道外側單獨進行操練。；兩駒其後均落實角逐本週六舉行的一級賽覺士盾（2040米），此賽今年因滿利谷進行重建而移師費明頓上演。；一級賽覺士盾共有12匹賽駒獲接納角逐，排位抽籤將於本週二稍後時間舉行。",
+   "content_hash": "b28485aa496602f0",
+   "metadata": {
+    "kind": "knowledge",
+    "purpose": "knowledge",
+    "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+    "domain_tags": [
+     "knowledge",
+     "commentary",
+     "晨操與試閘",
+     "場地與途程",
+     "檔位與冷熱偏",
+     "班次與評分",
+     "騎師練馬師"
+    ],
+    "topics": [
+     "晨操與試閘",
+     "場地與途程",
+     "檔位與冷熱偏",
+     "班次與評分",
+     "騎師練馬師"
+    ],
+    "paraphrased": true
+   },
+   "_chunkFile": "20261021-080650-style-knowledge.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "【凌機一觸】覺士盾兩女將爭創歷史",
+   "content": "來源: https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022\n\n【凌機一觸】覺士盾兩女將爭創歷史\n2026-10-22\n澳洲兩位當時得令的女騎師金美琪與苗傑美，將於周末（10月24 日）力爭成為史上首位捧走覺士盾的女騎師。與此同時，她們的座騎「戰跡」及「加碼一擲」亦力求成為繼2013年「夏姆斯獎」之後，首匹稱霸此項2040米一級賽的三歲賽駒。由於滿利谷馬場正在進行重建工程，今年覺士盾將移師費明頓上演。\n覺士盾自1922年舉辦首屆賽事以來，從未有女騎師奪魁。對金",
+   "content_hash": "06c6049dd3399182",
+   "metadata": {
+    "kind": "style_article",
+    "purpose": "style",
+    "commentator": "hkdn-教父",
+    "url": "https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022",
+    "title": "【凌機一觸】覺士盾兩女將爭創歷史",
+    "domain_tags": [
+     "style",
+     "commentary",
+     "cantonese"
+    ],
+    "excerpt_only": true,
+    "full_chars": 591
+   },
+   "_chunkFile": "20261023-080431-style-excerpts.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "新報馬頁- HKDN Racing",
+   "content": "來源: https://hkdnracing.com/zh/news/晨操靚馬開心五月神色暢旺-20261022\n\n【晨操靚馬】開心五月神色暢旺 2026-10-22 今晨過檔馬十分踴躍，鍾易禮6時42分騎師父馬房「開心五月」，大圈單試兩段，時間30.2、27.1（57.3），走中檔時間不快但姿態硬朗，收身已呈飽滿結實，神色旺盛而不急，看季內有秩序增程，今回相信是出擊目標。 上一篇 萬眾矚目的覺士盾將於費明頓上演 下一篇 【凌機一觸】覺士盾兩女將爭創歷史",
+   "content_hash": "370c3dc724582a86",
+   "metadata": {
+    "kind": "style_article",
+    "purpose": "style",
+    "commentator": "hkdn-教父",
+    "url": "https://hkdnracing.com/zh/news/晨操靚馬開心五月神色暢旺-20261022",
+    "title": "新報馬頁- HKDN Racing",
+    "domain_tags": [
+     "style",
+     "commentary",
+     "cantonese"
+    ],
+    "excerpt_only": true,
+    "full_chars": 171
+   },
+   "_chunkFile": "20261023-080431-style-excerpts.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "新報馬頁- HKDN Racing",
+   "content": "來源: https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022\n\n華禮納再與麥道朗攜手力爭追平覺士盾紀錄\n2026-10-22\n同屬馬漢雅旗下的「輕取勝」及「川河陸駒」將於週六（10月24日）在澳洲墨爾本費明頓馬場競逐覺士盾（2040米一級賽）。兩駒均擅長以領放跑法爭勝，今仗將自最外的兩個檔位出閘，盼可盡展所長，爭取佳績。華禮納則會派遣「陽光小姐」參賽，期望馬兒能助他追平歷史紀錄，成為勝出此項大賽次數最多的練馬師之一。\n今年共有十二駒角逐這項總獎金高達六百萬澳元",
+   "content_hash": "76222fb118a1df50",
+   "metadata": {
+    "kind": "style_article",
+    "purpose": "style",
+    "commentator": "hkdn-教父",
+    "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+    "title": "新報馬頁- HKDN Racing",
+    "domain_tags": [
+     "style",
+     "commentary",
+     "cantonese"
+    ],
+    "excerpt_only": true,
+    "full_chars": 1651
+   },
+   "_chunkFile": "20261023-080431-style-excerpts.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "新報馬頁- HKDN Racing",
+   "content": "來源: https://hkdnracing.com/zh/news/萬眾矚目的覺士盾將於費明頓上演-20261022\n\n萬眾矚目的覺士盾將於費明頓上演\n2026-10-22\n星期六將是澳紐賽馬界誕生王者之日，總獎金達600萬澳元的覺士盾這項分齡讓磅錦標賽，將破例離開其傳統根據地滿利谷馬場，移師費明頓馬場上演，為這個特別年份添上與別不同的色彩。\n此賽歷來誕生不少傳奇，「雲絲仙子」四度封王，「京士頓城」三度掄元，「信可成真」則兩度稱霸；「日平線」與「北來風」於世紀交替之際雄踞一時，「雍容白荷」及「浪漫勇士」亦分別為日本",
+   "content_hash": "142e88f58eabbaee",
+   "metadata": {
+    "kind": "style_article",
+    "purpose": "style",
+    "commentator": "hkdn-教父",
+    "url": "https://hkdnracing.com/zh/news/萬眾矚目的覺士盾將於費明頓上演-20261022",
+    "title": "新報馬頁- HKDN Racing",
+    "domain_tags": [
+     "style",
+     "commentary",
+     "cantonese"
+    ],
+    "excerpt_only": true,
+    "full_chars": 611
+   },
+   "_chunkFile": "20261023-080431-style-excerpts.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "新報馬頁- HKDN Racing",
+   "content": "來源: https://hkdnracing.com/zh/news/距離2026年墨爾本盃嘉年華尚有8日-20261022\n\n距離2026年墨爾本盃嘉年華尚有8日\n2026-10-22\n去年墨爾本盃賽事中，「一半屬你」於費明頓末段全力衝刺，締造歷史；「乖女孩」僅能力保亞席；「中土世界」跑獲季軍，而高達1000萬澳元的獎金亦成為全場焦點，該幕精彩場面令全國馬迷為之沸騰。\n苗傑美成為首位完成考菲爾德盃及墨爾本盃雙冠的女騎師；在其摯友佩妮締造歷史十年之後，苗傑美憑「一半屬你」為巴拉瑞特父子練馬師麥伊維及麥彥輝取得同等成就，堪稱",
+   "content_hash": "39e6cb941da695c3",
+   "metadata": {
+    "kind": "style_article",
+    "purpose": "style",
+    "commentator": "hkdn-教父",
+    "url": "https://hkdnracing.com/zh/news/距離2026年墨爾本盃嘉年華尚有8日-20261022",
+    "title": "新報馬頁- HKDN Racing",
+    "domain_tags": [
+     "style",
+     "commentary",
+     "cantonese"
+    ],
+    "excerpt_only": true,
+    "full_chars": 316
+   },
+   "_chunkFile": "20261023-080431-style-excerpts.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "[知識] 【凌機一觸】覺士盾兩女將爭創歷史",
+   "content": "【知識摘要·非原文】來源: https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022\n標題: 【凌機一觸】覺士盾兩女將爭創歷史\n主題標籤: 班次與評分, 騎師練馬師\n要點: 【凌機一觸】覺士盾兩女將爭創歷史 2026-10-22 澳洲兩位當時得令的女騎師金美琪與苗傑美，將於周末（10月24 日）力爭成為史上首位捧走覺士盾的女騎師。；與此同時，她們的座騎「戰跡」及「加碼一擲」亦力求成為繼2013年「夏姆斯獎」之後，首匹稱霸此項2040米一級賽的三歲賽駒。；由於滿利谷馬場正在進行重建工程，今年覺士盾將移師費明頓上演。；覺士盾自1922年舉辦首屆賽事以來，從未有女騎師奪魁。",
+   "content_hash": "4e167a8e09a500aa",
+   "metadata": {
+    "kind": "knowledge",
+    "purpose": "knowledge",
+    "url": "https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022",
+    "domain_tags": [
+     "knowledge",
+     "commentary",
+     "班次與評分",
+     "騎師練馬師"
+    ],
+    "topics": [
+     "班次與評分",
+     "騎師練馬師"
+    ],
+    "paraphrased": true
+   },
+   "_chunkFile": "20261023-080431-style-knowledge.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "[知識] 新報馬頁- HKDN Racing",
+   "content": "【知識摘要·非原文】來源: https://hkdnracing.com/zh/news/晨操靚馬開心五月神色暢旺-20261022\n標題: 新報馬頁- HKDN Racing\n主題標籤: 晨操與試閘, 騎師練馬師\n要點: 上一篇 萬眾矚目的覺士盾將於費明頓上演 下一篇 【凌機一觸】覺士盾兩女將爭創歷史",
+   "content_hash": "81732ab82f2e6d79",
+   "metadata": {
+    "kind": "knowledge",
+    "purpose": "knowledge",
+    "url": "https://hkdnracing.com/zh/news/晨操靚馬開心五月神色暢旺-20261022",
+    "domain_tags": [
+     "knowledge",
+     "commentary",
+     "晨操與試閘",
+     "騎師練馬師"
+    ],
+    "topics": [
+     "晨操與試閘",
+     "騎師練馬師"
+    ],
+    "paraphrased": true
+   },
+   "_chunkFile": "20261023-080431-style-knowledge.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "[知識] 新報馬頁- HKDN Racing",
+   "content": "【知識摘要·非原文】來源: https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022\n標題: 新報馬頁- HKDN Racing\n主題標籤: 晨操與試閘, 場地與途程, 檔位與冷熱偏, 班次與評分, 閱讀賽績, 騎師練馬師\n要點: 華禮納再與麥道朗攜手力爭追平覺士盾紀錄 2026-10-22 同屬馬漢雅旗下的「輕取勝」及「川河陸駒」將於週六（10月24日）在澳洲墨爾本費明頓馬場競逐覺士盾（2040米一級賽）。；兩駒均擅長以領放跑法爭勝，今仗將自最外的兩個檔位出閘，盼可盡展所長，爭取佳績。；華禮納則會派遣「陽光小姐」參賽，期望馬兒能助他追平歷史紀錄，成為勝出此項大賽次數最多的練馬師之一。；今年共有十二駒角逐這項總獎金高達六百萬澳元（約合三千二百萬港元）的大賽，其中「輕取勝」及「川河陸駒」分別抽得第十一及第十二檔起步。",
+   "content_hash": "9dd42d0df2153443",
+   "metadata": {
+    "kind": "knowledge",
+    "purpose": "knowledge",
+    "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+    "domain_tags": [
+     "knowledge",
+     "commentary",
+     "晨操與試閘",
+     "場地與途程",
+     "檔位與冷熱偏",
+     "班次與評分",
+     "閱讀賽績",
+     "騎師練馬師"
+    ],
+    "topics": [
+     "晨操與試閘",
+     "場地與途程",
+     "檔位與冷熱偏",
+     "班次與評分",
+     "閱讀賽績",
+     "騎師練馬師"
+    ],
+    "paraphrased": true
+   },
+   "_chunkFile": "20261023-080431-style-knowledge.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "[知識] 新報馬頁- HKDN Racing",
+   "content": "【知識摘要·非原文】來源: https://hkdnracing.com/zh/news/萬眾矚目的覺士盾將於費明頓上演-20261022\n標題: 新報馬頁- HKDN Racing\n主題標籤: 馬匹生理與獸醫, 場地與途程, 檔位與冷熱偏, 班次與評分\n要點: 萬眾矚目的覺士盾將於費明頓上演 2026-10-22 星期六將是澳紐賽馬界誕生王者之日，總獎金達600萬澳元的覺士盾這項分齡讓磅錦標賽，將破例離開其傳統根據地滿利谷馬場，移師費明頓馬場上演，為這個特別年份添上與別不同的色彩。；此賽歷來誕生不少傳奇，「雲絲仙子」四度封王，「京士頓城」三度掄元，「信可成真」則兩度稱霸；；「日平線」與「北來風」於世紀交替之際雄踞一時，「雍容白荷」及「浪漫勇士」亦分別為日本及香港爭光。；兩屆冠軍「精緻之道」已告別賽場，今仗將由十二匹參戰馬中誕生新盟主，其中九駒曾勝出一級賽。",
+   "content_hash": "8f5ddd2cc8a39fa8",
+   "metadata": {
+    "kind": "knowledge",
+    "purpose": "knowledge",
+    "url": "https://hkdnracing.com/zh/news/萬眾矚目的覺士盾將於費明頓上演-20261022",
+    "domain_tags": [
+     "knowledge",
+     "commentary",
+     "馬匹生理與獸醫",
+     "場地與途程",
+     "檔位與冷熱偏",
+     "班次與評分"
+    ],
+    "topics": [
+     "馬匹生理與獸醫",
+     "場地與途程",
+     "檔位與冷熱偏",
+     "班次與評分"
+    ],
+    "paraphrased": true
+   },
+   "_chunkFile": "20261023-080431-style-knowledge.json"
+  },
+  {
+   "source_id": "style-hkdn-racing",
+   "title": "[知識] 新報馬頁- HKDN Racing",
+   "content": "【知識摘要·非原文】來源: https://hkdnracing.com/zh/news/距離2026年墨爾本盃嘉年華尚有8日-20261022\n標題: 新報馬頁- HKDN Racing\n主題標籤: 騎師練馬師\n要點: 距離2026年墨爾本盃嘉年華尚有8日 2026-10-22 去年墨爾本盃賽事中，「一半屬你」於費明頓末段全力衝刺，締造歷史；；「乖女孩」僅能力保亞席；；「中土世界」跑獲季軍，而高達1000萬澳元的獎金亦成為全場焦點，該幕精彩場面令全國馬迷為之沸騰。；苗傑美成為首位完成考菲爾德盃及墨爾本盃雙冠的女騎師；",
+   "content_hash": "542f775e6967e9e4",
+   "metadata": {
+    "kind": "knowledge",
+    "purpose": "knowledge",
+    "url": "https://hkdnracing.com/zh/news/距離2026年墨爾本盃嘉年華尚有8日-20261022",
+    "domain_tags": [
+     "knowledge",
+     "commentary",
+     "騎師練馬師"
+    ],
+    "topics": [
+     "騎師練馬師"
+    ],
+    "paraphrased": true
+   },
+   "_chunkFile": "20261023-080431-style-knowledge.json"
+  }
+ ],
+ "exemplars": [
+  {
+   "id": "private:00544b123cd0f4c4:p0",
+   "text": "萬眾矚目的覺士盾將於費明頓上演 2026-10-22 星期六將是澳紐賽馬界誕生王者之日，總獎金達600萬澳元的覺士盾這項分齡讓磅錦標賽，將破例離開其傳統根據地滿利谷馬場，移師費明頓馬場上演，為這個特別年份添上與別不同的色彩。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/萬眾矚目的覺士盾將於費明頓上演-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "142e88f58eabbaee",
+   "excerpt_only": true,
+   "full_chars": 112
+  },
+  {
+   "id": "private:00544b123cd0f4c4:p1",
+   "text": "此賽歷來誕生不少傳奇，「雲絲仙子」四度封王，「京士頓城」三度掄元，「信可成真」則兩度稱霸；「日平線」與「北來風」於世紀交替之際雄踞一時，「雍容白荷」及「浪漫勇士」亦分別為日本及香港爭光。兩屆冠軍「精緻之道」已告別賽場，今仗將由十二匹參戰馬中誕生新盟主，其中九駒曾勝出一級賽。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/萬眾矚目的覺士盾將於費明頓上演-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "142e88f58eabbaee",
+   "excerpt_only": true,
+   "full_chars": 137
+  },
+  {
+   "id": "private:00544b123cd0f4c4:p2",
+   "text": "「國民樂派」為此賽大熱門，該駒在女皇伊利沙伯錦標中表現出色，今仗背負補償使命，事緣去年因獸醫檢查後被剔除，令人震驚。此駒本賽季兩度跑獲第四，表面上看似平凡，但東寶錦標一役在爛地上以極快步速競跑。預期此駒在較乾爽的場地上狀態更佳，而5檔起步亦屬理想。「陽光小姐」是主要威脅，華禮納麾下這匹雌馬與「國民樂派」對賽往績以3比1領先，今仗由麥道朗策騎。此駒將從後而上，耐力充沛。「戰跡」是人人談論的三歲馬，該",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/萬眾矚目的覺士盾將於費明頓上演-20261022",
+   "date": null,
+   "situation": "大熱門",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "142e88f58eabbaee",
+   "excerpt_only": true,
+   "full_chars": 342
+  },
+  {
+   "id": "private:0fcac08fbc74f447:p1",
+   "text": "上一篇 萬眾矚目的覺士盾將於費明頓上演 下一篇 【凌機一觸】覺士盾兩女將爭創歷史",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/晨操靚馬開心五月神色暢旺-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "370c3dc724582a86",
+   "excerpt_only": true,
+   "full_chars": 40
+  },
+  {
+   "id": "private:1534e5deb296a397:p0",
+   "text": "舉國停步 世界矚目｜2026年墨爾本盃 2026-10-21 2026年一級賽墨爾本盃堪稱令全國以至全球矚目的焦點大賽，此賽不僅是澳洲賽馬界的年度盛事，更吸引世界各地頂級賽駒與騎練慕名而來，屆時一眾長途精英將齊集費明頓馬場，爭奪這項享譽國際的3200米大賽殊榮，賽事氣氛勢必沸騰，萬眾期待。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/舉國停步-世界矚目2026年墨爾本盃-20261021",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "e41b3e8b9a14b9ec",
+   "excerpt_only": true,
+   "full_chars": 145
+  },
+  {
+   "id": "private:1534e5deb296a397:p2",
+   "text": "今年11月3日星期二，即11月首個星期二，澳洲墨爾本費明頓馬場將見證新傳奇的誕生；3200米賽事，全球最頂尖的長途賽駒，僅此一戰，爭奪不朽榮耀。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/舉國停步-世界矚目2026年墨爾本盃-20261021",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "e41b3e8b9a14b9ec",
+   "excerpt_only": true,
+   "full_chars": 72
+  },
+  {
+   "id": "private:1534e5deb296a397:p4",
+   "text": "然而，真正令人著迷之處在於現場觀眾。在費明頓舉行的盃賽，匯聚社會各階層人士：講究時尚者於草坪上昂首闊步，別具個性的群眾在停車場鋪開野餐，商界人士則於企業帳篷內交際應酬；隨著香檳源源不絕，眾人逐漸放鬆，最終融為一個聲勢浩大、齊聲吶喊的盃賽大家庭。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/舉國停步-世界矚目2026年墨爾本盃-20261021",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "e41b3e8b9a14b9ec",
+   "excerpt_only": true,
+   "full_chars": 122
+  },
+  {
+   "id": "private:1534e5deb296a397:p5",
+   "text": "此家族的影響力早已遍及全球，絕不止於費明頓一地；無論身處倫敦、里斯本、洛杉磯抑或拉各斯，今年的大賽榮耀同樣可屬於您。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/舉國停步-世界矚目2026年墨爾本盃-20261021",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "e41b3e8b9a14b9ec",
+   "excerpt_only": true,
+   "full_chars": 58
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p0",
+   "text": "一場足以名留青史的覺士盾 2026-10-20 兩匹代表華禮納馬房出戰覺士盾的賽駒，於費明頓進行最後操練後，均令練馬師感到滿意。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 64
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p1",
+   "text": "「陽光小姐」由麥道朗策騎，而「天鳥俠義」則由苗康文主轡，兩駒將於週六角逐覺士盾（2040米），並於週二早上各自在跑道外側單獨進行操練。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 67
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p2",
+   "text": "兩駒其後均落實角逐本週六舉行的一級賽覺士盾（2040米），此賽今年因滿利谷進行重建而移師費明頓上演。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 50
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p3",
+   "text": "一級賽覺士盾共有12匹賽駒獲接納角逐，排位抽籤將於本週二稍後時間舉行。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 35
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p4",
+   "text": "華禮納表示，兩駒狀態俱佳，鞍上人對其操練表現均感滿意，能夠獲得他們效力實屬好事。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 40
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p5",
+   "text": "「精緻之道」及「雄威霸主」今晨進行賽前最後一課快操，表現令人滿意，練馬師團隊對其備戰進度深感稱心。此課操練力度充足，兩駒課後恢復情況理想，無論在體能狀態、操練強度及整體備戰部署方面，均已達到出戰週六覺士盾的預期要求，可謂全面達標。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 115
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p6",
+   "text": "華禮納表示，兩匹賽駒均屬真正的一級賽分子，而牠們正於合適時機步入巔峰狀態。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 37
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p7",
+   "text": "「華禮納」表示：「陽光小姐」上仗於準決賽跑出水準，現已準備就緒，狀態有望達至高峰；「天鳥俠義」的情況亦與牠相若。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 56
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p8",
+   "text": "「天鳥俠義」上仗於最後100米體力不繼，故此該課操練將有助牠以更佳狀態迎戰。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 38
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p9",
+   "text": "「賽駒若得到妥善照料，便會持續進步，這正是我們一直努力的方向，尤其對「陽光小姐」更是如此。」 「天鳥俠義」於秋季賽期展現最佳狀態，因而取得不俗評分，而此駒在過去六個月進步神速，先後於布里斯本及墨爾本攻下一級賽。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 105
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p10",
+   "text": "「陽光小姐」於冬季期間逐步調整至佳態，踏入春季後狀態與生理機能全面配合，此駒現時健康狀況極佳。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 47
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p11",
+   "text": "華禮納表示，週六覺士盾的12匹參賽馬令此賽事更具觀賞性，各駒賽績背景各異，形成多條不同的實力線。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 48
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p12",
+   "text": "他補充指出，在考菲爾德堅尼中包辦頭兩名的「戰跡」與「加碼一擲」為賽事增添另一層次，而此賽移師費明頓舉行亦帶來不同變化。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 59
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p13",
+   "text": "「華禮納」表示，賽事具備相當深度。三歲馬質素上乘，賽前狀態甚佳，此役預期步速偏快，且屬分齡讓磅賽事。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 50
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p14",
+   "text": "本屆賽事勢必成為載入史冊的經典之戰。馬漢雅旗下共有四駒角逐週六賽事十二匹參戰馬中的四席，分別為「輕取勝」、「川河陸駒」、「中土世界」及「聖喬治」；而活侯夫人及布特馬房則派出「國民樂派」應戰。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 95
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p15",
+   "text": "該賽事的其餘參賽馬包括「雄威霸主」、「耗敵」及「星辰征駕」。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 30
+  },
+  {
+   "id": "private:31a8d3d9e172d2be:p16",
+   "text": "「Gobi Desert」上仗於費明頓角逐一項1400米賽事，末段衝刺凌厲，最終僅以短距離見負，表現甚具說服力；該駒今仗回師同程，狀態保持穩定，賽前試閘走勢理想，具備再下一城的條件。練馬師華禮納對此駒評價甚高，認為牠仍有進步空間，今仗面對較高級別考驗，仍具備一爭之力。騎師麥道朗將繼續為此駒執韁，檔位理想，有望沿途走勢暢順，末段施展加速力制勝。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "date": null,
+   "situation": "新馬或初出",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "31741d7df5a20ae4",
+   "excerpt_only": true,
+   "full_chars": 172
+  },
+  {
+   "id": "private:3cb9d485dc8c040e:p5",
+   "text": "同一問題亦向「秋暉」的騎師麥道朗提出，他回應道：「易於駕馭、持續速度，以及牠的加速力！」 麥道朗表示：「我認為並無賽駒能夠超越牠。」他續指，此駒於去年4月出爭女皇伊利沙伯錦標時，未能追上「國民樂派」。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/秋暉於今季繼續不敗-20261018",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "cc7379185ee6564f",
+   "excerpt_only": true,
+   "full_chars": 100
+  },
+  {
+   "id": "private:3cb9d485dc8c040e:p17",
+   "text": "應屆香港馬王「秋暉」今個春季在悉尼三戰全勝，先後輕取一級賽雲絲仙子錦標、二級賽Seven Sunrise Stakes及一級賽Charles III Stakes，表現從容，而其征戰部署亦頗有機會再添一仗，劍指今年11月7日在費明頓舉行的一級賽冠軍一哩錦標。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/秋暉於今季繼續不敗-20261018",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "cc7379185ee6564f",
+   "excerpt_only": true,
+   "full_chars": 129
+  },
+  {
+   "id": "private:3cb9d485dc8c040e:p23",
+   "text": "「She」一直與我方保持一段可觀距離，惟並未進一步拋離我駒。我在末段刻意加以照料，以備幕後有意安排此駒於下週出戰覺士盾。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/秋暉於今季繼續不敗-20261018",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "cc7379185ee6564f",
+   "excerpt_only": true,
+   "full_chars": 60
+  },
+  {
+   "id": "private:4412e16c00bc12e3:p6",
+   "text": "更值得關注的是，究竟「動心」會否於本春季再出賽，角逐今年10月31日在蘭域舉行、總獎金300萬澳元的二級賽布耀德錦標（1300米），抑或出戰今年11月7日在費明頓上演、總獎金300萬澳元的一級賽冠軍短途錦標（1200米）。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/動心有意遠征海外而嘉應高昇則料於明年重返悉尼角逐珠穆朗瑪峰錦標-20261020",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "45aca88a6b4f0bbd",
+   "excerpt_only": true,
+   "full_chars": 111
+  },
+  {
+   "id": "private:8379d1dc455eb085:p8",
+   "text": "「這對所有人而言均令人難受，馬房上下均深有同感。我們昨晚已向費明頓及巴拉烈全體團隊發出明確訊息，向他們保證旗下賽駒安然無恙，並將順利康復。他們會將情感表露無遺，皆因他們與這些賽駒關係密切，並且表現出色。目睹此情此景固然令人揪心，然而能夠將賽駒平安帶返家中，而騎師亦安然無恙，我們深感慶幸。」 Photo: Racing Photos",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/一半屬你於盃賽中墮馬事故中多處受傷-20261018",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "21e52e257c1f57bc",
+   "excerpt_only": true,
+   "full_chars": 166
+  },
+  {
+   "id": "private:93896d2dec270f35:p0",
+   "text": "距離2026年墨爾本盃嘉年華尚有8日 2026-10-22 去年墨爾本盃賽事中，「一半屬你」於費明頓末段全力衝刺，締造歷史；「乖女孩」僅能力保亞席；「中土世界」跑獲季軍，而高達1000萬澳元的獎金亦成為全場焦點，該幕精彩場面令全國馬迷為之沸騰。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/距離2026年墨爾本盃嘉年華尚有8日-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "39e6cb941da695c3",
+   "excerpt_only": true,
+   "full_chars": 122
+  },
+  {
+   "id": "private:b81c942badc56910:p0",
+   "text": "華禮納再與麥道朗攜手力爭追平覺士盾紀錄 2026-10-22 同屬馬漢雅旗下的「輕取勝」及「川河陸駒」將於週六（10月24日）在澳洲墨爾本費明頓馬場競逐覺士盾（2040米一級賽）。兩駒均擅長以領放跑法爭勝，今仗將自最外的兩個檔位出閘，盼可盡展所長，爭取佳績。華禮納則會派遣「陽光小姐」參賽，期望馬兒能助他追平歷史紀錄，成為勝出此項大賽次數最多的練馬師之一。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 178
+  },
+  {
+   "id": "private:b81c942badc56910:p1",
+   "text": "今年共有十二駒角逐這項總獎金高達六百萬澳元（約合三千二百萬港元）的大賽，其中「輕取勝」及「川河陸駒」分別抽得第十一及第十二檔起步。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 65
+  },
+  {
+   "id": "private:b81c942badc56910:p2",
+   "text": "由於滿利谷馬場正進行大型重建工程，今屆覺士盾將首度移師費明頓馬場舉行，預料「輕取勝」及「川河陸駒」將為賽事帶來快步速。除這兩駒外，馬漢雅今仗也會派遣曾在歐洲服役的長途佳駟「中土世界」及「聖喬治」上陣。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 100
+  },
+  {
+   "id": "private:b81c942badc56910:p3",
+   "text": "現年七歲的「川河陸駒」上仗以冷門身分出爭考菲爾德錦標（2000米一級賽），沿途一直領放，最終力拒衝刺強勁的「紅妝力證」，爆冷掄元。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "冷馬有價",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 65
+  },
+  {
+   "id": "private:b81c942badc56910:p4",
+   "text": "「輕取勝」則擅跑費明頓的同程賽事，上仗在此場出爭東寶錦標（2000米一級賽）也採取了領放戰術，惜於末段被「星辰征駕」趕過，屈居亞軍。兩駒將於週六再度交鋒。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 77
+  },
+  {
+   "id": "private:b81c942badc56910:p5",
+   "text": "在該仗跑入季席的「陽光小姐」也會於週六加入戰團，並改由麥道朗主轡。這匹備受看好的佳駟是陣中唯一的雌馬，去年曾夥拍布文角逐此賽，在八駒中取得第六名。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 73
+  },
+  {
+   "id": "private:b81c942badc56910:p6",
+   "text": "若「陽光小姐」今仗報捷，不但可助練馬師華禮納第七度揚威這項享譽全球的分齡讓磅大賽，追平練馬師勝出此賽次數最多的紀錄，也會助麥道朗連續第五年在此賽稱王。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 75
+  },
+  {
+   "id": "private:b81c942badc56910:p7",
+   "text": "麥道朗說：「每當提起覺士盾時，我都會格外興奮。這項賽事一直是我最重視的目標之一，而我們一直得到幸運之神眷顧，在此賽屢創佳績。」 麥道朗於2022年主策甘敏斯麾下的「愛禮物」攻下此賽，翌年則夥拍香港訓練賽駒「浪漫勇士」掄元。他其後於2024年及2025年與華禮納馬房的「精緻之道」攜手連奪兩屆錦標。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 148
+  },
+  {
+   "id": "private:b81c942badc56910:p8",
+   "text": "除了「陽光小姐」外，華禮納也會派出另一匹一級賽盟主「天鳥俠義」上陣，力爭連續第三年勝出此賽。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 46
+  },
+  {
+   "id": "private:b81c942badc56910:p9",
+   "text": "華禮納早前於晨課後表示：「兩駒狀態俱佳，騎師們均很滿意牠們的操練表現。分別為『陽光小姐』及『天鳥俠義』主操的麥道朗及苗康文將於週六策騎兩駒出賽。」 由活侯夫人及布特訓練的「國民樂派」抽得第五檔後，支持度稍有回升。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 106
+  },
+  {
+   "id": "private:b81c942badc56910:p10",
+   "text": "活侯夫人談及「國民樂派」於週二（10月20日）的快操時說：「馬兒的操練表現與去年不太一樣，畢竟牠年長了一歲，也更成熟，但我認為牠應付得很好。牠狀態十足，心情愉快。」 活侯夫人的父親是著名練馬師湯美史密夫，從練時曾創下七奪覺士盾的紀錄，但活侯夫人本人至今尚未摘下此賽桂冠。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 135
+  },
+  {
+   "id": "private:b81c942badc56910:p11",
+   "text": "活侯夫人說：「今仗陣容鼎盛，實力出眾的參賽馬眾多，相信競爭將會格外激烈。這將是一場真正高水準的的覺士盾。」 另一方面，兩匹三歲馬「戰跡」及「加碼一擲」今仗均會負最輕的109磅上陣，有望左右戰局。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 97
+  },
+  {
+   "id": "private:b81c942badc56910:p12",
+   "text": "由白敬雅訓練的「戰跡」於10月10日擊敗「加碼一擲」攻下考菲爾德堅尼（1600米一級賽），而贏馬拍檔金美琪更形容馬兒是她騎過最優秀的賽駒。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 69
+  },
+  {
+   "id": "private:b81c942badc56910:p13",
+   "text": "金美琪說︰「我認為馬兒的潛力尚未盡現，實在令人期待，但我們也清楚牠今次將面對較年長的賽駒，這會是截然不同的挑戰。」 「馬兒絕對是我騎過最出色的一駒。」 「加碼一擲」今仗將改由另一女將苗傑美執韁。此駒慣常居前競跑，雖然今仗或會面對「川河陸駒」及「輕取勝」的考驗，但練馬師布樹庭及楊麗妮均表示馬兒有力爭勝。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 151
+  },
+  {
+   "id": "private:b81c942badc56910:p14",
+   "text": "最近一匹捧走覺士盾的三歲馬是「夏姆斯獎」，牠於2013年在此大賽中打開勝門。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 38
+  },
+  {
+   "id": "private:b81c942badc56910:p15",
+   "text": "由彭達訓練的「雄威霸主」近四仗均角逐一哩途程，取得三亞一季，今仗增程至2040米應合發揮。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "距離或場地轉變",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 45
+  },
+  {
+   "id": "private:b81c942badc56910:p16",
+   "text": "「星辰征駕」上週在考菲爾德盃（2400米一級賽）取得第四名，以往也曾揚威同場同程的一級賽，相信將獲不少捧揚客支持。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 57
+  },
+  {
+   "id": "private:b81c942badc56910:p17",
+   "text": "根據天氣預報，墨爾本週六大致多雲，預料全日降雨量介乎3毫米至20毫米。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 35
+  },
+  {
+   "id": "private:b81c942badc56910:p18",
+   "text": "覺士盾（2040米一級賽）編為海外賽事第一組第八場，將於香港時間10月24日（星期六）下午二時十分開跑。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "76222fb118a1df50",
+   "excerpt_only": true,
+   "full_chars": 52
+  },
+  {
+   "id": "private:cbcad3201903b1fc:p1",
+   "text": "由維多利亞州領先練馬師馬漢雅訓練的「法律論點」，在布浩榮信心十足的策騎下交出強勁的長途表現，擊敗岳本賢麾下的「幼苗」及「全能通才」。此役勝出後，該閹馬已躍升為墨爾本盃的大熱門，該賽將於13天後在費明頓上演。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/法律論點勇奪墨爾本盃參賽資格-20261021",
+   "date": null,
+   "situation": "大熱門",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "62b03048d3cfb615",
+   "excerpt_only": true,
+   "full_chars": 103
+  },
+  {
+   "id": "private:cbcad3201903b1fc:p5",
+   "text": "有關人馬將於本週末全力爭取墨爾本盃參賽席位，費明頓將首次上演覺士盾及滿利谷金盃。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/法律論點勇奪墨爾本盃參賽資格-20261021",
+   "date": null,
+   "situation": "新馬或初出",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "62b03048d3cfb615",
+   "excerpt_only": true,
+   "full_chars": 40
+  },
+  {
+   "id": "private:d2a167a28b1ff62c:p0",
+   "text": "【凌機一觸】覺士盾兩女將爭創歷史 2026-10-22 澳洲兩位當時得令的女騎師金美琪與苗傑美，將於周末（10月24 日）力爭成為史上首位捧走覺士盾的女騎師。與此同時，她們的座騎「戰跡」及「加碼一擲」亦力求成為繼2013年「夏姆斯獎」之後，首匹稱霸此項2040米一級賽的三歲賽駒。由於滿利谷馬場正在進行重建工程，今年覺士盾將移師費明頓上演。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "06c6049dd3399182",
+   "excerpt_only": true,
+   "full_chars": 170
+  },
+  {
+   "id": "private:d2a167a28b1ff62c:p1",
+   "text": "覺士盾自1922年舉辦首屆賽事以來，從未有女騎師奪魁。對金美琪而言，周末倘能奏凱而回，可謂別具意義，事緣這是她首次參與角逐此項一級賽。苗傑美則已多次列席此項大賽，最佳成績是2024年策騎「側面進擊」跑獲季軍，然而今年幾乎錯過了出爭此賽的機會，事緣上周六她策騎「保證品」出戰悉尼錦標跑獲亞軍，但賽後被競賽董事小組指控在接近300米處不小心策騎，判罰停賽四個賽馬日。不幸中的大幸，是罰則將於本周末過後才執",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022",
+   "date": null,
+   "situation": "新馬或初出",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "06c6049dd3399182",
+   "excerpt_only": true,
+   "full_chars": 242
+  },
+  {
+   "id": "private:d2a167a28b1ff62c:p2",
+   "text": "本屆覺士盾的另一個看點，是剛於10月10日舉行的一級賽考菲爾德堅尼出爐冠軍「戰跡」及亞軍「加碼一擲」將會再度交鋒，前者繼續由老拍檔金美琪執韁，排在第二檔，後者改配苗傑美，排在第九檔。在此項分齡讓磅賽中，這兩匹三歲馬俱負49.5kg（約109磅）上陣，憑輕磅之助，堪與一眾年長馬如「陽光小姐」、「國民樂派」、「雄威霸主」、「星辰征駕」等一較高下。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "06c6049dd3399182",
+   "excerpt_only": true,
+   "full_chars": 172
+  },
+  {
+   "id": "private:e66f601beddbe401:p7",
+   "text": "由艾寧策騎的「御獵林區」（26倍）以半個馬位之先掄元，「聖喬治」（10倍）屈居亞軍，「巨爆」（12倍）再落後半個馬位跑獲季軍。",
+   "commentator": "hkdn-教父",
+   "url": "https://hkdnracing.com/zh/news/御獵林區力壓群雄勇奪考菲爾德盃殊榮-20261018",
+   "date": null,
+   "situation": "其他",
+   "source_id": "style-hkdn-racing",
+   "content_hash": "6b0ca001211f9db8",
+   "excerpt_only": true,
+   "full_chars": 63
+  }
+ ]
+}

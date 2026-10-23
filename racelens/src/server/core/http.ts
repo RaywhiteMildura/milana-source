@@ -138,6 +138,8 @@ export class HttpClient {
         return res;
       } catch (err) {
         lastErr = err;
+        // A timeout already consumed the caller's patience: do not retry it.
+        if (err instanceof Error && err.name === 'AbortError') throw new Error(`Timed out after ${opts.timeoutMs ?? this.opts.timeoutMs}ms: ${url}`);
         if (attempt < retries) await sleep(300 * 2 ** attempt);
       }
     }

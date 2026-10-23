@@ -1,0 +1,1181 @@
+{
+ "_fixtureNote": "RESEARCH PACK, not a captured API response. Built 2026-10-23 inside a sandbox that could not reach any racing, bookmaker, news or weather site (only github.com/raw.githubusercontent.com were reachable; the WebSearch budget was exhausted before this task started). Every fact below comes from REAL third-party captures archived in public GitHub repositories (see sources[] and the evidence/ folder) or from the orchestrator's workflow brief (marked 'brief'). Fields that could not be confirmed are null. No horse name was invented; runners known only by Hong Kong Chinese names are listed under unresolvedRunners rather than guessed.",
+ "schemaVersion": "racelens.tomorrowcard/1",
+ "meeting": {
+  "venue": "Flemington",
+  "date": "2026-10-24",
+  "state": "VIC",
+  "country": "AUS",
+  "club": "Victoria Racing Club (Moonee Valley Racing Club's Cox Plate day relocated)",
+  "dayName": "Cox Plate Day (Ladbrokes Cox Plate) - first time run at Flemington; Moonee Valley under redevelopment",
+  "timezone": "Australia/Melbourne (AEDT, UTC+11)",
+  "gatesOpen": "10:30",
+  "firstRace": "12:25",
+  "lastRace": "17:50",
+  "raceCount": 9,
+  "raceCountConfidence": "medium (brief; consistent with 12:25-17:50 at ~40 min intervals)",
+  "trackCondition": null,
+  "trackRating": null,
+  "rail": null,
+  "penetrometer": null,
+  "weather": null,
+  "weatherNote": "No forecast or track report could be fetched (BOM, Open-Meteo, racing.com, Racing Victoria all blocked from the sandbox). HKDN (22 Oct) says Sir Delius is 'expected to be better on drier ground' and that the Turnbull Stakes (3 Oct) was run on a heavy/wet track, implying a wet Melbourne spring to date - low. Fetch live: racing.com meeting header (railPosition/trackCondition/weather), Racing Victoria track reports, BOM Melbourne (Olympic Park) obs, Open-Meteo for -37.79,144.91.",
+  "expectedCrowdNote": "Transport Victoria warns of heavy crowds (Future Drive Australia and a tattoo expo at the Showgrounds the same day).",
+  "fieldConfidence": {
+   "venue": "high",
+   "date": "high",
+   "firstRace": "high",
+   "lastRace": "high",
+   "gatesOpen": "high",
+   "trackCondition": "unknown",
+   "rail": "unknown",
+   "weather": "unknown"
+  }
+ },
+ "races": [
+  {
+   "number": 1,
+   "name": null,
+   "group": null,
+   "distance": null,
+   "startTime": "12:25",
+   "prize": "AEDT",
+   "runners": [],
+   "note": "First race 12:25pm per transport.vic.gov.au (high). Name/distance/class unknown."
+  },
+  {
+   "number": 2,
+   "name": null,
+   "group": null,
+   "distance": null,
+   "startTime": null,
+   "prize": null,
+   "runners": [],
+   "note": "Unknown."
+  },
+  {
+   "number": 3,
+   "name": null,
+   "group": null,
+   "distance": null,
+   "startTime": null,
+   "prize": null,
+   "runners": [],
+   "note": "Unknown."
+  },
+  {
+   "number": 4,
+   "name": null,
+   "group": null,
+   "distance": null,
+   "startTime": null,
+   "prize": null,
+   "runners": [],
+   "note": "Unknown."
+  },
+  {
+   "number": 5,
+   "name": null,
+   "group": null,
+   "distance": null,
+   "startTime": null,
+   "prize": null,
+   "runners": [],
+   "note": "Unknown."
+  },
+  {
+   "number": 6,
+   "name": null,
+   "group": null,
+   "distance": null,
+   "startTime": null,
+   "prize": null,
+   "runners": [],
+   "note": "Unknown."
+  },
+  {
+   "number": 7,
+   "name": "Moonee Valley Gold Cup",
+   "group": "G2",
+   "distance": 2500,
+   "startTime": "16:20",
+   "prize": null,
+   "runners": [],
+   "note": "Name/distance/time from the workflow brief only (medium-low). Race number inferred from the timetable (12:25 first, 17:10 Cox Plate, 17:50 last => Gold Cup is the race before the Cox Plate). In the fan calendar (meshi-z) the Gold Cup is listed as 2026-au-g2 at 2500m. Field, prize, conditions not captured."
+  },
+  {
+   "number": 8,
+   "name": "Ladbrokes Cox Plate (W.S. Cox Plate)",
+   "group": "G1",
+   "distance": 2040,
+   "startTime": "17:10",
+   "prize": {
+    "total": 6000000,
+    "currency": "AUD",
+    "byPlace": {
+     "1": 4000000,
+     "2": 800000,
+     "3": 500000,
+     "4": 250000,
+     "5": 150000,
+     "6": 100000,
+     "7": 100000,
+     "8": 100000
+    },
+    "byPlaceNote": "total A$6M confirmed by hkdnracing.com 2026-10-22; distribution copied from the 2025 race (Racing Australia results page) - medium"
+   },
+   "runners": [
+    {
+     "number": null,
+     "name": "Sir Delius (GB)",
+     "barrier": 5,
+     "jockey": "Craig Williams",
+     "trainer": "Gai Waterhouse & Adrian Bott",
+     "weight": 59.0,
+     "age": 6,
+     "sex": "horse (entire)",
+     "form": {
+      "lastSix": null,
+      "recent": [
+       {
+        "date": "2026-10-03",
+        "race": "Turnbull Stakes G1 2000m Flemington",
+        "finish": 4,
+        "note": "won by Cosmic Crusader (W Pike); HKDN: ran very fast sectionals on a heavy/wet track; finish 4th per HKDN 'two fourths this season' (medium)"
+       },
+       {
+        "date": "2026-09-12",
+        "race": "Makybe Diva Stakes G1 1600m Flemington (R8, saddlecloth 4)",
+        "finish": 4,
+        "note": "won by Sheza Alibi (L Nolen); pre-race W$4.20 in PuntingIQ report; finish 4th inferred from HKDN (medium)"
+       },
+       {
+        "date": "2026-04-11",
+        "race": "Queen Elizabeth Stakes G1 2000m Randwick, Good 4",
+        "finish": 1,
+        "sp": "$6.00",
+        "barrier": 3,
+        "weight": "59kg",
+        "note": "beat Lindermann ($31) and Autumn Glow ($1.30 fav); Dubai Honour 4th, Light Infantry Man 5th, Aeliana unplaced (Sportsbet capture, high)"
+       },
+       {
+        "date": "2026-03-21",
+        "race": "Ranvet Stakes G1 2000m Rosehill, Soft",
+        "finish": 3,
+        "sp": "$3.00",
+        "margin": "1.0L",
+        "note": "Aeliana 1st, Lindermann 2nd; 5 runners (high)"
+       },
+       {
+        "date": "2026-02-28",
+        "race": "Verry Elleegant (Chipping Norton) Stakes G1 1600m Randwick, Soft 5",
+        "finish": 3,
+        "sp": "$8.00",
+        "margin": "3.9L",
+        "note": "Autumn Glow 1st, Aeliana 2nd; first-up after 21 weeks (high)"
+       },
+       {
+        "date": "2025-10-04",
+        "race": "Turnbull Stakes G1 2000m Flemington, Good",
+        "finish": 1,
+        "sp": "$7.00",
+        "barrier": 14,
+        "weight": "58kg",
+        "margin": "1.8L",
+        "note": "beat Antino; 2:02.82, last 600m 33.85 (high). Then withdrawn from the 2025 Cox Plate / cups on veterinary advice (Sportsbet comment + HKDN) (high)"
+       },
+       {
+        "date": "2025-09-20",
+        "race": "Caulfield 1800m (G1 Underwood Stakes date; race name not captured)",
+        "finish": 1,
+        "note": "from Sportsbet form line, class field truncated (medium)"
+       }
+      ],
+      "careerToApr2026": "13 starts: 7 wins, 2 seconds, 3 thirds (12:6-2-3 before the QE Stakes win); prize ~A$1.70M before QE Stakes",
+      "sportsbetStatsApr2026": {
+       "good": "3:2-1-0",
+       "soft": "7:2-1-3",
+       "heavy": "2:2-0-0",
+       "2000m": "3:2-0-1",
+       "firstUp": "4:2-1-1",
+       "secondUp": "3:2-0-1",
+       "settling": "Midfield / Pace",
+       "speedRating": 34
+      }
+     },
+     "odds": {
+      "market": "Cox Plate favourite per hkdnracing.com 2026-10-22; price not captured"
+     },
+     "scratched": false,
+     "notes": "Barrier 5 confirmed by two sources (workflow brief + HKDN '5檔起步亦屬理想'). Trainer confirmed (idolhorse 23 Oct; HKDN). Jockey: Craig Williams rode him in every 2026 start and was quoted in HKJC's Turnbull preview - not explicitly confirmed for Saturday (medium). Sire Frankel (GB), dam Whatami (GB), bay; 5yo in autumn 2026 so 6yo by AU convention (medium). HKDN preview: 'hot favourite, impressive QE Stakes win, redemption after shock 2025 vet scratching, two 4ths this spring look plain but Turnbull run on a bog was fast; expected better on drier ground'.",
+     "sire": "Frankel (GB)",
+     "dam": "Whatami (GB)",
+     "colour": "bay",
+     "fieldConfidence": {
+      "name": "high",
+      "barrier": "high",
+      "trainer": "high",
+      "jockey": "medium",
+      "weight": "medium (WFA scale: 59kg for 4yo+ male in Oct)",
+      "age": "medium",
+      "form": "high (to Apr 2026) / medium (spring 2026)",
+      "odds": "low"
+     }
+    },
+    {
+     "number": null,
+     "name": "Aeliana (NZ)",
+     "barrier": 10,
+     "jockey": "James McDonald",
+     "trainer": "Chris Waller",
+     "weight": 57.0,
+     "age": 5,
+     "sex": "mare",
+     "form": {
+      "lastSix": null,
+      "recent": [
+       {
+        "date": "2026 spring",
+        "race": "Last start described by Waller as a 'semi-final' run to standard (race not identified)",
+        "finish": null,
+        "note": "HKDN 2026-10-20 (medium)"
+       },
+       {
+        "date": "2026-04-11",
+        "race": "Queen Elizabeth Stakes G1 2000m Randwick",
+        "finish": null,
+        "sp": null,
+        "barrier": 8,
+        "weight": "57kg",
+        "jockey": "Damian Lane",
+        "note": "placings 1-7 recorded for the other 7 runners in the Sportsbet capture, so she apparently finished last of 8 (low); $7.00-7.50 pre-race"
+       },
+       {
+        "date": "2026-03-28",
+        "race": "Tancred Stakes G1 2400m Rosehill, Soft 6",
+        "finish": 1,
+        "sp": "$1.70",
+        "barrier": 7,
+        "weight": "56.5kg",
+        "margin": "0.2L",
+        "note": "beat Dubai Honour ($3.60), Vauban 3rd; 2:29.90 (high)"
+       },
+       {
+        "date": "2026-03-21",
+        "race": "Ranvet Stakes G1 2000m Rosehill, Soft",
+        "finish": 1,
+        "sp": "$1.60",
+        "barrier": 3,
+        "weight": "57kg",
+        "margin": "0.2L",
+        "note": "beat Lindermann, Sir Delius 3rd (high)"
+       },
+       {
+        "date": "2026-02-28",
+        "race": "Verry Elleegant (Chipping Norton) Stakes G1 1600m Randwick",
+        "finish": 2,
+        "sp": "$12.00",
+        "barrier": 1,
+        "margin": "0.4L",
+        "note": "to Autumn Glow; Sir Delius 3rd (high)"
+       },
+       {
+        "date": "2026-02-14",
+        "race": "Apollo Stakes G2 1400m Randwick, Good",
+        "finish": 2,
+        "sp": "$14.00",
+        "margin": "2.8L",
+        "note": "to Autumn Glow (high)"
+       },
+       {
+        "date": "2025-10-25",
+        "race": "Cox Plate G1 2040m Moonee Valley, Good 4",
+        "finish": 6,
+        "sp": "$8.00",
+        "barrier": 7,
+        "weight": "55.5kg",
+        "jockey": "Hugh Bowman",
+        "margin": "5.2L",
+        "note": "Via Sistina won (real Racing Australia results page) (high)"
+       },
+       {
+        "date": "2025-10-04",
+        "race": "Turnbull Stakes G1 2000m Flemington",
+        "finish": null,
+        "note": "ran; finish not captured"
+       },
+       {
+        "date": "2025 autumn",
+        "race": "Australian Derby G1 2400m (ATC)",
+        "finish": 1,
+        "note": "'Best win was this trip in last year's Derby' - Sportsbet comment Mar 2026 (medium)"
+       }
+      ],
+      "careerToApr2026": "18 starts: 6 wins, 6 seconds, 1 third; prize A$4,444,225 (before QE Stakes)",
+      "sportsbetStatsApr2026": {
+       "good": "12:2-4-1",
+       "soft": "5:4-1-0",
+       "heavy": "1:0-1-0",
+       "2000m": "4:1-1-0",
+       "firstUp": "4:0-2-1",
+       "settling": "Off midfield / off pace",
+       "speedRating": 28
+      }
+     },
+     "odds": {
+      "market": "described as the main danger to Sir Delius (HKDN 2026-10-22); price not captured"
+     },
+     "scratched": false,
+     "notes": "Barrier 10 from the workflow brief only (medium). Trainer and jockey confirmed by HKDN (2 articles) and the HKJC preview headline 'Waller and McDonald chase history'. Sire Castelvecchio (AUS), dam Temolie (AUS), bay mare; 4yo in autumn 2026 so 5yo now (medium). HKDN: leads Sir Delius 3-1 head-to-head; will come from behind, strong stamina. Waller: 'came up well through winter, health excellent'.",
+     "sire": "Castelvecchio (AUS)",
+     "dam": "Temolie (AUS)",
+     "colour": "bay",
+     "fieldConfidence": {
+      "name": "high",
+      "barrier": "medium",
+      "trainer": "high",
+      "jockey": "high",
+      "weight": "medium (WFA 57kg for 5yo+ mare)",
+      "age": "medium",
+      "form": "high (to Apr 2026)",
+      "odds": "low"
+     }
+    },
+    {
+     "number": null,
+     "name": "Birdman",
+     "barrier": null,
+     "jockey": "Ben Melham",
+     "trainer": "Chris Waller",
+     "weight": null,
+     "age": null,
+     "sex": null,
+     "form": {
+      "recent": [
+       {
+        "date": "2026-09-19",
+        "race": "Underwood Stakes G1 1800m Caulfield",
+        "finish": 1,
+        "jockey": "Ben Melham",
+        "note": "meshi-z winners file (medium)"
+       },
+       {
+        "date": "2026-05-16",
+        "race": "Doomben Cup G1 2000m Doomben",
+        "finish": 1,
+        "jockey": "James McDonald",
+        "note": "meshi-z winners file (medium)"
+       },
+       {
+        "date": "2026 spring",
+        "race": "last start (not identified)",
+        "finish": null,
+        "note": "HKDN: 'ran out of petrol in the final 100m last start' (medium)"
+       }
+      ]
+     },
+     "odds": null,
+     "scratched": false,
+     "notes": "Identification INFERRED: HKDN names Waller's second runner 「天鳥俠義」 ridden by 苗康文 and says it 'won G1s in Brisbane and Melbourne in the last six months'; Birdman won the Doomben Cup (Brisbane) and Underwood Stakes (Melbourne) in 2026 and Ben Melham rode him in the Underwood. 苗 is the HK transliteration used for Melham (苗傑美 = Jamie Melham). Trainer per HKDN 'two Waller runners' (medium). Barrier, weight, age, sex not captured.",
+     "fieldConfidence": {
+      "name": "medium",
+      "jockey": "medium",
+      "trainer": "medium",
+      "barrier": "unknown"
+     }
+    },
+    {
+     "number": null,
+     "name": "Warwoven",
+     "barrier": null,
+     "jockey": "Rachel King",
+     "trainer": "Bjorn Baker",
+     "weight": 49.5,
+     "age": 3,
+     "sex": null,
+     "form": {
+      "recent": [
+       {
+        "date": "2026-10-10",
+        "race": "Caulfield Guineas G1 1600m Caulfield",
+        "finish": 1,
+        "jockey": "Rachel King",
+        "note": "meshi-z winners file + HKDN ('Caulfield Guineas winner') (high)"
+       },
+       {
+        "date": "2026-09-26",
+        "race": "Golden Rose Stakes G1 1400m Rosehill",
+        "finish": 1,
+        "jockey": "Rachel King",
+        "note": "meshi-z winners file (medium)"
+       },
+       {
+        "date": "2026-03-14",
+        "race": "Rosehill R4 (2yo)",
+        "finish": 1,
+        "note": "Betfair Hub tipster results CSV: won at BSP 2.88 (medium)"
+       },
+       {
+        "date": "2026-02-28",
+        "race": "Randwick R5 (2yo), $2.15 fav",
+        "finish": null,
+        "note": "mattdlong/racing-ai-reports preview (low)"
+       }
+      ]
+     },
+     "odds": null,
+     "scratched": false,
+     "notes": "3yo. Identification of HKDN's 「戰跡」 as Warwoven rests on 'the Caulfield Guineas 1-2 (戰跡 and 加碼一擲)' + 'ridden by 金美琪' (Rachel King, who won the Guineas on him) - medium-high. Trainer 'Baker' from HKJC preview 'Baker confident of success with Warwoven in Caulfield Guineas' and SMH headline; assumed Bjorn Baker (medium). Weight 49.5kg = WFA for a 3yo colt/gelding in October (2025 precedent: Nepotism 49.5kg) - sex not confirmed. HKDN: 'the three-year-old everyone is talking about'; would be the first 3yo winner since Shamus Award (2013).",
+     "fieldConfidence": {
+      "name": "medium-high",
+      "jockey": "medium-high",
+      "trainer": "medium",
+      "age": "high",
+      "weight": "medium",
+      "barrier": "unknown"
+     }
+    },
+    {
+     "number": null,
+     "name": "Middle Earth (GB)",
+     "barrier": null,
+     "jockey": null,
+     "trainer": "Ciaron Maher",
+     "weight": 59.0,
+     "age": null,
+     "sex": "gelding",
+     "form": {
+      "recent": [
+       {
+        "date": "2025-11-04",
+        "race": "Melbourne Cup G1 3200m Flemington, Soft 5",
+        "finish": 3,
+        "note": "HKDN 「中土世界」跑獲季軍 (3rd) behind Half Yours and Goodie Two Shoes (Sportsbet form line confirms the 1-2) (medium-high)"
+       }
+      ]
+     },
+     "odds": null,
+     "scratched": false,
+     "notes": "Named by HKDN as one of Ciaron Maher's four Cox Plate runners (「中土世界」 = Middle Earth). Jockey, barrier not captured. Sex/weight assumed (older gelding, 59kg WFA) - low.",
+     "fieldConfidence": {
+      "name": "medium",
+      "trainer": "medium",
+      "barrier": "unknown",
+      "jockey": "unknown"
+     }
+    }
+   ],
+   "conditions": "Weight-for-age, 3yo+, 12 acceptors (9 of them G1 winners); barrier draw held Tuesday 20 Oct 2026",
+   "fieldSize": 12,
+   "note": "Race number 8 is INFERRED (start 5:10pm per brief; last race 5:50pm per PTV => not the last race). Distance 2040m stated by HKDN x3, HKJC and the brief; Flemington does not normally race over 2040m so expect a special start - verify on the official card. Only 5 of 12 runners are identified in English; 4 more are known only by HK Chinese names (see unresolvedRunners); 3 are unknown. Saddlecloth numbers, weights (except WFA defaults), odds and scratchings were not obtainable before race day.",
+   "unresolvedRunners": [
+    {
+     "chineseName": "加碼一擲",
+     "facts": "3yo; runner-up in the 2026 Caulfield Guineas (behind Warwoven); to be ridden by Jamie Melham (苗傑美). Trainer unknown. English name NOT resolved - do not guess.",
+     "sources": [
+      "https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022",
+      "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020"
+     ],
+     "confidence": "medium"
+    },
+    {
+     "chineseName": "輕取勝",
+     "facts": "Ciaron Maher-trained; drew barrier 11; on-pace runner ('擅長以領放跑法'). English name NOT resolved (Light Infantry Man is a Maher-trained 2025 Cox Plate runner and 2026 Australian Cup winner, but the mapping is unverified).",
+     "sources": [
+      "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+      "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020"
+     ],
+     "confidence": "medium (facts) / low (identity)"
+    },
+    {
+     "chineseName": "川河陸駒",
+     "facts": "Ciaron Maher-trained; drew barrier 12; on-pace runner. English name NOT resolved.",
+     "sources": [
+      "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+      "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020"
+     ],
+     "confidence": "medium (facts) / unknown (identity)"
+    },
+    {
+     "chineseName": "聖喬治",
+     "facts": "Ciaron Maher-trained (fourth Maher runner). English name NOT resolved ('St George' literal).",
+     "sources": [
+      "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020"
+     ],
+     "confidence": "medium (facts) / unknown (identity)"
+    }
+   ],
+   "unknownRunnerCount": 3,
+   "namedConnections": {
+    "ciaronMaher": "4 runners: 輕取勝 (bar 11), 川河陸駒 (bar 12), Middle Earth, 聖喬治",
+    "chrisWaller": "2 runners: Aeliana (J McDonald), Birdman (B Melham)",
+    "waterhouseBott": "Sir Delius (favourite, bar 5)",
+    "baker": "Warwoven (3yo, Rachel King)",
+    "unknownTrainer": "加碼一擲 (3yo, Jamie Melham)"
+   }
+  },
+  {
+   "number": 9,
+   "name": null,
+   "group": null,
+   "distance": null,
+   "startTime": "17:50",
+   "prize": null,
+   "runners": [],
+   "note": "Last race 5:50pm per transport.vic.gov.au (high). Name unknown."
+  }
+ ],
+ "otherSaturdayMeetings": [
+  {
+   "city": "Sydney",
+   "venue": "Royal Randwick",
+   "state": "NSW",
+   "confidence": "medium",
+   "detail": "Spring Champion Stakes G1 2000m 3yo set weights listed for 2026-10-24 at Royal Randwick in the meshi-z calendar (venue field is unreliable in that file but Randwick hosts this race in the Everest carnival). Fields not captured."
+  },
+  {
+   "city": "Melbourne (country)",
+   "venue": "Yarra Valley",
+   "state": "VIC",
+   "confidence": "medium",
+   "detail": "RTV (Racing.com TV) EPG for 2026-10-24 carries 'Racing Review | Yarra Valley' episodes."
+  },
+  {
+   "city": "Adelaide",
+   "venue": "Morphettville",
+   "state": "SA",
+   "confidence": "medium",
+   "detail": "RTV EPG for 2026-10-24 carries 'Racing Review | Morphettville' episodes."
+  },
+  {
+   "city": "Brisbane",
+   "venue": null,
+   "state": "QLD",
+   "confidence": "unknown",
+   "detail": "Eagle Farm or Doomben - not captured."
+  },
+  {
+   "city": "Perth",
+   "venue": null,
+   "state": "WA",
+   "confidence": "unknown",
+   "detail": "Ascot (if the Ascot season has opened) or Belmont - not captured."
+  },
+  {
+   "city": "Hong Kong",
+   "venue": "Sha Tin (Sunday 25 Oct)",
+   "state": "HK",
+   "confidence": "high",
+   "detail": "Not Saturday, but HKJC simulcasts 'Cox Plate Day' for Hong Kong betting (notice 19/10/2026) and publishes 'Cox Plate Day - Declared Runners', 'Last 5 Performances', 'Racing Colours' circulars (22/10/2026) - an extra, independent source of the final field, colours, form and HK tote odds."
+  }
+ ],
+ "history": {
+  "coxPlate2025": {
+   "venue": "Moonee Valley",
+   "date": "2025-10-25",
+   "raceNumber": 10,
+   "start": "17:40",
+   "distance": 2040,
+   "going": "Good 4",
+   "time": "2:05.03",
+   "last600": "0:35.25",
+   "prize": 6000000,
+   "placings": [
+    {
+     "finish": 1,
+     "no": 6,
+     "horse": "Via Sistina (IRE)",
+     "jockey": "James McDonald",
+     "trainer": "Chris Waller",
+     "barrier": 5,
+     "weight": 57,
+     "sp": "$2.25F"
+    },
+    {
+     "finish": 2,
+     "no": 4,
+     "horse": "Buckaroo (GB)",
+     "jockey": "Mark Zahra",
+     "trainer": "Chris Waller",
+     "barrier": 4,
+     "weight": 59,
+     "sp": "$16",
+     "margin": "0.1L"
+    },
+    {
+     "finish": 3,
+     "no": 7,
+     "horse": "Treasurethe Moment",
+     "jockey": "Damian Lane",
+     "trainer": "Matt Laurie",
+     "barrier": 1,
+     "weight": 55.5,
+     "sp": "$5.50",
+     "margin": "1.6L"
+    },
+    {
+     "finish": 4,
+     "no": 3,
+     "horse": "Attrition",
+     "jockey": "Craig Williams",
+     "trainer": "Mitchell Freedman",
+     "barrier": 2,
+     "weight": 59,
+     "sp": "$41",
+     "margin": "3.35L"
+    },
+    {
+     "finish": 5,
+     "no": 1,
+     "horse": "Light Infantry Man (FR)",
+     "jockey": "Ethan Brown",
+     "trainer": "Ciaron Maher",
+     "barrier": 8,
+     "weight": 59,
+     "sp": "$31",
+     "margin": "3.45L"
+    },
+    {
+     "finish": 6,
+     "no": 8,
+     "horse": "Aeliana (NZ)",
+     "jockey": "Hugh Bowman",
+     "trainer": "Chris Waller",
+     "barrier": 7,
+     "weight": 55.5,
+     "sp": "$8",
+     "margin": "5.2L"
+    },
+    {
+     "finish": 7,
+     "no": 9,
+     "horse": "Nepotism",
+     "jockey": "Zac Lloyd",
+     "trainer": "Michael, John & Wayne Hawkes",
+     "barrier": 3,
+     "weight": 49.5,
+     "sp": "$21",
+     "margin": "5.7L"
+    },
+    {
+     "finish": 8,
+     "no": 2,
+     "horse": "Antino (NZ)",
+     "jockey": "Blake Shinn",
+     "trainer": "Tony Gollan",
+     "barrier": 6,
+     "weight": 59,
+     "sp": "$3.80",
+     "margin": "7.7L"
+    },
+    {
+     "finish": null,
+     "no": 5,
+     "horse": "Globe (NZ)",
+     "jockey": "Ben Melham",
+     "trainer": "Mick Price & Michael Kent (Jnr)",
+     "scratched": true
+    }
+   ],
+   "source": "https://racingaustralia.horse/FreeFields/Results.aspx?Key=2025Oct25,VIC,The%20Valley",
+   "confidence": "high (real Racing Australia results page archived on GitHub, already in research/fixtures/racingaustralia)"
+  },
+  "coxPlateDay2025Card": {
+   "raceCount": 10,
+   "known": [
+    {
+     "number": 1,
+     "time": "12:10",
+     "name": "Imperatriz Sprint (1000m, 3yo+ hcp, A$200k)"
+    },
+    {
+     "number": 8,
+     "time": "16:10",
+     "name": "McEwen Stakes G2 1200m WFA A$300k"
+    },
+    {
+     "number": 9,
+     "time": "16:50",
+     "name": "(Drummond Golf) Vase G2 2040m 3yo SW A$400k"
+    },
+    {
+     "number": 10,
+     "time": "17:40",
+     "name": "Ladbrokes Cox Plate G1 2040m WFA A$6M"
+    }
+   ],
+   "note": "Typical undercard also includes the Moonee Valley Gold Cup (G2 2500m), Fillies Classic (G2 3yo fillies 1600m) and Crockett Stakes (Listed 1200m); the 2026 program at Flemington was not captured. The Manikato Stakes is NOT on this card - it was run 2026-09-25 at Moonee Valley (won by Jimmysstar, Ethan Brown - meshi-z, medium)."
+  },
+  "trainerRecords": "Chris Waller is chasing a record-equalling 7th Cox Plate (T.J. Smith 7); Gai Waterhouse has never won it (idolhorse 23 Oct, HKJC 22 Oct, HKDN 22 Oct). Via Sistina (dual winner 2024-25) has retired (HKDN)."
+ },
+ "formReference2026": {
+  "note": "2026 Australian G1 winners with dates (meshi-z calendar joined with its winners file; medium confidence; winners after 2026-10-10 not yet filled). Useful to score Cox Plate rivals once the final field is known.",
+  "springG1s": [
+   {
+    "id": "2026-au-g1-44",
+    "date": "2026-08-22",
+    "course": "Royal Randwick",
+    "distance": 1400,
+    "grade": "G1",
+    "name": "Winx Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": "Autumn Glow",
+    "jockey": "James McDonald"
+   },
+   {
+    "id": "2026-au-g1-45",
+    "date": "2026-08-29",
+    "course": "Caulfield",
+    "distance": 1400,
+    "grade": "G1",
+    "name": "Memsie Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": "Beiwacht",
+    "jockey": "Nash Rawiller"
+   },
+   {
+    "id": "2026-au-g1-46",
+    "date": "2026-09-05",
+    "course": "Moonee Valley",
+    "distance": 1000,
+    "grade": "G1",
+    "name": "Moir Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": "My Gladiola",
+    "jockey": "Jamie Mott"
+   },
+   {
+    "id": "2026-au-g1-47",
+    "date": "2026-09-12",
+    "course": "Flemington",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "Makybe Diva Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": "Sheza Alibi",
+    "jockey": "Luke Nolen"
+   },
+   {
+    "id": "2026-au-g1-48",
+    "date": "2026-09-19",
+    "course": "Caulfield",
+    "distance": 1800,
+    "grade": "G1",
+    "name": "Underwood Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": "Birdman",
+    "jockey": "Ben Melham"
+   },
+   {
+    "id": "2026-au-g1-49",
+    "date": "2026-09-25",
+    "course": "Moonee Valley",
+    "distance": 1200,
+    "grade": "G1",
+    "name": "Manikato Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": "Jimmysstar",
+    "jockey": "Ethan Brown"
+   },
+   {
+    "id": "2026-au-g1-50",
+    "date": "2026-09-26",
+    "course": "Rosehill Gardens",
+    "distance": 1400,
+    "grade": "G1",
+    "name": "Golden Rose Stakes",
+    "conditions": "Set Weights",
+    "age": "3yo",
+    "winner": "Warwoven",
+    "jockey": "Rachel King"
+   },
+   {
+    "id": "2026-au-g1-51",
+    "date": "2026-10-03",
+    "course": "Royal Randwick",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "Epsom Handicap",
+    "conditions": "Handicap",
+    "age": "3yo_and_up",
+    "winner": "God's Window",
+    "jockey": "Siena Grima"
+   },
+   {
+    "id": "2026-au-g1-52",
+    "date": "2026-10-03",
+    "course": "Royal Randwick",
+    "distance": 2400,
+    "grade": "G1",
+    "name": "The Metropolitan",
+    "conditions": "Handicap",
+    "age": "3yo_and_up",
+    "winner": "Juja Kibo",
+    "jockey": "Sam Clipperton"
+   },
+   {
+    "id": "2026-au-g1-53",
+    "date": "2026-10-03",
+    "course": "Royal Randwick",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "Flight Stakes",
+    "conditions": "Set Weights",
+    "age": "3yo",
+    "winner": "Global Goal",
+    "jockey": "Dylan Gibbons"
+   },
+   {
+    "id": "2026-au-g1-54",
+    "date": "2026-10-03",
+    "course": "Flemington",
+    "distance": 2000,
+    "grade": "G1",
+    "name": "Turnbull Stakes",
+    "conditions": "Set Weights",
+    "age": "4yo_and_up",
+    "winner": "Cosmic Crusader",
+    "jockey": "William Pike"
+   },
+   {
+    "id": "2026-au-g1-55",
+    "date": "2026-10-10",
+    "course": "Caulfield",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "Caulfield Guineas",
+    "conditions": "Set Weights",
+    "age": "3yo",
+    "winner": "Warwoven",
+    "jockey": "Rachel King"
+   },
+   {
+    "id": "2026-au-g1-56",
+    "date": "2026-10-10",
+    "course": "Caulfield",
+    "distance": 2000,
+    "grade": "G1",
+    "name": "Might And Power Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": "Land Legend",
+    "jockey": "Ethan Brown"
+   },
+   {
+    "id": "2026-au-g1-57",
+    "date": "2026-10-10",
+    "course": "Caulfield",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "Toorak Handicap",
+    "conditions": "Handicap",
+    "age": "3yo_and_up",
+    "winner": "Lady Shenandoah",
+    "jockey": "J B Mc Donald"
+   },
+   {
+    "id": "2026-au-g1-58",
+    "date": "2026-10-17",
+    "course": "Royal Randwick",
+    "distance": 1200,
+    "grade": "G1",
+    "name": "The Everest",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-59",
+    "date": "2026-10-17",
+    "course": "Royal Randwick",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "King Charles III Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-60",
+    "date": "2026-10-17",
+    "course": "Caulfield",
+    "distance": 2400,
+    "grade": "G1",
+    "name": "Caulfield Cup",
+    "conditions": "Handicap",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-61",
+    "date": "2026-10-24",
+    "course": "Moonee Valley",
+    "distance": 2040,
+    "grade": "G1",
+    "name": "Cox Plate",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-62",
+    "date": "2026-10-24",
+    "course": "Royal Randwick",
+    "distance": 2000,
+    "grade": "G1",
+    "name": "Spring Champion Stakes",
+    "conditions": "Set Weights",
+    "age": "3yo",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-63",
+    "date": "2026-10-31",
+    "course": "Flemington",
+    "distance": 2500,
+    "grade": "G1",
+    "name": "Victoria Derby",
+    "conditions": "Set Weights",
+    "age": "3yo",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-64",
+    "date": "2026-10-31",
+    "course": "Flemington",
+    "distance": 1200,
+    "grade": "G1",
+    "name": "Coolmore Stud Stakes",
+    "conditions": "Set Weights",
+    "age": "3yo",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-65",
+    "date": "2026-10-31",
+    "course": "Flemington",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "Empire Rose Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-66",
+    "date": "2026-11-03",
+    "course": "Flemington",
+    "distance": 3200,
+    "grade": "G1",
+    "name": "Melbourne Cup",
+    "conditions": "Handicap",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-67",
+    "date": "2026-11-05",
+    "course": "Flemington",
+    "distance": 2500,
+    "grade": "G1",
+    "name": "VRC Oaks",
+    "conditions": "Set Weights",
+    "age": "3yo",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-68",
+    "date": "2026-11-07",
+    "course": "Flemington",
+    "distance": 2000,
+    "grade": "G1",
+    "name": "Champions Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-69",
+    "date": "2026-11-07",
+    "course": "Flemington",
+    "distance": 1200,
+    "grade": "G1",
+    "name": "Champions Sprint",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-70",
+    "date": "2026-11-07",
+    "course": "Flemington",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "Champions Mile",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-71",
+    "date": "2026-11-14",
+    "course": "Caulfield",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "Thousand Guineas",
+    "conditions": "Set Weights",
+    "age": "3yo",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-72",
+    "date": "2026-11-21",
+    "course": "Ascot (AUS)",
+    "distance": 1600,
+    "grade": "G1",
+    "name": "Railway Stakes",
+    "conditions": "Handicap",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-73",
+    "date": "2026-11-28",
+    "course": "Ascot (AUS)",
+    "distance": 1200,
+    "grade": "G1",
+    "name": "Winterbottom Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   },
+   {
+    "id": "2026-au-g1-74",
+    "date": "2026-12-05",
+    "course": "Ascot (AUS)",
+    "distance": 1800,
+    "grade": "G1",
+    "name": "Northerly Stakes",
+    "conditions": "Weight for Age",
+    "age": "3yo_and_up",
+    "winner": null,
+    "jockey": null
+   }
+  ]
+ },
+ "newsContext": [
+  {
+   "date": "2026-10-23",
+   "source": "https://idolhorse.com/horse-racing-news/world/why-cant-gai-waterhouse-win-a-cox-plate/",
+   "item": "Idol Horse: 'Kingston Town's trainer won seven Cox Plates - his daughter Gai Waterhouse is still waiting on one ... Sir Delius might be her best chance in more than a decade' (Adam Pengilly).",
+   "confidence": "high"
+  },
+  {
+   "date": "2026-10-22",
+   "source": "https://racingnews.hkjc.com/english/",
+   "item": "HKJC Cox Plate Preview: 'Waller and McDonald chase history in G1 W.S. Cox Plate at Flemington'; circulars 'Cox Plate Day - Declared Runners / Last 5 Performances / Racing Colours' published.",
+   "confidence": "high"
+  },
+  {
+   "date": "2026-10-22",
+   "source": "https://hkdnracing.com/zh/news/萬眾矚目的覺士盾將於費明頓上演-20261022",
+   "item": "HKDN preview: 12 runners, 9 G1 winners; Sir Delius hot favourite (QE Stakes form, 2025 vet scratching, two 4ths this spring, fast sectionals on a bog in the Turnbull, better on drier ground, barrier 5 ideal); Aeliana main danger (leads h2h 3-1, McDonald, backmarker with stamina); Warwoven 'the 3yo everyone talks about'.",
+   "confidence": "medium (sentence-level content from a style-exemplar store that may include paraphrase)"
+  },
+  {
+   "date": "2026-10-22",
+   "source": "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+   "item": "HKDN: Maher's 輕取勝 and 川河陸駒 drew barriers 11 and 12; both on-pace runners; Waller sends Aeliana; 12 runners for the A$6M race.",
+   "confidence": "high (knowledge summary of the real article)"
+  },
+  {
+   "date": "2026-10-22",
+   "source": "https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022",
+   "item": "HKDN: Rachel King (金美琪) and Jamie Melham (苗傑美) bid to be the first female jockey to win the Cox Plate, on the Caulfield Guineas 1-2 (戰跡 = Warwoven, 加碼一擲 = unresolved), first 3yo winner since Shamus Award 2013.",
+   "confidence": "medium-high"
+  },
+  {
+   "date": "2026-10-20",
+   "source": "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+   "item": "HKDN: Waller's Aeliana (McDonald) and Birdman (B Melham) completed final Flemington gallops Tuesday; 12 acceptors; barrier draw later Tuesday; Maher has 4 of the 12 (輕取勝, 川河陸駒, Middle Earth, 聖喬治); Waterhouse & Bott send Sir Delius.",
+   "confidence": "medium-high"
+  },
+  {
+   "date": "2026-10-20",
+   "source": "https://www.abc.net.au/news/2026-10-20/caulfield-cup-ohope-wins-half-yours-fall-ruled-accidental/107287784",
+   "item": "ABC: jockeys cleared over Ohope Wins's fatal fall in the 2026 Caulfield Cup (Half Yours also involved) - relevant to form reading of Caulfield Cup runners and to rider availability.",
+   "confidence": "high (headline only)"
+  },
+  {
+   "date": "2026-10-17",
+   "source": "https://idolhorse.com/horse-racing-news/g1-race-reviews/when-the-unexpected-happens-tempted-beats-ka-ying-rising-to-end-1000-day-reign/",
+   "item": "The Everest 2026 won by Tempted (Chad Schofield) over Ka Ying Rising on a drying Randwick track.",
+   "confidence": "high"
+  },
+  {
+   "date": "2026-10-14",
+   "source": "https://transport.vic.gov.au/news-and-resources/events-and-public-transport/public-transport-for-the-cox-plate",
+   "item": "Transport Victoria: 2026 Cox Plate at Flemington for the first time; gates 10:30am, first race 12:25pm, last race 5:50pm; extra trains/trams.",
+   "confidence": "high"
+  }
+ ],
+ "sources": [
+  "https://raw.githubusercontent.com/TransportVic/PTVNewsBot/6b0f6f3a08ca03bc1eab045ee84808b7a9155274/raw-articles/2026-10-14Cox-Plate.json",
+  "https://transport.vic.gov.au/news-and-resources/events-and-public-transport/public-transport-for-the-cox-plate",
+  "https://www.vrc.com.au/race-days-and-events/2026-2027/2026-cox-plate/",
+  "https://raw.githubusercontent.com/sleepingarhat/domain-brain/218de15048827a89a6a07845d81b45354d751020/ingestion/chunks/20261022-170441-hkjc-news.json",
+  "https://racingnews.hkjc.com/english/",
+  "https://hkdnracing.com/zh/news/一場足以名留青史的覺士盾-20261020",
+  "https://hkdnracing.com/zh/news/華禮納再與麥道朗攜手力爭追平覺士盾紀錄-20261022",
+  "https://hkdnracing.com/zh/news/萬眾矚目的覺士盾將於費明頓上演-20261022",
+  "https://hkdnracing.com/zh/news/凌機一觸覺士盾兩女將爭創歷史-20261022",
+  "https://raw.githubusercontent.com/sleepingarhat/domain-brain/main/ingestion/chunks/20261023-080431-style-knowledge.json",
+  "https://idolhorse.com/horse-racing-news/world/why-cant-gai-waterhouse-win-a-cox-plate/",
+  "https://raw.githubusercontent.com/meshi-z/horse-racing-calender/7d0c9eadd27928af467b9fbd6a1e13dab9b95be4/src/data/race_winners.json",
+  "https://raw.githubusercontent.com/kaballas/yy1/0cd4af7b284a99c492a8faaa7c67d7abf4c011d2/src/get_data/data/race_10350480_class_1__sportsbet_racing_json_2026-04-11.json",
+  "https://raw.githubusercontent.com/kaballas/yy1/0cd4af7b284a99c492a8faaa7c67d7abf4c011d2/src/get_data/data/race_10298478_class_1___2026-04-04.json",
+  "https://raw.githubusercontent.com/kaballas/yy1/0cd4af7b284a99c492a8faaa7c67d7abf4c011d2/src/get_data/data/race_10197604_class_1__sportsbet_racing_json_2026-02-28.json",
+  "https://raw.githubusercontent.com/puntingiq/puntingiq-site/main/reports/20260912/daily-intelligence.html",
+  "https://raw.githubusercontent.com/puntingiq/puntingiq-site/main/reports/20261003/daily-intelligence.html",
+  "https://racingaustralia.horse/FreeFields/Results.aspx?Key=2025Oct25,VIC,The%20Valley",
+  "https://github.com/thumentianlu1993-blip/Umanewsbot/blob/main/server/stable/fixtures/australia/ra_results_2025-10-25_thevalley.html",
+  "https://raw.githubusercontent.com/Jinx8004NEW/FoxtelEPG/568f5bf7ea2ffc302d97185bf5dd8f209e71fc14/data/RTV/2026-10-24.json",
+  "https://raw.githubusercontent.com/sleepingarhat/domain-brain/218de15048827a89a6a07845d81b45354d751020/ingestion/chunks/20261008-190502-hkjc-news.json",
+  "https://www.smh.com.au/sport/racing/baker-backs-relaxed-warwoven-to-join-elite-company-in-caulfield-guineas-20261009-p6144t.html",
+  "https://www.abc.net.au/news/2026-10-20/caulfield-cup-ohope-wins-half-yours-fall-ruled-accidental/107287784",
+  "https://raw.githubusercontent.com/sleepingarhat/domain-brain/main/wiki/style/exemplars.json",
+  "https://raw.githubusercontent.com/puntingiq/puntingiq-site/main/reports/20261023/daily-intelligence.html",
+  "https://raw.githubusercontent.com/Josh9456/Racing-Form-/e3a425ccd7be489fe039995578357e007f48e36c/racing_data/2026-10-23/Cranbourne_Thoroughbred_AUS_VIC/meeting_info.json",
+  "https://raw.githubusercontent.com/hamishivi/hamish-reads/main/docs/data/2026-10-20/news.json"
+ ],
+ "builtAt": "2026-10-23T11:42:26+00:00",
+ "confidenceNotes": [
+  "HIGH: venue Flemington, date, first/last race times, Cox Plate relocation reason, 12 acceptors, A$6M, 2040m WFA, Sir Delius barrier 5 + trainer, Aeliana trainer + jockey, 2025 Cox Plate result/history.",
+  "MEDIUM: 9 races; Gold Cup 16:20 and Cox Plate 17:10 (brief); race numbers 7/8/9 (inferred from times); Aeliana barrier 10 (brief only); Birdman and Warwoven identities (inferred from Chinese names + corroborating 2026 results); Craig Williams on Sir Delius; WFA weights; ages.",
+  "LOW/UNKNOWN: all other races' names, fields and prizes; saddlecloth numbers; odds; scratchings; track condition, rail, weather; Brisbane/Perth venues; the three unidentified Cox Plate runners and the English names of 加碼一擲, 輕取勝, 川河陸駒, 聖喬治.",
+  "The orchestrator's brief (Cox Plate 12 runners incl. Aeliana b10 and Sir Delius b5; Gold Cup 4:20pm; Cox Plate 5:10pm; 9 races) is consistent with every independent capture found (12 runners, Sir Delius b5, 2040m, Flemington, Maher pair in 11-12).",
+  "Nothing here was fetched live from a racing website. On race morning run the live adapters (Racing Australia FreeFields Key=2026Oct24,VIC,Flemington; racing.com getRaceForm; TAB; Sportsbet; Entain) and reconcile; this pack is a cross-check, not a substitute."
+ ]
+}

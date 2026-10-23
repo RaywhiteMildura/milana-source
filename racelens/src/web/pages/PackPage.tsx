@@ -365,9 +365,11 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
             </div>
             <div className="race-top__side">
               <Ring value={race.verification?.score ?? 0} size={56} stroke={6} caption={<span className="small muted">{plural(race.verification?.sourceCount ?? 0, 'source')}</span>} testId="race-verification" />
-              <button type="button" className="btn btn-primary" onClick={() => startJob('recheck', race.number)} disabled={!!raceJob || starting === `recheck:${race.number}`} data-testid="recheck-btn">
-                {starting === `recheck:${race.number}` ? 'Starting…' : 'Pre-race check this race'}
-              </button>
+              {!result && (
+                <button type="button" className="btn btn-primary" onClick={() => startJob('recheck', race.number)} disabled={!!raceJob || starting === `recheck:${race.number}`} data-testid="recheck-btn">
+                  {starting === `recheck:${race.number}` ? 'Starting…' : 'Pre-race check this race'}
+                </button>
+              )}
             </div>
             {raceJob && (
               <div className="race-top__job">
