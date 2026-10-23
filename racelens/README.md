@@ -41,7 +41,7 @@ Useful variations:
 | `npm run test:e2e` | Browser tests (Playwright) against the demo server – run `npx playwright install chromium` once first |
 | `npm run typecheck` | TypeScript checks |
 
-Environment variables: `RACELENS_PORT` (default 4850), `RACELENS_DATA_DIR` (default `./data`), `RACELENS_MODE` (`live` default or `demo`), `RACELENS_LOG` (`debug|info|warn|error`).
+Environment variables: `RACELENS_PORT` (default 4850), `RACELENS_HOST` (default `127.0.0.1`; set `0.0.0.0` to open it to your phone on the same Wi-Fi), `RACELENS_DATA_DIR` (default `./data`), `RACELENS_MODE` (`live` default or `demo`), `RACELENS_LOG` (`debug|info|warn|error`), `RACELENS_CONTACT_EMAIL` (sent as the `From` header to the Ladbrokes affiliate API, as its terms ask), `RACING_COM_API_KEY` (override if racing.com rotates its public key).
 
 Your research packs and settings are JSON files in `data/` – back them up or delete them freely.
 

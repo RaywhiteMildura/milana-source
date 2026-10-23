@@ -125,7 +125,15 @@ export class HttpClient {
           await sleep(300 * 2 ** attempt);
           continue;
         }
-        if (res.ok && method === 'GET' && this.opts.cacheTtlMs > 0) this.cache.set(key, { at: Date.now(), res });
+        if (res.ok && method === 'GET' && this.opts.cacheTtlMs > 0) {
+          if (this.cache.size >= 500) {
+            // Bounded cache: drop expired entries first, then the oldest.
+            const cutoff = Date.now() - this.opts.cacheTtlMs;
+            for (const [k, v] of this.cache) if (v.at < cutoff) this.cache.delete(k);
+            if (this.cache.size >= 500) this.cache.delete(this.cache.keys().next().value as string);
+          }
+          this.cache.set(key, { at: Date.now(), res });
+        }
         if (this.opts.recordDir) this.record(url, key, res);
         return res;
       } catch (err) {
