@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MeetingSummary } from '@shared/types';
 import { parseTrackRating, trackRatingLabel } from '@shared/util';
 import { api, errorMessage, useRequest, type PackListItem, isQueued } from '../lib/api';
 import { addDays, defaultHomeDate, fmtLongDate, fmtRelative, fmtShortDate, fmtTime, isYmd, meetingZone, nextSaturday, pct100, plural, relativeDayLabel, sourceName, todayYmd, verificationTone } from '../lib/format';
 import { navigate, routes } from '../lib/router';
+import { savedKeys } from '../lib/saved';
 import { useConfirm } from '../components/Confirm';
 import { SourceHealth } from '../components/SourceHealth';
 import { useToast } from '../components/Toast';
-import { Chip, Dot, EmptyState, ErrorState, Ring, SkeletonCard } from '../components/ui';
+import { Chip, Dot, EmptyState, ErrorState, Ring, SavedCopyBanner, SkeletonCard } from '../components/ui';
 
 function trackLabel(m: MeetingSummary): string {
   const rating = m.trackRating ?? parseTrackRating(m.trackCondition);
@@ -153,8 +154,19 @@ export function HomePage({ query }: { query: URLSearchParams }) {
   }, [inputValue, date]);
 
   const meetings = useRequest(() => api.getMeetings(date), [date]);
-  const packs = useRequest(() => api.getPacks(), []);
+  // Kept on the phone, so a stalled connection at the track still lists the research (with a "saved copy" banner).
+  const packs = useRequest(() => api.getPacks(), [], savedKeys.packList);
   const sources = useRequest(() => api.getSources().then((r) => r.sources), []);
+  // Back from the saved copy: fetch what failed meanwhile.
+  const lastSavedAt = useRef<string | null>(null);
+  useEffect(() => {
+    const was = lastSavedAt.current;
+    lastSavedAt.current = packs.savedAt;
+    if (!was || packs.savedAt) return;
+    if (meetings.error) void meetings.reload();
+    if (sources.error) void sources.reload(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [packs.savedAt]);
   // Discovery records source statuses server-side: show them once the meetings have loaded.
   useEffect(() => {
     if (meetings.data) void sources.reload(true);
@@ -262,6 +274,8 @@ export function HomePage({ query }: { query: URLSearchParams }) {
         </div>
       </section>
 
+      {packs.savedAt && <SavedCopyBanner savedAt={packs.savedAt} />}
+
       <div className="home-grid">
         <div className="home-main">
           {(packs.data ?? []).some((p) => p.meeting.date === date) && (
@@ -300,7 +314,7 @@ export function HomePage({ query }: { query: URLSearchParams }) {
                 <SkeletonCard lines={4} />
               </div>
             ) : meetings.error ? (
-              <ErrorState title="Couldn't load meetings" message={`${meetings.error}. Check your internet connection and try again.`} onRetry={() => meetings.reload()} />
+              <ErrorState title="Couldn't load meetings" message={`${meetings.error.replace(/[.!]?\s*$/, '')}. Check your internet connection and try again.`} onRetry={() => meetings.reload()} />
             ) : !meetings.data || meetings.data.meetings.length === 0 ? (
               <EmptyState icon="📅" title="No meetings found for this date" action={<button type="button" className="btn btn-secondary" onClick={() => meetings.reload()}>Try again</button>}>
                 No meetings found for this date from any source. Check your internet or try another date.

@@ -1,18 +1,28 @@
 import { useState, type FormEvent } from 'react';
 import type { Prediction, Race, RaceResult } from '@shared/types';
-import { fmtDateTime, fmtMoney, ordinal, sourceName } from '../lib/format';
+import { fmtDateTime, fmtMoney, ordinal, placingPositions, sourceName } from '../lib/format';
 import { useConfirm } from './Confirm';
 import { Saddle } from './ui';
 
 function Scorecard({ result, prediction }: { result: RaceResult; prediction?: Prediction }) {
   const sc = result.scorecard;
+  // First rated after the jump (a meeting researched mid-day): shown for reference, never scored.
+  if (prediction?.postJump)
+    return (
+      <p className="muted small" data-testid="not-scored">
+        Not scored – RaceLens first rated this race after it had started.
+      </p>
+    );
   if (!sc) return <p className="muted small">No scorecard yet – run a results fetch to score this prediction.</p>;
   const winnerNo = result.placings[0]?.[0];
   const ourPick = prediction?.top[0];
+  // "ran =2nd" when our pick dead-heated (the server's position is where its slot starts).
+  const pickSlot = ourPick ? (result.placings ?? []).findIndex((slot) => slot.includes(ourPick.number)) : -1;
+  const pickRan = pickSlot >= 0 ? placingPositions(result.placings)[pickSlot].label : sc.predictedWinnerPosition != null ? ordinal(sc.predictedWinnerPosition) : 'unplaced';
   const lines: Array<{ ok: boolean | null; text: string }> = [];
   if (sc.winnerRank != null) lines.push({ ok: sc.winnerRank <= 3, text: `Winner was our ${ordinal(sc.winnerRank)} pick` });
   else lines.push({ ok: false, text: 'Winner was outside our ranked list' });
-  if (ourPick) lines.push({ ok: sc.predictedWinnerPosition === 1, text: `Our top pick (${ourPick.number} ${ourPick.name}) ran ${sc.predictedWinnerPosition != null ? ordinal(sc.predictedWinnerPosition) : 'unplaced'}` });
+  if (ourPick) lines.push({ ok: sc.predictedWinnerPosition === 1, text: `Our top pick (${ourPick.number} ${ourPick.name}) ran ${pickRan}` });
   lines.push({ ok: sc.winnerInTop3, text: 'Winner in our top 3' });
   lines.push({ ok: sc.winnerInTop6, text: 'Winner in our top 6' });
   lines.push({ ok: sc.placegettersInTop6 >= 2, text: `${sc.placegettersInTop6} of the placegetters were in our top 6` });
@@ -57,6 +67,7 @@ export function ResultView({
   const [showForm, setShowForm] = useState(!result);
   const [err, setErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const positions = placingPositions(result?.placings);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -104,8 +115,8 @@ export function ResultView({
           </header>
           <ol className="placings" data-testid="placings">
             {(result.placings ?? []).map((group, i) => (
-              <li key={i} className={`placing placing--${i + 1}`}>
-                <span className="placing__pos">{ordinal(i + 1)}</span>
+              <li key={i} className={`placing placing--${positions[i].position}`} data-testid="placing" data-position={positions[i].position}>
+                <span className="placing__pos">{positions[i].label}</span>
                 <span className="placing__runners">
                   {group.map((n, j) => {
                     const r = byNo.get(n);

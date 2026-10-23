@@ -13,6 +13,8 @@ const SW_SOURCE = fs.readFileSync(path.join(path.dirname(fileURLToPath(import.me
 
 type Handler = (event: unknown) => void;
 
+const typeOf = (pathname: string) => (pathname.endsWith('.js') ? 'text/javascript; charset=utf-8' : pathname.endsWith('.css') ? 'text/css; charset=utf-8' : 'text/html; charset=utf-8');
+
 function boot() {
   const stores = new Map<string, Map<string, Response>>();
   const keyOf = (r: string | { url: string }) => new URL(typeof r === 'string' ? r : r.url, ORIGIN).href;
@@ -32,25 +34,40 @@ function boot() {
     delete: async (name: string) => stores.delete(name),
   };
   let site: Record<string, string> = {};
+  /** What stands in front of RaceLens answers instead (Tailscale Serve while the Mac restarts it), or 'down' for no network at all. */
+  let front: { status: number; body: string } | 'down' | 'stalled' | null = null;
   const fetch = async (r: string | { url: string }) => {
-    const body = site[new URL(keyOf(r)).pathname];
-    return body == null ? new Response('missing', { status: 404 }) : new Response(body, { status: 200 });
+    if (front === 'down') throw new TypeError('Load failed');
+    if (front === 'stalled') return new Promise<Response>(() => undefined);
+    if (front) return new Response(front.body, { status: front.status, headers: { 'Content-Type': 'text/plain' } });
+    const pathname = new URL(keyOf(r)).pathname;
+    const body = site[pathname];
+    // Like the real server: any path it has no file for gets the app's index.html.
+    if (body == null) return site['/'] == null ? new Response('missing', { status: 404 }) : new Response(site['/'], { status: 200, headers: { 'Content-Type': typeOf('/') } });
+    return new Response(body, { status: 200, headers: { 'Content-Type': typeOf(pathname) } });
   };
+  const timers: Array<() => void> = [];
   const handlers: Record<string, Handler> = {};
   const self = { location: { origin: ORIGIN }, addEventListener: (type: string, fn: Handler) => (handlers[type] = fn), skipWaiting: () => undefined, clients: { claim: async () => undefined } };
-  vm.runInNewContext(SW_SOURCE, { self, caches, fetch, Response, URL, Promise, console });
+  vm.runInNewContext(SW_SOURCE, { self, caches, fetch, Response, URL, Promise, Symbol, console, setTimeout: (fn: () => void) => timers.push(fn) });
 
-  const dispatch = async (pathname: string, mode: 'navigate' | 'no-cors') => {
+  const settle = () => new Promise((r) => setTimeout(r, 0));
+  const dispatch = async (pathname: string, mode: 'navigate' | 'no-cors', opts: { fireTimers?: boolean } = {}) => {
     const pending: Promise<unknown>[] = [];
     let response: Promise<Response> | undefined;
     handlers.fetch({ request: { method: 'GET', url: ORIGIN + pathname, mode }, respondWith: (p: Promise<Response>) => (response = p), waitUntil: (p: Promise<unknown>) => pending.push(p) });
+    if (opts.fireTimers) {
+      await settle();
+      timers.splice(0).forEach((fn) => fn());
+    }
     const res = await response!;
     await Promise.all(pending);
-    await new Promise((r) => setTimeout(r, 0)); // let fire-and-forget cache.put calls land
+    await settle(); // let fire-and-forget cache.put calls land
     return res;
   };
   const shell = (hash: string) => `<!doctype html><html><head><script type="module" crossorigin src="/assets/index-${hash}.js"></script><link rel="stylesheet" crossorigin href="/assets/index-${hash}.css"></head><body><div id="root"></div></body></html>`;
   const deploy = (hash: string) => {
+    front = null;
     site = { '/': shell(hash), [`/assets/index-${hash}.js`]: `js ${hash}`, [`/assets/index-${hash}.css`]: `css ${hash}` };
   };
   /** Open the app on the phone: the page, then its two hashed assets. */
@@ -65,7 +82,7 @@ function boot() {
     await Promise.all(pending);
   };
   const cached = () => [...stores.values()].flatMap((s) => [...s.keys()].map((k) => new URL(k).pathname)).sort();
-  return { stores, deploy, openApp, dispatch, activate, cached, setSite: (s: Record<string, string>) => (site = s) };
+  return { stores, deploy, openApp, dispatch, activate, cached, shell, setSite: (s: Record<string, string>) => (site = s), setFront: (f: typeof front) => (front = f) };
 }
 
 describe('service worker', () => {
@@ -78,24 +95,72 @@ describe('service worker', () => {
     expect(sw.cached()).toEqual(['/assets/index-ddd.css', '/assets/index-ddd.js', '/index.html']);
   });
 
-  it('serves the cached shell and assets offline, and keeps everything when the fresh page is not the app shell', async () => {
+  it('serves the cached shell and assets offline, and a fresh page that is not the app shell (a Wi-Fi login page) does not replace it', async () => {
     const sw = boot();
     sw.deploy('aaa');
     await sw.openApp('aaa');
-    sw.setSite({ '/': '<!doctype html><p>Bad gateway</p>' });
-    await sw.dispatch('/', 'navigate');
+    sw.setSite({ '/': '<!doctype html><p>Sign in to the Wi-Fi</p>' });
+    expect(await (await sw.dispatch('/', 'navigate')).text()).toContain('Sign in to the Wi-Fi');
     expect(sw.cached()).toEqual(['/assets/index-aaa.css', '/assets/index-aaa.js', '/index.html']);
+    sw.setFront('down');
+    expect(await (await sw.dispatch('/', 'navigate')).text()).toBe(sw.shell('aaa'));
     expect(await (await sw.dispatch('/assets/index-aaa.js', 'no-cors')).text()).toBe('js aaa');
+  });
+
+  it('opens the cached shell, not the error page, while Tailscale Serve answers 502 (or 404/421)', async () => {
+    const sw = boot();
+    sw.deploy('aaa');
+    await sw.openApp('aaa');
+    for (const status of [502, 503, 500, 404, 421]) {
+      sw.setFront({ status, body: 'Bad Gateway' });
+      const res = await sw.dispatch('/', 'navigate');
+      expect(res.status, String(status)).toBe(200);
+      expect(await res.text()).toBe(sw.shell('aaa'));
+    }
+    expect(sw.cached()).toEqual(['/assets/index-aaa.css', '/assets/index-aaa.js', '/index.html']);
+  });
+
+  it('passes the error page through when this phone has no cached shell yet, and says it is offline with a Try again button', async () => {
+    const sw = boot();
+    sw.setFront({ status: 502, body: 'Bad Gateway' });
+    const res = await sw.dispatch('/', 'navigate');
+    expect(res.status).toBe(502);
+    expect(await res.text()).toBe('Bad Gateway');
+
+    sw.setFront('down');
+    const offline = await sw.dispatch('/', 'navigate');
+    expect(offline.status).toBe(503);
+    expect(await offline.text()).toMatch(/Try again/);
+  });
+
+  it('opens the cached shell when the network stalls instead of waiting for the browser to give up', async () => {
+    const sw = boot();
+    sw.deploy('aaa');
+    await sw.openApp('aaa');
+    sw.setFront('stalled');
+    const res = await sw.dispatch('/', 'navigate', { fireTimers: true });
+    expect(await res.text()).toBe(sw.shell('aaa'));
+  });
+
+  it('never caches an HTML page served for a missing asset (it would blank the app for good)', async () => {
+    const sw = boot();
+    sw.deploy('bbb');
+    // A page from the old deploy asks for its bundle; the server answers with index.html.
+    const res = await sw.dispatch('/assets/index-aaa.js', 'no-cors');
+    expect(res.headers.get('Content-Type')).toMatch(/text\/html/);
+    expect(sw.cached()).toEqual([]);
+    await sw.openApp('bbb');
+    expect(sw.cached()).toEqual(['/assets/index-bbb.css', '/assets/index-bbb.js', '/index.html']);
   });
 
   it('drops caches written by an older version of the worker when it activates', async () => {
     const sw = boot();
-    sw.stores.set('racelens-v1', new Map([[`${ORIGIN}/assets/index-old.js`, new Response('old')]]));
+    sw.stores.set('racelens-v2', new Map([[`${ORIGIN}/assets/index-old.js`, new Response('<!doctype html>', { headers: { 'Content-Type': 'text/html' } })]]));
     sw.deploy('aaa');
     await sw.openApp('aaa');
     await sw.activate();
     expect([...sw.stores.keys()]).toEqual([expect.stringMatching(/^racelens-v\d+$/)]);
-    expect([...sw.stores.keys()][0]).not.toBe('racelens-v1');
+    expect([...sw.stores.keys()][0]).not.toBe('racelens-v2');
     expect(sw.cached()).toEqual(['/assets/index-aaa.css', '/assets/index-aaa.js', '/index.html']);
   });
 });

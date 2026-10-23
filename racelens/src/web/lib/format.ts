@@ -260,6 +260,22 @@ export function ordinal(n: number): string {
   }
 }
 
+/**
+ * Finishing position of each result slot. A slot is one finishing position and
+ * holds every horse that dead-heated for it, so the next slot starts after all
+ * of them: [[4],[2,7],[9]] is 1st, =2nd (#2 and #7) and 4th – #9 did not run 3rd.
+ */
+export function placingPositions(placings: number[][] | undefined): Array<{ position: number; label: string; deadHeat: boolean }> {
+  let ahead = 0;
+  return (placings ?? []).map((slot) => {
+    const horses = new Set(slot ?? []).size;
+    const position = ahead + 1;
+    ahead += horses;
+    const deadHeat = horses > 1;
+    return { position, deadHeat, label: `${deadHeat ? '=' : ''}${ordinal(position)}` };
+  });
+}
+
 /** "12: 4-2-1" */
 export function careerRecord(c?: CareerStats | null): string {
   if (!c) return '–';

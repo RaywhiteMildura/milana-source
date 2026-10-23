@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { savedKeysOnPhone } from './saved-copies';
 
 /**
  * Password login, against the second demo server (:4852) which is started with
@@ -105,6 +106,21 @@ test('settings shows Sign out, and signing out returns to the login form', async
   expect(res.status()).toBe(401);
   await page.reload();
   await expect(page.getByTestId('login-form')).toBeVisible();
+});
+
+test('signing out forgets the research saved on the phone, so a dead connection then shows no copies', async ({ page }) => {
+  await signIn(page);
+  await expect.poll(() => savedKeysOnPhone(page)).toContain('packs');
+  await page.getByTestId('nav-settings').click();
+  await page.getByTestId('logout-btn').click();
+  await expect(page.getByTestId('login-form')).toBeVisible();
+  expect(await savedKeysOnPhone(page)).toEqual([]);
+
+  await page.route('**/api/**', (route) => route.abort('internetdisconnected'));
+  await page.reload();
+  await expect(page.getByTestId('cant-reach')).toBeVisible();
+  await expect(page.getByTestId('meeting-card')).toHaveCount(0);
+  await expect(page.getByTestId('saved-copy-banner')).toHaveCount(0);
 });
 
 test('an expired session drops the app back to the login screen', async ({ page }) => {

@@ -7,6 +7,7 @@ import { useServerNow } from '../lib/session';
 import { schedulerLine } from '../lib/raceday';
 import { useSession } from '../lib/session';
 import { useToast } from '../components/Toast';
+import { UpdateCard } from '../components/UpdateCard';
 import { Chip, Dot, ErrorState, SkeletonCard } from '../components/ui';
 
 const JURISDICTIONS = ['VIC', 'NSW', 'QLD', 'SA', 'WA', 'TAS', 'ACT', 'NT'];
@@ -216,6 +217,7 @@ export function SettingsPage() {
           <ol className="timeline-plain" data-testid="automation-timeline">
             <li>
               <strong>Before each race</strong> – a pre-race check runs {recheckMins > 0 ? `when the ${recheckMins}-minute window opens and again 3 minutes before the jump` : 'only when you tap Pre-race check (automatic checks are off)'}: scratchings, market moves and track changes.
+              {recheckMins > 0 && ' On race day it also refreshes every race still to run once an hour from 7:30 am, so morning scratchings show up early.'}
             </li>
             <li>
               <strong>After the jump</strong> – {draft.autoResults
@@ -397,6 +399,8 @@ export function SettingsPage() {
         </div>
         <p className="disclaimer">Suggestions only. Bet responsibly. Gambling Help 1800 858 858. Your current unit is {fmtMoney(unitNum || 0)}.</p>
       </form>
+
+      <UpdateCard />
 
       {session.authRequired && (
         <section className="card" data-testid="account-card">

@@ -17,6 +17,7 @@ import type {
   SourceKind,
   SourceStatus,
 } from '@shared/types';
+import { dropCopy, readCopy, saveCopy, savedGeneration, savedKeys } from './saved';
 
 // ---------------------------------------------------------------------------
 // Response shapes that only exist at the HTTP layer (see docs/API.md)
@@ -106,6 +107,22 @@ export interface RaceDetailResponse {
   result?: RaceResult;
 }
 
+/** GET /api/update: the version the server runs and its own updater (on the Mac mini; unsupported elsewhere). */
+export type UpdateState = 'idle' | 'requested' | 'running' | 'failed' | 'done';
+
+export interface UpdateStatus {
+  supported: boolean;
+  version?: { commit?: string; branch?: string; installedAt?: string };
+  state: UpdateState;
+  last?: { startedAt?: string; finishedAt?: string; ok?: boolean; message?: string; from?: string; to?: string };
+}
+
+/** POST /api/update: 202 (409 while one is running, 501 where there is no updater). */
+export interface UpdateRequested {
+  requested: true;
+  message: string;
+}
+
 // ---------------------------------------------------------------------------
 // Core request helper
 // ---------------------------------------------------------------------------
@@ -121,12 +138,33 @@ export class ApiError extends Error {
   }
 }
 
+export const UNREACHABLE_MESSAGE = 'The Mac mini is not answering – check Tailscale is on and you have signal.';
+/** An error page from what stands in front of RaceLens (Tailscale Serve answers 502 while the Mac restarts it). */
+const RESTARTING_MESSAGE = 'RaceLens on the Mac mini is restarting or not running – try again in a minute.';
+
+/** No answer from the server at all: the request timed out, or the network refused it (Tailscale off, no signal). */
+export class UnreachableError extends Error {
+  constructor(
+    public readonly path: string,
+    public readonly timedOut: boolean,
+  ) {
+    super(UNREACHABLE_MESSAGE);
+    this.name = 'UnreachableError';
+  }
+}
+
+/** RaceLens itself did not answer (see above, or a 5xx such as that 502): a saved copy may stand in. */
+export function isUnreachable(e: unknown): boolean {
+  return e instanceof UnreachableError || (e instanceof ApiError && e.status >= 500);
+}
+
 /** Turn any thrown value into a friendly one-line message for a toast. */
 export function errorMessage(e: unknown): string {
   if (e instanceof ApiError) {
     if (e.status === 404) return `Not found: ${e.message}`;
     return e.message;
   }
+  if (e instanceof UnreachableError) return e.message;
   if (e instanceof TypeError) return 'Could not reach the RaceLens server. Check it is running and you are online.';
   if (e instanceof Error) return e.message;
   return String(e);
@@ -151,11 +189,58 @@ function extractError(data: unknown): string | undefined {
 /** Fired on `window` whenever an API call is refused for want of a login. */
 export const AUTH_REQUIRED_EVENT = 'racelens:auth-required';
 
+/**
+ * How long a read may go without a byte from the server – before the answer
+ * starts, or between pieces of a big one – before it gives up. Without it a
+ * stalled connection (congested 4G at the track) hangs for a minute or more; a
+ * slow but moving download of a big meeting is never cut off.
+ */
+const READ_TIMEOUT_MS = 15_000;
+/** Writes and job starts: the server may take a moment before it answers. */
+const WRITE_TIMEOUT_MS = 30_000;
+
+/** The body as text, calling `onProgress` as each piece arrives. */
+async function readBody(res: Response, onProgress: () => void): Promise<string> {
+  const reader = res.body?.getReader();
+  if (!reader) return res.text();
+  const decoder = new TextDecoder();
+  let text = '';
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return text + decoder.decode();
+    onProgress();
+    text += decoder.decode(value, { stream: true });
+  }
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (init.body !== undefined) headers['Content-Type'] = 'application/json';
-  const res = await fetch(path, { ...init, headers: { ...headers, ...(init.headers as Record<string, string> | undefined) } });
-  const text = await res.text();
+  const ctrl = new AbortController();
+  init.signal?.addEventListener('abort', () => ctrl.abort(), { once: true });
+  let timedOut = false;
+  let timer: number | undefined;
+  const wait = (ms: number) => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      timedOut = true;
+      ctrl.abort();
+    }, ms);
+  };
+  let res: Response;
+  let text: string;
+  wait(!init.method || init.method === 'GET' ? READ_TIMEOUT_MS : WRITE_TIMEOUT_MS);
+  try {
+    res = await fetch(path, { ...init, signal: ctrl.signal, headers: { ...headers, ...(init.headers as Record<string, string> | undefined) } });
+    wait(READ_TIMEOUT_MS);
+    text = await readBody(res, () => wait(READ_TIMEOUT_MS));
+  } catch (e) {
+    // A network failure is a TypeError ("Load failed" on an iPhone); our own timeout is an AbortError.
+    if (timedOut || e instanceof TypeError) throw new UnreachableError(path, timedOut);
+    throw e;
+  } finally {
+    window.clearTimeout(timer);
+  }
   let data: unknown = null;
   if (text) {
     try {
@@ -169,7 +254,9 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       // The session cookie is missing or expired: let the app shell drop back to the login screen.
       window.dispatchEvent(new CustomEvent(AUTH_REQUIRED_EVENT));
     }
-    throw new ApiError(res.status, extractError(data) ?? `${res.status} ${res.statusText || 'request failed'}`, path);
+    // Not RaceLens's own JSON error but a gateway's page: say what it means.
+    const gateway = res.status >= 502 && res.status <= 504 && !(data && typeof data === 'object');
+    throw new ApiError(res.status, gateway ? RESTARTING_MESSAGE : extractError(data) ?? `${res.status} ${res.statusText || 'request failed'}`, path);
   }
   return data as T;
 }
@@ -180,6 +267,14 @@ const put = <T,>(path: string, body: unknown) => request<T>(path, { method: 'PUT
 const del = <T,>(path: string) => request<T>(path, { method: 'DELETE' });
 
 const enc = encodeURIComponent;
+
+/** Keep a good answer as the phone's saved copy (lib/saved.ts) – only the meeting list and the meetings themselves. */
+async function keep<T>(key: string, p: Promise<T>): Promise<T> {
+  const gen = savedGeneration();
+  const data = await p;
+  void saveCopy(key, data, gen);
+  return data;
+}
 
 // ---------------------------------------------------------------------------
 // Endpoints
@@ -205,9 +300,13 @@ export const api = {
   getJobs: () => get<JobProgress[]>('/api/jobs'),
   getJob: (id: string) => get<JobProgress>(`/api/jobs/${enc(id)}`),
 
-  getPacks: () => get<PackListItem[]>('/api/packs'),
-  getPack: (id: string) => get<MeetingPack>(`/api/packs/${enc(id)}`),
-  deletePack: (id: string) => del<{ ok: boolean } | QueuedReply>(`/api/packs/${enc(id)}`),
+  getPacks: () => keep(savedKeys.packList, get<PackListItem[]>('/api/packs')),
+  getPack: (id: string) => keep(savedKeys.pack(id), get<MeetingPack>(`/api/packs/${enc(id)}`)),
+  deletePack: async (id: string) => {
+    const out = await del<{ ok: boolean } | QueuedReply>(`/api/packs/${enc(id)}`);
+    void dropCopy(savedKeys.pack(id));
+    return out;
+  },
 
   recheck: (id: string, raceNumber?: number) =>
     post<JobIdResponse>(`/api/packs/${enc(id)}/recheck`, raceNumber == null ? {} : { raceNumber }),
@@ -219,6 +318,9 @@ export const api = {
     post<MeetingPack | QueuedReply>(`/api/packs/${enc(id)}/results/manual`, { raceNumber, placings }),
 
   getRace: (id: string, raceNumber: number) => get<RaceDetailResponse>(`/api/packs/${enc(id)}/races/${raceNumber}`),
+
+  getUpdate: () => get<UpdateStatus>('/api/update'),
+  startUpdate: () => post<UpdateRequested>('/api/update'),
 };
 
 // ---------------------------------------------------------------------------
@@ -229,30 +331,79 @@ export interface RequestState<T> {
   data: T | null;
   loading: boolean;
   error: string | null;
+  /** When the copy on screen was saved on this phone, while RaceLens cannot be reached (see `savedKey`); null when live. */
+  savedAt: string | null;
   /** Re-run the request. `silent` keeps the current data on screen while it refreshes. */
   reload: (silent?: boolean) => Promise<void>;
+  /** Show newer data from the server (marks it live). */
   setData: (d: T | null) => void;
 }
 
-/** Run an async request once (and again whenever `deps` change). */
-export function useRequest<T>(fn: () => Promise<T>, deps: unknown[]): RequestState<T> {
-  const [state, setState] = useState<{ data: T | null; loading: boolean; error: string | null }>({
-    data: null,
-    loading: true,
-    error: null,
-  });
+interface RequestData<T> {
+  data: T | null;
+  loading: boolean;
+  error: string | null;
+  savedAt: string | null;
+}
+
+/** How often a page showing a saved copy asks the server again (and at once on regaining the network or the screen). */
+const SAVED_RETRY_MS = 15_000;
+/** On a crawling connection, show the saved copy after this long rather than a skeleton for the whole wait. */
+const SAVED_EARLY_MS = 4_000;
+
+/**
+ * Run an async request once (and again whenever `deps` change).
+ *
+ * With `savedKey` (the lib/saved.ts key whose copy `fn` keeps), a request that
+ * cannot reach RaceLens shows the copy saved on this phone instead of an error
+ * – flagged by `savedAt` for the page's banner – and keeps retrying in the
+ * background until the server answers again.
+ */
+export function useRequest<T>(fn: () => Promise<T>, deps: unknown[], savedKey?: string): RequestState<T> {
+  const [state, setState] = useState<RequestData<T>>({ data: null, loading: true, error: null, savedAt: null });
   const fnRef = useRef(fn);
   fnRef.current = fn;
+  const keyRef = useRef(savedKey);
+  keyRef.current = savedKey;
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  /** When the live data on screen arrived: "Saved copy from …" if the server then stops answering. */
+  const liveAt = useRef<string | null>(null);
   const seq = useRef(0);
 
   const reload = useCallback(async (silent = false) => {
     const mine = ++seq.current;
+    const key = keyRef.current;
+    let settled = false;
     if (!silent) setState((s) => ({ ...s, loading: true, error: null }));
+    const showSaved = async (onlyWhilePending: boolean) => {
+      const copy = key ? await readCopy<T>(key) : null;
+      if (!copy || mine !== seq.current || (onlyWhilePending && settled)) return false;
+      setState({ data: copy.data, loading: false, error: null, savedAt: copy.savedAt });
+      return true;
+    };
+    const early = key && !silent ? window.setTimeout(() => void showSaved(true), SAVED_EARLY_MS) : undefined;
     try {
       const data = await fnRef.current();
-      if (mine === seq.current) setState({ data, loading: false, error: null });
+      settled = true;
+      if (mine !== seq.current) return;
+      liveAt.current = new Date().toISOString();
+      setState({ data, loading: false, error: null, savedAt: null });
     } catch (e) {
-      if (mine === seq.current) setState((s) => ({ data: silent ? s.data : null, loading: false, error: errorMessage(e) }));
+      settled = true;
+      if (mine !== seq.current) return;
+      if (key && isUnreachable(e)) {
+        // What is on screen is the newest copy this phone has: keep it, labelled. Otherwise the saved one.
+        const s = stateRef.current;
+        if (silent && s.data != null) {
+          setState({ ...s, loading: false, error: null, savedAt: s.savedAt ?? liveAt.current ?? new Date().toISOString() });
+          return;
+        }
+        if ((await showSaved(false)) || mine !== seq.current) return;
+      }
+      setState((s) => ({ data: silent ? s.data : null, loading: false, error: errorMessage(e), savedAt: silent ? s.savedAt : null }));
+    } finally {
+      window.clearTimeout(early);
     }
   }, []);
 
@@ -261,7 +412,34 @@ export function useRequest<T>(fn: () => Promise<T>, deps: unknown[]): RequestSta
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
-  const setData = useCallback((d: T | null) => setState((s) => ({ ...s, data: d })), []);
+  // Showing a saved copy: keep asking, quietly, until the server answers.
+  const onSavedCopy = state.savedAt != null;
+  useEffect(() => {
+    if (!onSavedCopy) return;
+    let busy = false;
+    const retry = async () => {
+      if (busy || document.visibilityState === 'hidden') return;
+      busy = true;
+      try {
+        await reload(true);
+      } finally {
+        busy = false;
+      }
+    };
+    const timer = window.setInterval(retry, SAVED_RETRY_MS);
+    window.addEventListener('online', retry);
+    document.addEventListener('visibilitychange', retry);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('online', retry);
+      document.removeEventListener('visibilitychange', retry);
+    };
+  }, [onSavedCopy, reload]);
+
+  const setData = useCallback((d: T | null) => {
+    liveAt.current = new Date().toISOString();
+    setState((s) => ({ ...s, data: d, savedAt: null }));
+  }, []);
 
   return { ...state, reload, setData };
 }

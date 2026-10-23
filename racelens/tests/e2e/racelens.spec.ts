@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { savedKeysOnPhone } from './saved-copies';
 
 /**
  * End-to-end tests against the demo server (RACELENS_MODE=demo on :4851).
@@ -357,6 +358,23 @@ test('the app is installable: manifest link, manifest and service worker are ser
   await expect
     .poll(async () => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), { timeout: 15_000 })
     .toBeGreaterThan(0);
+
+  // Once it controls the page, it keeps the shell and the built JavaScript and CSS for opening on a bad signal.
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+  });
+  await page.reload();
+  await expect
+    .poll(
+      () =>
+        page.evaluate(async () => {
+          const out: string[] = [];
+          for (const name of await caches.keys()) for (const r of await (await caches.open(name)).keys()) out.push(new URL(r.url).pathname.replace(/-[\w-]+\.(js|css)$/, '.$1'));
+          return out.sort();
+        }),
+      { timeout: 15_000 },
+    )
+    .toEqual(['/assets/index.css', '/assets/index.js', '/index.html']);
 });
 
 test('settings shows the race day automation card and the auto-results toggle round-trips', async ({ page }) => {
@@ -365,6 +383,7 @@ test('settings shows the race day automation card and the auto-results toggle ro
   await expect(page.getByTestId('automation-card')).toContainText(/Race day automation/i);
   await expect(page.getByTestId('automation-timeline')).toContainText(/pre-race check/i);
   await expect(page.getByTestId('automation-timeline')).toContainText(/30 seconds/i);
+  await expect(page.getByTestId('automation-timeline')).toContainText(/once an hour from 7:30 am/);
   await expect(page.getByTestId('scheduler-status')).toBeVisible();
   // Its "Last look 1 min ago" ticks, so it must not be a live region that screen readers re-announce.
   expect(await page.getByTestId('scheduler-status').getAttribute('aria-live')).toBeNull();
@@ -560,6 +579,218 @@ test('the live refresh toasts a new result but stays quiet for a routine automat
   phase = 'result';
   await page.clock.fastForward('00:31');
   await expect.poll(() => seenToasts(page)).toEqual([expect.stringContaining(`R${target} result in`)]);
+});
+
+test('a dead heat is labelled by finishing position: both horses =2nd, the next one 4th', async ({ page }) => {
+  let deadHeat: number[] = [];
+  await servePackWith(page, (pack) => {
+    const p = pack as unknown as { races: Array<{ number: number; runners: Array<{ number: number; scratched?: boolean }> }>; results?: Record<number, unknown> };
+    const race = p.races[0];
+    deadHeat = race.runners.filter((r) => !r.scratched).slice(0, 4).map((r) => r.number);
+    const [a, b, c, d] = deadHeat;
+    return { results: { ...(p.results ?? {}), [race.number]: { raceNumber: race.number, placings: [[a], [b, c], [d]], recordedAt: new Date().toISOString(), source: 'racingaustralia', status: 'final' } } };
+  });
+  await openFirstMeeting(page);
+  await page.getByTestId('race-tab').first().click();
+  await page.getByTestId('result-tab').click();
+  const rows = page.getByTestId('placing');
+  await expect(rows).toHaveCount(3);
+  await expect(rows.nth(0).locator('.placing__pos')).toHaveText('1st');
+  await expect(rows.nth(1).locator('.placing__pos')).toHaveText('=2nd');
+  await expect(rows.nth(1)).toContainText(String(deadHeat[2]));
+  // Not "3rd": two horses finished ahead of it in 2nd.
+  await expect(rows.nth(2).locator('.placing__pos')).toHaveText('4th');
+  await expect(rows.nth(2)).toHaveAttribute('data-position', '4');
+});
+
+test('a race first rated after the jump says so and is not scored', async ({ page }) => {
+  await servePackWith(page, (pack) => {
+    const p = pack as unknown as { races: Array<{ number: number; runners: Array<{ number: number; scratched?: boolean }> }>; predictions: Record<number, Record<string, unknown>>; results?: Record<number, unknown> };
+    const race = p.races[0];
+    const placings = race.runners.filter((r) => !r.scratched).slice(0, 3).map((r) => [r.number]);
+    return {
+      predictions: { ...p.predictions, [race.number]: { ...p.predictions[race.number], postJump: true } },
+      results: { ...(p.results ?? {}), [race.number]: { raceNumber: race.number, placings, recordedAt: new Date().toISOString(), source: 'racingaustralia', status: 'final' } },
+    };
+  });
+  await openFirstMeeting(page);
+  await page.getByTestId('race-tab').first().click();
+  await expect(page.getByTestId('post-jump-chip')).toHaveText('Rated after the jump');
+  await page.getByTestId('result-tab').click();
+  await expect(page.getByTestId('not-scored')).toContainText('Not scored – RaceLens first rated this race after it had started.');
+  await expect(page.getByTestId('scorecard')).toHaveCount(0);
+  // Races rated before the jump show no such chip.
+  await page.getByTestId('race-tab').nth(1).click();
+  await page.getByTestId('prediction-tab').click();
+  await expect(page.getByTestId('ranked-runner').first()).toBeVisible();
+  await expect(page.getByTestId('post-jump-chip')).toHaveCount(0);
+});
+
+test.describe('phone at the track', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('with no connection the phone shows its saved copy of the meeting, says so, and goes live again by itself', async ({ page }) => {
+    await openFirstMeeting(page);
+    const packId = decodeURIComponent(new URL(page.url()).hash.split('/')[2]);
+    // Opening it live kept a copy on the phone (the list too).
+    await expect.poll(() => savedKeysOnPhone(page)).toEqual(expect.arrayContaining(['packs', `pack:${packId}`]));
+
+    // Tailscale off, or no signal: nothing under /api answers. Reopening the app still shows the picks.
+    await page.route('**/api/**', (route) => route.abort('internetdisconnected'));
+    await page.reload();
+    const banner = page.getByTestId('saved-copy-banner');
+    await expect(banner).toContainText(/Saved copy from \S+ – not live\. Retrying…/);
+    await expect(page.getByTestId('race-detail')).toBeVisible();
+    await expect(page.getByTestId('ranked-runner').first()).toBeVisible();
+    expect(await noHorizontalOverflow(page)).toBe(true);
+
+    // The home page lists the saved research too.
+    await page.goto(`/#/?date=${DEMO_DATE}`);
+    await expect(page.getByTestId('today-research').getByTestId('pack-open')).toBeVisible();
+    await expect(banner).toBeVisible();
+
+    // Tailscale Serve answering 502 while the Mac restarts RaceLens is no different.
+    await page.unroute('**/api/**');
+    await page.route('**/api/**', (route) => route.fulfill({ status: 502, contentType: 'text/plain', body: 'Bad Gateway' }));
+    await page.getByTestId('today-research').getByTestId('pack-open').click();
+    await expect(page.getByTestId('race-detail')).toBeVisible();
+    await expect(banner).toBeVisible();
+
+    // Back in range: the page notices by itself and drops the banner.
+    await page.unroute('**/api/**');
+    await page.evaluate(() => window.dispatchEvent(new Event('online')));
+    await expect(banner).toHaveCount(0);
+    await expect(page.getByTestId('race-detail')).toBeVisible();
+    await expect(page.getByTestId('demo-banner')).toBeVisible();
+  });
+
+  test('on a stalled connection the saved copy shows within seconds, not after a minute of spinner', async ({ page }) => {
+    await page.clock.install();
+    await openFirstMeeting(page);
+    const packId = decodeURIComponent(new URL(page.url()).hash.split('/')[2]);
+    await expect.poll(() => savedKeysOnPhone(page)).toContain(`pack:${packId}`);
+
+    // Congested 4G: requests go out and nothing ever comes back.
+    await page.route('**/api/**', () => undefined);
+    await page.reload();
+    await expect(page.getByTestId('startup-skeleton')).toBeVisible();
+    await page.clock.fastForward('00:05');
+    await expect(page.locator('.page--pack[aria-busy="true"]')).toBeVisible();
+    await page.clock.fastForward('00:05');
+    await expect(page.getByTestId('saved-copy-banner')).toContainText(/Saved copy from .+ – not live/);
+    await expect(page.getByTestId('ranked-runner').first()).toBeVisible();
+  });
+
+  test('with nothing saved, a dead connection shows a friendly "can\'t reach RaceLens" with Try again', async ({ page }) => {
+    await page.route('**/api/**', (route) => route.abort('internetdisconnected'));
+    await page.goto(`/#/?date=${DEMO_DATE}`);
+    const state = page.getByTestId('cant-reach');
+    await expect(state).toContainText("Can't reach RaceLens");
+    await expect(state).toContainText(/Mac mini is not answering/);
+    await page.unroute('**/api/**');
+    await state.getByRole('button', { name: 'Try again' }).click();
+    await expect(page.getByTestId('meeting-card').first()).toBeVisible();
+  });
+
+  const VERSION = { commit: 'a1b2c3d4e5f6a7b8', branch: 'main', installedAt: '2026-10-23T21:00:00.000Z' };
+
+  test('Settings updates RaceLens from the phone: confirm, progress every 5 s through the restart, then Reload', async ({ page }) => {
+    await page.clock.install();
+    let state: 'idle' | 'requested' | 'running' | 'done' = 'idle';
+    let down = false;
+    let gets = 0;
+    let downGets = 0;
+    const posts: unknown[] = [];
+    await page.route('**/api/update', async (route) => {
+      if (route.request().method() === 'POST') {
+        posts.push(route.request().postDataJSON());
+        state = 'requested';
+        return route.fulfill({ status: 202, json: { requested: true, message: 'Update started – about 3–5 minutes.' } });
+      }
+      gets += 1;
+      if (down) {
+        downGets += 1;
+        return route.abort('connectionrefused');
+      }
+      const done = state === 'done';
+      await route.fulfill({
+        json: {
+          supported: true,
+          state,
+          version: done ? { ...VERSION, commit: 'f00dfacecafe', installedAt: '2026-10-24T01:00:00.000Z' } : VERSION,
+          last: done ? { startedAt: new Date().toISOString(), finishedAt: new Date().toISOString(), ok: true, from: 'a1b2c3d', to: 'f00dfacecafe' } : undefined,
+        },
+      });
+    });
+
+    await page.goto('/#/settings');
+    const card = page.getByTestId('update-card');
+    await expect(card.getByTestId('update-version')).toContainText('a1b2c3d');
+    await expect(card.getByTestId('update-version')).not.toContainText('a1b2c3d4');
+    await expect(card.getByTestId('update-version')).toContainText(/installed/);
+    expect(await noHorizontalOverflow(page)).toBe(true);
+
+    await card.getByTestId('update-btn').click();
+    const dialog = page.getByTestId('confirm-dialog');
+    await expect(dialog).toContainText('about 3–5 minutes');
+    await expect(dialog).toContainText('goes back to this one by itself');
+    await page.getByTestId('confirm-ok').click();
+    await expect(card.getByTestId('update-progress')).toContainText(/waiting for the Mac mini/);
+    expect(posts).toHaveLength(1);
+
+    state = 'running';
+    await page.clock.fastForward('00:06');
+    await expect(card.getByTestId('update-progress')).toContainText(/downloading and building/);
+
+    // RaceLens restarts for a few seconds at the end: unanswered polls change nothing.
+    down = true;
+    await page.clock.fastForward('00:06');
+    await expect.poll(() => downGets).toBeGreaterThan(0);
+    await expect(card.getByTestId('update-progress')).toBeVisible();
+
+    down = false;
+    state = 'done';
+    await page.clock.fastForward('00:06');
+    await expect(card.getByTestId('update-done')).toContainText('f00dfac');
+    await expect(card.getByTestId('update-version')).toContainText('f00dfac');
+    const polls = gets;
+    await page.clock.fastForward('00:11');
+    expect(gets).toBe(polls); // stopped asking once done
+
+    const reloaded = page.waitForEvent('load');
+    await card.getByTestId('update-reload').click();
+    await reloaded;
+    await expect(page.getByTestId('settings-form')).toBeVisible();
+  });
+
+  test('Settings shows only the version where there is no updater, and no card at all on a server without /api/update', async ({ page }) => {
+    let reply: { status: number; json: unknown } = { status: 200, json: { supported: false, state: 'idle', version: VERSION } };
+    await page.route('**/api/update', (route) => route.fulfill(reply));
+    await page.goto('/#/settings');
+    const card = page.getByTestId('update-card');
+    await expect(card.getByTestId('update-version')).toContainText('a1b2c3d');
+    await expect(card.getByTestId('update-btn')).toHaveCount(0);
+
+    // Supported, but the server then says it cannot (501): say so and drop the button.
+    reply = { status: 200, json: { supported: true, state: 'idle', version: VERSION } };
+    await page.unroute('**/api/update');
+    await page.route('**/api/update', (route) =>
+      route.request().method() === 'POST' ? route.fulfill({ status: 501, json: { error: 'Updating is only available on the Mac mini.' } }) : route.fulfill(reply),
+    );
+    await page.reload();
+    await card.getByTestId('update-btn').click();
+    await page.getByTestId('confirm-ok').click();
+    await expect(page.getByTestId('toast').filter({ hasText: 'only available on the Mac mini' })).toBeVisible();
+    await expect(card.getByTestId('update-btn')).toHaveCount(0);
+    await expect(card.getByTestId('update-version')).toContainText('a1b2c3d');
+
+    reply = { status: 404, json: { error: 'Not found' } };
+    const answered = page.waitForResponse((r) => new URL(r.url()).pathname === '/api/update');
+    await page.reload();
+    await answered;
+    await expect(page.getByTestId('settings-form')).toBeVisible();
+    await expect(page.getByTestId('update-card')).toHaveCount(0);
+  });
 });
 
 test.describe('mobile viewport', () => {

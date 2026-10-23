@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { AUTH_REQUIRED_EVENT, api, errorMessage, useRequest, type AuthState } from './lib/api';
+import { AUTH_REQUIRED_EVENT, api, errorMessage, isUnreachable, useRequest, type AuthState } from './lib/api';
 import { routes, useRoute } from './lib/router';
+import { clearSaved, hasSavedCopies } from './lib/saved';
 import { SessionContext, type Session } from './lib/session';
 import { ConfirmProvider } from './components/Confirm';
 import { InstallHint } from './components/InstallHint';
@@ -56,36 +57,79 @@ export default function App() {
   // null = not known yet (show a skeleton); otherwise whether a login is needed.
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  // The server cannot be reached but this phone has saved copies of the researched meetings: open the app on those.
+  const [offline, setOffline] = useState(false);
   const checkAuth = useCallback(async () => {
+    let answered = false;
+    // A stalled connection: open on the saved copies after a few seconds rather than a skeleton for the whole timeout.
+    const early = window.setTimeout(async () => {
+      if ((await hasSavedCopies()) && !answered) setOffline(true);
+    }, 4000);
     try {
       const a = await api.auth();
+      answered = true;
+      // Saved copies never outlive this device's sign-in (expired, signed out elsewhere, password changed).
+      if (a.required && !a.authenticated) await clearSaved();
       setAuth(a);
       setAuthError(null);
+      setOffline(false);
     } catch (e) {
+      answered = true;
       // An older server without /api/auth has no login at all; anything else is a real outage.
       if ((e as { status?: number }).status === 404) {
         setAuth({ required: false, authenticated: true });
         setAuthError(null);
+        setOffline(false);
       } else {
+        setOffline(isUnreachable(e) && (await hasSavedCopies()));
         setAuthError(errorMessage(e));
       }
+    } finally {
+      window.clearTimeout(early);
     }
   }, []);
   useEffect(() => {
     void checkAuth();
   }, [checkAuth]);
 
+  // Not through yet (the Mac mini restarting, Tailscale reconnecting, no signal): keep trying by ourselves.
+  const waiting = !auth && !!authError;
+  useEffect(() => {
+    if (!waiting) return;
+    let busy = false;
+    const retry = async () => {
+      if (busy || document.visibilityState === 'hidden') return;
+      busy = true;
+      try {
+        await checkAuth();
+      } finally {
+        busy = false;
+      }
+    };
+    const timer = window.setInterval(retry, 15_000);
+    window.addEventListener('online', retry);
+    document.addEventListener('visibilitychange', retry);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('online', retry);
+      document.removeEventListener('visibilitychange', retry);
+    };
+  }, [waiting, checkAuth]);
+
   // Any API call refused for want of a login drops us back to the login screen.
   useEffect(() => {
-    const onRequired = () => setAuth((a) => (a && a.required && !a.authenticated ? a : { required: true, authenticated: false }));
+    const onRequired = () => {
+      void clearSaved();
+      setAuth((a) => (a && a.required && !a.authenticated ? a : { required: true, authenticated: false }));
+    };
     window.addEventListener(AUTH_REQUIRED_EVENT, onRequired);
     return () => window.removeEventListener(AUTH_REQUIRED_EVENT, onRequired);
   }, []);
 
-  const signedIn = !!auth && (!auth.required || auth.authenticated);
+  const signedIn = offline || (!!auth && (!auth.required || auth.authenticated));
 
-  // Health carries the scheduler status and LAN urls only once signed in, so re-fetch it after a login.
-  const health = useRequest(() => (signedIn ? api.health() : Promise.resolve(null)), [signedIn]);
+  // Health carries the scheduler status and LAN urls only once signed in, so re-fetch it after a login (and once back online).
+  const health = useRequest(() => (signedIn && !offline ? api.health() : Promise.resolve(null)), [signedIn, offline]);
 
   const afterLogin = useCallback(async () => {
     await checkAuth();
@@ -95,6 +139,7 @@ export default function App() {
     try {
       await api.logout();
     } finally {
+      await clearSaved();
       setAuth({ required: true, authenticated: false });
     }
   }, []);
@@ -114,12 +159,12 @@ export default function App() {
   }, [seg0, seg1]);
 
   // ------------------------------------------------------------ shells
-  if (!auth) {
+  if (!auth && !offline) {
     if (authError) {
       return (
         <div className="startup">
-          <div className="startup__card">
-            <ErrorState title="Could not reach the RaceLens server" message={authError} onRetry={() => void checkAuth()} />
+          <div className="startup__card" data-testid="cant-reach">
+            <ErrorState title="Can't reach RaceLens" message={`${authError.replace(/[.!]?\s*$/, '.')} It keeps trying by itself.`} onRetry={() => void checkAuth()} />
           </div>
         </div>
       );

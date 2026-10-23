@@ -5,6 +5,7 @@ import { api, errorMessage, useJobPoll, useRequest, isQueued } from '../lib/api'
 import { countdown, deviceZone, fmtDistance, fmtLongDate, fmtMoney, fmtOdds, fmtPct, fmtRelative, fmtTime, meetingZone, plural, raceStatusLabel, verificationWord, zoneAbbrev } from '../lib/format';
 import { CATCHUP_STALE_MS, catchupDue, newsToast, packNews, resultWatchLine, watchLineVisible } from '../lib/raceday';
 import { navigate, routes } from '../lib/router';
+import { savedKeys } from '../lib/saved';
 import { useServerNow, useSession } from '../lib/session';
 import { BettingPlanView } from '../components/BettingPlanView';
 import { ConfidenceMeter } from '../components/ConfidenceMeter';
@@ -16,7 +17,7 @@ import { RankedRunnerCard } from '../components/RankedRunnerCard';
 import { ResultView } from '../components/ResultView';
 import { useToast } from '../components/Toast';
 import { VerificationView } from '../components/VerificationView';
-import { Chip, EmptyState, ErrorState, Ring, Saddle, Skeleton, SkeletonCard } from '../components/ui';
+import { Chip, EmptyState, ErrorState, Ring, Saddle, SavedCopyBanner, Skeleton, SkeletonCard } from '../components/ui';
 
 type Section = 'prediction' | 'field' | 'verification' | 'news' | 'result';
 type RaceState = 'open' | 'predicted' | 'resulted' | 'abandoned';
@@ -62,9 +63,23 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   const { clockOffset } = session;
   const clockOffsetRef = useRef(clockOffset);
   clockOffsetRef.current = clockOffset;
-  const pack = useRequest(() => api.getPack(id), [id]);
+  // Kept on the phone: a stalled connection at the track shows the saved copy (with a banner) and keeps retrying.
+  const pack = useRequest(() => api.getPack(id), [id], savedKeys.pack(id));
   const sources = useRequest(() => api.getSources().then((r) => Object.fromEntries(r.sources.map((s) => [s.id, s.name])) as Record<string, string>), []);
   const liveSettings = useRequest(() => api.getSettings(), []);
+  const onSavedCopy = pack.savedAt != null;
+  const onSavedCopyRef = useRef(onSavedCopy);
+  onSavedCopyRef.current = onSavedCopy;
+  // Back from the saved copy: fetch what failed meanwhile (the catch-up waits for the settings).
+  const lastSavedAt = useRef<string | null>(null);
+  useEffect(() => {
+    const was = lastSavedAt.current;
+    lastSavedAt.current = pack.savedAt;
+    if (!was || pack.savedAt) return;
+    if (liveSettings.error) void liveSettings.reload(true);
+    if (sources.error) void sources.reload(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pack.savedAt]);
   const names = sources.data ?? undefined;
   const [section, setSection] = useState<Section>('prediction');
   const [packJob, setPackJob] = useState<ActiveJob | null>(null);
@@ -109,7 +124,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
 
   const maybeCatchUp = useCallback(async () => {
     const d = dataRef.current;
-    if (!d || jobRunningRef.current || !autoOnRef.current) return;
+    if (!d || jobRunningRef.current || !autoOnRef.current || onSavedCopyRef.current) return;
     if (document.visibilityState === 'hidden') return;
     const t = Date.now() + clockOffsetRef.current;
     if (t - catchup.current.lastFiredAt < CATCHUP_STALE_MS) return;
@@ -125,12 +140,12 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
     }
   }, []);
 
-  // On load, once the auto-results setting and the server's clock are known, and again whenever the person moves to another race (throttled inside).
+  // On load, once the auto-results setting and the server's clock are known, again whenever the person moves to another race (throttled inside), and once a saved copy gives way to live data.
   useEffect(() => {
     if (!data) return;
     void maybeCatchUp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, !!data, raceParam, autoResultsKnownOn, clockOffset]);
+  }, [id, !!data, raceParam, autoResultsKnownOn, clockOffset, onSavedCopy]);
 
   useEffect(() => {
     const onVisible = () => {
@@ -177,7 +192,8 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   useEffect(() => {
     if (!data) return;
     const timer = window.setInterval(async () => {
-      if (jobRunningRef.current) return;
+      // A saved copy on screen: useRequest is already retrying.
+      if (jobRunningRef.current || onSavedCopyRef.current) return;
       try {
         const mine = (await api.getPacks()).find((p) => p.id === id);
         if (!mine) return;
@@ -370,6 +386,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
 
   return (
     <div className="page page--pack" data-testid="pack-page">
+      {pack.savedAt && <SavedCopyBanner savedAt={pack.savedAt} />}
       {/* ------------------------------------------------------------ header */}
       <section className="card pack-head" data-testid="pack-header">
         <div className="pack-head__row">
@@ -601,6 +618,11 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
                     <span className="small muted">
                       Generated {fmtRelative(prediction.generatedAt, now)} · {prediction.modelVersion}
                     </span>
+                    {prediction.postJump && (
+                      <Chip tone="amber" title="First rated after this race had started: shown for reference, not scored" testId="post-jump-chip">
+                        Rated after the jump
+                      </Chip>
+                    )}
                   </div>
                   <div className="ranked-list" data-testid="ranked-list" key={race.number}>
                     {(prediction.top ?? prediction.ranked ?? []).slice(0, 6).map((a) => (
