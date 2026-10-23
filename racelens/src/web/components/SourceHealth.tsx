@@ -31,17 +31,26 @@ export function SourceHealth({ sources, loading, onRefresh }: { sources: SourceI
     }
   };
 
-  const healthy = sources?.filter((s) => s.enabled && s.lastStatus?.ok).length ?? 0;
-  const total = sources?.filter((s) => s.enabled).length ?? 0;
+  const enabled = sources?.filter((s) => s.enabled) ?? [];
+  const checked = enabled.filter((s) => s.lastStatus);
+  const healthy = checked.filter((s) => s.lastStatus?.ok).length;
   const lastChecked = sources?.map((s) => s.lastStatus?.fetchedAt).filter(Boolean).sort().pop();
+  const headline =
+    loading && !sources
+      ? 'Checking…'
+      : !sources
+        ? 'Could not load sources'
+        : checked.length === 0
+          ? 'Not checked yet – tap Check sources'
+          : `${healthy} of ${checked.length} checked ${checked.length === 1 ? 'is' : 'are'} working${lastChecked ? ` · checked ${fmtRelative(lastChecked)}` : ''}`;
 
   return (
     <section className="card sources" data-testid="source-health">
       <header className="sources__head">
         <div>
           <h3>Data sources</h3>
-          <p className="small muted">
-            {loading && !sources ? 'Checking…' : sources ? `${healthy} of ${total} working${lastChecked ? ` · checked ${fmtRelative(lastChecked)}` : ''}` : 'Could not load sources'}
+          <p className="small muted" data-testid="source-headline">
+            {headline}
           </p>
         </div>
         <button type="button" className="btn btn-secondary btn-sm" onClick={probe} disabled={starting || !!jobId} data-testid="probe-btn">

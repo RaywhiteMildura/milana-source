@@ -1,4 +1,4 @@
-import type { BetSuggestion, BettingPlan, Runner } from '@shared/types';
+import type { BetSuggestion, BettingPlan, Runner, Settings } from '@shared/types';
 import { betTypeLabel, fmtMoney, ordinal, priorityLabel, stanceBlurb, stanceLabel, stanceTone } from '../lib/format';
 import { Chip } from './ui';
 
@@ -27,8 +27,9 @@ function RunnersText({ s, runners }: { s: BetSuggestion; runners: Map<number, Ru
   return <>{(s.runners ?? []).map((n) => runnerLabel(n, runners)).join(', ')}</>;
 }
 
-export function BettingPlanView({ plan, runners }: { plan: BettingPlan; runners: Map<number, Runner> }) {
+export function BettingPlanView({ plan, runners, sizedWith, current }: { plan: BettingPlan; runners: Map<number, Runner>; sizedWith?: Settings; current?: Settings }) {
   const suggestions = plan.suggestions ?? [];
+  const stale = !!sizedWith && !!current && (sizedWith.unitAmount !== current.unitAmount || sizedWith.riskProfile !== current.riskProfile);
   const groups = PRIORITY_ORDER.map((p) => ({ p, items: suggestions.filter((s) => s.priority === p) })).filter((g) => g.items.length);
 
   return (
@@ -43,6 +44,11 @@ export function BettingPlanView({ plan, runners }: { plan: BettingPlan; runners:
         </Chip>
       </header>
 
+      {stale && (
+        <p className="banner banner--warn small" data-testid="stakes-stale">
+          Stakes were sized to a {fmtMoney(sizedWith!.unitAmount)} unit ({sizedWith!.riskProfile}). Your unit is now {fmtMoney(current!.unitAmount)} ({current!.riskProfile}) – press Pre-race check to re-size.
+        </p>
+      )}
       <div className="betting__totals">
         <div className="stat">
           <span className="stat__label">Unit</span>

@@ -263,7 +263,7 @@ function RunnerDetails({ runner, names }: { runner: Runner; names?: Record<strin
   );
 }
 
-export function FieldTable({ race, names }: { race: Race; names?: Record<string, string> }) {
+export function FieldTable({ race, names, tz }: { race: Race; names?: Record<string, string>; tz?: string }) {
   const [open, setOpen] = useState<Set<string>>(new Set());
   const toggle = (id: string) =>
     setOpen((s) => {
@@ -280,7 +280,7 @@ export function FieldTable({ race, names }: { race: Race; names?: Record<string,
       <header className="field__head">
         <h3>Full field</h3>
         <span className="muted small">
-          {active} runners{runners.length - active > 0 ? ` · ${runners.length - active} scratched` : ''} · updated {fmtDateTime(race.fetchedAt)}
+          {active} runners{runners.length - active > 0 ? ` · ${runners.length - active} scratched` : ''} · updated {fmtDateTime(race.fetchedAt, tz)}
         </span>
       </header>
       <div className="table-wrap">
@@ -350,6 +350,18 @@ export function FieldTable({ race, names }: { race: Race; names?: Record<string,
                     <td data-label="Check">
                       <VerificationDot score={r.verification?.score} conflicts={r.verification?.conflicts} />
                       <span className="small muted"> {r.verification ? `${Math.round(r.verification.score * 100)}%` : '–'}</span>
+                      {(r.verification?.conflicts ?? []).length > 0 && (
+                        <details className="conflicts small" data-testid="runner-conflicts">
+                          <summary>
+                            {r.verification!.conflicts.length} conflict{r.verification!.conflicts.length === 1 ? '' : 's'}
+                          </summary>
+                          <ul>
+                            {r.verification!.conflicts.map((c, i) => (
+                              <li key={i}>{c}</li>
+                            ))}
+                          </ul>
+                        </details>
+                      )}
                     </td>
                     <td data-label="" className="td-actions">
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => toggle(r.id)} aria-expanded={isOpen} data-testid="runner-toggle">

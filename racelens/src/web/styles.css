@@ -2464,3 +2464,34 @@ svg {
     font-size: 1.15rem;
   }
 }
+
+
+/* ---- review follow-ups: touch targets, visible conflicts, today card ---- */
+@media (pointer: coarse) {
+  .btn-sm,
+  details > summary,
+  .manual-result__toggle {
+    min-height: var(--tap);
+  }
+}
+.conflicts {
+  margin-top: 4px;
+  max-width: 260px;
+}
+.conflicts > summary {
+  cursor: pointer;
+  color: var(--amber);
+  font-weight: 600;
+}
+.conflicts ul {
+  margin: 4px 0 0;
+  padding-left: 16px;
+}
+.saved--today {
+  margin-bottom: 16px;
+}
+
+.countdown--done {
+  background: var(--green-soft, var(--surface-3));
+  color: var(--green, var(--muted));
+}

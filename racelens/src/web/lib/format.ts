@@ -81,22 +81,75 @@ function parseIso(iso?: string | null): number | null {
   return Number.isNaN(t) ? null : t;
 }
 
-/** "12:25pm" in Melbourne time */
-export function fmtTime(iso?: string | null): string {
+/** IANA zone for an Australian state code. */
+export function zoneForState(state?: string | null): string | undefined {
+  switch ((state || '').toUpperCase()) {
+    case 'VIC':
+      return 'Australia/Melbourne';
+    case 'NSW':
+    case 'ACT':
+      return 'Australia/Sydney';
+    case 'TAS':
+      return 'Australia/Hobart';
+    case 'QLD':
+      return 'Australia/Brisbane';
+    case 'SA':
+      return 'Australia/Adelaide';
+    case 'WA':
+      return 'Australia/Perth';
+    case 'NT':
+      return 'Australia/Darwin';
+    default:
+      return undefined;
+  }
+}
+
+/** The zone race times should be shown in: the track's own local time. */
+export function meetingZone(m?: { timezone?: string; state?: string } | null): string {
+  return m?.timezone || zoneForState(m?.state) || TZ;
+}
+
+export function deviceZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || TZ;
+  } catch {
+    return TZ;
+  }
+}
+
+/** "AEDT", "AEST", "AWST"… for a zone at an instant. */
+export function zoneAbbrev(tz: string, at: number = Date.now()): string {
+  try {
+    const part = new Intl.DateTimeFormat('en-AU', { timeZone: tz, timeZoneName: 'short' }).formatToParts(new Date(at)).find((p) => p.type === 'timeZoneName');
+    return part?.value || tz;
+  } catch {
+    return tz;
+  }
+}
+
+/** Today until 7pm Melbourne time, then tomorrow (the next race day people plan for). */
+export function defaultHomeDate(now: Date = new Date()): string {
+  const today = toISODate(now, TZ);
+  const hour = Number(new Intl.DateTimeFormat('en-AU', { timeZone: TZ, hour: 'numeric', hourCycle: 'h23' }).format(now));
+  return hour >= 19 ? addDays(today, 1) : today;
+}
+
+/** "12:25pm" in the given zone (default Melbourne) */
+export function fmtTime(iso?: string | null, tz: string = TZ): string {
   const t = parseIso(iso);
   if (t == null) return '–';
-  return new Intl.DateTimeFormat('en-AU', { timeZone: TZ, hour: 'numeric', minute: '2-digit', hour12: true })
+  return new Intl.DateTimeFormat('en-AU', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true })
     .format(new Date(t))
     .replace(/\s+/g, '')
     .toLowerCase();
 }
 
 /** "Sat 24 Oct, 12:25pm" */
-export function fmtDateTime(iso?: string | null): string {
+export function fmtDateTime(iso?: string | null, tz: string = TZ): string {
   const t = parseIso(iso);
   if (t == null) return '–';
-  const day = new Intl.DateTimeFormat('en-AU', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(t));
-  return `${day}, ${fmtTime(iso)}`;
+  const day = new Intl.DateTimeFormat('en-AU', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(t));
+  return `${day}, ${fmtTime(iso, tz)}`;
 }
 
 /** Local race-day date (YYYY-MM-DD, Melbourne) of an ISO timestamp. */

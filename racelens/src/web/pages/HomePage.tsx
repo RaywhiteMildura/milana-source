@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { MeetingSummary } from '@shared/types';
 import { parseTrackRating, trackRatingLabel } from '@shared/util';
 import { api, errorMessage, useRequest, type PackListItem } from '../lib/api';
-import { addDays, fmtLongDate, fmtRelative, fmtShortDate, fmtTime, isYmd, nextSaturday, pct100, plural, relativeDayLabel, sourceName, todayYmd, verificationTone } from '../lib/format';
+import { addDays, defaultHomeDate, fmtLongDate, fmtRelative, fmtShortDate, fmtTime, isYmd, meetingZone, nextSaturday, pct100, plural, relativeDayLabel, sourceName, todayYmd, verificationTone } from '../lib/format';
 import { navigate, routes } from '../lib/router';
 import { useConfirm } from '../components/Confirm';
 import { SourceHealth } from '../components/SourceHealth';
@@ -61,7 +61,7 @@ function MeetingCard({
         </div>
         <div>
           <dt>First race</dt>
-          <dd>{fmtTime(m.firstRaceTime)}</dd>
+          <dd>{fmtTime(m.firstRaceTime, meetingZone(m))}</dd>
         </div>
         {m.weather && (
           <div>
@@ -140,13 +140,26 @@ export function HomePage({ query }: { query: URLSearchParams }) {
   const tomorrow = addDays(today, 1);
   const saturday = nextSaturday(today);
   const queryDate = query.get('date');
-  const date = isYmd(queryDate) ? queryDate : tomorrow;
+  const date = isYmd(queryDate) ? queryDate : defaultHomeDate();
   const [inputValue, setInputValue] = useState(date);
   useEffect(() => setInputValue(date), [date]);
+  // Typing a date: only navigate once the value is complete and plausible, and not on every keystroke.
+  useEffect(() => {
+    if (!isYmd(inputValue) || inputValue === date) return;
+    const year = Number(inputValue.slice(0, 4));
+    if (year < 2000 || year > 2100) return;
+    const t = window.setTimeout(() => navigate(routes.home(inputValue), true), 400);
+    return () => window.clearTimeout(t);
+  }, [inputValue, date]);
 
   const meetings = useRequest(() => api.getMeetings(date), [date]);
   const packs = useRequest(() => api.getPacks(), []);
   const sources = useRequest(() => api.getSources().then((r) => r.sources), []);
+  // Discovery records source statuses server-side: show them once the meetings have loaded.
+  useEffect(() => {
+    if (meetings.data) void sources.reload(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meetings.data]);
   const names = useMemo(() => (sources.data ? Object.fromEntries(sources.data.map((s) => [s.id, s.name])) : undefined), [sources.data]);
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -211,10 +224,9 @@ export function HomePage({ query }: { query: URLSearchParams }) {
               type="date"
               className="input input--date"
               value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                if (isYmd(e.target.value)) setDate(e.target.value);
-              }}
+              min="2000-01-01"
+              max="2100-12-31"
+              onChange={(e) => setInputValue(e.target.value)}
               data-testid="date-input"
               aria-label="Race day date"
             />
@@ -239,6 +251,21 @@ export function HomePage({ query }: { query: URLSearchParams }) {
 
       <div className="home-grid">
         <div className="home-main">
+          {(packs.data ?? []).some((p) => p.meeting.date === date) && (
+            <section className="saved saved--today" data-testid="today-research">
+              <div className="section-title">
+                <h2>{date === today ? "Today's research" : date === tomorrow ? "Tomorrow's research" : `Research for ${fmtLongDate(date)}`}</h2>
+                <span className="small muted">Ready to open</span>
+              </div>
+              <ul className="packs-list">
+                {(packs.data ?? [])
+                  .filter((p) => p.meeting.date === date)
+                  .map((p) => (
+                    <PackRow key={p.id} pack={p} onDelete={remove} />
+                  ))}
+              </ul>
+            </section>
+          )}
           <section className="meetings" data-testid="meetings">
             <div className="section-title">
               <h2>
@@ -288,8 +315,8 @@ export function HomePage({ query }: { query: URLSearchParams }) {
 
           <section className="saved" data-testid="saved-research">
             <div className="section-title">
-              <h2>Saved research</h2>
-              {packs.data && <span className="small muted">{plural(packs.data.length, 'meeting')}</span>}
+              <h2>{(packs.data ?? []).some((p) => p.meeting.date === date) ? 'Other saved research' : 'Saved research'}</h2>
+              {packs.data && <span className="small muted">{plural(packs.data.filter((p) => p.meeting.date !== date).length, 'meeting')}</span>}
             </div>
             {packs.loading && !packs.data ? (
               <SkeletonCard lines={2} />
@@ -299,9 +326,12 @@ export function HomePage({ query }: { query: URLSearchParams }) {
               <EmptyState icon="🗂" title="Nothing saved yet">
                 Research a meeting above and it will be saved here so you can come back to it on race day.
               </EmptyState>
+            ) : packs.data.every((p) => p.meeting.date === date) ? (
+              <p className="small muted">Nothing saved for other dates.</p>
             ) : (
               <ul className="packs-list">
-                {[...packs.data]
+                {packs.data
+                  .filter((p) => p.meeting.date !== date)
                   .sort((a, b) => (a.meeting.date < b.meeting.date ? 1 : a.meeting.date > b.meeting.date ? -1 : a.updatedAt < b.updatedAt ? 1 : -1))
                   .map((p) => (
                     <PackRow key={p.id} pack={p} onDelete={remove} />

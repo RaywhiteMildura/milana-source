@@ -15,13 +15,29 @@ async function gotoHome(page: Page) {
   await expect(page.getByTestId('meeting-card').first()).toBeVisible();
 }
 
+/**
+ * Load the home page and wait until the first meeting card knows whether saved research exists.
+ * The card shows "Research" until /api/packs answers, so we read that response and then wait for
+ * the matching button instead of guessing from whichever button happens to be rendered first.
+ */
+async function gotoHomeSettled(page: Page): Promise<{ card: ReturnType<Page['getByTestId']>; hasPack: boolean }> {
+  // A hash-only navigation to a page we are already on would not reload, and so would never re-request the packs.
+  if (page.url() !== 'about:blank') await page.goto('about:blank');
+  const packsLoaded = page.waitForResponse((r) => r.url().includes('/api/packs') && r.request().method() === 'GET');
+  await gotoHome(page);
+  const packs = (await (await packsLoaded).json()) as Array<{ id: string; meeting: { date: string } }>;
+  const card = page.getByTestId('meeting-card').first();
+  const meetingId = await card.getAttribute('data-meeting-id');
+  const hasPack = packs.some((p) => p.id === meetingId || p.meeting.date === DEMO_DATE);
+  await expect(card.getByTestId(hasPack ? 'open-btn' : 'research-btn')).toBeVisible();
+  return { card, hasPack };
+}
+
 /** Open the first meeting's research, running it first if it has not been researched yet. */
 async function openFirstMeeting(page: Page) {
-  await gotoHome(page);
-  const card = page.getByTestId('meeting-card').first();
-  const open = card.getByTestId('open-btn');
-  if (await open.count()) {
-    await open.click();
+  const { card, hasPack } = await gotoHomeSettled(page);
+  if (hasPack) {
+    await card.getByTestId('open-btn').click();
   } else {
     await card.getByTestId('research-btn').click();
     await expect(page).toHaveURL(/#\/pack\//, { timeout: 80_000 });
@@ -50,11 +66,9 @@ test('home loads with the demo banner and at least one meeting card', async ({ p
 });
 
 test('researching a meeting shows progress, then the meeting page with predictions', async ({ page }) => {
-  await gotoHome(page);
-  const card = page.getByTestId('meeting-card').first();
-  const research = card.getByTestId('research-btn');
-  if (await research.count()) {
-    await research.click();
+  const { card, hasPack } = await gotoHomeSettled(page);
+  if (!hasPack) {
+    await card.getByTestId('research-btn').click();
   } else {
     // Already researched by an earlier run – re-run so we still exercise the job flow.
     await card.getByTestId('rerun-btn').click();
@@ -129,6 +143,87 @@ test('pre-race check runs and the page refreshes with a new history event', asyn
   await expect(page.getByTestId('ranked-runner').first()).toBeVisible();
 });
 
+test('news tab lists stories grouped by runner', async ({ page }) => {
+  await openFirstMeeting(page);
+  await page.getByTestId('news-tab').click();
+  await expect(page.getByTestId('news-panel')).toBeVisible();
+  await expect(page.getByTestId('news-tab')).toHaveAttribute('aria-selected', 'true');
+  // The demo meeting ships bundled stories, so at least one item must render.
+  await expect(page.getByTestId('news-item').first()).toBeVisible();
+});
+
+test('field table shows cross-source conflicts for runners the sources disagree on', async ({ page }) => {
+  await openFirstMeeting(page);
+  await page.getByTestId('field-tab').click();
+  await expect(page.getByTestId('field-table')).toBeVisible();
+  // The demo data deliberately disagrees between sources, so a conflict list must be visible somewhere in the meeting.
+  const tabs = page.getByTestId('race-tab');
+  const n = await tabs.count();
+  let found = false;
+  for (let i = 0; i < n && !found; i++) {
+    await tabs.nth(i).click();
+    await expect(page.getByTestId('race-detail')).toHaveAttribute('data-race', (await tabs.nth(i).getAttribute('data-race')) ?? '');
+    found = (await page.getByTestId('runner-conflicts').count()) > 0;
+  }
+  expect(found).toBe(true);
+  const details = page.getByTestId('runner-conflicts').first();
+  await details.locator('summary').click();
+  await expect(details.locator('li').first()).toBeVisible();
+});
+
+test('refreshing a deep race link keeps the selected race', async ({ page }) => {
+  await openFirstMeeting(page);
+  const tabs = page.getByTestId('race-tab');
+  if ((await tabs.count()) < 3) test.skip(true, 'Demo meeting has fewer than three races');
+  await tabs.nth(2).click();
+  const raceNo = await tabs.nth(2).getAttribute('data-race');
+  await expect(page).toHaveURL(new RegExp(`/race/${raceNo}(\\?|$)`));
+  await page.reload();
+  await expect(page.getByTestId('race-detail')).toHaveAttribute('data-race', String(raceNo));
+  await expect(tabs.nth(2)).toHaveAttribute('aria-selected', 'true');
+});
+
+test('entering a result manually asks for confirmation, then scores the prediction', async ({ page }) => {
+  await openFirstMeeting(page);
+  // Use the last race so the earlier tests (which assume an un-resulted first race) keep working on re-runs.
+  const tabs = page.getByTestId('race-tab');
+  const last = tabs.nth((await tabs.count()) - 1);
+  await last.click();
+  const raceNo = await last.getAttribute('data-race');
+  await expect(page.getByTestId('race-detail')).toHaveAttribute('data-race', String(raceNo));
+
+  await page.getByTestId('result-tab').click();
+  await expect(page.getByTestId('result-panel')).toBeVisible();
+  if ((await page.getByTestId('placings').count()) > 0) {
+    // Already resulted by an earlier run – the scorecard must still be shown.
+    await expect(page.getByTestId('scorecard')).toBeVisible();
+    return;
+  }
+
+  // Pick the first three runners from our own ranked list so the saddlecloth numbers are real.
+  await page.getByTestId('prediction-tab').click();
+  const ranked = page.getByTestId('ranked-runner');
+  await expect(ranked.first()).toBeVisible();
+  const numbers: string[] = [];
+  for (let i = 0; i < Math.min(3, await ranked.count()); i++) numbers.push((await ranked.nth(i).getAttribute('data-number')) ?? '');
+  expect(numbers.every((n) => /^\d+$/.test(n))).toBe(true);
+
+  await page.getByTestId('result-tab').click();
+  for (let i = 0; i < numbers.length; i++) await page.getByTestId(`manual-place-${i + 1}`).fill(numbers[i]);
+  await page.getByTestId('manual-result-save').click();
+
+  const dialog = page.getByTestId('confirm-dialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText(`Race ${raceNo}`);
+  await page.getByTestId('confirm-ok').click();
+
+  await expect(page.getByTestId('placings')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('placings')).toContainText('1st');
+  await expect(page.getByTestId('scorecard')).toBeVisible();
+  // Our top pick "won", so the scorecard's first line must be a hit.
+  await expect(page.getByTestId('scorecard').locator('li').first()).toHaveClass(/is-hit/);
+});
+
 test('settings save and round-trip after reload', async ({ page }) => {
   await page.goto('/#/settings');
   const unit = page.getByTestId('settings-unit');
@@ -152,11 +247,17 @@ test.describe('mobile viewport', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test('home and meeting page render without horizontal overflow', async ({ page }) => {
-    await gotoHome(page);
+    const { card, hasPack } = await gotoHomeSettled(page);
     await expect(page.getByTestId('source-health')).toBeVisible();
     expect(await noHorizontalOverflow(page)).toBe(true);
 
-    await openFirstMeeting(page);
+    if (hasPack) {
+      await card.getByTestId('open-btn').click();
+    } else {
+      await card.getByTestId('research-btn').click();
+      await expect(page).toHaveURL(/#\/pack\//, { timeout: 80_000 });
+    }
+    await expect(page.getByTestId('race-detail')).toBeVisible();
     await expect(page.getByTestId('ranked-runner').first()).toBeVisible();
     await expect(page.getByTestId('confidence-meter')).toBeVisible();
     expect(await noHorizontalOverflow(page)).toBe(true);
@@ -169,4 +270,22 @@ test.describe('mobile viewport', () => {
     await expect(page.getByTestId('verification-panel')).toBeVisible();
     expect(await noHorizontalOverflow(page)).toBe(true);
   });
+});
+
+test('deleting saved research removes it from the home page', async ({ page }) => {
+  const { hasPack } = await gotoHomeSettled(page);
+  expect(hasPack).toBe(true);
+  const items = page.getByTestId('pack-item');
+  const before = await items.count();
+  expect(before).toBeGreaterThan(0);
+
+  await items.first().getByTestId('pack-delete').click();
+  const dialog = page.getByTestId('confirm-dialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText(/delete research/i);
+  await page.getByTestId('confirm-ok').click();
+
+  await expect.poll(async () => page.getByTestId('pack-item').count(), { timeout: 15_000 }).toBeLessThan(before);
+  // The meeting card now offers research again instead of "open".
+  await expect(page.getByTestId('meeting-card').first().getByTestId('research-btn')).toBeVisible();
 });

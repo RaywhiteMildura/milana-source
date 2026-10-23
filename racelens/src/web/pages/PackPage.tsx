@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { JobProgress, MeetingPack, NewsItem, Race } from '@shared/types';
 import { normaliseName, normalisePerson, parseTrackRating, trackRatingLabel } from '@shared/util';
 import { api, errorMessage, useRequest } from '../lib/api';
-import { countdown, fmtDistance, fmtLongDate, fmtMoney, fmtOdds, fmtPct, fmtRelative, fmtTime, plural, raceStatusLabel, verificationWord } from '../lib/format';
+import { countdown, deviceZone, fmtDistance, fmtLongDate, fmtMoney, fmtOdds, fmtPct, fmtRelative, fmtTime, meetingZone, plural, raceStatusLabel, verificationWord, zoneAbbrev } from '../lib/format';
 import { useNow } from '../lib/hooks';
 import { navigate, routes } from '../lib/router';
 import { BettingPlanView } from '../components/BettingPlanView';
@@ -59,6 +59,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   const now = useNow(30_000);
   const pack = useRequest(() => api.getPack(id), [id]);
   const sources = useRequest(() => api.getSources().then((r) => Object.fromEntries(r.sources.map((s) => [s.id, s.name])) as Record<string, string>), []);
+  const liveSettings = useRequest(() => api.getSettings(), []);
   const names = sources.data ?? undefined;
   const [section, setSection] = useState<Section>('prediction');
   const [packJob, setPackJob] = useState<ActiveJob | null>(null);
@@ -66,7 +67,32 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   const [starting, setStarting] = useState<string | null>(null);
 
   const data = pack.data;
+  const tz = meetingZone(data?.meeting);
   const races = useMemo(() => (data ? [...(data.races ?? [])].sort((a, b) => a.number - b.number) : []), [data]);
+
+  // The server re-checks races on its own before the jump: notice that and refresh.
+  const updatedAtRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    updatedAtRef.current = data?.updatedAt;
+  }, [data?.updatedAt]);
+  const jobRunning = !!packJob || !!raceJob;
+  useEffect(() => {
+    if (!data) return;
+    const timer = window.setInterval(async () => {
+      if (jobRunning) return;
+      try {
+        const mine = (await api.getPacks()).find((p) => p.id === id);
+        if (mine && updatedAtRef.current && mine.updatedAt > updatedAtRef.current) {
+          await pack.reload(true);
+          toast.info('Updated: an automatic pre-race check changed this meeting');
+        }
+      } catch {
+        /* a missed poll is harmless */
+      }
+    }, 30_000);
+    return () => window.clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, !!data, jobRunning]);
 
   const selectedNumber = useMemo(() => {
     if (!data || !races.length) return null;
@@ -151,8 +177,9 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
 
   const onJobFinished = (job: JobProgress) => {
     void pack.reload(true);
+    const where = job.raceNumber != null ? `Race ${job.raceNumber}: ` : '';
     if (job.status === 'done') {
-      toast.success(job.type === 'results' ? 'Results updated' : 'Pre-race check complete – page refreshed');
+      toast.success(job.type === 'results' ? `${where}results updated` : `${where}pre-race check complete – page refreshed`);
     } else {
       toast.error(job.error || 'The check failed. Try again in a moment.');
     }
@@ -255,6 +282,11 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
                   ☁ {w.summary}
                 </Chip>
               )}
+              {tz !== deviceZone() && (
+                <Chip tone="neutral" title="Race times are shown in the track's local time" testId="zone-chip">
+                  Times {zoneAbbrev(tz)}
+                </Chip>
+              )}
             </div>
             {w && (w.rainLast72hMm != null || w.rainRaceDayMm != null || w.maxTempC != null || w.windKmhMax != null) && (
               <p className="small muted pack-head__weather">
@@ -325,7 +357,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
                 >
                   <span className="race-tab__num">R{r.number}</span>
                   <span className="race-tab__meta">
-                    {fmtDistance(r.distance)} · {fmtTime(r.startTime)}
+                    {fmtDistance(r.distance)} · {fmtTime(r.startTime, tz)}
                   </span>
                   <span className={`pip pip--${st}`} aria-label={stateWord(st)} />
                 </button>
@@ -358,20 +390,21 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
                   {race.status !== 'open' && race.status !== 'unknown' && <Chip tone={race.status === 'abandoned' ? 'red' : 'neutral'}>{raceStatusLabel(race.status)}</Chip>}
                 </div>
               </div>
-              <div className={`countdown countdown--${cd.tone}`} data-testid="countdown">
-                <strong>{cd.text}</strong>
-                <span className="muted">{fmtTime(race.startTime)}</span>
+              <div className={`countdown countdown--${result ? 'done' : cd.tone}`} data-testid="countdown">
+                <strong>{result ? (result.status === 'interim' ? 'Interim result in' : 'Result in') : cd.text}</strong>
+                <span className="muted">{fmtTime(race.startTime, tz)}</span>
               </div>
             </div>
             <div className="race-top__side">
               <Ring value={race.verification?.score ?? 0} size={56} stroke={6} caption={<span className="small muted">{plural(race.verification?.sourceCount ?? 0, 'source')}</span>} testId="race-verification" />
               {!result && (
-                <button type="button" className="btn btn-primary" onClick={() => startJob('recheck', race.number)} disabled={!!raceJob || starting === `recheck:${race.number}`} data-testid="recheck-btn">
-                  {starting === `recheck:${race.number}` ? 'Starting…' : 'Pre-race check this race'}
+                <button type="button" className="btn btn-primary" onClick={() => startJob('recheck', race.number)} disabled={raceJob?.raceNumber === race.number || starting === `recheck:${race.number}`} data-testid="recheck-btn">
+                  {starting === `recheck:${race.number}` ? 'Starting…' : raceJob?.raceNumber === race.number ? 'Checking…' : 'Pre-race check this race'}
                 </button>
               )}
+              {raceJob && raceJob.raceNumber !== race.number && <span className="small muted">Checking Race {raceJob.raceNumber}…</span>}
             </div>
-            {raceJob && (
+            {raceJob && raceJob.raceNumber === race.number && (
               <div className="race-top__job">
                 <InlineJob jobId={raceJob.id} title={raceJob.title} onFinished={onJobFinished} onClear={() => setRaceJob(null)} />
               </div>
@@ -386,6 +419,8 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
                 key={s.key}
                 type="button"
                 role="tab"
+                id={`section-tab-${s.key}`}
+                aria-controls={`section-panel-${s.key}`}
                 aria-selected={section === s.key}
                 className={`section-tab ${section === s.key ? 'is-active' : ''}`}
                 onClick={() => setSection(s.key)}
@@ -399,7 +434,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
 
           {/* -------------------------------------------------- prediction */}
           {section === 'prediction' && (
-            <div className="section" data-testid="prediction-panel">
+            <div className="section" data-testid="prediction-panel" id="section-panel-prediction" role="tabpanel">
               {!prediction ? (
                 <EmptyState icon="🔮" title="No prediction yet for this race" action={<button type="button" className="btn btn-primary" onClick={() => startJob('recheck', race.number)}>Run a pre-race check</button>}>
                   {race.status === 'abandoned' ? 'This race was abandoned.' : 'Run a pre-race check and we will rate the field.'}
@@ -412,7 +447,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
                       Generated {fmtRelative(prediction.generatedAt, now)} · {prediction.modelVersion}
                     </span>
                   </div>
-                  <div className="ranked-list" data-testid="ranked-list">
+                  <div className="ranked-list" data-testid="ranked-list" key={race.number}>
                     {(prediction.top ?? prediction.ranked ?? []).slice(0, 6).map((a) => (
                       <RankedRunnerCard key={a.runnerId || a.number} assessment={a} runner={runnerById.get(a.runnerId) ?? runnerByNo.get(a.number)} />
                     ))}
@@ -452,7 +487,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
                   )}
                   <div className="two-col">
                     <ConfidenceMeter rating={prediction.confidence} />
-                    <BettingPlanView plan={prediction.betting} runners={runnerByNo} />
+                    <BettingPlanView plan={prediction.betting} runners={runnerByNo} sizedWith={data.settings} current={liveSettings.data ?? undefined} />
                   </div>
                   {(prediction.dayPatternsApplied ?? []).length > 0 && (
                     <p className="small muted">Day patterns applied to this race: {prediction.dayPatternsApplied.map((p) => p.label).join(', ')}.</p>
@@ -464,19 +499,19 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
           )}
 
           {section === 'field' && (
-            <div className="section" data-testid="field-panel">
-              <FieldTable race={race} names={names} />
+            <div className="section" data-testid="field-panel" id="section-panel-field" role="tabpanel">
+              <FieldTable key={race.number} race={race} names={names} tz={tz} />
             </div>
           )}
 
           {section === 'verification' && (
-            <div className="section">
-              <VerificationView race={race} names={names} />
+            <div className="section" id="section-panel-verification" role="tabpanel">
+              <VerificationView key={race.number} race={race} names={names} />
             </div>
           )}
 
           {section === 'news' && (
-            <div className="section news-groups" data-testid="news-panel">
+            <div className="section news-groups" data-testid="news-panel" id="section-panel-news" role="tabpanel">
               <div className="card">
                 <h3>About this race</h3>
                 <NewsItems items={raceNews.race} names={names} />
@@ -489,8 +524,8 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
           )}
 
           {section === 'result' && (
-            <div className="section">
-              <ResultView race={race} result={result} prediction={prediction} onManual={saveManual} onFetch={() => startJob('results', race.number)} busy={!!raceJob || starting === `results:${race.number}`} names={names} />
+            <div className="section" id="section-panel-result" role="tabpanel">
+              <ResultView key={race.number} race={race} result={result} prediction={prediction} onManual={saveManual} onFetch={() => startJob('results', race.number)} busy={raceJob?.raceNumber === race.number || starting === `results:${race.number}`} names={names} tz={tz} />
             </div>
           )}
         </div>

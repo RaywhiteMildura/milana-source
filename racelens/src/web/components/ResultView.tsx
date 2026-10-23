@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import type { Prediction, Race, RaceResult } from '@shared/types';
 import { fmtDateTime, fmtMoney, ordinal, sourceName } from '../lib/format';
+import { useConfirm } from './Confirm';
 import { Saddle } from './ui';
 
 function Scorecard({ result, prediction }: { result: RaceResult; prediction?: Prediction }) {
@@ -39,6 +40,7 @@ export function ResultView({
   onFetch,
   busy,
   names,
+  tz,
 }: {
   race: Race;
   result?: RaceResult;
@@ -47,7 +49,9 @@ export function ResultView({
   onFetch: () => void;
   busy?: boolean;
   names?: Record<string, string>;
+  tz?: string;
 }) {
+  const confirm = useConfirm();
   const byNo = new Map((race.runners ?? []).map((r) => [r.number, r]));
   const [vals, setVals] = useState(['', '', '', '']);
   const [showForm, setShowForm] = useState(!result);
@@ -71,6 +75,12 @@ export function ResultView({
       setErr('Each placing must be a different runner.');
       return;
     }
+    const ok = await confirm({
+      title: `Save result for Race ${race.number}?`,
+      message: nums.map((n, i) => `${ordinal(i + 1)}: ${n} ${byNo.get(n)?.name ?? ''}`).join(' · ') + '. This re-rates the remaining races.',
+      confirmLabel: 'Save result',
+    });
+    if (!ok) return;
     setSaving(true);
     try {
       const ok = await onManual(nums.map((n) => [n]));
@@ -87,7 +97,8 @@ export function ResultView({
           <header className="result__head">
             <h3>Result</h3>
             <span className="small muted">
-              {sourceName(result.source, names)} · {fmtDateTime(result.recordedAt)}
+              {sourceName(result.source, names)} · {fmtDateTime(result.recordedAt, tz)}
+              {result.status === 'interim' && ' · interim'}
               {result.time && ` · time ${result.time}`}
             </span>
           </header>
@@ -107,7 +118,11 @@ export function ResultView({
                     );
                   })}
                 </span>
-                {result.margins?.[i - 1] != null && i > 0 && <span className="muted small">{result.margins[i - 1]}L</span>}
+                {i > 0 && result.margins?.[i] != null && (
+                  <span className="muted small" data-testid="placing-margin">
+                    {result.margins[i] === result.margins[i - 1] ? 'dead heat' : `${result.margins[i]}L`}
+                  </span>
+                )}
               </li>
             ))}
           </ol>
