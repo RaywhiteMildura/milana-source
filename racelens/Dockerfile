@@ -8,10 +8,10 @@
 #   docker run -p 4850:4850 -v racelens_data:/data -e RACELENS_PASSWORD=choose-one racelens
 #
 # The image sets RACELENS_ALLOWED_HOSTS=*, which marks the server as hosted: without
-# RACELENS_PASSWORD it stops at once with "Refusing to start" (add -e RACELENS_ALLOW_OPEN=1
-# only on a private network you trust). Add -e RACELENS_PUBLIC_URL=https://your.address so
-# Settings shows the phone address, and -e RACELENS_TRUST_PROXY=1 only when a reverse proxy
-# (one that sets X-Forwarded-For) is the only way in - Fly.io and Render are detected by themselves.
+# RACELENS_PASSWORD it stops at once with "Refusing to start" - always give it a password.
+# Add -e RACELENS_PUBLIC_URL=https://your.address so Settings shows the phone address, and
+# -e RACELENS_TRUST_PROXY=1 only when a reverse proxy (one that sets X-Forwarded-For) is the
+# only way in - Fly.io and Render are detected by themselves.
 #
 # See docs/DEPLOY.md for the step-by-step guides.
 

@@ -1,11 +1,11 @@
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import express from 'express';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import request from 'supertest';
-import { createApp, hostGuard, openHostedRefusal } from './app.js';
+import { createApp, hostGuard, openHostedRefusal, publishedVia } from './app.js';
 import { SESSION_COOKIE } from './auth.js';
 import { NetworkSnapshot, hostingFromEnv, listenUrls } from './net.js';
 
@@ -61,6 +61,7 @@ describe('hostingFromEnv', () => {
 describe('open hosted server', () => {
   it('refuses to start hosted without a password unless RACELENS_ALLOW_OPEN=1', () => {
     expect(openHostedRefusal({ hosted: true }, false, {})).toMatch(/RACELENS_PASSWORD is not set.*Refusing to start.*RACELENS_ALLOW_OPEN=1/s);
+    expect(openHostedRefusal({ hosted: true }, false, {})).not.toMatch(/private network/);
     expect(openHostedRefusal({ hosted: true }, false, { RACELENS_ALLOW_OPEN: '1' })).toBeUndefined();
     expect(openHostedRefusal({ hosted: true }, true, {})).toBeUndefined();
     // LAN mode without a password keeps working (it only warns).
@@ -75,6 +76,90 @@ describe('open hosted server', () => {
     expect(run.stderr + run.stdout).toMatch(/Refusing to start/);
     expect(run.stdout).not.toMatch(/RaceLens listening/);
   }, 40_000);
+});
+
+describe('open server published through a proxy or a name', () => {
+  /** What scripts/mac/install.sh writes for the Mac mini behind Tailscale Serve (plus the Keychain password, or not). */
+  const MAC_MINI = { RACELENS_HOST: '127.0.0.1', RACELENS_TRUST_PROXY: '1', RACELENS_ALLOWED_HOSTS: 'mac-mini.tail1234.ts.net', RACELENS_PUBLIC_URL: 'https://mac-mini.tail1234.ts.net' };
+  const TSX = path.resolve('node_modules/.bin/tsx');
+  const childEnv = (extra: Record<string, string>) => ({ ...process.env, RACELENS_ALLOWED_HOSTS: '', RACELENS_TRUST_PROXY: '', RACELENS_PUBLIC_URL: '', RACELENS_ALLOW_OPEN: '', RACELENS_PASSWORD: '', FLY_APP_NAME: '', RENDER: '', RACELENS_MODE: 'demo', RACELENS_PORT: '0', RACELENS_QR: '0', RACELENS_DATA_DIR: tmp(), ...extra });
+
+  it('refuses the Mac mini setup when the Keychain gave no password, and says it retries by itself', () => {
+    const refusal = openHostedRefusal(hostingFromEnv(MAC_MINI), false, MAC_MINI);
+    expect(refusal).toMatch(/RACELENS_TRUST_PROXY=1, RACELENS_ALLOWED_HOSTS=mac-mini\.tail1234\.ts\.net, RACELENS_PUBLIC_URL=https:\/\/mac-mini\.tail1234\.ts\.net/);
+    expect(refusal).toMatch(/Refusing to start/);
+    expect(refusal).toMatch(/Keychain.*every 10 seconds/s);
+    expect(refusal).toMatch(/install\.sh --new-password/);
+    expect(refusal).toMatch(/RACELENS_ALLOW_OPEN=1/);
+    // With the password (the normal case) or a deliberate RACELENS_ALLOW_OPEN=1 it starts.
+    expect(openHostedRefusal(hostingFromEnv(MAC_MINI), true, MAC_MINI)).toBeUndefined();
+    expect(openHostedRefusal(hostingFromEnv(MAC_MINI), false, { ...MAC_MINI, RACELENS_ALLOW_OPEN: '1' })).toBeUndefined();
+  });
+
+  it('counts each of trust proxy, a named allowed host and a public URL as published; plain LAN mode is not', () => {
+    for (const env of [{ RACELENS_TRUST_PROXY: '1' }, { RACELENS_ALLOWED_HOSTS: 'office-pc' }, { RACELENS_PUBLIC_URL: 'https://office-pc.tail1234.ts.net' }]) {
+      expect(openHostedRefusal(hostingFromEnv(env), false, env), JSON.stringify(env)).toMatch(/Refusing to start/);
+    }
+    // npm run start:phone / scripts/start-phone.* with Enter for no password: only a warning (index.ts).
+    expect(openHostedRefusal(hostingFromEnv({ RACELENS_HOST: '0.0.0.0' }), false, { RACELENS_HOST: '0.0.0.0' })).toBeUndefined();
+    expect(openHostedRefusal(hostingFromEnv({}), false, {})).toBeUndefined(); // the e2e demo server on :4851
+    expect(publishedVia({}, [])).toEqual([]);
+    expect(publishedVia({ trustProxy: false, publicUrl: undefined }, [' * '])).toEqual([]);
+  });
+
+  it('the Mac mini process exits instead of serving the tailnet without a password', () => {
+    const run = spawnSync(TSX, ['src/server/index.ts'], { env: childEnv(MAC_MINI), encoding: 'utf8', timeout: 30_000 });
+    expect(run.status).toBe(1);
+    expect(run.stderr + run.stdout).toMatch(/Refusing to start.*every 10 seconds/s);
+    expect(run.stdout).not.toMatch(/RaceLens listening/);
+  }, 40_000);
+
+  it('plain LAN mode without a password still starts, with a loud warning', async () => {
+    const child = spawn(TSX, ['src/server/index.ts'], { env: childEnv({ RACELENS_HOST: '0.0.0.0' }) });
+    let out = '';
+    child.stdout.on('data', (d) => (out += d));
+    child.stderr.on('data', (d) => (out += d));
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error(`no start-up within 30 s:\n${out}`)), 30_000);
+        const check = () => {
+          if (/NO PASSWORD SET/.test(out)) {
+            clearTimeout(timer);
+            resolve();
+          }
+        };
+        child.stdout.on('data', check);
+        child.stderr.on('data', check);
+        child.on('exit', (code) => reject(new Error(`exited with ${code}:\n${out}`)));
+      });
+      expect(out).toMatch(/RaceLens listening/);
+      expect(out).not.toMatch(/Refusing to start/);
+    } finally {
+      child.kill();
+    }
+  }, 40_000);
+});
+
+describe("RACELENS_ALLOWED_HOSTS='*' without a password", () => {
+  it('keeps the DNS-rebinding guard on: own addresses and the public URL host only', async () => {
+    cleanEnv();
+    vi.stubEnv('RACELENS_PUBLIC_URL', 'https://races.example.com');
+    const { app } = createApp({ mode: 'demo', dataDir: tmp(), allowedHosts: ['*'] });
+    await request(app).get('/api/health').set('Host', 'rebind.evil.example').expect(421);
+    await request(app).get('/api/health').set('Host', 'races.example.com').expect(200);
+    await request(app).get('/api/health').set('Host', 'localhost:4850').expect(200);
+    // With a password '*' still means any name (Fly.io, Render, docker run behind a proxy).
+    const hosted = createApp({ mode: 'demo', dataDir: tmp(), allowedHosts: ['*'], password: 'pw' });
+    await request(hosted.app).get('/api/health').set('Host', 'whatever.example').expect(200);
+  });
+
+  it('accepts the RACELENS_PUBLIC_URL host without listing it in RACELENS_ALLOWED_HOSTS', async () => {
+    cleanEnv();
+    vi.stubEnv('RACELENS_PUBLIC_URL', 'https://office-pc.tail1234.ts.net');
+    const { app } = createApp({ mode: 'demo', dataDir: tmp(), password: 'pw' });
+    await request(app).get('/api/health').set('Host', 'office-pc.tail1234.ts.net').expect(200);
+    await request(app).get('/api/health').set('Host', 'other-pc.tail1234.ts.net').expect(421);
+  });
 });
 
 describe('proxy trust', () => {

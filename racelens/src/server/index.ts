@@ -1,7 +1,7 @@
 import QRCode from 'qrcode';
-import { createApp, openHostedRefusal } from './app.js';
+import { createApp, openHostedRefusal, publishedVia } from './app.js';
 import { logger } from './core/logger.js';
-import { listenUrls, machineNetwork } from './net.js';
+import { allowedHostsFromEnv, listenUrls, machineNetwork } from './net.js';
 
 const port = Number(process.env.RACELENS_PORT || 4850);
 // Personal tool: listen on localhost only unless RACELENS_HOST is set (e.g. 0.0.0.0 to use it from a phone on the same Wi-Fi).
@@ -30,8 +30,19 @@ app.listen(port, host, () => {
   if (auth.required) {
     logger.info('Password login is on (RACELENS_PASSWORD).');
     if ((process.env.RACELENS_PASSWORD ?? '').length < 8) logger.warn('RACELENS_PASSWORD is shorter than 8 characters – choose a longer one, especially if RaceLens is reachable from the internet.');
-  } else if (hosting.hosted) logger.warn('No password set and RACELENS_ALLOW_OPEN=1: anyone on the internet can open RaceLens. Set RACELENS_PASSWORD to require a login.');
-  else if (open) logger.warn('No password set: anyone on this network can open RaceLens. Set RACELENS_PASSWORD to require a login.');
+  } else {
+    // Reaching this point without a password means RACELENS_ALLOW_OPEN=1 (hosted / published) or plain LAN mode.
+    const via = publishedVia(hosting);
+    if (hosting.hosted) logger.warn('No password set and RACELENS_ALLOW_OPEN=1: anyone on the internet can open RaceLens. Set RACELENS_PASSWORD to require a login.');
+    else if (via.length) logger.warn(`No password set and RACELENS_ALLOW_OPEN=1: anyone who can reach RaceLens through ${via.join(', ')} can open it. Set RACELENS_PASSWORD to require a login.`);
+    else if (open) {
+      logger.warn('NO PASSWORD SET: anyone on this network can open RaceLens and change its settings, packs and results.');
+      logger.warn('Set RACELENS_PASSWORD to require a login (scripts/start-phone.sh and scripts\\start-phone.cmd ask for one at start-up).');
+    }
+    if (allowedHostsFromEnv().some((h) => h.trim() === '*')) {
+      logger.warn("RACELENS_ALLOWED_HOSTS=* is not honoured without a password: RaceLens answers only this machine's own addresses, the names in RACELENS_ALLOWED_HOSTS and the RACELENS_PUBLIC_URL host.");
+    }
+  }
   if (!webDir) logger.warn('Web app not built yet – run `npm run build` (or `npm run dev` for the Vite dev server on :5173).');
   if (open && !hosting.hosted && !urls.length) logger.info('No network address yet – Settings → Use RaceLens on your phone shows it once this computer is connected.');
   if (open && urls.length && process.env.RACELENS_QR !== '0') {

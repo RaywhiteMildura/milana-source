@@ -9,8 +9,12 @@
 #
 # One-time setup (about five minutes, can be done from a phone browser):
 #   1. Fly dashboard (https://fly.io/dashboard) -> your app -> "Tokens" -> create a
-#      deploy token for this app (or run `fly tokens create deploy -x 999999h` on a
-#      computer). Copy the token – it is shown only once.
+#      deploy token for this app that expires in 90 days (or run
+#      `fly tokens create deploy -x 2160h` on a computer). Copy the token – it is shown
+#      only once. Put a reminder in your calendar ~80 days from now to make a new one
+#      and paste it over the FLY_API_TOKEN secret (step 2). A token that never expires
+#      stays a key to your app for ever if it leaks; an expired one only makes the
+#      next deploy fail until it is replaced (the running app is not affected).
 #   2. GitHub -> your repo -> Settings -> Secrets and variables -> Actions ->
 #      "New repository secret": name FLY_API_TOKEN, value = the token from step 1.
 #   3. The app, its volume and the RACELENS_PASSWORD secret must already exist
@@ -21,6 +25,11 @@
 #
 # The working directory is racelens/ because the app lives in that folder of the
 # repo; fly.toml and the Dockerfile are read from there.
+#
+# The actions are pinned to exact commits: a branch or tag can be moved to other
+# code, which would then run with your deploy token. The comment beside each says
+# which release that commit is; to update one, look up the new release's commit on
+# the action's GitHub page and replace both.
 
 name: Deploy RaceLens to Fly.io
 
@@ -31,6 +40,10 @@ on:
       - 'racelens/**'
       - '.github/workflows/fly-deploy.yml'
   workflow_dispatch:
+
+# The workflow only reads the code; the Fly token (a repository secret) does the deploying.
+permissions:
+  contents: read
 
 # Never run two deploys at once; a second push waits for the first to finish.
 concurrency:
@@ -46,10 +59,12 @@ jobs:
         working-directory: racelens
     steps:
       - name: Check out the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (v4.4.0)
+        with:
+          persist-credentials: false
 
       - name: Install flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
+        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # v1 (1.6, master on 2026-10-23)
 
       - name: Deploy
         run: flyctl deploy --remote-only
