@@ -514,6 +514,23 @@ export interface PackEvent {
   changes?: string[];
 }
 
+/**
+ * Book-keeping for the automatic results watcher: one entry per race the
+ * server is (or was) polling for a result after the jump.
+ */
+export interface ResultWatch {
+  /** Last time the sources were asked for this race's result */
+  lastCheckedAt: string;
+  /** How many automatic checks have run for this race */
+  attempts: number;
+  /** When the next automatic check is due (absent once settled or given up) */
+  nextCheckAt?: string;
+  /** Set once the watcher stops trying (e.g. hours after the jump with nothing published) */
+  gaveUp?: boolean;
+  /** Human-readable state, e.g. "Result from one source only – waiting for confirmation" */
+  note?: string;
+}
+
 export interface MeetingPack {
   id: string;
   createdAt: string;
@@ -531,6 +548,8 @@ export interface MeetingPack {
   verificationScore: number;
   /** Settings used */
   settings: Settings;
+  /** Automatic results watcher state, keyed by race number */
+  resultWatch?: Record<number, ResultWatch>;
 }
 
 export interface Settings {
@@ -541,6 +560,19 @@ export interface Settings {
   jurisdiction: string;
   disabledSources: SourceId[];
   autoRecheckMinutesBeforeRace: number;
+  /** Poll the results sources after each race and re-rate the remaining races automatically */
+  autoResults: boolean;
+}
+
+/** What the background scheduler is doing, as reported by GET /api/health (authenticated). */
+export interface SchedulerStatus {
+  running: boolean;
+  lastTickAt?: string;
+  nextTickAt?: string;
+  autoResults: boolean;
+  autoRecheckMinutes: number;
+  /** Races currently being watched for a result */
+  watching: Array<{ meetingId: string; venue: string; raceNumber: number; attempts: number; lastCheckedAt?: string; nextCheckAt?: string }>;
 }
 
 // ---------------------------------------------------------------------------

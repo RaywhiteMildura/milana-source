@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRegistry, type Mode } from './adapters/index.js';
+import { createAuth } from './auth.js';
 import type { FetchContext } from './adapters/types.js';
 import { HttpClient } from './core/http.js';
 import { logger } from './core/logger.js';
@@ -18,6 +19,12 @@ export interface AppOptions {
   record?: boolean;
   now?: () => Date;
   webDir?: string;
+  /** Password that protects the app (default: RACELENS_PASSWORD env). Empty = no login. */
+  password?: string;
+  /** Hosts allowed in the Host header besides this machine's own (default: RACELENS_ALLOWED_HOSTS env; '*' allows any). */
+  allowedHosts?: string[];
+  /** URLs phones can use to reach this server (filled in by index.ts once listening). */
+  urls?: () => string[];
 }
 
 export const VERSION = '0.1.0';
@@ -28,6 +35,8 @@ export const VERSION = '0.1.0';
  * reach http://127.0.0.1:4850 through a hostname they control.
  */
 export function hostGuard(extra: string[] = (process.env.RACELENS_ALLOWED_HOSTS || '').split(',').map((s) => s.trim()).filter(Boolean)) {
+  // '*' is for hosted deployments (Fly.io, Render…) where the platform owns the hostname and the password protects the app.
+  if (extra.includes('*')) return (_req: Request, _res: Response, next: NextFunction) => next();
   const allowed = new Set(['localhost', '127.0.0.1', '::1', '[::1]', ...extra.map((h) => h.toLowerCase())]);
   try {
     for (const ifaces of Object.values(os.networkInterfaces())) for (const i of ifaces || []) allowed.add(i.address.toLowerCase());
@@ -64,12 +73,24 @@ export function createApp(opts: AppOptions = {}) {
   };
   void settings;
   const jobs = new JobManager();
+  const auth = createAuth({ password: opts.password ?? process.env.RACELENS_PASSWORD, secret: store.getSecret(), now: opts.now });
 
   const app = express();
   app.disable('x-powered-by');
-  app.use(hostGuard());
+  // Behind a hosting platform's proxy (Fly.io, Render) the TLS hop is theirs; trust it so secure cookies work.
+  if (process.env.RACELENS_TRUST_PROXY === '1' || (opts.allowedHosts ?? (process.env.RACELENS_ALLOWED_HOSTS || '').split(',')).includes('*')) app.set('trust proxy', 1);
+  app.use(hostGuard(opts.allowedHosts));
   app.use(express.json({ limit: '1mb' }));
-  app.use('/api', createApi({ registry, store, ctx, jobs, mode, version: VERSION, now: opts.now }));
+  app.use('/api', auth.guard);
+  app.use('/api', auth.router);
+  const scheduler = new AutoRecheckScheduler({
+    store,
+    jobs,
+    researchDeps: () => ({ registry, ctx, settings: store.getSettings(), now: opts.now }),
+    now: opts.now,
+    log: logger,
+  });
+  app.use('/api', createApi({ registry, store, ctx, jobs, mode, version: VERSION, now: opts.now, healthExtras: () => ({ urls: opts.urls?.() ?? [], scheduler: scheduler.status() }) }));
   app.use('/api', jsonErrorHandler);
 
   // Static web app (built by vite into dist/web). When running from src via tsx, look for ../../dist/web too.
@@ -82,12 +103,5 @@ export function createApp(opts: AppOptions = {}) {
   } else {
     app.get('/', (_req, res) => res.type('text').send('RaceLens API is running. Build the web app with `npm run build` or run `npm run dev` for the dev server.'));
   }
-  const scheduler = new AutoRecheckScheduler({
-    store,
-    jobs,
-    researchDeps: () => ({ registry, ctx, settings: store.getSettings(), now: opts.now }),
-    now: opts.now,
-    log: logger,
-  });
-  return { app, store, registry, jobs, ctx, mode, dataDir, webDir, scheduler };
+  return { app, store, registry, jobs, ctx, mode, dataDir, webDir, scheduler, auth };
 }

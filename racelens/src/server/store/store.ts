@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import type { MeetingPack, Settings } from '../../shared/types.js';
@@ -9,6 +10,7 @@ export const DEFAULT_SETTINGS: Settings = {
   jurisdiction: 'VIC',
   disabledSources: [],
   autoRecheckMinutesBeforeRace: 10,
+  autoResults: true,
 };
 
 /**
@@ -44,6 +46,20 @@ export class Store {
   // Settings -----------------------------------------------------------------
   getSettings(): Settings {
     return { ...DEFAULT_SETTINGS, ...(this.readJson<Partial<Settings>>(path.join(this.dir, 'settings.json')) || {}) };
+  }
+
+  /** A per-installation random secret (signs login cookies). Created on first use, kept in the data dir. */
+  getSecret(): string {
+    const file = path.join(this.dir, '.secret');
+    try {
+      const existing = fs.readFileSync(file, 'utf8').trim();
+      if (/^[0-9a-f]{64}$/.test(existing)) return existing;
+    } catch {
+      /* first run */
+    }
+    const fresh = crypto.randomBytes(32).toString('hex');
+    fs.writeFileSync(file, fresh, { mode: 0o600 });
+    return fresh;
   }
 
   saveSettings(s: Partial<Settings>): Settings {

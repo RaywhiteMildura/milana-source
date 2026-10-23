@@ -16,6 +16,8 @@ export interface ApiDeps {
   mode: 'live' | 'demo';
   version: string;
   now?: () => Date;
+  /** Extra fields merged into GET /api/health for authenticated callers (LAN urls, scheduler status). */
+  healthExtras?: () => Record<string, unknown>;
 }
 
 class HttpProblem extends Error {
@@ -38,7 +40,11 @@ export function createApi(deps: ApiDeps): Router {
   const remember = (statuses: SourceStatus[]) => statuses.forEach((s) => lastStatuses.set(s.source, s));
 
   r.get('/health', (_req, res) => {
-    res.json({ ok: true, mode: deps.mode, version: deps.version, time: new Date().toISOString(), dataDir: deps.store.dir });
+    // Public part: enough for the app shell, deploy health checks and the login screen.
+    const auth = (res.locals.auth as { required: boolean; authenticated: boolean } | undefined) ?? { required: false, authenticated: true };
+    const body: Record<string, unknown> = { ok: true, mode: deps.mode, version: deps.version, time: new Date().toISOString(), authRequired: auth.required };
+    if (auth.authenticated) Object.assign(body, { dataDir: deps.store.dir }, deps.healthExtras?.() ?? {});
+    res.json(body);
   });
 
   r.get('/settings', (_req, res) => res.json(deps.store.getSettings()));
@@ -53,6 +59,7 @@ export function createApi(deps: ApiDeps): Router {
       if (typeof body.jurisdiction === 'string' && /^[A-Z]{2,3}$/.test(body.jurisdiction)) clean.jurisdiction = body.jurisdiction;
       if (Array.isArray(body.disabledSources)) clean.disabledSources = body.disabledSources.filter((s) => typeof s === 'string');
       if (typeof body.autoRecheckMinutesBeforeRace === 'number' && body.autoRecheckMinutesBeforeRace >= 0) clean.autoRecheckMinutesBeforeRace = body.autoRecheckMinutesBeforeRace;
+      if (typeof body.autoResults === 'boolean') clean.autoResults = body.autoResults;
       res.json(deps.store.saveSettings(clean));
     }),
   );

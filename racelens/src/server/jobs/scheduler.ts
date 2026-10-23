@@ -1,4 +1,4 @@
-import type { MeetingPack } from '../../shared/types.js';
+import type { MeetingPack, SchedulerStatus } from '../../shared/types.js';
 import type { Store } from '../store/store.js';
 import type { JobManager } from './manager.js';
 import { recheckMeeting, type ResearchDeps } from './research.js';
@@ -33,6 +33,12 @@ export class AutoRecheckScheduler {
   stop(): void {
     if (this.timer) clearInterval(this.timer);
     this.timer = undefined;
+  }
+
+  /** What the scheduler is doing right now (shown in Settings and the pack page). */
+  status(): SchedulerStatus {
+    const settings = this.deps.store.getSettings();
+    return { running: !!this.timer, autoResults: settings.autoResults !== false, autoRecheckMinutes: settings.autoRecheckMinutesBeforeRace, watching: [] };
   }
 
   /** Decide which races are due for an automatic check. Pure, for tests. */
