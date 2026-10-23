@@ -8,7 +8,9 @@
 #      (checked against nodejs.org's published checksum; no admin password, nothing installed system-wide);
 #   2. downloads the latest RaceLens into ~/RaceLens/app-new, installs and builds it there, and only then swaps it
 #      in (the previous version is kept in ~/RaceLens/app-previous) – a failed update never breaks the running copy;
-#   3. runs scripts/mac/install.sh, which sets up the background service, your password and the phone address.
+#   3. records what it installed in ~/RaceLens/app/VERSION.json {commit, branch, installedAt};
+#   4. runs scripts/mac/install.sh, which sets up the background service, your password, the phone address and
+#      the updater that lets you update from your phone (Settings → RaceLens version → Update RaceLens).
 # Your research, settings and password are kept in ~/Library/Application Support/RaceLens and the Keychain,
 # never in the app folder, so updates do not touch them.
 set -euo pipefail
@@ -16,6 +18,7 @@ set -euo pipefail
 REPO="${RACELENS_REPO:-RaywhiteMildura/milana-source}"
 BRANCH="${RACELENS_BRANCH:-claude/horse-racing-predictor-ts4iet}"
 HOME_DIR="${RACELENS_HOME:-$HOME/RaceLens}"
+SUPPORT="${RACELENS_SUPPORT_DIR:-$HOME/Library/Application Support/RaceLens}"
 NODE_MAJOR=22
 
 say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
@@ -23,6 +26,15 @@ die() { printf '\n\033[31mRaceLens install stopped: %s\033[0m\n' "$*" >&2; exit 
 
 [ "$(uname -s)" = "Darwin" ] || [ -n "${RACELENS_ALLOW_NON_MAC:-}" ] || die "this installer is for macOS."
 mkdir -p "$HOME_DIR"
+
+# An update started from the phone (scripts/mac/self-update.sh) builds in the same folders: never run two at once.
+if [ -z "${RACELENS_SELF_UPDATE:-}" ]; then
+  LOCK_PID="$(cat "$SUPPORT/update.lock/pid" 2>/dev/null || true)"
+  case "$LOCK_PID" in
+    '' | *[!0-9]*) ;;
+    *) if kill -0 "$LOCK_PID" 2>/dev/null; then die "an update started from your phone is running right now. Wait a few minutes (it finishes by itself), then run this again if you still need to."; fi ;;
+  esac
+fi
 
 # ---------------------------------------------------------------- Node.js
 version_ok() { # $1 = node binary
@@ -66,6 +78,20 @@ echo "Using Node.js $("$NODE" -v) at $NODE"
 say "Downloading the latest RaceLens ($BRANCH)…"
 TMP="$(mktemp -d)"
 curl -fsSL "https://codeload.github.com/$REPO/tar.gz/refs/heads/$BRANCH" -o "$TMP/src.tar.gz" || die "could not download RaceLens from GitHub."
+
+# Which commit this is (best effort – never stops the install). GitHub's archives carry it in their first header
+# (git archive's "comment=<sha>"), which is exactly what was downloaded; otherwise ask the GitHub API; last, the
+# archive's top folder (<repo>-<sha> for commit archives).
+is_sha() { printf '%s' "$1" | grep -Eq '^[0-9a-f]{40}$'; }
+COMMIT="$(gzip -dc "$TMP/src.tar.gz" 2>/dev/null | head -c 4096 | LC_ALL=C grep -a -o 'comment=[0-9a-f]\{40\}' | head -n 1 | cut -d= -f2 || true)"
+if ! is_sha "$COMMIT"; then
+  COMMIT="$(curl -fsSL -m 15 -H 'Accept: application/vnd.github.sha' "https://api.github.com/repos/$REPO/commits/$BRANCH" 2>/dev/null | head -c 64 || true)"
+fi
+if ! is_sha "$COMMIT"; then
+  COMMIT="$(tar -tzf "$TMP/src.tar.gz" 2>/dev/null | head -n 1 | sed -n 's|^.*-\([0-9a-f]\{40\}\)/.*$|\1|p' || true)"
+fi
+is_sha "$COMMIT" || COMMIT=""
+
 mkdir -p "$TMP/src" && tar -xzf "$TMP/src.tar.gz" -C "$TMP/src" --strip-components 1
 [ -f "$TMP/src/racelens/package.json" ] || die "the download did not contain the racelens folder."
 rm -rf "$HOME_DIR/app-new" && mv "$TMP/src/racelens" "$HOME_DIR/app-new" && rm -rf "$TMP"
@@ -75,10 +101,19 @@ cd "$HOME_DIR/app-new"
 "$NPM" ci --no-audit --no-fund --loglevel=error || die "installing the app's packages failed (see above)."
 "$NPM" run build --silent || die "building the app failed (see above)."
 
+# What is installed (shown in status.sh and on the phone under Settings → RaceLens version).
+"$NODE" -e '
+  const [file, commit, branch, repo] = process.argv.slice(1);
+  const v = { commit: commit || undefined, branch, repo, installedAt: new Date().toISOString() };
+  require("fs").writeFileSync(file, JSON.stringify(v, null, 2) + "\n");
+' "$HOME_DIR/app-new/VERSION.json" "$COMMIT" "$BRANCH" "$REPO" || echo "(Could not record the version number – carrying on.)"
+echo "Version: ${COMMIT:-unknown} ($BRANCH)"
+
 # Swap only after a successful build, keeping the previous version for a quick roll-back.
 cd "$HOME_DIR"
 if [ -d app ]; then rm -rf app-previous && mv app app-previous; fi
 mv app-new app
 
-export RACELENS_NODE="$NODE"
+# install.sh sets up the updater for this same folder, repository and branch.
+export RACELENS_NODE="$NODE" RACELENS_HOME="$HOME_DIR" RACELENS_REPO="$REPO" RACELENS_BRANCH="$BRANCH"
 exec bash "$HOME_DIR/app/scripts/mac/install.sh"

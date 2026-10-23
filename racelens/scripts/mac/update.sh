@@ -1,5 +1,6 @@
 #!/bin/bash
-# Update RaceLens to the latest version (same as running the one-line installer again).
+# Update RaceLens to the latest version from Terminal on the Mac (same as running the one-line installer again).
+# From the phone: Settings → RaceLens version → Update RaceLens (that runs scripts/mac/self-update.sh for you).
 set -euo pipefail
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TMP="$(mktemp -d)"

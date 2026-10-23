@@ -13,6 +13,7 @@ import { JobManager } from './jobs/manager.js';
 import { AutoRecheckScheduler } from './jobs/scheduler.js';
 import { allowedHostsFromEnv, hostingFromEnv, machineNetwork, type Hosting, type NetworkSnapshot } from './net.js';
 import { createApi, jsonErrorHandler } from './routes/api.js';
+import { updateRouter } from './routes/update.js';
 import { Store } from './store/store.js';
 
 export interface AppOptions {
@@ -365,6 +366,9 @@ export function createApp(opts: AppOptions = {}) {
   });
   // Hosted: the container's own addresses are unreachable for a phone, so only the public URL is reported.
   const healthExtras = () => ({ urls: hosting.hosted ? [] : (opts.urls?.() ?? []), publicUrl: hosting.publicUrl, scheduler: scheduler.status() });
+  // Updating from the phone: the Mac mini installer sets RACELENS_UPDATE_DIR (elsewhere the route answers 'not supported').
+  // No `now` here: the update files carry the Mac's real clock, never the demo clock.
+  app.use('/api', updateRouter({ updateDir: process.env.RACELENS_UPDATE_DIR || undefined, appDir: path.resolve(here, '../..') }));
   app.use('/api', createApi({ registry, store, ctx, jobs, mode, version: VERSION, now, healthExtras }));
   app.use('/api', jsonErrorHandler);
 

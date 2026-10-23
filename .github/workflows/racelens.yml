@@ -48,7 +48,7 @@ jobs:
 
   tests-mac:
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -78,8 +78,85 @@ jobs:
           bash "$RACELENS_HOME/app/scripts/mac/update.sh"
           curl -fsS http://127.0.0.1:4850/api/health >/dev/null
           test -d "$HOME/Library/Application Support/RaceLens/data"
+      - name: Update from the phone, the way the server asks for it (the updater service downloads, builds, swaps and checks)
+        if: hashFiles('racelens/scripts/mac/self-update.sh') != ''
+        timeout-minutes: 14
+        env:
+          RACELENS_HOME: ${{ runner.temp }}/racelens-home
+          RACELENS_PASSWORD: ci-only-password-${{ github.run_id }}
+        run: |
+          SUPPORT="$HOME/Library/Application Support/RaceLens"
+          STATUS="$SUPPORT/update-status.json"
+          BASE=http://127.0.0.1:4850
+          # install.sh set up the updater service and told the server where update requests go.
+          launchctl print "gui/$(id -u)/au.racelens.updater" | grep -E '^\s*(state|path) =' || { echo "updater service not loaded"; exit 1; }
+          grep -q '^RACELENS_UPDATE_DIR=' "$SUPPORT/config.env"
+          cat "$RACELENS_HOME/app/VERSION.json"
+          cp "$SUPPORT/config.env" "$RUNNER_TEMP/config.before"
+          touch "$RUNNER_TEMP/update-marker"; sleep 1
+          # Sign in like the phone. POST /api/update when the server has the route; otherwise write the request file
+          # exactly as the route does (temp file, then rename).
+          JAR="$RUNNER_TEMP/cookies"
+          curl -fsS -c "$JAR" -H 'Content-Type: application/json' -d "{\"password\":\"$RACELENS_PASSWORD\"}" "$BASE/api/login" >/dev/null
+          CODE="$(curl -s -o "$RUNNER_TEMP/update.json" -w '%{http_code}' -b "$JAR" "$BASE/api/update")"
+          if [ "$CODE" = 200 ]; then
+            cat "$RUNNER_TEMP/update.json"; echo
+            grep -q '"supported":true' "$RUNNER_TEMP/update.json"
+            test "$(curl -s -o /dev/null -w '%{http_code}' -b "$JAR" -X POST "$BASE/api/update")" = 202
+            test "$(curl -s -o /dev/null -w '%{http_code}' -b "$JAR" -X POST "$BASE/api/update")" = 409
+          else
+            echo "GET /api/update answered $CODE (route not mounted yet) - writing the request file the way the server does"
+            printf '{"requestedAt":"%s"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$SUPPORT/.update-request.tmp"
+            mv -f "$SUPPORT/.update-request.tmp" "$SUPPORT/update-request"
+          fi
+          # launchd starts the updater (WatchPaths, or its two-minute safety net). Wait up to 10 minutes for its result.
+          T0=$(date +%s)
+          for _ in $(seq 1 120); do
+            if [ "$STATUS" -nt "$RUNNER_TEMP/update-marker" ] && grep -Eq '"state":"(done|failed)"' "$STATUS"; then break; fi
+            sleep 5
+          done
+          echo "Update result after $(( $(date +%s) - T0 )) s:"; cat "$STATUS" 2>/dev/null || echo "(no update-status.json)"; echo
+          grep -q '"state":"done"' "$STATUS"
+          grep -q '"ok":true' "$STATUS"
+          test ! -e "$SUPPORT/update-request"
+          test ! -e "$SUPPORT/update.lock"
+          curl -fsS "$BASE/api/health" | grep -q '"ok":true'
+          cat "$RACELENS_HOME/app/VERSION.json"
+          grep -Eq '"commit": "[0-9a-f]{40}"' "$RACELENS_HOME/app/VERSION.json"
+          test -d "$RACELENS_HOME/app-previous"
+          # Every setting kept exactly (demo mode, Wi-Fi, port, the update folder), with no prompt and no password given.
+          diff "$RUNNER_TEMP/config.before" "$SUPPORT/config.env"
+          if [ "$CODE" = 200 ]; then
+            curl -fsS -b "$JAR" "$BASE/api/update" > "$RUNNER_TEMP/update.json"; cat "$RUNNER_TEMP/update.json"; echo
+            grep -q '"state":"done"' "$RUNNER_TEMP/update.json"
+          fi
+          bash "$RACELENS_HOME/app/scripts/mac/status.sh"
+      - name: Remove it again (the service and the updater)
+        if: hashFiles('racelens/scripts/mac/bootstrap.sh') != ''
+        env:
+          RACELENS_HOME: ${{ runner.temp }}/racelens-home
+          RACELENS_INSTALL_UNATTENDED: '1'
+        run: |
           bash "$RACELENS_HOME/app/scripts/mac/uninstall.sh" --purge
-          ! curl -fsS -m 3 http://127.0.0.1:4850/api/health
+          # (`! cmd` never fails a step under bash -e, hence the explicit checks.)
+          if curl -fsS -m 3 http://127.0.0.1:4850/api/health; then echo "RaceLens still answers after uninstall"; exit 1; fi
+          if launchctl print "gui/$(id -u)/au.racelens.updater" >/dev/null 2>&1; then echo "updater still loaded"; exit 1; fi
+          test ! -e "$HOME/Library/LaunchAgents/au.racelens.updater.plist"
+          test ! -e "$HOME/Library/LaunchAgents/au.racelens.server.plist"
+          test ! -e "$HOME/Library/Application Support/RaceLens"
+      - name: Mac service and updater logs (only when something failed)
+        if: failure()
+        run: |
+          L="$HOME/Library/Logs/RaceLens"; S="$HOME/Library/Application Support/RaceLens"
+          echo "== update.log"; tail -n 300 "$L/update.log" 2>/dev/null || echo "(none)"
+          echo "== server.log"; tail -n 100 "$L/server.log" 2>/dev/null || echo "(none)"
+          echo "== update-status.json"; cat "$S/update-status.json" 2>/dev/null || echo "(none)"
+          echo "== update-request / lock"; ls -la "$S" 2>/dev/null || true
+          echo "== config.env (no secrets in it)"; cat "$S/config.env" 2>/dev/null || echo "(none)"
+          echo "== updater service"; launchctl print "gui/$(id -u)/au.racelens.updater" 2>&1 | head -n 40 || true
+          echo "== server service"; launchctl print "gui/$(id -u)/au.racelens.server" 2>&1 | head -n 40 || true
+          echo "== app folders"; ls -la "${{ runner.temp }}/racelens-home" 2>/dev/null || true
+          cat "${{ runner.temp }}/racelens-home/app/VERSION.json" 2>/dev/null || true
 
   live-check:
     runs-on: ubuntu-24.04
