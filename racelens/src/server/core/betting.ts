@@ -90,7 +90,8 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
       const eachWay = odds1 >= 4 && odds1 <= 12 && slots === 3 && t1.placeProb >= 0.5 && ewEv > 0;
       if (winEv > 0 || eachWay) {
         const k = kellyFraction(t1.winProb, odds1);
-        const perLeg = clamp((k * profile.kelly * settings.bankroll) / unit, 0.5, 2) * scale;
+        // Never below the smallest worthwhile stake: an uncertain race shrinks the bet, it does not hide a price that beats fair.
+        const perLeg = Math.max(MIN_UNITS, clamp((k * profile.kelly * settings.bankroll) / unit, 0.5, 2) * scale);
         // Each-way is two bets: both legs count against the profile cap.
         const units = spend(eachWay ? perLeg * 2 : perLeg);
         if (units >= MIN_UNITS) {
@@ -127,15 +128,17 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
     }
 
     // Value plays -----------------------------------------------------------
-    // At least 5% better than our fair price, so a small rating error does not turn it into a losing bet.
-    const value = top.filter((r) => r !== t1 && r.bestOdds != null && r.bestOdds >= 4 && r.winProb >= 0.08 && expectedReturn(r.winProb, r.bestOdds) >= VALUE_MARGIN).slice(0, 2);
+    // At least 5% better than our fair price, so a small rating error does not turn it into a losing bet. The top
+    // pick qualifies too when it has no core bet (an open race where it is under 20%).
+    const coreBacked = suggestions.some((x) => x.priority === 'core' && x.runners[0] === t1.number);
+    const value = top.filter((r) => (r !== t1 || !coreBacked) && r.bestOdds != null && r.bestOdds >= 4 && r.winProb >= 0.08 && expectedReturn(r.winProb, r.bestOdds) >= VALUE_MARGIN).slice(0, 2);
     for (const v of value) {
       const odds = v.bestOdds!;
       const winEv = expectedReturn(v.winProb, odds);
       const placeOdds = placeOddsFor(v);
       const ew = odds >= 6 && slots === 3 && v.placeProb >= 0.35 && placeOdds != null && (winEv + expectedReturn(v.placeProb, placeOdds)) / 2 > 0;
       const k = kellyFraction(v.winProb, odds);
-      const perLeg = clamp((k * profile.kelly * settings.bankroll) / unit, 0.25, 1) * scale;
+      const perLeg = Math.max(MIN_UNITS, clamp((k * profile.kelly * settings.bankroll) / unit, 0.25, 1) * scale);
       const units = spend(ew ? perLeg * 2 : perLeg);
       if (units < MIN_UNITS) break;
       const leg = ew ? units / 2 : units;
@@ -203,9 +206,20 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
     }
   }
 
-  if (!suggestions.length && (stance === 'bet' || stance === 'small')) {
-    stance = 'watch';
-    notes.unshift('No bet at the current prices: nothing on offer pays more than our ratings say it is worth. Watch, or bet only if a price reaches the mark given below.');
+  if (!suggestions.length && scale > 0) {
+    if (stance === 'bet' || stance === 'small') stance = 'watch';
+    // Say what it would take, so the plan never just says "no".
+    const slight = top.filter((r) => r.bestOdds != null && expectedReturn(r.winProb, r.bestOdds) > 0);
+    const mark = notes.some((n) => n.startsWith(`${t1.name} is the most likely winner`) || n.startsWith(`No price yet for ${t1.name}`))
+      ? ''
+      : t1.bestOdds != null
+        ? ` ${t1.name} (our top pick, ${pct(t1.winProb)}) is $${t1.bestOdds.toFixed(2)} now; it would be worth a bet at $${(t1.fairOdds * (1 + VALUE_MARGIN)).toFixed(2)} or better.`
+        : '';
+    notes.unshift(
+      slight.length
+        ? `No bet suggested: ${slight.map((r) => r.name).join(' and ')} ${slight.length > 1 ? 'are' : 'is'} only just above our fair price – not enough in a race this open.${mark}`
+        : `No bet at the current prices: none of our top picks is paying more than our ratings say it is worth.${mark}`,
+    );
   }
   if (slots === 0) notes.push('Fewer than 5 runners: no place betting available.');
   else if (slots === 2) notes.push('5–7 runners: place pays first two only.');

@@ -324,6 +324,33 @@ describe('betting plan only backs prices that beat our fair odds', () => {
     expect(plan.notes.join(' ')).toMatch(/No price yet for Horse 1\. It is only worth a win bet at \$3\.13 or better/);
   });
 
+  it('keeps a value bet at the smallest stake in a less certain race instead of dropping it', () => {
+    const race = makeRace(14);
+    const ranked = withPrices(race, { 1: { winProb: 0.3, bestOdds: 3 }, 2: { winProb: 0.195, placeProb: 0.5, bestOdds: 6.5, bestPlace: 2.1 } });
+    const small = { ...high, overall: 55, label: 'Fair' as const };
+    const plan = buildBettingPlan({ race, ranked, confidence: small, settings: { ...settings, bankroll: 200 } });
+    expect(plan.stance).toBe('small');
+    const v = plan.suggestions.find((s) => s.priority === 'value' && s.runners[0] === 2);
+    expect(v?.stakeUnits).toBeGreaterThanOrEqual(0.25);
+  });
+
+  it('lets an under-20% top pick be a value bet when its price is well above fair', () => {
+    const race = makeRace(16);
+    const ranked = withPrices(race, { 1: { winProb: 0.16, placeProb: 0.42, bestOdds: 7.5, bestPlace: 2.6 } });
+    const plan = buildBettingPlan({ race, ranked, confidence: high, settings });
+    expect(plan.suggestions.some((s) => s.priority === 'value' && s.runners[0] === 1)).toBe(true);
+  });
+
+  it('says what price would make a bet when nothing is worth backing, without pointing at a note that is not there', () => {
+    const race = makeRace(16);
+    const ranked = withPrices(race, { 1: { winProb: 0.16, bestOdds: 5 } }).map((r) => (r.number === 1 ? r : { ...r, bestOdds: Math.max(1.5, r.fairOdds * 0.8) }));
+    const plan = buildBettingPlan({ race, ranked, confidence: high, settings });
+    expect(plan.suggestions.filter((s) => s.type === 'win' || s.type === 'each-way')).toHaveLength(0);
+    const text = plan.notes.join(' ');
+    expect(text).toMatch(/none of our top picks is paying more than our ratings say it is worth\. Horse 1 \(our top pick, 16%\) is \$5\.00 now; it would be worth a bet at \$6\.56 or better\./);
+    expect(text).not.toMatch(/given below/);
+  });
+
   it('marks value as the expected return at the best price', () => {
     const race = makeRace(10);
     for (const r of rankedFor(race)) expect(r.valueEdge).toBeCloseTo(r.winProb * r.bestOdds! - 1, 3);

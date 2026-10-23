@@ -16,7 +16,7 @@ import { BASE_WEIGHTS, computeFieldStats, evaluateRunner, type FactorContext } f
 import { applyDayPatterns, patternBias } from './daypatterns.js';
 import { expectedTrackRating } from './weather.js';
 import { summariseRaceMarket } from './market.js';
-import { buildBettingPlan, expectedReturn } from './betting.js';
+import { buildBettingPlan, expectedReturn, VALUE_MARGIN } from './betting.js';
 import { starters } from './field.js';
 
 /**
@@ -335,7 +335,7 @@ function summarise(race: Race, ranked: RunnerAssessment[], c: ConfidenceRating, 
   const second = ranked[1];
   const bits = [`${t.name} (${t.number}) is our top pick at ${Math.round(t.winProb * 100)}% to win${t.bestOdds ? ` (best $${t.bestOdds.toFixed(2)})` : ''}.`];
   if (second) bits.push(`${second.name} (${second.number}) next at ${Math.round(second.winProb * 100)}%.`);
-  if (t.valueEdge != null && t.bestOdds && t.valueEdge > 0.03) bits.push(`$${t.bestOdds.toFixed(2)} is better than our fair price of $${t.fairOdds.toFixed(2)} – value.`);
+  if (t.valueEdge != null && t.bestOdds && t.valueEdge >= VALUE_MARGIN) bits.push(`$${t.bestOdds.toFixed(2)} is better than our fair price of $${t.fairOdds.toFixed(2)} – value.`);
   else if (t.valueEdge != null && t.bestOdds && t.valueEdge < 0) bits.push(`$${t.bestOdds.toFixed(2)} is under our fair price of $${t.fairOdds.toFixed(2)} – no value on top at that price.`);
   bits.push(`Confidence ${c.label.toLowerCase()} (${c.overall}/100).`);
   if (patterns.length) bits.push(`Adjusted for today's patterns: ${patterns.map((p) => p.label).join(', ')}.`);
