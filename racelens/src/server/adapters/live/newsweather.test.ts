@@ -120,6 +120,8 @@ describe('RacingRssAdapter', () => {
     expect(items[0].source).toBe('racingrss');
     const none = await adapter.searchNews('Sir Delius', ctxFor({ 'feed-ok.example': { body: feed } }));
     expect(none).toHaveLength(0);
+    const either = await adapter.searchNews('"Sir Delius" OR "Aeliana" OR "Nobody"', ctxFor({ 'feed-ok.example': { body: feed } }));
+    expect(either).toHaveLength(1);
     await expect(adapter.searchNews('Aeliana', ctxFor({}))).rejects.toThrow();
   });
 });

@@ -1,0 +1,2380 @@
+{
+ "layout": "twoColumn",
+ "data": [
+  {}
+ ],
+ "fetch": {
+  "0": {
+   "stickyClass": "",
+   "groupOneRaces": [],
+   "bettingResources": [
+    {
+     "text": "Odds Comparison",
+     "href": "https://www.racenet.com.au/odds-comparison/horse-racing",
+     "target": "_blank"
+    },
+    {
+     "text": "Bookie Reviews",
+     "href": "/bookie-reviews",
+     "target": ""
+    },
+    {
+     "text": "Form Guide",
+     "href": "/form-guide/horse-racing",
+     "target": ""
+    },
+    {
+     "text": "Bonus Bet Specials",
+     "href": "/bonus-bets",
+     "target": ""
+    },
+    {
+     "text": "Free Tips",
+     "href": "/horse-racing-tips",
+     "target": ""
+    }
+   ],
+   "displayPos2Mrec": true,
+   "$apolloData": {
+    "queries": {},
+    "loading": 0,
+    "data": {}
+   }
+  },
+  "data-v-2410c970:0": {
+   "headerHeight": "180px",
+   "dynamicSubNaviItems": [
+    {
+     "path": "/premium-racing-tips",
+     "value": "Premium Tips",
+     "subNavi": [
+      {
+       "title": null,
+       "list": [
+        {
+         "value": "The Guru",
+         "path": "https://www.racenet.com.au/news/how-pro-punter-the-guru-is-profitable-on-the-punt",
+         "showNewStack": false
+        },
+        {
+         "value": "Greg Polson",
+         "path": "https://www.racenet.com.au/news/expert-profile-how-greg-polson-continues-to-be-a-winning-punter",
+         "showNewStack": false
+        },
+        {
+         "value": "Mark Guest",
+         "path": "https://www.racenet.com.au/news/mark-guest-the-crucial-factors-to-finding-a-winner",
+         "showNewStack": false
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "path": "/bookie-reviews",
+     "value": "Bookie Reviews",
+     "subNavi": [
+      {
+       "title": null,
+       "list": [
+        {
+         "value": "CrownBet",
+         "path": "https://www.racenet.com.au/bookie-reviews/crownbet-review",
+         "showNewStack": false
+        },
+        {
+         "value": "Betr",
+         "path": "https://www.racenet.com.au/bookie-reviews/betr-review",
+         "showNewStack": false
+        },
+        {
+         "value": "BetNation",
+         "path": "https://www.racenet.com.au/bookie-reviews/betnation-review",
+         "showNewStack": false
+        },
+        {
+         "value": "Sportsbet",
+         "path": "https://www.racenet.com.au/bookie-reviews/sportsbet-review",
+         "showNewStack": false
+        },
+        {
+         "value": "Ladbrokes",
+         "path": "https://www.racenet.com.au/bookie-reviews/ladbrokes-review",
+         "showNewStack": false
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "path": "/horse",
+     "value": "Profiles",
+     "subNavi": [
+      {
+       "title": null,
+       "list": [
+        {
+         "value": "Horse Profiles",
+         "path": "/profiles/horse",
+         "showNewStack": true
+        },
+        {
+         "value": "Trainer Profiles",
+         "path": "/profiles/trainer",
+         "showNewStack": true
+        },
+        {
+         "value": "Jockey Profiles",
+         "path": "/profiles/jockey",
+         "showNewStack": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "path": "/tracks",
+     "value": "Race Tracks",
+     "subNavi": [
+      {
+       "title": null,
+       "list": [
+        {
+         "value": "Flemington",
+         "path": "https://www.racenet.com.au/tracks/vic/flemington",
+         "showNewStack": false
+        },
+        {
+         "value": "Randwick",
+         "path": "https://www.racenet.com.au/tracks/nsw/randwick",
+         "showNewStack": false
+        },
+        {
+         "value": "Rosehill",
+         "path": "https://www.racenet.com.au/tracks/nsw/rosehill",
+         "showNewStack": false
+        },
+        {
+         "value": "Caulfield",
+         "path": "https://www.racenet.com.au/tracks/vic/caulfield",
+         "showNewStack": false
+        },
+        {
+         "value": "Moonee Valley",
+         "path": "https://www.racenet.com.au/tracks/vic/moonee-valley",
+         "showNewStack": false
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "path": "/group-one-races",
+     "value": "Group 1 & Feature Races",
+     "subNavi": [
+      {
+       "title": "Racing Calendars",
+       "list": [
+        {
+         "value": "Group 1 Races",
+         "path": "https://www.racenet.com.au/group-one-races",
+         "showNewStack": false
+        },
+        {
+         "value": "Group 2 Races",
+         "path": "https://www.racenet.com.au/group-two-races",
+         "showNewStack": false
+        },
+        {
+         "value": "Group 3 Races",
+         "path": "https://www.racenet.com.au/group-three-races",
+         "showNewStack": false
+        },
+        {
+         "value": "Listed Races",
+         "path": "https://www.racenet.com.au/listed-races",
+         "showNewStack": false
+        },
+        {
+         "value": "Notable Races",
+         "path": "https://www.racenet.com.au/notable-races",
+         "showNewStack": false
+        }
+       ]
+      },
+      {
+       "title": "Upcoming",
+       "list": [
+        {
+         "value": "Darwin Cup",
+         "path": "https://www.racenet.com.au/notable-races/darwin-cup",
+         "showNewStack": false
+        }
+       ]
+      },
+      {
+       "title": "Popular",
+       "list": [
+        {
+         "value": "Melbourne Cup",
+         "path": "https://www.racenet.com.au/melbourne-cup",
+         "showNewStack": false
+        },
+        {
+         "value": "Cox Plate",
+         "path": "https://www.racenet.com.au/cox-plate",
+         "showNewStack": false
+        },
+        {
+         "value": "The Everest",
+         "path": "https://www.racenet.com.au/the-everest",
+         "showNewStack": false
+        },
+        {
+         "value": "Caulfield Cup",
+         "path": "https://www.racenet.com.au/caulfield-cup",
+         "showNewStack": false
+        },
+        {
+         "value": "Golden Slipper",
+         "path": "https://www.racenet.com.au/golden-slipper",
+         "showNewStack": false
+        },
+        {
+         "value": "All Group 1 Results",
+         "path": "https://www.racenet.com.au/group-one-races/group-one-results",
+         "showNewStack": false
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "$apolloData": {
+    "queries": {},
+    "loading": 0,
+    "data": {}
+   }
+  }
+ },
+ "error": null,
+ "state": {
+  "AlphabetFilter": {
+   "selectedInitial": ""
+  },
+  "Analytics": {
+   "analyticsClass": ""
+  },
+  "BettingPromotions": {
+   "promotions": [],
+   "promotionsList": [],
+   "tcsModalActive": false,
+   "tcsModalText": ""
+  },
+  "Blackbook": {
+   "filters": {
+    "upcoming": {
+     "orderBy": "DateAscending",
+     "comments": true,
+     "date": "",
+     "entityType": "",
+     "state": ""
+    },
+    "results": {
+     "orderBy": "DateDescending",
+     "comments": true,
+     "timePeriod": "",
+     "entityType": "",
+     "state": ""
+    },
+    "blackbook": {
+     "orderBy": "NameAscending",
+     "comments": true,
+     "entityType": ""
+    }
+   },
+   "lists": {
+    "upcoming": {
+     "count": 0,
+     "data": [],
+     "offset": 0,
+     "startTime": "",
+     "loading": false
+    },
+    "results": {
+     "count": 0,
+     "data": [],
+     "offset": 0,
+     "startTime": "",
+     "loading": false
+    },
+    "blackbook": {
+     "count": 0,
+     "data": [],
+     "offset": 0,
+     "loading": false
+    }
+   },
+   "upcomingRunnersCountByDate": null,
+   "meeting": {
+    "meetingId": "",
+    "events": {}
+   },
+   "entries": {},
+   "entry": "",
+   "remove": [],
+   "search": {},
+   "error": false
+  },
+  "BookmakerOffers": {
+   "promotions": [],
+   "promotionsList": [],
+   "tcsModalActive": false,
+   "tcsModalText": ""
+  },
+  "Bookmakers": {
+   "bookmakers": [
+    {
+     "id": "2",
+     "displayName": "Ladbrokes",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/ladbrokes/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/ladbrokes/lightondark.svg",
+     "name": "ladbrokes",
+     "primaryColor": "#eb1c24",
+     "secondaryColor": "#333333",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 8,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "3",
+     "displayName": "Sportsbet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/sportsbet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/sportsbet/lightondark.svg",
+     "name": "sportsbet",
+     "primaryColor": "#30a5dd",
+     "secondaryColor": "#f8d830",
+     "secondaryFontColor": "#333732",
+     "bettingPromotionOrder": 1,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "4",
+     "displayName": "CrownBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/crownbet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/crownbet/lightondark.svg",
+     "name": "crownbet",
+     "primaryColor": "#843987",
+     "secondaryColor": "#ff992c",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "5",
+     "displayName": "Unibet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/unibet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/unibet/lightondark.svg",
+     "name": "unibet",
+     "primaryColor": "#007040",
+     "secondaryColor": "#4B9300",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 10,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "6",
+     "displayName": "PointsBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/pointsbet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/pointsbet/lightondark.svg",
+     "name": "pointsbet",
+     "primaryColor": "#111111",
+     "secondaryColor": "#ed1d41",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "8",
+     "displayName": "PalmerBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/palmerbet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/palmerbet/lightondark.svg",
+     "name": "palmerbet",
+     "primaryColor": "#8391c0",
+     "secondaryColor": "#2e2f34",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 11,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "10",
+     "displayName": "bet365",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/bet365/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/bet365/lightondark.svg",
+     "name": "bet365",
+     "primaryColor": "#0a4c42ff",
+     "secondaryColor": "#ffe53b",
+     "secondaryFontColor": "#333732",
+     "bettingPromotionOrder": 2,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "12",
+     "displayName": "Betfair",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/betfair/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betfair/lightondark.svg",
+     "name": "betfair",
+     "primaryColor": "#ffb80c",
+     "secondaryColor": "#1e1e1e",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "14",
+     "displayName": "TAB",
+     "fontColor": "#434842",
+     "logoCircle": "https://puntcdn.com/Logos/ubet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/ubet/lightondark.svg",
+     "name": "ubet",
+     "primaryColor": "#26E36B",
+     "secondaryColor": "#26E36B",
+     "secondaryFontColor": "#333732",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "17",
+     "displayName": "NSWTAB",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/nswtab/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/nswtab/lightondark.svg",
+     "name": "nswtab",
+     "primaryColor": "#038542",
+     "secondaryColor": "#c3cf21",
+     "secondaryFontColor": "#333732",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "18",
+     "displayName": "STAB",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/stab/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/stab/lightondark.svg",
+     "name": "stab",
+     "primaryColor": "#038542",
+     "secondaryColor": "#c3cf21",
+     "secondaryFontColor": "#333732",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "19",
+     "displayName": "Neds",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/neds/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/neds/lightondark.svg",
+     "name": "neds",
+     "primaryColor": "#ff7800",
+     "secondaryColor": "#000000",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 9,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "25",
+     "displayName": "Betway",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/betwayuk/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betwayuk/lightondark.svg",
+     "name": "betwayuk",
+     "primaryColor": "#000000",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#000000",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "27",
+     "displayName": "BlueBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/bluebet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/bluebet/lightondark.svg",
+     "name": "bluebet",
+     "primaryColor": "#0688C3",
+     "secondaryColor": "#D62329",
+     "secondaryFontColor": "#000000",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "30",
+     "displayName": "Ladbrokes",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/ladbrokesuk/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/ladbrokesuk/lightondark.svg",
+     "name": "ladbrokesuk",
+     "primaryColor": "#eb1c24",
+     "secondaryColor": "#333333",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "31",
+     "displayName": "Coral",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/coraluk/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/coraluk/lightondark.svg",
+     "name": "coraluk",
+     "primaryColor": "#3260a0",
+     "secondaryColor": "#333333",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "33",
+     "displayName": "TopSport",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/topsport/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/topsport/lightondark.svg",
+     "name": "topsport",
+     "primaryColor": "#0B07B7",
+     "secondaryColor": "#6ECFF6",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 4,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "37",
+     "displayName": "Betfair",
+     "fontColor": "#333732",
+     "logoCircle": "https://puntcdn.com/Logos/betfairuk/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betfairuk/lightondark.svg",
+     "name": "betfairuk",
+     "primaryColor": "#ffb80c",
+     "secondaryColor": "#1e1e1e",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "38",
+     "displayName": "Realbookie",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/realbookie/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/realbookie/lightondark.svg",
+     "name": "realbookie",
+     "primaryColor": "#158C93",
+     "secondaryColor": "#158C93",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "45",
+     "displayName": "BoomBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/boombet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/boombet/lightondark.svg",
+     "name": "boombet",
+     "primaryColor": "#FD346E",
+     "secondaryColor": "#F6921E",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 5,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "46",
+     "displayName": "BetRight",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/betright/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betright/lightondark.svg",
+     "name": "betright",
+     "primaryColor": "#334155",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "48",
+     "displayName": "Crossbet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/crossbet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/crossbet/lightondark.svg",
+     "name": "crossbet",
+     "primaryColor": "#131247",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 12,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "49",
+     "displayName": "ColossalBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/colossalbet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/colossalbet/lightondark.svg",
+     "name": "colossalbet",
+     "primaryColor": "#1A212A",
+     "secondaryColor": "#C89753",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 6,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "50",
+     "displayName": "Betr",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/betr/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betr/lightondark.svg",
+     "name": "betr",
+     "primaryColor": "#093AD3",
+     "secondaryColor": "#85FFE6",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "51",
+     "displayName": "TABtouch",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/tabtouch/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/tabtouch/lightondark.svg",
+     "name": "tabtouch",
+     "primaryColor": "#4C2F69",
+     "secondaryColor": "#4C2F69",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 3,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "53",
+     "displayName": "Picklebet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/picklebet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/picklebet/lightondark.svg",
+     "name": "picklebet",
+     "primaryColor": "#57d33b",
+     "secondaryColor": "#11181C",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": 7,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "55",
+     "displayName": "Dabble",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/dabble/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/dabble/lightondark.svg",
+     "name": "dabble",
+     "primaryColor": "#7742FF",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#7742FF",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "56",
+     "displayName": "BlondeBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/blondebet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/blondebet/lightondark.svg",
+     "name": "blondebet",
+     "primaryColor": "#120042",
+     "secondaryColor": "#E2A365",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "57",
+     "displayName": "MintBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/mintbet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/mintbet/lightondark.svg",
+     "name": "mintbet",
+     "primaryColor": "#26D17D",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#26D17D",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "58",
+     "displayName": "BetEstate",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/betestate/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betestate/lightondark.svg",
+     "name": "betestate",
+     "primaryColor": "#4A4E53",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "59",
+     "displayName": "BaggyBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/baggybet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/baggybet/lightondark.svg",
+     "name": "baggybet",
+     "primaryColor": "#353548",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "60",
+     "displayName": "BetChamps",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/betchamps/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betchamps/lightondark.svg",
+     "name": "betchamps",
+     "primaryColor": "#000000",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "61",
+     "displayName": "Next2Go",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/next2go/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/next2go/lightondark.svg",
+     "name": "next2go",
+     "primaryColor": "#171D22",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "62",
+     "displayName": "RipperBet",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/ripperbet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/ripperbet/lightondark.svg",
+     "name": "ripperbet",
+     "primaryColor": "#065051",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "63",
+     "displayName": "Betmax",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/betmax/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betmax/lightondark.svg",
+     "name": "betmax",
+     "primaryColor": "#007BD9",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#007BD9",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "64",
+     "displayName": "BetDragon",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/betdragon/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betdragon/lightondark.svg",
+     "name": "betdragon",
+     "primaryColor": "#840600",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "65",
+     "displayName": "PuntX",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/puntx/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/puntx/lightondark.svg",
+     "name": "puntx",
+     "primaryColor": "#000120",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#ffffff",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "66",
+     "displayName": "BetFocus",
+     "fontColor": "#ffffff",
+     "logoCircle": "https://puntcdn.com/Logos/betfocus/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/betfocus/lightondark.svg",
+     "name": "betfocus",
+     "primaryColor": "#00b9f7",
+     "secondaryColor": "#ffffff",
+     "secondaryFontColor": "#00b9f7",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    },
+    {
+     "id": "67",
+     "displayName": "BearBet",
+     "fontColor": "#FFFFFF",
+     "logoCircle": "https://puntcdn.com/Logos/bearbet/circle-60x60@2x.png",
+     "logoRectangle": "https://puntcdn.com/Logos/bearbet/lightondark.svg",
+     "name": "bearbet",
+     "primaryColor": "#CC0000",
+     "secondaryColor": "#0C1B1F",
+     "secondaryFontColor": "#FFFFFF",
+     "bettingPromotionOrder": null,
+     "__typename": "Bookmaker"
+    }
+   ]
+  },
+  "BookmakerStacker": {
+   "bookmakers": []
+  },
+  "Breach": {
+   "pageId": "",
+   "showBreachModal": false
+  },
+  "Breadcrumbs": {
+   "list": [
+    {
+     "name": "nocookies",
+     "path": "/nocookies"
+    }
+   ]
+  },
+  "FormGuide": {
+   "meetings": {},
+   "meetingEvents": [],
+   "recentFormsFilters": [],
+   "nextTogoMeetings": [],
+   "bookmakersList": {},
+   "isModalActive": false,
+   "selectedFormOptions": [
+    "field_comments"
+   ],
+   "config": null,
+   "selectedBookmaker": "",
+   "isLoading": false,
+   "showVideoComments": false,
+   "showVideoCommentsTooltip": true
+  },
+  "FreeTips": {
+   "events": [],
+   "selectedDate": ""
+  },
+  "Global": {
+   "appconfigFeatures": {
+    "PRO_TIPS_BREACH": {
+     "name": "proTipsBreach",
+     "variations": {
+      "INFO": "INFO",
+      "BLUR": "BLUR",
+      "WIN": "WIN",
+      "STAT": "STAT"
+     },
+     "default": {
+      "variation": "WIN",
+      "feature": "proTipsBreach"
+     }
+    }
+   },
+   "mobileMenuActive": false,
+   "showSideNavi": false,
+   "pageTitle": "",
+   "isMobile": false,
+   "isInitialRoute": false,
+   "isMobileApp": false,
+   "isPopularGroupOneRace": false,
+   "isIos": false,
+   "isAndroid": false,
+   "isSkipGtm": false,
+   "lastFiredGtmRoute": "",
+   "requestedDomain": {
+    "domainURL": "https://www.racenet.com.au",
+    "domainHost": "www.racenet.com.au"
+   },
+   "isLoggedIn": false,
+   "geoLocation": {
+    "countryISOCode": "AU",
+    "state": "NSW"
+   },
+   "isBannerAd": true,
+   "userPreferences": null,
+   "sideWidget": null,
+   "botScore": {},
+   "admiralScript": null,
+   "showIQBanner": true,
+   "showResultsWidget": true
+  },
+  "MeetingSelector": {
+   "isMeetingSelectorActive": false
+  },
+  "Navigation": {
+   "activeSideNavi": {}
+  },
+  "NewsArticle": {
+   "article": {}
+  },
+  "OddsComparisonTable": {
+   "eventId": "",
+   "eventData": {},
+   "betType": "FixedWin",
+   "eventOdds": {},
+   "eventsObj": {},
+   "isLoadingOdds": false,
+   "selectedTab": ""
+  },
+  "ProfileDetails": {
+   "expandGraphqlLimit": false
+  },
+  "ProfileUpcomingRaces": {
+   "eventsOdds": [],
+   "isLoading": true
+  },
+  "RealtimeInsights": {
+   "userFilters": {
+    "isFollowed": null,
+    "day": null,
+    "period": null,
+    "state": null,
+    "trackCondition": null,
+    "bettingOption": null,
+    "realtimeInsightType": null
+   },
+   "defaultFilters": {
+    "period": null
+   },
+   "upcomingTipFilters": {
+    "day": {
+     "label": "Day",
+     "selected": "all",
+     "options": [
+      {
+       "title": "All",
+       "id": "all"
+      },
+      {
+       "title": "Today",
+       "id": "2026-08-03"
+      },
+      {
+       "title": "Tomorrow",
+       "id": "2026-08-04"
+      },
+      {
+       "title": "Wednesday",
+       "id": "2026-08-05"
+      },
+      {
+       "title": "Thursday",
+       "id": "2026-08-06"
+      },
+      {
+       "title": "Friday",
+       "id": "2026-08-07"
+      }
+     ]
+    },
+    "state": {
+     "label": "State",
+     "selected": "all",
+     "options": [
+      {
+       "title": "All",
+       "id": "all"
+      },
+      {
+       "title": "VIC",
+       "id": "VIC"
+      },
+      {
+       "title": "NSW",
+       "id": "NSW"
+      },
+      {
+       "title": "QLD",
+       "id": "QLD"
+      },
+      {
+       "title": "SA",
+       "id": "SA"
+      },
+      {
+       "title": "WA",
+       "id": "WA"
+      },
+      {
+       "title": "ACT",
+       "id": "ACT"
+      },
+      {
+       "title": "NT",
+       "id": "NT"
+      },
+      {
+       "title": "TAS",
+       "id": "TAS"
+      }
+     ]
+    },
+    "bettingOption": {
+     "label": "Bet Type",
+     "selected": "all",
+     "options": [
+      {
+       "title": "All",
+       "id": "all"
+      },
+      {
+       "title": "Win",
+       "id": "Win"
+      },
+      {
+       "title": "Place",
+       "id": "Place"
+      }
+     ]
+    },
+    "realtimeInsightType": {
+     "label": "Tip Type",
+     "selected": "all",
+     "options": []
+    }
+   },
+   "resultedTipFilters": {
+    "period": {
+     "label": "Time",
+     "selected": "",
+     "options": []
+    },
+    "state": {
+     "label": "State",
+     "selected": "all",
+     "options": [
+      {
+       "title": "All",
+       "id": "all"
+      },
+      {
+       "title": "VIC",
+       "id": "VIC"
+      },
+      {
+       "title": "NSW",
+       "id": "NSW"
+      },
+      {
+       "title": "QLD",
+       "id": "QLD"
+      },
+      {
+       "title": "SA",
+       "id": "SA"
+      },
+      {
+       "title": "WA",
+       "id": "WA"
+      },
+      {
+       "title": "ACT",
+       "id": "ACT"
+      },
+      {
+       "title": "NT",
+       "id": "NT"
+      },
+      {
+       "title": "TAS",
+       "id": "TAS"
+      }
+     ]
+    },
+    "trackCondition": {
+     "label": "Condition",
+     "selected": "all",
+     "options": [
+      {
+       "title": "All",
+       "id": "all"
+      }
+     ]
+    },
+    "bettingOption": {
+     "label": "Bet Type",
+     "selected": "all",
+     "options": [
+      {
+       "title": "All",
+       "id": "all"
+      },
+      {
+       "title": "Win",
+       "id": "Win"
+      },
+      {
+       "title": "Place",
+       "id": "Place"
+      }
+     ]
+    },
+    "realtimeInsightType": {
+     "label": "Tip Type",
+     "selected": "all",
+     "options": []
+    }
+   },
+   "followingList": []
+  },
+  "ResultsTabs": {
+   "chosenDate": null
+  },
+  "SearchBar": {
+   "searchInput": "",
+   "searchResults": [],
+   "isLoading": false
+  },
+  "SearchResults": {
+   "results": {},
+   "isLoading": true
+  },
+  "SelectionResults": {
+   "eventWithOdds": [
+    {}
+   ]
+  },
+  "SnackBar": {
+   "show": false,
+   "type": "",
+   "message": "",
+   "icon": ""
+  },
+  "StarRating": {
+   "starRatingFilters": [
+    {
+     "rating": 3,
+     "isActive": true
+    },
+    {
+     "rating": 2,
+     "isActive": false
+    },
+    {
+     "rating": 1,
+     "isActive": false
+    }
+   ],
+   "savedPresets": [],
+   "appliedPreset": null,
+   "groupedStarRating": [],
+   "showStarRatingWidget": true,
+   "showStarRatingWidgetSubscriber": false
+  },
+  "Subscriptions": {
+   "isSubscriber": false,
+   "isLoggedIn": false,
+   "subscriptionBannerSettings": null
+  },
+  "Video": {
+   "playlists": [],
+   "mainPlaylist": null,
+   "mainVideo": null,
+   "isModalActive": false,
+   "replayVideo": {}
+  }
+ },
+ "serverRendered": true,
+ "routePath": "/nocookies",
+ "config": {
+  "BRAND": "racenet",
+  "BASE_URL": "https://www.racenet.com.au",
+  "NUXT_ENV_RACING_API_URL": "https://api.racenet.com.au/racing",
+  "NUXT_ENV_CONTENT_API_URL": "https://api.racenet.com.au/content",
+  "NUXT_ENV_REST_API_URL": "https://api.racenet.com.au/rest-services-sts",
+  "DISQUS_PUBLIC_KEY": "6TQBkls9urs4taZMkRbnzoeiLWrVTABTIZgJqrAkb1spcJpTz4Vehem2CISdM9R0",
+  "NUXT_ENV_DISQUS_SHORTNAME": "racenet",
+  "STAGE": "prod",
+  "NO_EXTERNAL_TRACKING": false,
+  "AUTH_CALLBACK_URI": "https://www.racenet.com.au/auth/callback",
+  "AUTH_LOGOUT_URI": "https://www.racenet.com.au/api/accounts/logout",
+  "AUTH_RAMPART_URI": "https://www.news.com.au/remote/identity/rampart/latest/rampart.js",
+  "AUTH_USER_DATA_ENDPOINT": "https://api.racenet.com.au/auth/me",
+  "NUXT_ENV_AUTH_TOKEN_URL": "https://auth.racenet.com.au/webtoken",
+  "NUXT_ENV_AUTH_TOKEN_NAME": "npat",
+  "DD_APP_ID": "447aa280-78e0-4eaa-b428-86788baead32",
+  "DD_CLIENT_TOKEN": "pub7ac780175d60637f816be516e8b90fff",
+  "DD_ENV": "prod",
+  "DD_RUM_ENABLED": true,
+  "_app": {
+   "basePath": "/",
+   "assetsPath": "/",
+   "cdnURL": "https://assets2.racenet.com.au/_nuxt/"
+  }
+ },
+ "apollo": {
+  "contentClient": {
+   "ROOT_QUERY.menu({\"brand\":\"racenet\"}).0": {
+    "title": "Premium Tips",
+    "url": "/premium-racing-tips",
+    "subMenus": {
+     "type": "json",
+     "json": [
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "The Guru",
+       "url": "https://www.racenet.com.au/news/how-pro-punter-the-guru-is-profitable-on-the-punt",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Greg Polson",
+       "url": "https://www.racenet.com.au/news/expert-profile-how-greg-polson-continues-to-be-a-winning-punter",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Mark Guest",
+       "url": "https://www.racenet.com.au/news/mark-guest-the-crucial-factors-to-finding-a-winner",
+       "classes": ""
+      }
+     ]
+    },
+    "__typename": "Menu"
+   },
+   "ROOT_QUERY.menu({\"brand\":\"racenet\"}).1": {
+    "title": "Bookie Reviews",
+    "url": "/bookie-reviews",
+    "subMenus": {
+     "type": "json",
+     "json": [
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "CrownBet",
+       "url": "https://www.racenet.com.au/bookie-reviews/crownbet-review",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Betr",
+       "url": "https://www.racenet.com.au/bookie-reviews/betr-review",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "BetNation",
+       "url": "https://www.racenet.com.au/bookie-reviews/betnation-review",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Sportsbet",
+       "url": "https://www.racenet.com.au/bookie-reviews/sportsbet-review",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Ladbrokes",
+       "url": "https://www.racenet.com.au/bookie-reviews/ladbrokes-review",
+       "classes": ""
+      }
+     ]
+    },
+    "__typename": "Menu"
+   },
+   "ROOT_QUERY.menu({\"brand\":\"racenet\"}).2": {
+    "title": "Profiles",
+    "url": "/horse",
+    "subMenus": {
+     "type": "json",
+     "json": [
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Horse Profiles",
+       "url": "/profiles/horse",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Trainer Profiles",
+       "url": "/profiles/trainer",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Jockey Profiles",
+       "url": "/profiles/jockey",
+       "classes": ""
+      }
+     ]
+    },
+    "__typename": "Menu"
+   },
+   "ROOT_QUERY.menu({\"brand\":\"racenet\"}).3": {
+    "title": "Race Tracks",
+    "url": "/tracks",
+    "subMenus": {
+     "type": "json",
+     "json": [
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Flemington",
+       "url": "https://www.racenet.com.au/tracks/vic/flemington",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Randwick",
+       "url": "https://www.racenet.com.au/tracks/nsw/randwick",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Rosehill",
+       "url": "https://www.racenet.com.au/tracks/nsw/rosehill",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Caulfield",
+       "url": "https://www.racenet.com.au/tracks/vic/caulfield",
+       "classes": ""
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Moonee Valley",
+       "url": "https://www.racenet.com.au/tracks/vic/moonee-valley",
+       "classes": ""
+      }
+     ]
+    },
+    "__typename": "Menu"
+   },
+   "ROOT_QUERY.menu({\"brand\":\"racenet\"}).4": {
+    "title": "Group 1 & Feature Races",
+    "url": "/group-one-races",
+    "subMenus": {
+     "type": "json",
+     "json": [
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Racing Calendars",
+       "url": "#",
+       "classes": "",
+       "sub_menus": [
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Group 1 Races",
+         "url": "https://www.racenet.com.au/group-one-races",
+         "classes": ""
+        },
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Group 2 Races",
+         "url": "https://www.racenet.com.au/group-two-races",
+         "classes": ""
+        },
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Group 3 Races",
+         "url": "https://www.racenet.com.au/group-three-races",
+         "classes": ""
+        },
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Listed Races",
+         "url": "https://www.racenet.com.au/listed-races",
+         "classes": ""
+        },
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Notable Races",
+         "url": "https://www.racenet.com.au/notable-races",
+         "classes": ""
+        }
+       ]
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Upcoming",
+       "url": "#",
+       "classes": "",
+       "sub_menus": [
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Darwin Cup",
+         "url": "https://www.racenet.com.au/notable-races/darwin-cup",
+         "classes": ""
+        }
+       ]
+      },
+      {
+       "desktop_icon": false,
+       "mobile_icon": false,
+       "login_redirect": false,
+       "display_desktop": true,
+       "display_mobile": true,
+       "title": "Popular",
+       "url": "#",
+       "classes": "",
+       "sub_menus": [
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Melbourne Cup",
+         "url": "https://www.racenet.com.au/melbourne-cup",
+         "classes": ""
+        },
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Cox Plate",
+         "url": "https://www.racenet.com.au/cox-plate",
+         "classes": ""
+        },
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "The Everest",
+         "url": "https://www.racenet.com.au/the-everest",
+         "classes": ""
+        },
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Caulfield Cup",
+         "url": "https://www.racenet.com.au/caulfield-cup",
+         "classes": ""
+        },
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "Golden Slipper",
+         "url": "https://www.racenet.com.au/golden-slipper",
+         "classes": ""
+        },
+        {
+         "desktop_icon": false,
+         "mobile_icon": false,
+         "login_redirect": false,
+         "display_desktop": true,
+         "display_mobile": true,
+         "title": "All Group 1 Results",
+         "url": "https://www.racenet.com.au/group-one-races/group-one-results",
+         "classes": ""
+        }
+       ]
+      }
+     ]
+    },
+    "__typename": "Menu"
+   },
+   "ROOT_QUERY": {
+    "menu({\"brand\":\"racenet\"})": [
+     {
+      "type": "id",
+      "generated": true,
+      "id": "ROOT_QUERY.menu({\"brand\":\"racenet\"}).0",
+      "typename": "Menu"
+     },
+     {
+      "type": "id",
+      "generated": true,
+      "id": "ROOT_QUERY.menu({\"brand\":\"racenet\"}).1",
+      "typename": "Menu"
+     },
+     {
+      "type": "id",
+      "generated": true,
+      "id": "ROOT_QUERY.menu({\"brand\":\"racenet\"}).2",
+      "typename": "Menu"
+     },
+     {
+      "type": "id",
+      "generated": true,
+      "id": "ROOT_QUERY.menu({\"brand\":\"racenet\"}).3",
+      "typename": "Menu"
+     },
+     {
+      "type": "id",
+      "generated": true,
+      "id": "ROOT_QUERY.menu({\"brand\":\"racenet\"}).4",
+      "typename": "Menu"
+     }
+    ]
+   }
+  },
+  "defaultClient": {
+   "Bookmaker:2": {
+    "id": "2",
+    "displayName": "Ladbrokes",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/ladbrokes/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/ladbrokes/lightondark.svg",
+    "name": "ladbrokes",
+    "primaryColor": "#eb1c24",
+    "secondaryColor": "#333333",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 8,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:3": {
+    "id": "3",
+    "displayName": "Sportsbet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/sportsbet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/sportsbet/lightondark.svg",
+    "name": "sportsbet",
+    "primaryColor": "#30a5dd",
+    "secondaryColor": "#f8d830",
+    "secondaryFontColor": "#333732",
+    "bettingPromotionOrder": 1,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:4": {
+    "id": "4",
+    "displayName": "CrownBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/crownbet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/crownbet/lightondark.svg",
+    "name": "crownbet",
+    "primaryColor": "#843987",
+    "secondaryColor": "#ff992c",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:5": {
+    "id": "5",
+    "displayName": "Unibet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/unibet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/unibet/lightondark.svg",
+    "name": "unibet",
+    "primaryColor": "#007040",
+    "secondaryColor": "#4B9300",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 10,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:6": {
+    "id": "6",
+    "displayName": "PointsBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/pointsbet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/pointsbet/lightondark.svg",
+    "name": "pointsbet",
+    "primaryColor": "#111111",
+    "secondaryColor": "#ed1d41",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:8": {
+    "id": "8",
+    "displayName": "PalmerBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/palmerbet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/palmerbet/lightondark.svg",
+    "name": "palmerbet",
+    "primaryColor": "#8391c0",
+    "secondaryColor": "#2e2f34",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 11,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:10": {
+    "id": "10",
+    "displayName": "bet365",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/bet365/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/bet365/lightondark.svg",
+    "name": "bet365",
+    "primaryColor": "#0a4c42ff",
+    "secondaryColor": "#ffe53b",
+    "secondaryFontColor": "#333732",
+    "bettingPromotionOrder": 2,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:12": {
+    "id": "12",
+    "displayName": "Betfair",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/betfair/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betfair/lightondark.svg",
+    "name": "betfair",
+    "primaryColor": "#ffb80c",
+    "secondaryColor": "#1e1e1e",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:14": {
+    "id": "14",
+    "displayName": "TAB",
+    "fontColor": "#434842",
+    "logoCircle": "https://puntcdn.com/Logos/ubet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/ubet/lightondark.svg",
+    "name": "ubet",
+    "primaryColor": "#26E36B",
+    "secondaryColor": "#26E36B",
+    "secondaryFontColor": "#333732",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:17": {
+    "id": "17",
+    "displayName": "NSWTAB",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/nswtab/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/nswtab/lightondark.svg",
+    "name": "nswtab",
+    "primaryColor": "#038542",
+    "secondaryColor": "#c3cf21",
+    "secondaryFontColor": "#333732",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:18": {
+    "id": "18",
+    "displayName": "STAB",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/stab/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/stab/lightondark.svg",
+    "name": "stab",
+    "primaryColor": "#038542",
+    "secondaryColor": "#c3cf21",
+    "secondaryFontColor": "#333732",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:19": {
+    "id": "19",
+    "displayName": "Neds",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/neds/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/neds/lightondark.svg",
+    "name": "neds",
+    "primaryColor": "#ff7800",
+    "secondaryColor": "#000000",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 9,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:25": {
+    "id": "25",
+    "displayName": "Betway",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/betwayuk/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betwayuk/lightondark.svg",
+    "name": "betwayuk",
+    "primaryColor": "#000000",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#000000",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:27": {
+    "id": "27",
+    "displayName": "BlueBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/bluebet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/bluebet/lightondark.svg",
+    "name": "bluebet",
+    "primaryColor": "#0688C3",
+    "secondaryColor": "#D62329",
+    "secondaryFontColor": "#000000",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:30": {
+    "id": "30",
+    "displayName": "Ladbrokes",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/ladbrokesuk/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/ladbrokesuk/lightondark.svg",
+    "name": "ladbrokesuk",
+    "primaryColor": "#eb1c24",
+    "secondaryColor": "#333333",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:31": {
+    "id": "31",
+    "displayName": "Coral",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/coraluk/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/coraluk/lightondark.svg",
+    "name": "coraluk",
+    "primaryColor": "#3260a0",
+    "secondaryColor": "#333333",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:33": {
+    "id": "33",
+    "displayName": "TopSport",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/topsport/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/topsport/lightondark.svg",
+    "name": "topsport",
+    "primaryColor": "#0B07B7",
+    "secondaryColor": "#6ECFF6",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 4,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:37": {
+    "id": "37",
+    "displayName": "Betfair",
+    "fontColor": "#333732",
+    "logoCircle": "https://puntcdn.com/Logos/betfairuk/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betfairuk/lightondark.svg",
+    "name": "betfairuk",
+    "primaryColor": "#ffb80c",
+    "secondaryColor": "#1e1e1e",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:38": {
+    "id": "38",
+    "displayName": "Realbookie",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/realbookie/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/realbookie/lightondark.svg",
+    "name": "realbookie",
+    "primaryColor": "#158C93",
+    "secondaryColor": "#158C93",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:45": {
+    "id": "45",
+    "displayName": "BoomBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/boombet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/boombet/lightondark.svg",
+    "name": "boombet",
+    "primaryColor": "#FD346E",
+    "secondaryColor": "#F6921E",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 5,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:46": {
+    "id": "46",
+    "displayName": "BetRight",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/betright/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betright/lightondark.svg",
+    "name": "betright",
+    "primaryColor": "#334155",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:48": {
+    "id": "48",
+    "displayName": "Crossbet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/crossbet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/crossbet/lightondark.svg",
+    "name": "crossbet",
+    "primaryColor": "#131247",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 12,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:49": {
+    "id": "49",
+    "displayName": "ColossalBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/colossalbet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/colossalbet/lightondark.svg",
+    "name": "colossalbet",
+    "primaryColor": "#1A212A",
+    "secondaryColor": "#C89753",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 6,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:50": {
+    "id": "50",
+    "displayName": "Betr",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/betr/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betr/lightondark.svg",
+    "name": "betr",
+    "primaryColor": "#093AD3",
+    "secondaryColor": "#85FFE6",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:51": {
+    "id": "51",
+    "displayName": "TABtouch",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/tabtouch/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/tabtouch/lightondark.svg",
+    "name": "tabtouch",
+    "primaryColor": "#4C2F69",
+    "secondaryColor": "#4C2F69",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 3,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:53": {
+    "id": "53",
+    "displayName": "Picklebet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/picklebet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/picklebet/lightondark.svg",
+    "name": "picklebet",
+    "primaryColor": "#57d33b",
+    "secondaryColor": "#11181C",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": 7,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:55": {
+    "id": "55",
+    "displayName": "Dabble",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/dabble/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/dabble/lightondark.svg",
+    "name": "dabble",
+    "primaryColor": "#7742FF",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#7742FF",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:56": {
+    "id": "56",
+    "displayName": "BlondeBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/blondebet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/blondebet/lightondark.svg",
+    "name": "blondebet",
+    "primaryColor": "#120042",
+    "secondaryColor": "#E2A365",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:57": {
+    "id": "57",
+    "displayName": "MintBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/mintbet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/mintbet/lightondark.svg",
+    "name": "mintbet",
+    "primaryColor": "#26D17D",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#26D17D",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:58": {
+    "id": "58",
+    "displayName": "BetEstate",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/betestate/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betestate/lightondark.svg",
+    "name": "betestate",
+    "primaryColor": "#4A4E53",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:59": {
+    "id": "59",
+    "displayName": "BaggyBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/baggybet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/baggybet/lightondark.svg",
+    "name": "baggybet",
+    "primaryColor": "#353548",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:60": {
+    "id": "60",
+    "displayName": "BetChamps",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/betchamps/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betchamps/lightondark.svg",
+    "name": "betchamps",
+    "primaryColor": "#000000",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:61": {
+    "id": "61",
+    "displayName": "Next2Go",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/next2go/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/next2go/lightondark.svg",
+    "name": "next2go",
+    "primaryColor": "#171D22",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:62": {
+    "id": "62",
+    "displayName": "RipperBet",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/ripperbet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/ripperbet/lightondark.svg",
+    "name": "ripperbet",
+    "primaryColor": "#065051",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:63": {
+    "id": "63",
+    "displayName": "Betmax",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/betmax/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betmax/lightondark.svg",
+    "name": "betmax",
+    "primaryColor": "#007BD9",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#007BD9",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:64": {
+    "id": "64",
+    "displayName": "BetDragon",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/betdragon/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betdragon/lightondark.svg",
+    "name": "betdragon",
+    "primaryColor": "#840600",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:65": {
+    "id": "65",
+    "displayName": "PuntX",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/puntx/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/puntx/lightondark.svg",
+    "name": "puntx",
+    "primaryColor": "#000120",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#ffffff",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:66": {
+    "id": "66",
+    "displayName": "BetFocus",
+    "fontColor": "#ffffff",
+    "logoCircle": "https://puntcdn.com/Logos/betfocus/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/betfocus/lightondark.svg",
+    "name": "betfocus",
+    "primaryColor": "#00b9f7",
+    "secondaryColor": "#ffffff",
+    "secondaryFontColor": "#00b9f7",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "Bookmaker:67": {
+    "id": "67",
+    "displayName": "BearBet",
+    "fontColor": "#FFFFFF",
+    "logoCircle": "https://puntcdn.com/Logos/bearbet/circle-60x60@2x.png",
+    "logoRectangle": "https://puntcdn.com/Logos/bearbet/lightondark.svg",
+    "name": "bearbet",
+    "primaryColor": "#CC0000",
+    "secondaryColor": "#0C1B1F",
+    "secondaryFontColor": "#FFFFFF",
+    "bettingPromotionOrder": null,
+    "__typename": "Bookmaker"
+   },
+   "ROOT_QUERY": {
+    "bookmakers({\"removed\":false})": [
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:2",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:3",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:4",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:5",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:6",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:8",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:10",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:12",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:14",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:17",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:18",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:19",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:25",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:27",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:30",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:31",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:33",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:37",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:38",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:45",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:46",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:48",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:49",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:50",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:51",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:53",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:55",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:56",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:57",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:58",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:59",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:60",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:61",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:62",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:63",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:64",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:65",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:66",
+      "typename": "Bookmaker"
+     },
+     {
+      "type": "id",
+      "generated": false,
+      "id": "Bookmaker:67",
+      "typename": "Bookmaker"
+     }
+    ]
+   }
+  }
+ }
+}

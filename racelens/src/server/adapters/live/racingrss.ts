@@ -27,12 +27,13 @@ export class RacingRssAdapter implements SourceAdapter {
   constructor(private readonly feeds = RACING_FEEDS) {}
 
   async searchNews(query: string, ctx: FetchContext): Promise<NewsItem[]> {
-    const cleaned = query.replace(/\b(horse|racing|races)\b/gi, ' ');
-    const terms = cleaned
-      .split(/"\s*|\s+/)
-      .map((t) => normaliseName(t))
-      .filter((t) => t.length >= 3);
-    const phrase = normaliseName(cleaned);
+    // "A" OR "B" OR "C" → match any alternative; a plain query must contain every term (or the whole phrase).
+    const alternatives = query
+      .split(/\s+OR\s+/)
+      .map((alt) => alt.replace(/\b(horse|racing|races)\b/gi, ' ').replace(/"/g, ' ').trim())
+      .filter(Boolean)
+      .map((alt) => ({ phrase: normaliseName(alt), terms: alt.split(/\s+/).map((t) => normaliseName(t)).filter((t) => t.length >= 3) }));
+    const matches = (hay: string) => alternatives.some(({ phrase, terms }) => (phrase.length >= 3 && hay.includes(phrase)) || (terms.length > 0 && terms.every((t) => hay.includes(t))));
     const out: NewsItem[] = [];
     let okFeeds = 0;
     let lastError: unknown;
@@ -43,8 +44,7 @@ export class RacingRssAdapter implements SourceAdapter {
           okFeeds++;
           for (const it of parseRss(xml)) {
             const hay = normaliseName(`${it.title} ${it.description || ''}`);
-            const hit = (phrase.length >= 3 && hay.includes(phrase)) || (terms.length > 0 && terms.every((t) => hay.includes(t)));
-            if (hit) out.push(toNewsItem(this.id, it, feed.outlet));
+            if (matches(hay)) out.push(toNewsItem(this.id, it, feed.outlet));
           }
         } catch (err) {
           lastError = err;

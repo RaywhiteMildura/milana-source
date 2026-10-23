@@ -54,18 +54,27 @@ Your research packs and settings are JSON files in `data/` – back them up or d
 5. **Before each race:** press *Pre-race check this race* (or *Pre-race check all*). It refreshes everything, pulls results of earlier races, detects day patterns and tells you what changed.
 6. **After the race:** *Fetch results* (or type them in manually) to see the scorecard and let the day-pattern detector learn from it.
 
+## Race-day checklist (first run)
+
+1. The night before or first thing: `npm install`, `npm run build`, `npm start`, open http://localhost:4850.
+2. Click **Check sources** on the home page. Green = responding. If every racing source is red, your connection or an Australian-IP requirement is the problem (TAB and Sportsbet only answer Australian IPs); news and weather are unaffected.
+3. Pick the date and the meeting, **Research this meeting**, and read the Verification tab for one race: the barrier/jockey/weight columns should agree across at least two sources. If one source disagrees everywhere, switch it off in Settings and re-run.
+4. Set bankroll, unit and risk profile in **Settings** before trusting any stake sizes.
+5. Leave the app running on race day: it re-checks each race automatically before the jump, pulls results, and re-rates the rest of the card. Press **Pre-race check** yourself any time.
+6. If a source changes its format overnight, the research still completes with the remaining sources; run `npm run probe -- <date> <venue>` to see which one failed and `RACELENS_RECORD=1 npm start` to capture the raw response for fixing.
+
 ## Sources
 
 Live mode uses whatever responds; each one is optional and can be switched off in Settings.
 
 | Source | Kind | What it gives us |
 |---|---|---|
-| TAB (`api.beta.tab.com.au`) | odds + form + results | Meetings, race cards, fixed & tote odds with price history, speed bands, ratings, deep form, breeding, results |
-| Racing Australia Free Fields | official | Official fields, barriers, riders, weights, gear, scratchings, results |
-| Sportsbet | odds + form | Fixed odds, runner form & comments |
-| Ladbrokes / Neds (Entain) | odds | Fixed odds, flucs, scratchings |
-| Punters.com.au / Racenet | form | Form guide, ratings, speed maps |
-| Google News, Bing News | news | Stable talk, jockey changes, injuries, "worked brilliantly" stories |
+| Racing Australia Free Fields (`racingaustralia.horse`, official) | official | Official fields, barriers, riders, weights, gear, scratchings, pedigree, run-by-run form, results with margins and times |
+| Racing.com (Racing Victoria GraphQL, official for VIC) | official | Meetings, fields, form, odds from several providers, jockey/trainer strike rates, results, stewards' comments |
+| TAB (`api.beta.tab.com.au`) | odds + form + results | Race cards, fixed & tote odds with price history, speed bands, TAB form ratings and win probabilities, results and dividends |
+| Sportsbet | odds + form | Fixed odds with fluctuations, full runner form (career/track/distance/going splits, last starts), Racing & Sports comments, speed map, results |
+| Ladbrokes / Neds (Entain affiliate API) | odds | Fixed odds, fluctuations, scratchings, rail position, R&S race comment and tips, speed map, results and tote dividends |
+| Google News, Bing News, racing RSS feeds (Just Horse Racing, news.com.au Sport, Races.com.au…) | news | Stable talk, jockey changes, injuries, "worked brilliantly" stories – three independent channels |
 | Reddit | rumours | r/horseracing and Australian subreddit chatter |
 | Open-Meteo | weather | 72-hour rain lead-up and race-day forecast → expected track rating |
 

@@ -22,7 +22,7 @@ import { summariseRaceMarket } from '../core/market.js';
 import { detectDayPatterns } from '../core/daypatterns.js';
 import { matchNews } from '../core/news.js';
 import { scorePrediction } from '../core/scorecard.js';
-import { mapLimit, withTimeout } from '../core/http.js';
+import { mapLimit, sleep, withTimeout } from '../core/http.js';
 
 /**
  * Research orchestrator: fans out to every source, reconciles, enriches and
@@ -180,24 +180,22 @@ async function fetchNews(deps: ResearchDeps, meeting: MeetingSummary, races: Rac
   const statuses: SourceStatus[] = [];
   if (!adapters.length) return { news: [], statuses };
   job.start('news', 'Scanning news and online chatter for every runner');
-  const queries = new Set<string>();
-  queries.add(`${meeting.venue} races ${meeting.date}`);
-  for (const race of races) {
-    if (race.group || /stakes|cup|plate|classic|guineas|handicap/i.test(race.name)) queries.add(race.name);
-    for (const r of race.runners) if (!r.scratched) queries.add(`"${r.name}" horse`);
-  }
+  const qs = buildNewsQueries(meeting, races);
   const items: NewsItem[] = [];
-  const qs = [...queries];
-  for (const a of adapters) {
-    const started = Date.now();
-    let failures = 0;
-    await mapLimit(qs, 4, async (q) => {
-      const r = await timed(() => a.searchNews!(q, deps.ctx), `${a.name} news`);
-      if (r.error) failures++;
-      else items.push(...(r.value || []));
-    });
-    statuses.push(statusOf(a, failures < qs.length, Date.now() - started, { itemCount: items.length, error: failures ? `${failures}/${qs.length} queries failed` : undefined }));
-  }
+  await Promise.all(
+    adapters.map(async (a) => {
+      const started = Date.now();
+      let failures = 0;
+      // Sequential per source with a small pause: friendly to rate limits (Reddit, Google).
+      for (const q of qs) {
+        const r = await timed(() => a.searchNews!(q, deps.ctx), `${a.name} news`);
+        if (r.error) failures++;
+        else items.push(...(r.value || []));
+        await sleep(a.id === 'reddit' ? 1200 : 250);
+      }
+      statuses.push(statusOf(a, failures < qs.length, Date.now() - started, { itemCount: items.filter((i) => i.source === a.id).length, error: failures ? `${failures}/${qs.length} queries failed` : undefined }));
+    }),
+  );
   // Match against all runners of the meeting
   const everyone = { runners: races.flatMap((r) => r.runners.map((x) => ({ name: x.name, jockey: x.jockey, trainer: x.trainer }))) };
   const matched = matchNews(dedupeNews(items), everyone, [meeting.venue, ...races.map((r) => r.name)]);
@@ -209,6 +207,22 @@ async function fetchNews(deps: ResearchDeps, meeting: MeetingSummary, races: Rac
   }
   job.finish('news', 'done', `${matched.length} relevant items from ${qs.length} searches`);
   return { news: matched, statuses };
+}
+
+/**
+ * Build a compact set of news queries: the meeting, each feature race, and the
+ * runners grouped six at a time as "A" OR "B" OR ... (all our news sources
+ * understand OR). Keeps a 9-race card to ~20 queries per source instead of 100+.
+ */
+export function buildNewsQueries(meeting: MeetingSummary, races: Array<Pick<Race, 'name' | 'group' | 'runners'>>, groupSize = 6): string[] {
+  const out: string[] = [`${meeting.venue} races ${meeting.date}`];
+  const names: string[] = [];
+  for (const race of races) {
+    if (race.group || /stakes|cup|plate|classic|guineas/i.test(race.name)) out.push(race.name.replace(/^R\d+\s+/i, ''));
+    for (const r of race.runners) if (!r.scratched && r.name && !names.includes(r.name)) names.push(r.name);
+  }
+  for (let i = 0; i < names.length; i += groupSize) out.push(names.slice(i, i + groupSize).map((n) => `"${n}"`).join(' OR '));
+  return [...new Set(out)];
 }
 
 function dedupeNews(items: NewsItem[]): NewsItem[] {
@@ -299,7 +313,7 @@ export async function researchMeeting(deps: ResearchDeps, meeting: MeetingSummar
   };
 
   // Results already available (meeting partly run) ---------------------------
-  await collectResults(deps, pack, job, false);
+  await collectResults(deps, pack, job, true);
 
   job.start('predict', 'Rating every race and building betting structures');
   pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
@@ -316,7 +330,13 @@ export async function collectResults(deps: ResearchDeps, pack: MeetingPack, job:
   const adapters = deps.registry.withCapability('results', deps.settings.disabledSources);
   const now = deps.now?.() ?? new Date();
   const candidates = pack.races.filter((r) => (only ? r.number === only : true) && !pack.results[r.number] && (!r.startTime || new Date(r.startTime).getTime() <= now.getTime() + 60_000 || r.status === 'final' || r.status === 'interim' || only));
-  if (!adapters.length || !candidates.length) return [];
+  if (!adapters.length || !candidates.length) {
+    if (verbose) {
+      job.start('results', 'Collecting results of races already run');
+      job.finish('results', 'done', candidates.length ? 'No results source available' : 'No races have been run yet');
+    }
+    return [];
+  }
   if (verbose) job.start('results', 'Collecting results of races already run');
   const newly: number[] = [];
   for (const race of candidates) {

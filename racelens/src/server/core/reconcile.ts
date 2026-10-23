@@ -295,7 +295,8 @@ export function reconcileRace(raws: Array<{ source: SourceId; weight: number; ra
   const status = ordered.map((r) => r.race.status).sort((a, b) => STATUS_RANK[b] - STATUS_RANK[a])[0] || 'unknown';
   const withResults = ordered.find((r) => r.race.results && r.race.results.length);
   const distanceVotes = agree(ordered.map((r) => ({ source: r.source, weight: r.weight, value: r.race.distance })).filter((v) => v.value));
-  const nameVotes = agree(ordered.map((r) => ({ source: r.source, weight: r.weight, value: r.race.name })).filter((v) => v.value), (v) => normaliseName(v));
+  const cleanName = (n?: string) => (n || '').replace(/^\s*R(?:ace)?\s?\d{1,2}\s*[-–:.]?\s+/i, '').trim();
+  const nameVotes = agree(ordered.map((r) => ({ source: r.source, weight: r.weight, value: cleanName(r.race.name) })).filter((v) => v.value), (v) => normaliseName(v));
 
   const active = runners.filter((r) => !r.scratched);
   const runnerScores = runners.map((r) => r.verification.score);
@@ -311,7 +312,7 @@ export function reconcileRace(raws: Array<{ source: SourceId; weight: number; ra
 
   return {
     number: anchor.number,
-    name: nameVotes.value || anchor.name,
+    name: nameVotes.value || cleanName(anchor.name) || anchor.name,
     distance: distanceVotes.value || anchor.distance,
     startTime: ordered.map((r) => r.race.startTime).find(Boolean),
     raceClass: ordered.map((r) => r.race.raceClass).find(Boolean),

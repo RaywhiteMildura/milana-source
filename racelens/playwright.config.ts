@@ -18,7 +18,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   webServer: {
-    command: 'RACELENS_MODE=demo RACELENS_PORT=4851 RACELENS_DATA_DIR=./data-e2e node dist/server/index.js',
+    command: 'npx cross-env RACELENS_MODE=demo RACELENS_PORT=4851 RACELENS_DATA_DIR=./data-e2e node dist/server/index.js',
     url: 'http://localhost:4851/api/health',
     reuseExistingServer: false,
     timeout: 60_000,

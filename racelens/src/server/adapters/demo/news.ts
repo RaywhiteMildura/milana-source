@@ -124,15 +124,17 @@ export const demoNewsAdapter: SourceAdapter = {
 
   async searchNews(query: string, ctx: FetchContext): Promise<NewsItem[]> {
     await demoDelay(ctx);
-    const tokens = newsQueryTokens(query);
-    if (!tokens.length) return [];
+    // "A" OR "B" OR "C" → any alternative may match; a plain query needs every token.
+    const alternatives = query.split(/\s+OR\s+/).map((alt) => newsQueryTokens(alt)).filter((t) => t.length);
+    if (!alternatives.length) return [];
     const pack = loadDemoPack();
     const items = loadDemoNews().items ?? [];
     const hits: NewsItem[] = [];
     items.forEach((raw, i) => {
       if (!raw?.title) return;
       const text = normaliseName(`${raw.title} ${raw.snippet ?? ''}`);
-      if (!tokens.every((t) => wordMatch(text, t))) return;
+      const tokens = alternatives.find((alt) => alt.every((t) => wordMatch(text, t)));
+      if (!tokens) return;
       hits.push(toNewsItem(raw, i, pack, tokens));
     });
     hits.sort((a, b) => b.relevance - a.relevance || (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''));

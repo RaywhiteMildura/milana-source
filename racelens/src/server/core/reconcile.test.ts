@@ -125,6 +125,17 @@ describe('reconcileRace', () => {
   });
 });
 
+describe('race name clean-up', () => {
+  it('strips a leading race-number prefix from source race names', () => {
+    const r = reconcileRace([
+      { source: 'official', weight: 1, race: race('official', [{ number: 1, name: 'A' }], { name: 'R9 Demo Plate' }) },
+      { source: 'odds', weight: 0.65, race: race('odds', [{ number: 1, name: 'A' }], { name: 'Race 9 - Demo Plate' }) },
+    ]);
+    expect(r.name).toBe('Demo Plate');
+    expect(r.verification.conflicts).toHaveLength(0);
+  });
+});
+
 describe('reconcileMeeting', () => {
   it('aligns races by number across sources and computes meeting verification', () => {
     const m = reconcileMeeting(
