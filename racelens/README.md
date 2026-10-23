@@ -16,7 +16,19 @@ RaceLens is a personal horse-racing research assistant for Australian thoroughbr
 
 ---
 
-## Quick start (your computer, open internet)
+## Using it on your phone with a Mac mini (the main way)
+
+**Start here: [docs/MAC-MINI.md](docs/MAC-MINI.md).** Paste one line into Terminal on the Mac mini once; after that the
+Mac runs RaceLens silently in the background (starts by itself, restarts itself, keeps the Mac awake) and you use it
+only from your phone – anywhere, via Tailscale's private `https://` address, installed on the home screen like an app.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RaywhiteMildura/milana-source/refs/heads/claude/horse-racing-predictor-ts4iet/racelens/scripts/mac/bootstrap.sh | bash
+```
+
+Run the same line again to update. No Mac to leave on? [docs/DEPLOY.md](docs/DEPLOY.md) option B hosts it on Fly.io in Sydney.
+
+## Quick start (a developer's computer)
 
 Requirements: Node.js 22 or newer – install the LTS version from https://nodejs.org. (Node 20.19+ still builds and runs it, but the tests need Node 22.12+.)
 
@@ -29,7 +41,7 @@ npm start          # http://localhost:4850
 
 Open **http://localhost:4850**, pick tomorrow's date, choose the meeting (e.g. Flemington) and press **Research this meeting**.
 
-## Use it on your phone
+## Other ways to reach it from a phone
 
 ```bash
 npm run start:phone      # same as npm start, but reachable from your Wi-Fi; prints a QR code

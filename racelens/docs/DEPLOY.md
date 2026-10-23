@@ -1,5 +1,9 @@
 # Use RaceLens on your phone
 
+> **Have a Mac mini (or any Mac that can stay on)? Use [MAC-MINI.md](MAC-MINI.md) instead** – one line in Terminal sets
+> up everything below for you (background service, password in the Keychain, Tailscale https address, never-sleep,
+> restart after a power cut). This page covers the other options and the details.
+
 RaceLens is two things: a **small server program** that does the work (fetches the sources, rates the races, watches for results all day) and a **web page** that shows you the answers. Your phone only ever opens the web page. The server has to be **running somewhere for the whole race day** – on a computer at the office or at home, on a hosted machine in the cloud, or (Android only) on the phone itself.
 
 That is the only decision to make. Once the server is up, the phone side is the same every time: open the address, sign in once, add it to your home screen, and it behaves like an app.
