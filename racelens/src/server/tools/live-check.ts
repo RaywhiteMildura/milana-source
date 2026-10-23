@@ -6,7 +6,7 @@
  *
  *   npx tsx src/server/tools/live-check.ts [upcomingDate] [upcomingVenue] [resultsDate] [resultsVenue] [outDir]
  *
- * Defaults: tomorrow (Melbourne) at Flemington, results from last Saturday at
+ * Defaults: today (tomorrow after 7 pm, Melbourne time) at Flemington, results from last Saturday at
  * Caulfield, output in ./live-check-out. Exit code 1 when no race-card source
  * worked or the research job failed, so a CI run goes red. Prints no secrets.
  */
@@ -25,6 +25,9 @@ const addDays = (date: string, n: number) => {
   d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
 };
+// Before 7 pm in Melbourne the meeting that matters is today's; after that, tomorrow's (as the app's home page does).
+const hourInMelbourne = Number(new Intl.DateTimeFormat('en-AU', { timeZone: TZ, hour: 'numeric', hourCycle: 'h23' }).format(new Date()));
+const raceDay = hourInMelbourne >= 19 ? addDays(today, 1) : today;
 const lastSaturday = (() => {
   const dow = new Date(`${today}T12:00:00Z`).getUTCDay(); // 6 = Saturday
   return addDays(today, -(((dow + 1) % 7) || 7));
@@ -32,7 +35,7 @@ const lastSaturday = (() => {
 
 // Arguments, or LIVE_* environment variables (blank means "use the default").
 const arg = (i: number, env: string) => process.argv[2 + i] || process.env[env] || undefined;
-const upDate = arg(0, 'LIVE_UP_DATE') ?? addDays(today, 1);
+const upDate = arg(0, 'LIVE_UP_DATE') ?? raceDay;
 const upVenue = arg(1, 'LIVE_UP_VENUE') ?? 'flemington';
 const resDate = arg(2, 'LIVE_RES_DATE') ?? lastSaturday;
 const resVenue = arg(3, 'LIVE_RES_VENUE') ?? 'caulfield';
@@ -40,7 +43,8 @@ const outDir = arg(4, 'LIVE_OUT_DIR') ?? 'live-check-out';
 fs.mkdirSync(outDir, { recursive: true });
 
 const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'racelens-live-'));
-const { app, scheduler } = createApp({ mode: process.env.RACELENS_MODE === 'demo' ? 'demo' : 'live', dataDir, password: '' });
+const recordDir = process.env.LIVE_RECORD_DIR;
+const { app, scheduler } = createApp({ mode: process.env.RACELENS_MODE === 'demo' ? 'demo' : 'live', dataDir, password: '', record: !!recordDir });
 scheduler.stop();
 const server = app.listen(0, '127.0.0.1');
 await new Promise<void>((r) => server.once('listening', () => r()));
@@ -88,6 +92,9 @@ async function research(date: string, venueSlug: string): Promise<MeetingPack | 
   printStatuses(listed.sourceStatuses);
   for (const m of listed.meetings) console.log(`   ${m.venue.padEnd(24)} ${m.raceType.padEnd(12)} ${(m.state || '').padEnd(4)} races=${m.raceCount ?? '?'} first=${m.firstRaceTime ?? '?'} sources=${m.sources.join(',')}`);
   if (!listed.meetings.length) fail(`No meetings found for ${date} by any source`);
+  const slugs = listed.meetings.filter((m) => m.raceType === 'thoroughbred').map((m) => m.venueSlug);
+  const dupes = slugs.filter((s, i) => slugs.indexOf(s) !== i || slugs.some((o) => o !== s && (s.endsWith(`-${o}`) || o.endsWith(`-${s}`))));
+  if (dupes.length) fail(`The same meeting is listed twice (${[...new Set(dupes)].join(', ')}) – the phone would show duplicate cards`);
   const meeting = listed.meetings.find((m) => m.venueSlug === venueSlug) ?? listed.meetings.find((m) => m.venueSlug.startsWith(venueSlug));
   if (!meeting) {
     fail(`No '${venueSlug}' meeting on ${date}`);
@@ -127,12 +134,41 @@ function summarise(pack: MeetingPack) {
   }
 }
 
+/** Print the first meeting objects each feed really sent (field names and short values) – public racing data only. */
+function printRawMeetingSamples() {
+  const dir = path.resolve('fixtures/recorded');
+  if (!fs.existsSync(dir)) return;
+  console.log('\n## Raw meeting records as the feeds sent them (first two per response)');
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json') && !x.endsWith('.meta.json'))) {
+    const text = fs.readFileSync(path.join(dir, f), 'utf8');
+    if (!/"(venueName|meetingName|venue_name|meetName)"/.test(text)) continue;
+    const found: unknown[] = [];
+    const walk = (o: unknown) => {
+      if (found.length >= 2 || !o || typeof o !== 'object') return;
+      if (Array.isArray(o)) return o.forEach(walk);
+      const rec = o as Record<string, unknown>;
+      if ('venueName' in rec || 'meetingName' in rec || 'venue_name' in rec || 'meetName' in rec) {
+        found.push(Object.fromEntries(Object.entries(rec).filter(([, v]) => v === null || typeof v !== 'object').map(([k, v]) => [k, typeof v === 'string' ? v.slice(0, 60) : v])));
+        return;
+      }
+      Object.values(rec).forEach(walk);
+    };
+    try {
+      walk(JSON.parse(text));
+    } catch {
+      continue;
+    }
+    if (found.length) console.log(`   ${f.slice(0, 90)}\n${found.map((x) => `      ${JSON.stringify(x)}`).join('\n')}`);
+  }
+}
+
 try {
   console.log(`RaceLens live check – upcoming ${upDate} ${upVenue}; results ${resDate} ${resVenue}; server clock ${new Date().toISOString()}`);
   const upcoming = await research(upDate, upVenue);
   if (upcoming) summarise(upcoming);
 
   const past = await research(resDate, resVenue);
+  if (past) summarise(past);
   if (past) {
     console.log(`\n## Results for ${past.meeting.venue} ${resDate}`);
     const { jobId } = await api<{ jobId: string | null }>('POST', `/api/packs/${encodeURIComponent(past.id)}/results`, {});
@@ -148,6 +184,7 @@ try {
     }
     if (!got) fail(`No results collected for ${past.meeting.venue} ${resDate}`);
   }
+  if (recordDir) printRawMeetingSamples();
 } catch (err) {
   fail(err instanceof Error ? err.stack || err.message : String(err));
 } finally {

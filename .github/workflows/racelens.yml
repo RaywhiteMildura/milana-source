@@ -57,18 +57,29 @@ jobs:
       - run: npm run typecheck
       - run: npx vitest run
       - run: npm run build
-      - name: Mac installer – install the background service, check it answers, remove it
-        if: hashFiles('racelens/scripts/mac/install.sh') != ''
+      - name: The one-line Mac installer, exactly as the Mac mini runs it (downloads Node and this branch, builds, starts the service)
+        if: hashFiles('racelens/scripts/mac/bootstrap.sh') != ''
         env:
+          RACELENS_HOME: ${{ runner.temp }}/racelens-home
+          RACELENS_BRANCH: ${{ github.ref_name }}
+          RACELENS_FORCE_PORTABLE_NODE: '1'
           RACELENS_INSTALL_UNATTENDED: '1'
           RACELENS_PASSWORD: ci-only-password-${{ github.run_id }}
           RACELENS_SKIP_TAILSCALE: '1'
           RACELENS_SKIP_POWER: '1'
           RACELENS_MODE: demo
         run: |
-          bash scripts/mac/install.sh
-          bash scripts/mac/status.sh
-          bash scripts/mac/uninstall.sh --purge
+          bash scripts/mac/bootstrap.sh
+          bash "$RACELENS_HOME/app/scripts/mac/status.sh"
+          # The service must answer with a password required, and refuse data without signing in.
+          curl -fsS http://127.0.0.1:4850/api/health | grep -q '"authRequired":true'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4850/api/packs)" = 401
+          # Run it again: an update must keep working and keep the data folder.
+          bash "$RACELENS_HOME/app/scripts/mac/update.sh"
+          curl -fsS http://127.0.0.1:4850/api/health >/dev/null
+          test -d "$HOME/Library/Application Support/RaceLens/data"
+          bash "$RACELENS_HOME/app/scripts/mac/uninstall.sh" --purge
+          ! curl -fsS -m 3 http://127.0.0.1:4850/api/health
 
   live-check:
     runs-on: ubuntu-24.04
@@ -84,6 +95,7 @@ jobs:
           LIVE_UP_VENUE: ${{ inputs.upcoming_venue }}
           LIVE_RES_DATE: ${{ inputs.results_date }}
           LIVE_RES_VENUE: ${{ inputs.results_venue }}
+          LIVE_RECORD_DIR: fixtures/recorded
         run: |
           set -o pipefail
           npx tsx src/server/tools/live-check.ts 2>&1 | tee live-check.log

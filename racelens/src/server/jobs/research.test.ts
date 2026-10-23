@@ -42,6 +42,33 @@ describe('mergeMeetingSummaries', () => {
     expect(flem.rail).toBe('+3m');
     expect(flem.id).toBe('2026-10-24:flemington');
   });
+
+  it('merges what the live feeds actually send: slug names, sponsor prefixes, dates with a time, AU vs AUS', () => {
+    // Shapes seen from the real Racing.com, Racing Australia and Entain feeds on 17 and 24 Oct 2026.
+    const rc = (venue: string, state: string) => ({ ...meeting, id: `x:${venue}`, venue, venueSlug: venue, state, date: '2026-10-17T00:00:00+11:00', country: 'Australia', firstRaceTime: undefined, sourceRefs: { racingcom: venue } });
+    const en = (venue: string, state: string) => ({ ...meeting, id: `y:${venue}`, venue, venueSlug: venue.toLowerCase().replace(/ /g, '-'), state, date: '2026-10-17', country: 'AUS', firstRaceTime: '2026-10-17T01:15:00.000Z', sourceRefs: { entain: venue } });
+    const merged = mergeMeetingSummaries(
+      [
+        { source: 'racingcom', meetings: [rc('caulfield', 'VIC'), rc('royal-randwick', 'NSW'), rc('sportsbet-port-lincoln', 'SA'), rc('aquis-park-gold-coast', 'QLD'), rc('picklebet-park-wodonga', 'VIC'), rc('port-macquarie', 'NSW')] },
+        { source: 'entain', meetings: [en('Caulfield', 'VIC'), en('Randwick', 'NSW'), en('Port Lincoln', 'SA'), en('Gold Coast', 'QLD'), en('Wodonga', 'VIC'), en('Port Macquarie', 'NSW')] },
+      ],
+      '2026-10-17',
+    );
+    expect(merged.map((m) => m.venue)).toEqual(['Caulfield', 'Gold Coast', 'Port Lincoln', 'Port Macquarie', 'Randwick', 'Wodonga']);
+    for (const m of merged) {
+      expect(m.sources).toEqual(['racingcom', 'entain']);
+      expect(m.date).toBe('2026-10-17');
+      expect(m.firstRaceTime).toBe('2026-10-17T01:15:00.000Z');
+      expect(m.id).toBe(`2026-10-17:${m.venueSlug}`);
+    }
+    expect(merged.find((m) => m.venue === 'Randwick')!.venueSlug).toBe('randwick');
+  });
+
+  it('never merges two real tracks: different states, or names that only share a word', () => {
+    const one = (venue: string, state: string, source = 'a') => ({ source, meetings: [{ ...meeting, venue, venueSlug: venue.toLowerCase(), state, sourceRefs: {} }] });
+    const merged = mergeMeetingSummaries([one('Sandown Hillside', 'VIC'), one('Sandown Lakeside', 'VIC', 'b'), one('Park', 'NSW'), one('Royal Park', 'SA', 'b')]);
+    expect(merged).toHaveLength(4);
+  });
 });
 
 // ---------------------------------------------------------------------------

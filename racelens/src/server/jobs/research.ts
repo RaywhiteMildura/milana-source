@@ -215,33 +215,71 @@ async function timed<T>(fn: (ctx?: FetchContext) => Promise<T>, label: string, c
   }
 }
 
-/** Merge meeting summaries discovered by several sources into one list. */
-export function mergeMeetingSummaries(lists: Array<{ source: string; meetings: MeetingSummary[] }>): MeetingSummary[] {
-  const out = new Map<string, MeetingSummary>();
+/** "port-macquarie" / "caulfield" (a slug or all lower case, as some feeds send it) → "Port Macquarie" / "Caulfield". */
+export function displayVenueName(name: string): string {
+  const n = (name || '').trim();
+  if (/^[a-z0-9]+(?:[-_ ][a-z0-9]+)*$/.test(n)) return n.split(/[-_ ]+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  return n;
+}
+
+/** One spelling per country: feeds send "AUS", "AU" or "Australia". */
+function countryKey(country?: string): string {
+  const c = (country || 'AUS').toUpperCase().replace(/[^A-Z]/g, '');
+  if (c === 'AU' || c === 'AUS' || c === 'AUSTRALIA') return 'AUS';
+  if (c === 'NZ' || c === 'NZL' || c === 'NEWZEALAND') return 'NZ';
+  return c;
+}
+
+/**
+ * Whether two venue names from different feeds are the same meeting. Exact (after normalising) or one is the other
+ * with a sponsor or prefix in front: "Sportsbet Port Lincoln" / "Port Lincoln", "Royal Randwick" / "Randwick",
+ * "Aquis Park Gold Coast" / "Gold Coast", "Picklebet Park Wodonga" / "Wodonga". The prefix form only counts when the
+ * states agree (or one is unknown), so two real tracks never merge.
+ */
+function sameVenue(a: MeetingSummary, b: MeetingSummary): boolean {
+  const x = normaliseName(a.venue);
+  const y = normaliseName(b.venue);
+  if (!x || !y) return false;
+  if (x === y) return true;
+  const statesAgree = !a.state || !b.state || a.state.toUpperCase() === b.state.toUpperCase();
+  return statesAgree && (x.endsWith(` ${y}`) || y.endsWith(` ${x}`));
+}
+
+/** Merge meeting summaries discovered by several sources into one list (one card per real meeting). */
+export function mergeMeetingSummaries(lists: Array<{ source: string; meetings: MeetingSummary[] }>, date?: string): MeetingSummary[] {
+  const out: MeetingSummary[] = [];
   for (const { source, meetings } of lists) {
-    for (const m of meetings) {
-      const key = `${m.date}:${normaliseName(m.venue).replace(/\s+/g, '-')}:${m.raceType}:${(m.country || 'AUS').toUpperCase()}`;
-      const existing = out.get(key);
+    for (const raw of meetings) {
+      // Some feeds send "2026-10-24T00:00:00+11:00": the meeting date is the calendar day asked for.
+      const day = date || (raw.date || '').slice(0, 10);
+      const m: MeetingSummary = { ...raw, date: day, venue: displayVenueName(raw.venue) };
+      const existing = out.find((e) => e.date === m.date && e.raceType === m.raceType && countryKey(e.country) === countryKey(m.country) && sameVenue(e, m));
       if (!existing) {
-        out.set(key, { ...m, id: `${m.date}:${normaliseName(m.venue).replace(/\s+/g, '-')}`, venueSlug: normaliseName(m.venue).replace(/\s+/g, '-'), sources: [source], sourceRefs: { ...m.sourceRefs } });
-      } else {
-        existing.sources = [...new Set([...existing.sources, source])];
-        existing.sourceRefs = { ...existing.sourceRefs, ...m.sourceRefs };
-        existing.state = existing.state || m.state;
-        existing.country = existing.country || m.country;
-        existing.raceCount = existing.raceCount || (m.raceCount && m.raceCount <= MAX_RACES ? m.raceCount : undefined);
-        existing.trackCondition = existing.trackCondition || m.trackCondition;
-        existing.trackRating = existing.trackRating ?? m.trackRating;
-        existing.weather = existing.weather || m.weather;
-        existing.rail = existing.rail || m.rail;
-        existing.firstRaceTime = existing.firstRaceTime || m.firstRaceTime;
+        const slug = normaliseName(m.venue).replace(/\s+/g, '-');
+        out.push({ ...m, id: `${m.date}:${slug}`, venueSlug: slug, sources: [source], sourceRefs: { ...m.sourceRefs } });
+        continue;
+      }
+      existing.sources = [...new Set([...existing.sources, source])];
+      existing.sourceRefs = { ...existing.sourceRefs, ...m.sourceRefs };
+      existing.state = existing.state || m.state;
+      existing.country = existing.country || m.country;
+      existing.raceCount = existing.raceCount || (m.raceCount && m.raceCount <= MAX_RACES ? m.raceCount : undefined);
+      existing.trackCondition = existing.trackCondition || m.trackCondition;
+      existing.trackRating = existing.trackRating ?? m.trackRating;
+      existing.weather = existing.weather || m.weather;
+      existing.rail = existing.rail || m.rail;
+      existing.firstRaceTime = existing.firstRaceTime || m.firstRaceTime;
+      // Show the plain venue name ("Randwick", not "Royal Randwick" or "Sportsbet Port Lincoln").
+      if (normaliseName(m.venue).length < normaliseName(existing.venue).length) {
+        const slug = normaliseName(m.venue).replace(/\s+/g, '-');
+        Object.assign(existing, { venue: m.venue, venueSlug: slug, id: `${existing.date}:${slug}` });
       }
     }
   }
-  for (const m of out.values()) {
-    if (!m.timezone) m.timezone = zoneForAustralianState(m.state) || (m.country === 'NZ' ? 'Pacific/Auckland' : 'Australia/Melbourne');
+  for (const m of out) {
+    if (!m.timezone) m.timezone = zoneForAustralianState(m.state) || (countryKey(m.country) === 'NZ' ? 'Pacific/Auckland' : 'Australia/Melbourne');
   }
-  return [...out.values()].sort((a, b) => (a.raceType === b.raceType ? a.venue.localeCompare(b.venue) : a.raceType === 'thoroughbred' ? -1 : 1));
+  return out.sort((a, b) => (a.raceType === b.raceType ? a.venue.localeCompare(b.venue) : a.raceType === 'thoroughbred' ? -1 : 1));
 }
 
 export async function discoverMeetings(deps: ResearchDeps, date: string): Promise<{ meetings: MeetingSummary[]; statuses: SourceStatus[] }> {
@@ -252,7 +290,7 @@ export async function discoverMeetings(deps: ResearchDeps, date: string): Promis
     statuses.push(statusOf(a, !r.error, r.ms, { itemCount: r.value?.length, error: r.error }));
     return { source: a.id, meetings: r.value || [] };
   });
-  return { meetings: mergeMeetingSummaries(lists), statuses };
+  return { meetings: mergeMeetingSummaries(lists, date), statuses };
 }
 
 function sourceMeta(registry: AdapterRegistry): SourceMeta[] {
@@ -283,7 +321,8 @@ async function fetchAllSources(deps: ResearchDeps, meeting: MeetingSummary, job:
 }
 
 async function fetchDeepForm(deps: ResearchDeps, meeting: MeetingSummary, raws: MeetingRaw[], job: JobHandle): Promise<void> {
-  const adapters = deps.registry.withCapability('form', deps.settings.disabledSources);
+  // Only sources that can look form up separately (others deliver it with their race card, or not at all).
+  const adapters = deps.registry.withCapability('form', deps.settings.disabledSources).filter((a) => typeof a.fetchForm === 'function');
   if (!adapters.length) return;
   job.start('form', 'Collecting detailed form (past starts, breeding, statistics)');
   const raceNumbers = clampRaceNumbers(raws.flatMap((m) => m.races.map((r) => r.number)));
@@ -604,7 +643,7 @@ export async function collectResults(deps: ResearchDeps, pack: MeetingPack, job:
   if (!adapters.length || !candidates.length) {
     if (verbose) {
       job.start('results', 'Collecting results of races already run');
-      job.finish('results', 'done', candidates.length ? 'No results source available' : 'No races have been run yet');
+      job.finish('results', 'done', candidates.length ? 'No results source available' : Object.keys(pack.results).length ? 'Every race that has been run already has its result' : 'No races have been run yet');
     }
     return [];
   }
@@ -834,7 +873,9 @@ export async function collectAndRerate(deps: ResearchDeps, pack: MeetingPack, jo
       : !candidates.length
         ? wanted
           ? 'Nothing to check - already settled'
-          : 'No races have been run yet'
+          : Object.keys(pack.results).length
+            ? 'Every race that has been run already has its result'
+            : 'No races have been run yet'
         : noneAnswered
           ? `No results source answered${failed}`
           : `${newly.length ? `Results in for R${newly.join(', R')}` : 'No new results yet'}${failed}`,

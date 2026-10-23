@@ -87,12 +87,21 @@ async function servePackWith(page: Page, patch: (pack: { races: Array<{ number: 
     (url) => /^\/api\/packs\/[^/]+$/.test(url.pathname),
     async (route) => {
       if (route.request().method() !== 'GET') return route.fallback();
-      const res = await route.fetch();
-      const pack = await res.json();
-      await route.fulfill({ response: res, json: { ...pack, ...patch(pack) } });
+      try {
+        const res = await route.fetch();
+        const pack = await res.json();
+        await route.fulfill({ response: res, json: { ...pack, ...patch(pack) } });
+      } catch {
+        // The test finished (page closing) while this request was in flight: nothing left to serve.
+      }
     },
   );
 }
+
+// Requests still in flight when a test ends must not fail it (a mocked handler mid-fetch on a slower machine).
+test.afterEach(async ({ page }) => {
+  await page.unrouteAll({ behavior: 'ignoreErrors' });
+});
 
 test('home loads with the demo banner and at least one meeting card', async ({ page }) => {
   const meetingsRequest = page.waitForResponse((r) => r.url().includes(`/api/meetings?date=${DEMO_DATE}`));
