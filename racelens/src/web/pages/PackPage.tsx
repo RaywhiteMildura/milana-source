@@ -410,7 +410,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
             {w && (w.rainLast72hMm != null || w.rainRaceDayMm != null || w.maxTempC != null || w.windKmhMax != null) && (
               <p className="small muted pack-head__weather">
                 {w.rainLast72hMm != null && `Rain last 72h: ${w.rainLast72hMm}mm`}
-                {w.rainRaceDayMm != null && ` · Race day rain: ${w.rainRaceDayMm}mm`}
+                {w.rainRaceDayMm != null && ` · Rain still to come on race day: ${w.rainRaceDayMm}mm`}
                 {w.maxTempC != null && ` · Max ${Math.round(w.maxTempC)}°C`}
                 {w.windKmhMax != null && ` · Wind to ${Math.round(w.windKmhMax)} km/h`}
                 {w.conditionDrift != null && w.conditionDrift !== 0 && ` · Track may go ${w.conditionDrift > 0 ? 'softer' : 'firmer'}`}

@@ -2,12 +2,14 @@
  * Weather summary and wet-track suitability.
  *
  * `summariseWeather` folds hourly observations/forecasts into rain totals for
- * the 72 hours before race day and for race day itself (before 18:00 local),
- * the race-day maximum temperature and wind, a one-line summary and an
- * expected drift in track rating. `expectedTrackRating` applies that drift and
- * `wetTrackFactor` scores a runner's record on the expected going.
+ * the 72 hours before race day and for the race-day rain still to fall (after
+ * `now`, before 18:00 local), the race-day maximum temperature and wind, a
+ * one-line summary and an expected drift in track rating. `expectedTrackRating`
+ * applies that drift and `wetTrackFactor` scores a runner's record on the
+ * expected going.
  *
- * Pure functions: no I/O, no clock.
+ * Pure functions: no I/O; the clock is read only when neither `now` nor a
+ * readable `fetchedAt` is given.
  */
 import type { CareerStats, Runner, WeatherHour, WeatherSummary } from '../../shared/types.js';
 import { clamp, round, trackRatingLabel } from '../../shared/util.js';
@@ -102,14 +104,21 @@ function daysBefore(date: string, raceDayDate: string): number | undefined {
   return Math.round((b - a) / 86400000);
 }
 
+/** Local stamp of a Date, or of a timestamp read like the hourly ones; undefined when unreadable. */
+function stampOf(t: Date | string | undefined, tz: string): LocalStamp | undefined {
+  if (t instanceof Date) return Number.isNaN(t.getTime()) ? undefined : toLocalStamp(t.toISOString(), tz);
+  return t ? toLocalStamp(t, tz) : undefined;
+}
+
 // ---------------------------------------------------------------------------
 // Drift & summary
 // ---------------------------------------------------------------------------
 
 /**
  * Expected change in track rating from rain: 0 below 2mm in the 72h lead-up,
- * +1 for 2–8mm, +2 for 8–20mm, +3 above 20mm, plus 1 when more than 5mm falls
- * on race day before 18:00. Never negative; undefined when nothing is known.
+ * +1 for 2–8mm, +2 for 8–20mm, +3 above 20mm, plus 1 when more than 5mm is
+ * still to fall on race day before 18:00. Never negative; undefined when
+ * nothing is known.
  */
 export function rainDrift(rainLast72hMm: number | undefined, rainRaceDayMm: number | undefined): number | undefined {
   if (rainLast72hMm === undefined && rainRaceDayMm === undefined) return undefined;
@@ -188,10 +197,21 @@ function buildSummary(p: SummaryParts): string {
  * Summarise hourly weather for a race day. Rain totals are undefined when no
  * hours fall in the relevant window; temperature and wind use race-day hours
  * when present, else every hour supplied.
+ *
+ * Race-day rain counts only the hours still to come at `now` (default: the
+ * forecast's `fetchedAt`, i.e. when it was taken; the clock if that is
+ * unreadable). Rain that has already fallen is in the declared track rating,
+ * so only rain still to fall may move the expected going. An hourly amount is
+ * the hour ending at its timestamp (Open-Meteo), so the hour stamped at or
+ * before `now` has fallen. Before race day every race-day hour counts; after
+ * it, none does.
  */
-export function summariseWeather(input: WeatherInput): WeatherSummary {
+export function summariseWeather(input: WeatherInput, now?: Date | string): WeatherSummary {
   const tz = input.timezone || DEFAULT_TZ;
   const hourly = Array.isArray(input.hourly) ? input.hourly : [];
+  const nowLocal = stampOf(now, tz) ?? stampOf(input.fetchedAt, tz) ?? stampOf(new Date(), tz);
+  const nowBefore = nowLocal ? daysBefore(nowLocal.date, input.raceDayDate) : undefined;
+  const stillToCome = (hour: number): boolean => nowBefore === undefined || nowBefore > 0 || (nowBefore === 0 && hour > nowLocal!.hour);
 
   let rainLast72hMm: number | undefined;
   let rainPrevDayMm = 0;
@@ -219,7 +239,7 @@ export function summariseWeather(input: WeatherInput): WeatherSummary {
       if (before === 1) rainPrevDayMm += rain;
     } else if (before === 0) {
       rainRaceDayMm = rainRaceDayMm ?? 0;
-      if (local.hour < RACE_DAY_CUTOFF_HOUR) rainRaceDayMm += rain;
+      if (local.hour < RACE_DAY_CUTOFF_HOUR && stillToCome(local.hour)) rainRaceDayMm += rain;
       if (h.tempC !== undefined && Number.isFinite(h.tempC)) raceDayMaxTemp = Math.max(raceDayMaxTemp ?? -Infinity, h.tempC);
       if (h.windKmh !== undefined && Number.isFinite(h.windKmh)) raceDayMaxWind = Math.max(raceDayMaxWind ?? -Infinity, h.windKmh);
     }

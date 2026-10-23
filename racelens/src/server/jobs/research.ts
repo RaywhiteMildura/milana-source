@@ -380,13 +380,13 @@ function stripUndefined<T extends object>(o: T): Partial<T> {
   return out;
 }
 
-async function fetchWeather(deps: ResearchDeps, meeting: MeetingSummary, job: JobHandle): Promise<{ weather?: WeatherSummary; statuses: SourceStatus[] }> {
+async function fetchWeather(deps: ResearchDeps, meeting: MeetingSummary, job: JobHandle, budgetMs = 20_000): Promise<{ weather?: WeatherSummary; statuses: SourceStatus[] }> {
   const adapters = deps.registry.withCapability('weather', deps.settings.disabledSources);
   const statuses: SourceStatus[] = [];
   if (!adapters.length) return { statuses };
   job.start('weather', 'Checking weather and likely track condition');
   for (const a of adapters) {
-    const r = await timed((c) => a.fetchWeather!(meeting.venue, meeting.date, c || deps.ctx), `${a.name} weather`, deps.ctx, 20_000);
+    const r = await timed((c) => a.fetchWeather!(meeting.venue, meeting.date, c || deps.ctx), `${a.name} weather`, deps.ctx, budgetMs);
     statuses.push(statusOf(a, !r.error && !!r.value, r.ms, { error: r.error }));
     if (r.value) {
       job.finish('weather', 'done', r.value.summary);
@@ -395,6 +395,49 @@ async function fetchWeather(deps: ResearchDeps, meeting: MeetingSummary, job: Jo
   }
   job.finish('weather', 'warn', 'No weather source responded');
   return { statuses };
+}
+
+/** A pre-race check refreshes a forecast older than this, and asks the weather sources at most this often. */
+export const WEATHER_REFRESH_MS = 30 * 60_000;
+/** Time budget of that refresh: a slow weather source must not hold up a check minutes before the jump. */
+const WEATHER_REFRESH_BUDGET_MS = 10_000;
+/** Last pre-race weather refresh per meeting, so a weather source that is down is not asked on every check. */
+const weatherTriedAt = new Map<string, number>();
+
+/**
+ * Pre-race weather refresh. Race-day rain counts only while it is still to fall (summariseWeather), so the
+ * forecast taken at research time goes stale as the day goes on. Best effort: a weather source that fails
+ * or is slow leaves the earlier forecast in place and never fails the check.
+ */
+async function refreshWeather(deps: ResearchDeps, pack: MeetingPack, job: JobHandle, now: Date): Promise<void> {
+  const t = now.getTime();
+  const fetched = Date.parse(pack.weather?.fetchedAt ?? '');
+  if (Number.isFinite(fetched) && t - fetched < WEATHER_REFRESH_MS) return;
+  const tried = weatherTriedAt.get(pack.id);
+  if (tried !== undefined && t >= tried && t - tried < WEATHER_REFRESH_MS) return;
+  if (!deps.registry.withCapability('weather', deps.settings.disabledSources).length) return;
+  weatherTriedAt.set(pack.id, t);
+  try {
+    const { weather, statuses } = await fetchWeather(deps, pack.meeting, job, WEATHER_REFRESH_BUDGET_MS);
+    if (weather) pack.weather = weather;
+    pack.sourceStatuses = mergeStatuses(pack.sourceStatuses, statuses);
+  } catch (err) {
+    deps.ctx.log.warn(`Weather refresh ${pack.meeting.venue}: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+/**
+ * The meeting's sourceRefs with the keys each source resolved while fetching it (Racing Australia's meeting
+ * key, racing.com's meetCode, event maps) folded in, so later checks hand them straight back instead of
+ * making every adapter look the meeting up again. A ref sent back empty, or unchanged, never replaces one
+ * already known.
+ */
+function mergeSourceRefs(base: MeetingSummary['sourceRefs'] | undefined, raws: MeetingRaw[]): MeetingSummary['sourceRefs'] {
+  const out = { ...base };
+  for (const raw of raws) {
+    for (const [k, v] of Object.entries(raw.meeting?.sourceRefs ?? {})) if (typeof v === 'string' && v && v !== base?.[k]) out[k] = v;
+  }
+  return out;
 }
 
 async function fetchNews(deps: ResearchDeps, meeting: MeetingSummary, races: Race[], job: JobHandle): Promise<{ news: NewsItem[]; statuses: SourceStatus[] }> {
@@ -501,8 +544,9 @@ export async function researchMeeting(deps: ResearchDeps, meeting: MeetingSummar
   const { raws, statuses: s1 } = await fetchAllSources(deps, meeting, job);
   statuses.push(...s1);
   if (!raws.length) throw new Error('No source returned a race card for this meeting. Check your internet connection and the source health panel.');
+  const resolved: MeetingSummary = { ...meeting, sourceRefs: mergeSourceRefs(meeting.sourceRefs, raws) };
 
-  await fetchDeepForm(deps, meeting, raws, job);
+  await fetchDeepForm(deps, resolved, raws, job);
 
   job.start('reconcile', 'Cross-checking every runner across sources');
   const reconciled = reconcileMeeting(raws, { sources: sourceMeta(deps.registry) });
@@ -515,8 +559,8 @@ export async function researchMeeting(deps: ResearchDeps, meeting: MeetingSummar
   const { news, statuses: s3 } = await fetchNews(deps, meeting, reconciled.races, job);
   statuses.push(...s3);
 
-  // Meeting-level conditions from the best source
-  const header: MeetingSummary = { ...meeting, sources: reconciled.sources, timezone: meeting.timezone || zoneForAustralianState(meeting.state) || 'Australia/Melbourne' };
+  // Meeting-level conditions from the best source; the sources' own meeting keys are kept for the rechecks and results polls.
+  const header: MeetingSummary = { ...resolved, sources: reconciled.sources, timezone: meeting.timezone || zoneForAustralianState(meeting.state) || 'Australia/Melbourne' };
   for (const raw of raws) {
     header.trackCondition = header.trackCondition || raw.meeting.trackCondition;
     header.trackRating = header.trackRating ?? raw.meeting.trackRating;
@@ -1055,6 +1099,9 @@ export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job:
   const patternChanges = describePatternChanges(before, pack.dayPatterns);
   changes.push(...patternChanges);
   job.finish('patterns', 'done', pack.dayPatterns.length ? pack.dayPatterns.map((p) => p.label).join('; ') : `No strong patterns yet (${Object.keys(pack.results).length} result${Object.keys(pack.results).length === 1 ? '' : 's'} in)`);
+
+  // Race-day rain still to come, for the expected going (at most every 30 minutes, best effort).
+  if (pack.races.some((r) => !pack.results[r.number] && r.status !== 'abandoned')) await refreshWeather(deps, pack, job, now);
 
   // 3. Re-predict -------------------------------------------------------------
   job.start('repredict', 'Re-rating with the latest information');

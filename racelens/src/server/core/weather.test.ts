@@ -183,6 +183,42 @@ describe('summariseWeather', () => {
   });
 });
 
+describe('summariseWeather race-day rain still to come', () => {
+  // Friday night's forecast: 7mm on race morning between 10:00 and 13:00, nothing after.
+  const hourly: WeatherHour[] = [
+    ...day('2026-10-23', { rainMm: 0 }),
+    { time: '2026-10-24T10:00', rainMm: 2 },
+    { time: '2026-10-24T11:00', rainMm: 2 },
+    { time: '2026-10-24T12:00', rainMm: 2 },
+    { time: '2026-10-24T13:00', rainMm: 1 },
+    ...day('2026-10-24', { rainMm: 0, hours: [14, 15, 16, 17] }),
+  ];
+  const at = (fetchedAt: string, now?: Date | string) =>
+    summariseWeather({ venue: 'Flemington', source: 'test', fetchedAt, hourly, raceDayDate: RACE_DAY, timezone: 'Australia/Melbourne' }, now);
+
+  it('counts every race-day hour before race day and in the morning, none once the rain has passed', () => {
+    expect(at('2026-10-23T09:00:00Z').rainRaceDayMm).toBe(7); // Friday 20:00 AEDT
+    expect(at('2026-10-23T09:00:00Z', '2026-10-24T08:00').rainRaceDayMm).toBe(7);
+    const afternoon = at('2026-10-23T09:00:00Z', '2026-10-24T15:30');
+    expect(afternoon.rainRaceDayMm).toBe(0);
+    expect(afternoon.conditionDrift).toBe(0);
+    expect(afternoon.summary).not.toContain('showers forecast');
+    expect(at('2026-10-23T09:00:00Z', '2026-10-25T09:00').rainRaceDayMm).toBe(0); // race day over
+  });
+
+  it('drops the hours that have fallen, the one stamped at the current hour included', () => {
+    expect(at('2026-10-23T09:00:00Z', '2026-10-24T11:30').rainRaceDayMm).toBe(3); // 12:00 and 13:00 to come
+    expect(at('2026-10-23T09:00:00Z', '2026-10-24T12:00').rainRaceDayMm).toBe(1);
+  });
+
+  it('takes `now` as an instant and defaults it to when the forecast was taken', () => {
+    expect(at('2026-10-23T09:00:00Z', new Date('2026-10-24T15:30:00+11:00')).rainRaceDayMm).toBe(0);
+    expect(at('2026-10-23T09:00:00Z', new Date('2026-10-24T08:00:00+11:00')).rainRaceDayMm).toBe(7);
+    expect(at('2026-10-24T04:30:00.000Z').rainRaceDayMm).toBe(0); // fetched at 15:30 AEDT
+    expect(at('2026-10-23T21:00:00.000Z').rainRaceDayMm).toBe(7); // fetched at 08:00 AEDT
+  });
+});
+
 describe('expectedTrackRating', () => {
   it('adds drift and clamps to 1..10', () => {
     expect(expectedTrackRating(4, 2)).toBe(6);

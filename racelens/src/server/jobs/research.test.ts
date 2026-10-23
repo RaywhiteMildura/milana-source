@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import type { FieldAgreement, JobProgress, MeetingPack, MeetingSummary, Race, RaceRaw, RaceResult, RaceStatus, Runner } from '../../shared/types.js';
+import type { FieldAgreement, JobProgress, MeetingPack, MeetingSummary, Race, RaceRaw, RaceResult, RaceStatus, Runner, WeatherHour } from '../../shared/types.js';
 import type { FetchContext, SourceAdapter } from '../adapters/types.js';
 import { AdapterRegistry } from '../adapters/registry.js';
 import { silentLogger } from '../core/logger.js';
+import { forecastDrift } from '../core/model.js';
+import { summariseWeather } from '../core/weather.js';
 import { DEFAULT_SETTINGS } from '../store/store.js';
 import { JobHandle } from './manager.js';
-import { buildNewsQueries, chooseResult, collectAndRerate, confirmationChecks, dueResultChecks, isResultSettled, mergeMeetingSummaries, predictAll, recheckMeeting, type ResearchDeps } from './research.js';
+import { buildNewsQueries, chooseResult, collectAndRerate, confirmationChecks, dueResultChecks, isResultSettled, mergeMeetingSummaries, predictAll, recheckMeeting, researchMeeting, type ResearchDeps } from './research.js';
 
 const meeting: MeetingSummary = { id: '2026-10-24:flemington', date: '2026-10-24', venue: 'Flemington', venueSlug: 'flemington', raceType: 'thoroughbred', sourceRefs: {}, sources: [] };
 
@@ -604,5 +606,113 @@ describe('results path rules', () => {
     expect(changes).toContain('R1: race abandoned');
     expect(pack.resultWatch?.[1]).toBeUndefined();
     expect(pack.history.at(-1)?.summary).toMatch(/^Pre-race check R1: \d+ changes?/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pre-race weather refresh and the sources' own meeting keys (review fixes)
+// ---------------------------------------------------------------------------
+
+/** Friday night's forecast for Flemington: 7mm on race morning between 10:00 and 13:00 AEDT, then dry. */
+const RAIN_10_TO_13: WeatherHour[] = [10, 11, 12, 13].map((h, i) => ({ time: `2026-10-24T${h}:00`, rainMm: i < 3 ? 2 : 1 }));
+
+/** A weather source that forecasts RAIN_10_TO_13 as of its clock (or fails). */
+function weatherSource(onCall: () => void, fail = false): SourceAdapter {
+  return {
+    id: 'wx',
+    name: 'wx',
+    kind: 'weather',
+    capabilities: ['weather'],
+    fetchWeather: async (venue, date, c) => {
+      onCall();
+      if (fail) throw new Error('HTTP 503');
+      return summariseWeather({ venue, source: 'wx', fetchedAt: c.now().toISOString(), hourly: RAIN_10_TO_13, raceDayDate: date, timezone: 'Australia/Melbourne' });
+    },
+  };
+}
+
+/** R1 at 16:00 and R2 at 16:40 AEDT on a track declared Good 4, rated on Friday night's forecast. */
+function rainPack(id: string): MeetingPack {
+  const pack = makePack();
+  pack.id = id;
+  pack.races = [race(1, 180, { trackRating: 4 }), race(2, 220, { trackRating: 4 })];
+  pack.weather = summariseWeather({ venue: 'Flemington', source: 'wx', fetchedAt: '2026-10-23T09:00:00.000Z', hourly: RAIN_10_TO_13, raceDayDate: meeting.date, timezone: 'Australia/Melbourne' });
+  pack.predictions = {};
+  predictAll(pack, DEFAULT_SETTINGS, at(-60));
+  return pack;
+}
+
+describe('pre-race weather refresh', () => {
+  it('refreshes a forecast older than 30 minutes, so rain that has already fallen stops softening the expected going', async () => {
+    const pack = rainPack('wx-refresh');
+    expect(pack.weather?.rainRaceDayMm).toBe(7);
+    expect(forecastDrift(pack.weather)).toBe(1); // Good 4 rated as a Soft 5
+    let calls = 0;
+    const wx = weatherSource(() => calls++);
+
+    // 15:30 AEDT, R1's check: the morning rain has been and gone.
+    await recheckMeeting(deps({}, at(150), [wx]), pack, job(), 1);
+    expect(calls).toBe(1);
+    expect(pack.weather).toMatchObject({ fetchedAt: iso(150), rainRaceDayMm: 0 });
+    expect(forecastDrift(pack.weather)).toBe(0);
+    expect(pack.predictions[1].generatedAt).toBe(iso(150));
+
+    // Less than 30 minutes old: left alone. Older: refreshed again.
+    await recheckMeeting(deps({}, at(170), [wx]), pack, job(), 1);
+    expect(calls).toBe(1);
+    await recheckMeeting(deps({}, at(185), [wx]), pack, job(), 2);
+    expect(calls).toBe(2);
+    expect(pack.weather?.fetchedAt).toBe(iso(185));
+  });
+
+  it('a weather source that fails keeps the earlier forecast, never fails the check and is not asked again within 30 minutes', async () => {
+    const pack = rainPack('wx-down');
+    const before = pack.weather;
+    let calls = 0;
+    const wx = weatherSource(() => calls++, true);
+    const j = job();
+    await recheckMeeting(deps({}, at(150), [wx]), pack, j, 1);
+    expect(calls).toBe(1);
+    expect(pack.weather).toBe(before);
+    expect(j.progress.steps.find((s) => s.key === 'weather')).toMatchObject({ status: 'warn' });
+    expect(pack.sourceStatuses.find((s) => s.source === 'wx')).toMatchObject({ ok: false, error: 'HTTP 503' });
+    expect(steps(j)).toContain('repredict:done');
+    expect(pack.history.at(-1)).toMatchObject({ type: 'recheck', raceNumber: 1 });
+
+    await recheckMeeting(deps({}, at(160), [wx]), pack, job(), 1);
+    expect(calls).toBe(1);
+    await recheckMeeting(deps({}, at(181), [wx]), pack, job(), 2);
+    expect(calls).toBe(2);
+  });
+});
+
+describe('meeting keys resolved by the sources', () => {
+  it('are saved with the pack (an empty one never replaces a known one) and handed back on the next pre-race check and results poll', async () => {
+    const seen: string[] = [];
+    const base = card('fake', () => 'open');
+    const fake: SourceAdapter = {
+      ...base,
+      capabilities: ['racecard', 'results'],
+      fetchMeeting: async (m, c) => ({
+        meeting: { ...m, sourceRefs: { ...m.sourceRefs, tab: '', 'fake.key': 'X' }, sources: ['fake'] },
+        races: [await base.fetchRace!(m, 1, c), await base.fetchRace!(m, 2, c)],
+        source: 'fake',
+        fetchedAt: iso(-120),
+      }),
+      fetchRace: async (m, n, c) => {
+        seen.push(`race:${m.sourceRefs['fake.key']}`);
+        return base.fetchRace!(m, n, c);
+      },
+      fetchResults: async (m) => {
+        seen.push(`results:${m.sourceRefs['fake.key']}`);
+        return null;
+      },
+    };
+    const pack = await researchMeeting(deps({}, at(-120), [fake]), { ...meeting, sourceRefs: { tab: 'R/FLM' } }, job());
+    expect(pack.meeting.sourceRefs).toEqual({ tab: 'R/FLM', 'fake.key': 'X' });
+
+    await recheckMeeting(deps({}, at(-30), [fake]), pack, job(), 1);
+    await collectAndRerate(deps({}, at(3), [fake]), pack, job(), [1]);
+    expect(seen).toEqual(['race:X', 'results:X']);
   });
 });

@@ -4,7 +4,7 @@
  * reviewed against the research notes in research/modelknowledge.md.
  */
 
-import { normalisePerson } from '../../shared/util.js';
+import { normalisePerson, personKeys } from '../../shared/util.js';
 
 export type Tier = 'A' | 'B' | 'C';
 
@@ -29,7 +29,7 @@ const JOCKEY_TIERS: Record<Tier, string[]> = {
 };
 
 /** Leading Australian trainers (approximate tiers, 2024-26). */
-const TRAINER_TIERS: Record<Tier, string[]> = {
+export const TRAINER_TIERS: Record<Tier, string[]> = {
   A: [
     'Chris Waller', 'Ciaron Maher', 'Anthony & Sam Freedman', 'Anthony and Sam Freedman', 'Gai Waterhouse & Adrian Bott',
     'Gai Waterhouse and Adrian Bott', 'James Cummings', 'Annabel Neasham & Rob Archibald', 'Annabel Neasham',
@@ -63,37 +63,65 @@ function buildIndex(tiers: Record<Tier, string[]>): Map<string, Tier> {
 const JOCKEY_INDEX = buildIndex(JOCKEY_TIERS);
 const TRAINER_INDEX = buildIndex(TRAINER_TIERS);
 
-/** Trainer partnerships are often written as "A & B": match any member. */
-function partnershipKeys(name: string): string[] {
-  return name
-    .split(/\s*(?:&|and|\/)\s*/i)
-    .map((p) => p.trim())
-    .filter(Boolean)
-    .map(keyOf);
+/**
+ * The people in a trainer name as first initial + surname, a family name
+ * written once carried to the members named before it: "A & S Freedman" and
+ * "Anthony & Sam Freedman" → ["a freedman", "s freedman"]; "L & T Corstens &
+ * W Larkin" → ["l corstens", "t corstens", "w larkin"].
+ */
+function memberKeys(name: string): string[] {
+  const keys = personKeys(name);
+  const out = keys.map((k, i) => {
+    if (k.includes(' ')) return k;
+    const next = keys.slice(i + 1).find((x) => x.includes(' '));
+    return next ? `${k[0]} ${next.slice(next.indexOf(' ') + 1)}` : k;
+  });
+  return [...new Set(out)];
 }
+
+/** Listed trainers by person key, and listed partnerships by their members (A wins over B for a name in both). */
+const TRAINER_SOLO = new Map<string, Tier>();
+const TRAINER_PARTNERSHIPS: Array<{ members: string[]; tier: Tier }> = [];
+for (const tier of ['B', 'A'] as Tier[]) {
+  for (const n of TRAINER_TIERS[tier]) {
+    const members = memberKeys(n);
+    if (members.length === 1) TRAINER_SOLO.set(members[0], tier);
+    else if (members.length > 1) TRAINER_PARTNERSHIPS.push({ members, tier });
+  }
+}
+
+const better = (a: Tier | undefined, b: Tier | undefined): Tier | undefined => (!a ? b : !b || a <= b ? a : b);
 
 export function jockeyTier(name?: string): Tier | undefined {
   if (!name) return undefined;
   return JOCKEY_INDEX.get(keyOf(name.replace(/\(a\d*(?:\.\d)?\)/i, '')));
 }
 
+/**
+ * Tier of a trainer or partnership, matched person by person on first initial
+ * + surname ("C J Waller" is Chris Waller) and never on a surname alone, so an
+ * unlisted "Paul Walker" gets no tier. A partnership takes the tier of the
+ * listed partnership with the same people ("A & S Freedman"), else of one that
+ * contains it or that it contains, else of its best-known member ("C. Maher &
+ * D. Eustace" → Ciaron Maher). Undefined for a trainer not in the tables.
+ */
 export function trainerTier(name?: string): Tier | undefined {
   if (!name) return undefined;
-  const full = normalisePerson(name);
-  // Try whole string against known partnerships first
-  for (const [k, t] of TRAINER_INDEX) if (k === full) return t;
-  const parts = partnershipKeys(name);
+  const exact = TRAINER_INDEX.get(normalisePerson(name));
+  if (exact) return exact;
+  const members = memberKeys(name);
   let best: Tier | undefined;
-  for (const p of parts) {
-    const t = TRAINER_INDEX.get(p);
-    if (t === 'A') return 'A';
-    if (t) best = t;
+  if (members.length > 1) {
+    let same: Tier | undefined;
+    for (const p of TRAINER_PARTNERSHIPS) {
+      const inName = p.members.every((k) => members.includes(k));
+      const inEntry = members.every((k) => p.members.includes(k));
+      if (inName && inEntry) same = better(same, p.tier);
+      else if (inName || inEntry) best = better(best, p.tier);
+    }
+    if (same) return same;
   }
-  // Compare by surname only as a last resort
-  const surname = full.split(' ').pop();
-  if (!best && surname) {
-    for (const [k, t] of TRAINER_INDEX) if (k.endsWith(' ' + surname) || k === surname) return t;
-  }
+  for (const k of members) best = better(best, TRAINER_SOLO.get(k));
   return best;
 }
 

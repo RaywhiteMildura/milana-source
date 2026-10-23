@@ -256,6 +256,7 @@ export interface WeatherSummary {
   fetchedAt: string;
   /** Rain in the 72h before the meeting (mm) */
   rainLast72hMm?: number;
+  /** Rain still to fall on race day before 18:00, as of when the forecast was fetched (mm) */
   rainRaceDayMm?: number;
   maxTempC?: number;
   windKmhMax?: number;
