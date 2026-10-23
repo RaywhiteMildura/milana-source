@@ -60,7 +60,10 @@ export class AutoRecheckScheduler {
     const settings = this.deps.store.getSettings();
     const minutes = settings.autoRecheckMinutesBeforeRace;
     let started = 0;
+    // Only meetings on today's or tomorrow's local date can have races inside the window.
+    const localDates = new Set(['Australia/Perth', 'Australia/Melbourne', 'Australia/Brisbane'].flatMap((tz) => [0, 1].map((d) => new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(now.getTime() + d * 86400000)))));
     for (const item of this.deps.store.listPacks()) {
+      if (!localDates.has(item.meeting.date)) continue;
       const pack = this.deps.store.getPack(item.id);
       if (!pack) continue;
       const due = this.dueRaces(pack, now, minutes);

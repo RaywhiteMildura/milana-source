@@ -103,7 +103,7 @@ export function createApi(deps: ApiDeps): Router {
     '/meetings',
     wrap(async (req, res) => {
       const date = String(req.query.date || todayLocal(deps.now?.() ?? new Date()));
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new HttpProblem(400, 'date must be YYYY-MM-DD');
+      if (!isPlausibleDate(date)) throw new HttpProblem(400, 'date must be a real date, YYYY-MM-DD, between 2000 and 2100');
       const cacheKey = `meetings:${date}`;
       const force = req.query.force === '1';
       const cached = force ? undefined : deps.store.cacheGet<{ meetings: MeetingSummary[]; statuses: SourceStatus[] }>(cacheKey, 10 * 60_000);
@@ -122,7 +122,7 @@ export function createApi(deps: ApiDeps): Router {
     '/research',
     wrap(async (req, res) => {
       const { date, venueSlug } = (req.body || {}) as { date?: string; venueSlug?: string; force?: boolean };
-      if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new HttpProblem(400, 'date must be YYYY-MM-DD');
+      if (!date || !isPlausibleDate(date)) throw new HttpProblem(400, 'date must be a real date, YYYY-MM-DD, between 2000 and 2100');
       if (!venueSlug) throw new HttpProblem(400, 'venueSlug is required');
       const cacheKey = `meetings:${date}`;
       let meetings = deps.store.cacheGet<{ meetings: MeetingSummary[] }>(cacheKey, 6 * 60 * 60_000)?.meetings;
@@ -243,7 +243,8 @@ export function createApi(deps: ApiDeps): Router {
       const { raceNumber, placings } = (req.body || {}) as { raceNumber?: number; placings?: number[][] };
       const probeRace = probe.races.find((x) => x.number === raceNumber);
       if (!probeRace) throw new HttpProblem(400, 'unknown race number');
-      if (!Array.isArray(placings) || !placings.length || !placings.every((p) => Array.isArray(p) && p.every((n) => Number.isInteger(n) && n > 0))) throw new HttpProblem(400, 'placings must be number[][]');
+      if (!Array.isArray(placings) || !placings.length || placings.length > 24 || !placings.every((p) => Array.isArray(p) && p.length > 0 && p.every((n) => Number.isInteger(n) && n > 0))) throw new HttpProblem(400, 'placings must be non-empty groups of runner numbers');
+      if (new Set(placings.flat()).size !== placings.flat().length) throw new HttpProblem(400, 'a runner cannot fill two placings');
       const numbers = new Set(probeRace.runners.map((x) => x.number));
       const unknown = placings.flat().filter((n) => !numbers.has(n));
       if (unknown.length) throw new HttpProblem(400, `Unknown runner number(s): ${unknown.join(', ')}`);
@@ -297,6 +298,17 @@ export function jsonErrorHandler(err: unknown, _req: Request, res: Response, _ne
   const e = err as { status?: number; statusCode?: number; message?: string; type?: string };
   const status = e.status || e.statusCode || 500;
   res.status(status).json({ error: status === 400 ? `Bad request: ${e.message || 'invalid JSON body'}` : e.message || 'Server error' });
+}
+
+export function isPlausibleDate(s: string): boolean {
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return false;
+  const y = +m[1];
+  const mo = +m[2];
+  const d = +m[3];
+  if (y < 2000 || y > 2100 || mo < 1 || mo > 12 || d < 1 || d > 31) return false;
+  const dt = new Date(Date.UTC(y, mo - 1, d));
+  return dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
 }
 
 export function todayLocal(d: Date, tz = 'Australia/Melbourne'): string {

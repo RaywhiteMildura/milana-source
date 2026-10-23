@@ -59,6 +59,8 @@ export interface MeetingSummary {
   rail?: string;
   /** ISO time of first race */
   firstRaceTime?: string;
+  /** IANA time zone of the venue, e.g. Australia/Brisbane (for displaying race times in local track time) */
+  timezone?: string;
   /** Source specific identifiers (TAB venue mnemonic, Sportsbet meeting id, etc.) */
   sourceRefs: Record<SourceId, string>;
   sources: SourceId[];

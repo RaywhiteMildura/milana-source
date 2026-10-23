@@ -101,6 +101,29 @@ export function parseLastStarts(s?: string): Array<number | 'x'> {
     .filter((c) => c === 'x' || (typeof c === 'number' && !Number.isNaN(c))) as Array<number | 'x'>;
 }
 
+/** IANA zone for an Australian state code. */
+export function zoneForAustralianState(state?: string): string | undefined {
+  switch ((state || '').toUpperCase()) {
+    case 'VIC':
+      return 'Australia/Melbourne';
+    case 'NSW':
+    case 'ACT':
+      return 'Australia/Sydney';
+    case 'TAS':
+      return 'Australia/Hobart';
+    case 'QLD':
+      return 'Australia/Brisbane';
+    case 'SA':
+      return 'Australia/Adelaide';
+    case 'WA':
+      return 'Australia/Perth';
+    case 'NT':
+      return 'Australia/Darwin';
+    default:
+      return undefined;
+  }
+}
+
 export function toISODate(d: Date, tz = 'Australia/Melbourne'): string {
   const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' });
   return fmt.format(d);

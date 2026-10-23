@@ -12,7 +12,7 @@ import type {
   SourceStatus,
   WeatherSummary,
 } from '../../shared/types.js';
-import { mean, normaliseName, round, samePeople } from '../../shared/util.js';
+import { mean, normaliseName, round, samePeople, zoneForAustralianState } from '../../shared/util.js';
 import type { FetchContext, SourceAdapter } from '../adapters/types.js';
 import type { AdapterRegistry } from '../adapters/registry.js';
 import type { JobHandle } from './manager.js';
@@ -38,17 +38,24 @@ export interface ResearchDeps {
 }
 
 const SOURCE_TIMEOUT_MS = 45_000;
+/** No Australian meeting has more than 12 races; anything beyond this is a broken feed. */
+export const MAX_RACES = 20;
+export const clampRaceNumbers = (numbers: number[]): number[] => [...new Set(numbers.filter((n) => Number.isInteger(n) && n >= 1 && n <= MAX_RACES))].sort((a, b) => a - b);
 
 function statusOf(a: SourceAdapter, ok: boolean, ms: number, extra: Partial<SourceStatus> = {}): SourceStatus {
   return { source: a.id, name: a.name, kind: a.kind, ok, ms, fetchedAt: new Date().toISOString(), url: a.homepage, ...extra };
 }
 
-async function timed<T>(fn: () => Promise<T>, label: string): Promise<{ value?: T; error?: string; ms: number }> {
+/** Run a source call with a time budget; on overrun the in-flight HTTP requests are cancelled, not just abandoned. */
+async function timed<T>(fn: (ctx?: FetchContext) => Promise<T>, label: string, ctx?: FetchContext, budgetMs = SOURCE_TIMEOUT_MS): Promise<{ value?: T; error?: string; ms: number }> {
   const started = Date.now();
+  const controller = new AbortController();
+  const bound = ctx ? { ...ctx, http: ctx.http.bound(controller.signal), signal: controller.signal } : undefined;
   try {
-    const value = await withTimeout(fn(), SOURCE_TIMEOUT_MS, label);
+    const value = await withTimeout(fn(bound), budgetMs, label);
     return { value, ms: Date.now() - started };
   } catch (err) {
+    controller.abort();
     return { error: err instanceof Error ? err.message : String(err), ms: Date.now() - started };
   }
 }
@@ -67,7 +74,7 @@ export function mergeMeetingSummaries(lists: Array<{ source: string; meetings: M
         existing.sourceRefs = { ...existing.sourceRefs, ...m.sourceRefs };
         existing.state = existing.state || m.state;
         existing.country = existing.country || m.country;
-        existing.raceCount = existing.raceCount || m.raceCount;
+        existing.raceCount = existing.raceCount || (m.raceCount && m.raceCount <= MAX_RACES ? m.raceCount : undefined);
         existing.trackCondition = existing.trackCondition || m.trackCondition;
         existing.trackRating = existing.trackRating ?? m.trackRating;
         existing.weather = existing.weather || m.weather;
@@ -76,6 +83,9 @@ export function mergeMeetingSummaries(lists: Array<{ source: string; meetings: M
       }
     }
   }
+  for (const m of out.values()) {
+    if (!m.timezone) m.timezone = zoneForAustralianState(m.state) || (m.country === 'NZ' ? 'Pacific/Auckland' : 'Australia/Melbourne');
+  }
   return [...out.values()].sort((a, b) => (a.raceType === b.raceType ? a.venue.localeCompare(b.venue) : a.raceType === 'thoroughbred' ? -1 : 1));
 }
 
@@ -83,7 +93,7 @@ export async function discoverMeetings(deps: ResearchDeps, date: string): Promis
   const adapters = deps.registry.withCapability('meetings', deps.settings.disabledSources);
   const statuses: SourceStatus[] = [];
   const lists = await mapLimit(adapters, 6, async (a) => {
-    const r = await timed(() => a.listMeetings!(date, deps.ctx), `${a.name} meetings`);
+    const r = await timed((c) => a.listMeetings!(date, c || deps.ctx), `${a.name} meetings`, deps.ctx, 20_000);
     statuses.push(statusOf(a, !r.error, r.ms, { itemCount: r.value?.length, error: r.error }));
     return { source: a.id, meetings: r.value || [] };
   });
@@ -101,7 +111,8 @@ async function fetchAllSources(deps: ResearchDeps, meeting: MeetingSummary, job:
   await mapLimit(adapters, 6, async (a) => {
     const key = `fetch:${a.id}`;
     job.start(key, `Fetching ${a.name}`);
-    const r = await timed(() => a.fetchMeeting!(meeting, deps.ctx), `${a.name} meeting`);
+    const r = await timed((c) => a.fetchMeeting!(meeting, c || deps.ctx), `${a.name} meeting`, deps.ctx, 90_000);
+    if (r.value) r.value.races = r.value.races.filter((race) => Number.isInteger(race.number) && race.number >= 1 && race.number <= MAX_RACES);
     if (r.error || !r.value) {
       job.finish(key, 'warn', `Unavailable: ${r.error || 'no data'}`);
       statuses.push(statusOf(a, false, r.ms, { error: r.error || 'no data' }));
@@ -120,7 +131,7 @@ async function fetchDeepForm(deps: ResearchDeps, meeting: MeetingSummary, raws: 
   const adapters = deps.registry.withCapability('form', deps.settings.disabledSources);
   if (!adapters.length) return;
   job.start('form', 'Collecting detailed form (past starts, breeding, statistics)');
-  const raceNumbers = [...new Set(raws.flatMap((m) => m.races.map((r) => r.number)))].sort((a, b) => a - b);
+  const raceNumbers = clampRaceNumbers(raws.flatMap((m) => m.races.map((r) => r.number)));
   let added = 0;
   let failures = 0;
   for (const a of adapters) {
@@ -134,7 +145,7 @@ async function fetchDeepForm(deps: ResearchDeps, meeting: MeetingSummary, raws: 
       raws.push(existing);
     }
     await mapLimit(raceNumbers, 3, async (n) => {
-      const r = await timed(() => a.fetchForm!(meeting, n, deps.ctx), `${a.name} form R${n}`);
+      const r = await timed((c) => a.fetchForm!(meeting, n, c || deps.ctx), `${a.name} form R${n}`, deps.ctx, 30_000);
       if (r.error || !r.value) {
         failures++;
         return;
@@ -169,7 +180,7 @@ async function fetchWeather(deps: ResearchDeps, meeting: MeetingSummary, job: Jo
   if (!adapters.length) return { statuses };
   job.start('weather', 'Checking weather and likely track condition');
   for (const a of adapters) {
-    const r = await timed(() => a.fetchWeather!(meeting.venue, meeting.date, deps.ctx), `${a.name} weather`);
+    const r = await timed((c) => a.fetchWeather!(meeting.venue, meeting.date, c || deps.ctx), `${a.name} weather`, deps.ctx, 20_000);
     statuses.push(statusOf(a, !r.error && !!r.value, r.ms, { error: r.error }));
     if (r.value) {
       job.finish('weather', 'done', r.value.summary);
@@ -193,7 +204,7 @@ async function fetchNews(deps: ResearchDeps, meeting: MeetingSummary, races: Rac
       let failures = 0;
       // Sequential per source with a small pause: friendly to rate limits (Reddit, Google).
       for (const q of qs) {
-        const r = await timed(() => a.searchNews!(q, deps.ctx), `${a.name} news`);
+        const r = await timed((c) => a.searchNews!(q, c || deps.ctx), `${a.name} news`, deps.ctx, 15_000);
         if (r.error) failures++;
         else items.push(...(r.value || []));
         await sleep(a.id === 'reddit' ? 1200 : 250);
@@ -285,7 +296,7 @@ export async function researchMeeting(deps: ResearchDeps, meeting: MeetingSummar
   statuses.push(...s3);
 
   // Meeting-level conditions from the best source
-  const header: MeetingSummary = { ...meeting, sources: reconciled.sources };
+  const header: MeetingSummary = { ...meeting, sources: reconciled.sources, timezone: meeting.timezone || zoneForAustralianState(meeting.state) || 'Australia/Melbourne' };
   for (const raw of raws) {
     header.trackCondition = header.trackCondition || raw.meeting.trackCondition;
     header.trackRating = header.trackRating ?? raw.meeting.trackRating;
@@ -387,7 +398,7 @@ export async function collectResults(deps: ResearchDeps, pack: MeetingPack, job:
   const newly: number[] = [];
   for (const race of candidates) {
     // Ask every results source, then cross-check – one feed is never enough to settle a race.
-    const reports = (await mapLimit(adapters, 3, async (a) => (await timed(() => a.fetchResults!(pack.meeting, race.number, deps.ctx), `${a.name} results R${race.number}`)).value || null)).filter((r): r is RaceResult => !!r);
+    const reports = (await mapLimit(adapters, 3, async (a) => (await timed((c) => a.fetchResults!(pack.meeting, race.number, c || deps.ctx), `${a.name} results R${race.number}`, deps.ctx, 30_000)).value || null)).filter((r): r is RaceResult => !!r);
     const chosen = chooseResult(reports);
     if (!chosen) continue;
     const existing = pack.results[race.number];
@@ -444,14 +455,14 @@ export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job:
     const raws: Array<{ source: string; weight: number; race: RaceRaw }> = [];
     await mapLimit(adapters, 6, async (a) => {
       const fn = a.fetchRace
-        ? () => a.fetchRace!(pack.meeting, race.number, deps.ctx)
-        : async () => {
-            const m = await a.fetchMeeting!(pack.meeting, deps.ctx);
+        ? (c?: FetchContext) => a.fetchRace!(pack.meeting, race.number, c || deps.ctx)
+        : async (c?: FetchContext) => {
+            const m = await a.fetchMeeting!(pack.meeting, c || deps.ctx);
             const r = m.races.find((x) => x.number === race.number);
             if (!r) throw new Error(`race ${race.number} not in ${a.name} card`);
             return r;
           };
-      const r = await timed(fn, `${a.name} R${race.number}`);
+      const r = await timed(fn, `${a.name} R${race.number}`, deps.ctx, 30_000);
       statuses.push(statusOf(a, !r.error && !!r.value, r.ms, { error: r.error }));
       if (r.value) raws.push({ source: a.id, weight: a.kind === 'official' ? 1 : a.kind === 'form' ? 0.85 : 0.65, race: r.value });
     });

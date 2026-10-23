@@ -45,6 +45,8 @@ Environment variables: `RACELENS_PORT` (default 4850), `RACELENS_HOST` (default 
 
 Your research packs and settings are JSON files in `data/` – back them up or delete them freely.
 
+Security note: RaceLens has no login. It only answers requests addressed to this computer (localhost or its own network addresses; add others with `RACELENS_ALLOWED_HOSTS=name1,name2`). If you open it to your Wi-Fi with `RACELENS_HOST=0.0.0.0`, anyone on that network can change settings and results, so do that only on a network you trust.
+
 ## How to use it on race day
 
 1. **Morning:** open RaceLens, choose the date and meeting, press *Research this meeting*. Wait for the progress panel (it fetches every source, collects form, cross-checks, scans news, checks weather and rates every race). Open the meeting.

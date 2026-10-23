@@ -10,6 +10,8 @@ export interface HttpOptions {
   body?: string;
   /** Expected content, used to validate the response. */
   expect?: 'json' | 'text' | 'any';
+  /** External cancellation (the orchestrator aborts a source that overran its budget). */
+  signal?: AbortSignal;
 }
 
 export interface HttpResponse<T = unknown> {
@@ -87,6 +89,14 @@ export class HttpClient {
     return this.request<T>(url, { ...opts, method: 'GET' });
   }
 
+  /** A view of this client whose every request carries `signal`, so a whole source fetch can be cancelled. */
+  bound(signal: AbortSignal): HttpClient {
+    const base = this;
+    const bound = Object.create(base) as HttpClient;
+    bound.request = <T>(url: string, opts: HttpOptions) => base.request<T>(url, { ...opts, signal: opts.signal ?? signal });
+    return bound;
+  }
+
   async getJson<T = unknown>(url: string, opts: HttpOptions = {}): Promise<T> {
     const res = await this.request<T>(url, { ...opts, method: 'GET', expect: 'json' });
     if (!res.ok) throw new HttpError(`HTTP ${res.status} for ${url}`, res.status, url);
@@ -118,6 +128,7 @@ export class HttpClient {
     const retries = opts.retries ?? 2;
     let lastErr: unknown;
     for (let attempt = 0; attempt <= retries; attempt++) {
+      if (opts.signal?.aborted) throw new Error(`Cancelled: ${url}`);
       try {
         const res = await this.once<T>(url, opts);
         // Retry on 5xx / 429 only
@@ -125,13 +136,11 @@ export class HttpClient {
           await sleep(300 * 2 ** attempt);
           continue;
         }
-        if (res.ok && method === 'GET' && this.opts.cacheTtlMs > 0) {
-          if (this.cache.size >= 500) {
-            // Bounded cache: drop expired entries first, then the oldest.
-            const cutoff = Date.now() - this.opts.cacheTtlMs;
-            for (const [k, v] of this.cache) if (v.at < cutoff) this.cache.delete(k);
-            if (this.cache.size >= 500) this.cache.delete(this.cache.keys().next().value as string);
-          }
+        if (res.ok && method === 'GET' && this.opts.cacheTtlMs > 0 && res.text.length <= 256 * 1024) {
+          // Small, bounded cache: sweep expired entries on every insert, never more than 200 live entries.
+          const cutoff = Date.now() - this.opts.cacheTtlMs;
+          for (const [k, v] of this.cache) if (v.at < cutoff) this.cache.delete(k);
+          while (this.cache.size >= 200) this.cache.delete(this.cache.keys().next().value as string);
           this.cache.set(key, { at: Date.now(), res });
         }
         if (this.opts.recordDir) this.record(url, key, res);
@@ -155,6 +164,8 @@ export class HttpClient {
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), opts.timeoutMs ?? this.opts.timeoutMs);
+    const onAbort = () => controller.abort();
+    opts.signal?.addEventListener('abort', onAbort, { once: true });
     const started = Date.now();
     try {
       const f = this.opts.fetchImpl ?? fetch;
@@ -183,8 +194,12 @@ export class HttpClient {
         }
       }
       return { ok: res.ok, status: res.status, url, ms: Date.now() - started, text, json };
+    } catch (err) {
+      if (opts.signal?.aborted) throw new Error(`Cancelled: ${url}`);
+      throw err;
     } finally {
       clearTimeout(timer);
+      opts.signal?.removeEventListener('abort', onAbort);
     }
   }
 

@@ -15,7 +15,12 @@ export const DEFAULT_SETTINGS: Settings = {
  * Tiny JSON-file store. One file per meeting pack, plus settings and a cache
  * directory. Atomic writes (tmp + rename) so a crash never corrupts a pack.
  */
+type PackListItem = Pick<MeetingPack, 'id' | 'createdAt' | 'updatedAt' | 'meeting' | 'verificationScore'> & { raceCount: number; predictedRaces: number; resultedRaces: number };
+
 export class Store {
+  /** Pack summaries keyed by file name with the mtime they were read at – saves re-parsing megabytes of JSON per listing. */
+  private listIndex = new Map<string, { mtimeMs: number; item: PackListItem }>();
+
   constructor(public readonly dir: string) {
     fs.mkdirSync(path.join(dir, 'packs'), { recursive: true });
     fs.mkdirSync(path.join(dir, 'cache'), { recursive: true });
@@ -52,14 +57,28 @@ export class Store {
     return path.join(this.dir, 'packs', encodeURIComponent(id) + '.json');
   }
 
-  listPacks(): Array<Pick<MeetingPack, 'id' | 'createdAt' | 'updatedAt' | 'meeting' | 'verificationScore'> & { raceCount: number; predictedRaces: number; resultedRaces: number }> {
+  listPacks(): PackListItem[] {
     const dir = path.join(this.dir, 'packs');
-    return fs
-      .readdirSync(dir)
-      .filter((f) => f.endsWith('.json'))
-      .map((f) => this.readJson<MeetingPack>(path.join(dir, f)))
-      .filter((p): p is MeetingPack => !!p)
-      .map((p) => ({
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
+    const live = new Set(files);
+    for (const k of this.listIndex.keys()) if (!live.has(k)) this.listIndex.delete(k);
+    const items: PackListItem[] = [];
+    for (const f of files) {
+      const full = path.join(dir, f);
+      let mtimeMs = 0;
+      try {
+        mtimeMs = fs.statSync(full).mtimeMs;
+      } catch {
+        continue;
+      }
+      const cached = this.listIndex.get(f);
+      if (cached && cached.mtimeMs === mtimeMs) {
+        items.push(cached.item);
+        continue;
+      }
+      const p = this.readJson<MeetingPack>(full);
+      if (!p) continue;
+      const item: PackListItem = {
         id: p.id,
         createdAt: p.createdAt,
         updatedAt: p.updatedAt,
@@ -68,8 +87,11 @@ export class Store {
         raceCount: p.races.length,
         predictedRaces: Object.keys(p.predictions).length,
         resultedRaces: Object.keys(p.results).length,
-      }))
-      .sort((a, b) => (a.meeting.date < b.meeting.date ? 1 : a.meeting.date > b.meeting.date ? -1 : a.updatedAt < b.updatedAt ? 1 : -1));
+      };
+      this.listIndex.set(f, { mtimeMs, item });
+      items.push(item);
+    }
+    return items.sort((a, b) => (a.meeting.date < b.meeting.date ? 1 : a.meeting.date > b.meeting.date ? -1 : a.updatedAt < b.updatedAt ? 1 : -1));
   }
 
   getPack(id: string): MeetingPack | undefined {

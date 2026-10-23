@@ -1,5 +1,6 @@
-import express from 'express';
+import express, { type NextFunction, type Request, type Response } from 'express';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRegistry, type Mode } from './adapters/index.js';
@@ -20,6 +21,26 @@ export interface AppOptions {
 }
 
 export const VERSION = '0.1.0';
+
+/**
+ * Only answer requests addressed to this machine (localhost, its own network
+ * addresses, or RACELENS_ALLOWED_HOSTS). Defeats DNS-rebinding pages that try to
+ * reach http://127.0.0.1:4850 through a hostname they control.
+ */
+export function hostGuard(extra: string[] = (process.env.RACELENS_ALLOWED_HOSTS || '').split(',').map((s) => s.trim()).filter(Boolean)) {
+  const allowed = new Set(['localhost', '127.0.0.1', '::1', '[::1]', ...extra.map((h) => h.toLowerCase())]);
+  try {
+    for (const ifaces of Object.values(os.networkInterfaces())) for (const i of ifaces || []) allowed.add(i.address.toLowerCase());
+  } catch {
+    /* best effort */
+  }
+  return (req: Request, res: Response, next: NextFunction) => {
+    const raw = (req.headers.host || '').toLowerCase();
+    const host = raw.startsWith('[') ? raw.slice(0, raw.indexOf(']') + 1) : raw.split(':')[0];
+    if (!raw || allowed.has(host) || allowed.has(host.replace(/^\[|\]$/g, ''))) return next();
+    res.status(421).json({ error: `Host ${raw} is not allowed. Open RaceLens via http://localhost or set RACELENS_ALLOWED_HOSTS.` });
+  };
+}
 
 export function createApp(opts: AppOptions = {}) {
   const here = path.dirname(fileURLToPath(import.meta.url));
@@ -46,6 +67,7 @@ export function createApp(opts: AppOptions = {}) {
 
   const app = express();
   app.disable('x-powered-by');
+  app.use(hostGuard());
   app.use(express.json({ limit: '1mb' }));
   app.use('/api', createApi({ registry, store, ctx, jobs, mode, version: VERSION, now: opts.now }));
   app.use('/api', jsonErrorHandler);

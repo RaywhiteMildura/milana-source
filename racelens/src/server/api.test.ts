@@ -50,6 +50,9 @@ describe('RaceLens API (demo mode)', () => {
     const none = await request(app).get('/api/meetings?date=2026-10-25').expect(200);
     expect(none.body.meetings).toHaveLength(0);
     await request(app).get('/api/meetings?date=nonsense').expect(400);
+    await request(app).get('/api/meetings?date=0002-10-24').expect(400);
+    await request(app).get('/api/meetings?date=2026-02-30').expect(400);
+    expect(res.body.meetings[0].timezone).toBe('Australia/Melbourne');
   });
 
   it('runs a full research job and produces a pack with predictions', async () => {
@@ -144,6 +147,8 @@ describe('RaceLens API (demo mode)', () => {
     expect(updated.results[race.number].source).toBe('manual');
     expect(updated.results[race.number].scorecard).toBeDefined();
     await request(app).post(`/api/packs/${encodeURIComponent(meetingId)}/results/manual`).send({ raceNumber: race.number, placings: [[999]] }).expect(400);
+    await request(app).post(`/api/packs/${encodeURIComponent(meetingId)}/results/manual`).send({ raceNumber: race.number, placings: [[]] }).expect(400);
+    await request(app).post(`/api/packs/${encodeURIComponent(meetingId)}/results/manual`).send({ raceNumber: race.number, placings: [[active[0]], [active[0]]] }).expect(400);
     await request(app).post(`/api/packs/${encodeURIComponent(meetingId)}/results/manual`).send({ raceNumber: 123, placings: [[1]] }).expect(400);
   });
 
@@ -186,6 +191,12 @@ describe('RaceLens API (demo mode)', () => {
     expect(bad.body.error).toMatch(/Bad request/);
     const missing = await request(app).get('/api/nothing-here').expect(404);
     expect(missing.body.error).toBe('not found');
+  });
+
+  it('rejects requests addressed to a foreign host (DNS rebinding) but accepts localhost', async () => {
+    await request(app).get('/api/health').set('Host', 'evil.example.com').expect(421);
+    await request(app).get('/api/health').set('Host', 'localhost:4850').expect(200);
+    await request(app).get('/api/health').set('Host', '127.0.0.1:4850').expect(200);
   });
 
   it('settings round-trip and validate', async () => {

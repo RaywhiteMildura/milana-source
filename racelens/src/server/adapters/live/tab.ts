@@ -121,7 +121,7 @@ export class TabAdapter implements SourceAdapter {
       .map(obj)
       .find((x) => (str(x, 'venueMnemonic') || '').toUpperCase() === ref.mnemonic.toUpperCase() && (str(x, 'raceType') || 'R').toUpperCase().startsWith(ref.type.toUpperCase()));
     const skeleton = arr(m?.races).map(obj);
-    const numbers = skeleton.length ? skeleton.map((r) => num(r, 'raceNumber')).filter((n): n is number => !!n) : Array.from({ length: meeting.raceCount || 10 }, (_, i) => i + 1);
+    const numbers = (skeleton.length ? skeleton.map((r) => num(r, 'raceNumber')).filter((n): n is number => !!n) : Array.from({ length: Math.min(meeting.raceCount || 10, 12) }, (_, i) => i + 1)).filter((n) => n >= 1 && n <= 20);
     const races: RaceRaw[] = [];
     const header = m ? this.meetingSummary(m, meeting.date) : undefined;
     const fetchedAt = ctx.now().toISOString();
