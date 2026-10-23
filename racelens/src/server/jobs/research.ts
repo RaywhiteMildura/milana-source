@@ -276,6 +276,18 @@ export function mergeMeetingSummaries(lists: Array<{ source: string; meetings: M
       }
     }
   }
+  // One feed sometimes lists a meeting under its old venue too (a meeting moved from Doomben to Eagle Farm). A meeting only
+  // that one feed knows, with the same state, number of races and first race time as a meeting several feeds agree on, is
+  // that same meeting: fold it in rather than show two cards.
+  for (let i = out.length - 1; i >= 0; i--) {
+    const lone = out[i];
+    if (lone.sources.length !== 1 || !lone.firstRaceTime || !lone.raceCount) continue;
+    const twin = out.find((o) => o !== lone && o.sources.length > 1 && o.date === lone.date && o.raceType === lone.raceType && (o.state || '').toUpperCase() === (lone.state || '').toUpperCase() && o.raceCount === lone.raceCount && o.firstRaceTime && Date.parse(o.firstRaceTime) === Date.parse(lone.firstRaceTime!));
+    if (!twin) continue;
+    twin.sources = [...new Set([...twin.sources, ...lone.sources])];
+    twin.sourceRefs = { ...lone.sourceRefs, ...twin.sourceRefs };
+    out.splice(i, 1);
+  }
   for (const m of out) {
     if (!m.timezone) m.timezone = zoneForAustralianState(m.state) || (countryKey(m.country) === 'NZ' ? 'Pacific/Auckland' : 'Australia/Melbourne');
   }

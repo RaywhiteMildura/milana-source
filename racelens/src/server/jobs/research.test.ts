@@ -64,6 +64,18 @@ describe('mergeMeetingSummaries', () => {
     expect(merged.find((m) => m.venue === 'Randwick')!.venueSlug).toBe('randwick');
   });
 
+  it('folds a meeting one feed lists under its old venue into the meeting the other feeds agree on (Doomben / Eagle Farm, 24 Oct 2026)', () => {
+    const at = (venue: string, source: string) => ({ source, meetings: [{ ...meeting, venue, venueSlug: venue.toLowerCase().replace(/ /g, '-'), state: 'QLD', raceCount: 10, firstRaceTime: '2026-10-24T01:18:00.000Z', sourceRefs: { [source]: venue } }] });
+    const merged = mergeMeetingSummaries([at('Eagle Farm', 'racingaustralia'), at('Eagle Farm', 'racingcom'), { source: 'entain', meetings: [...at('Eagle Farm', 'entain').meetings, ...at('Doomben', 'entain').meetings] }], '2026-10-24');
+    expect(merged.map((m) => m.venue)).toEqual(['Eagle Farm']);
+    // Two meetings several feeds agree on are never folded together, even at the same time (Gold Coast turf and Poly).
+    const both = mergeMeetingSummaries([
+      { source: 'a', meetings: [...at('Gold Coast', 'a').meetings, ...at('Gold Coast Poly', 'a').meetings] },
+      { source: 'b', meetings: [...at('Gold Coast', 'b').meetings, ...at('Gold Coast Poly', 'b').meetings] },
+    ]);
+    expect(both).toHaveLength(2);
+  });
+
   it('never merges two real tracks: different states, or names that only share a word', () => {
     const one = (venue: string, state: string, source = 'a') => ({ source, meetings: [{ ...meeting, venue, venueSlug: venue.toLowerCase(), state, sourceRefs: {} }] });
     const merged = mergeMeetingSummaries([one('Sandown Hillside', 'VIC'), one('Sandown Lakeside', 'VIC', 'b'), one('Park', 'NSW'), one('Royal Park', 'SA', 'b')]);

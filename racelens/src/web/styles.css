@@ -1983,6 +1983,9 @@ svg {
 .bet__return {
   color: var(--green);
   font-weight: 600;
+  /* "Could return ≈ $1,234 if it wins" must wrap on a phone, or it pushes the page sideways. */
+  white-space: normal;
+  max-width: 10rem;
 }
 @media (max-width: 480px) {
   .bet {

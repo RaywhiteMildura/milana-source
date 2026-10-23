@@ -46,7 +46,32 @@ async function openFirstMeeting(page: Page) {
   await expect(page.getByTestId('race-detail')).toBeVisible();
 }
 
-const noHorizontalOverflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
+/** True when nothing pokes out past the right edge; otherwise the offending elements, so a failure says what to fix. */
+const noHorizontalOverflow = async (page: Page): Promise<true | string> => {
+  const r = await page.evaluate(() => {
+    const vw = window.innerWidth;
+    if (document.documentElement.scrollWidth <= vw + 1) return { ok: true, offenders: [] as string[] };
+    const offenders: string[] = [];
+    for (const el of Array.from(document.querySelectorAll('body *'))) {
+      const b = el.getBoundingClientRect();
+      if (!b.width || b.right <= vw + 1) continue;
+      // Inside a sideways-scrolling strip (the race tabs) is fine.
+      let p: Element | null = el.parentElement;
+      let scrolls = false;
+      while (p && p !== document.body) {
+        const ox = getComputedStyle(p).overflowX;
+        if (ox === 'auto' || ox === 'scroll' || ox === 'hidden' || ox === 'clip') { scrolls = true; break; }
+        p = p.parentElement;
+      }
+      if (scrolls) continue;
+      if (Array.from(el.children).some((k) => k.getBoundingClientRect().right >= b.right - 0.5)) continue;
+      const cls = typeof el.className === 'string' ? el.className.split(' ').filter(Boolean).slice(0, 3).join('.') : '';
+      offenders.push(`${el.tagName.toLowerCase()}${cls ? '.' + cls : ''} right=${Math.round(b.right)}px "${(el.textContent || '').trim().slice(0, 50)}"`);
+    }
+    return { ok: false, offenders: offenders.slice(0, 6) };
+  });
+  return r.ok ? true : `page is wider than the ${page.viewportSize()?.width}px screen; overflowing: ${r.offenders.join(' | ') || 'unknown'}`;
+};
 
 /** Race-day evening, after the demo card (12:25–17:05 AEDT) has run. */
 const RACE_DAY_EVENING = '2026-10-24T09:30:00.000Z';
