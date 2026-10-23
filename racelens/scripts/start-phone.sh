@@ -6,14 +6,18 @@
 #  It:
 #    1. moves into the RaceLens folder,
 #    2. installs/builds the app the first time (needs internet once),
-#    3. asks for a phone-login password (press Enter for none),
+#    3. asks for a phone-login password (hidden while you type; Enter for none),
 #    4. starts the server for your whole network and prints a QR code -
 #       scan it with your phone's camera on the same Wi-Fi.
 #  Keep the Terminal window open for the whole race day. Ctrl+C stops it.
 #  Full guide: docs/DEPLOY.md
 #
-#  Password without typing it each time:   bash scripts/start-phone.sh mypassword
-#  or:                                      RACELENS_PASSWORD=mypassword bash scripts/start-phone.sh
+#  The password is asked for and hidden while you type - the most private way.
+#  Without typing it each time:   bash scripts/start-phone.sh "my pass phrase"
+#  or:                            RACELENS_PASSWORD="my pass phrase" bash scripts/start-phone.sh
+#  Keep the quotes if it has spaces. Both forms are saved in your shell
+#  history (~/.zsh_history or ~/.bash_history), so only use them on a computer
+#  nobody else uses.
 #
 #  macOS tips
 #   - Double-click to start: make a copy named start-phone.command next to this
@@ -35,6 +39,14 @@
 # =============================================================================
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+# A password with spaces arrives as several words unless it is in quotes: say so here,
+# instead of starting with only the first word and refusing the real password on the phone.
+if [ $# -gt 1 ]; then
+  echo "The password arrived as several words. If it contains spaces, put it in quotes:"
+  echo '    bash scripts/start-phone.sh "my pass phrase"'
+  exit 1
+fi
 
 if ! command -v node >/dev/null 2>&1; then
   echo "Node.js is not installed. Download the LTS version from https://nodejs.org, install it, then run this again."

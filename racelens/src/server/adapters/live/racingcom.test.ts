@@ -120,6 +120,16 @@ describe('RacingComAdapter', () => {
     expect(await rc.fetchResults(meeting, 1, ctxFor(routes))).toBeNull();
   });
 
+  it('reports a protest-pending race as interim even though placings are published', async () => {
+    const interim = fx('raceform-FLM-1-final.json').replace('"raceStatus":"Resulted"', '"raceStatus":"Interim"').replace('"raceStatus": "Resulted"', '"raceStatus": "Interim"');
+    expect(interim).toMatch(/Interim/);
+    const ctx = ctxFor([[/getRaceForm\(meetCode:"MEET-FLM-20261024", raceNumber:1\)/, interim], ...routes]);
+    const meeting = { id: '2026-10-24:flemington', date: '2026-10-24', venue: 'Flemington', venueSlug: 'flemington', state: 'VIC', raceType: 'thoroughbred' as const, sourceRefs: { racingcom: 'MEET-FLM-20261024' }, sources: [] };
+    expect((await rc.fetchRace(meeting, 1, ctx)).status).toBe('interim');
+    const res = await rc.fetchResults(meeting, 1, ctx);
+    expect(res).toMatchObject({ status: 'interim', placings: [[3], [1]] });
+  });
+
   it('falls back to the minimal field set when the schema rejects a rich field', async () => {
     const ctx = ctxFor(routes, { rejectRich: true });
     const meetings = await rc.listMeetings('2026-10-24', ctx);

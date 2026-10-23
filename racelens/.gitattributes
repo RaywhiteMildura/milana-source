@@ -1,0 +1,4 @@
+# Keep the start scripts runnable after a checkout or a GitHub ZIP download.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.sh  text eol=lf

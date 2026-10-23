@@ -31,8 +31,10 @@ export interface Health {
   authRequired: boolean;
   // The fields below are only present once signed in (or when no password is set).
   dataDir?: string;
-  /** Addresses a phone on the same network can use (empty unless the server listens on 0.0.0.0). */
+  /** Addresses a phone on the same network can use (empty unless the server listens on 0.0.0.0, and always empty when hosted). */
   urls?: string[];
+  /** The address that works from anywhere when the server is hosted (Fly, Render or RACELENS_PUBLIC_URL). */
+  publicUrl?: string;
   scheduler?: SchedulerStatus;
 }
 
@@ -70,6 +72,22 @@ export interface ResearchResponse {
 export interface JobIdResponse {
   jobId: string;
 }
+
+/** POST /packs/:id/results with { catchup: true }: no job (jobId null) when the server has nothing due. */
+export interface CatchupResponse {
+  jobId: string | null;
+  /** Races the server found due and is checking */
+  due: number[];
+}
+
+/** A quick change (manual result, delete) accepted but still queued behind a long job: follow `jobId`. */
+export interface QueuedReply {
+  queued: true;
+  jobId: string;
+  message: string;
+}
+
+export const isQueued = (x: unknown): x is QueuedReply => !!x && typeof x === 'object' && (x as { queued?: unknown }).queued === true && typeof (x as { jobId?: unknown }).jobId === 'string';
 
 export interface PackListItem {
   id: string;
@@ -189,14 +207,16 @@ export const api = {
 
   getPacks: () => get<PackListItem[]>('/api/packs'),
   getPack: (id: string) => get<MeetingPack>(`/api/packs/${enc(id)}`),
-  deletePack: (id: string) => del<{ ok: boolean }>(`/api/packs/${enc(id)}`),
+  deletePack: (id: string) => del<{ ok: boolean } | QueuedReply>(`/api/packs/${enc(id)}`),
 
   recheck: (id: string, raceNumber?: number) =>
     post<JobIdResponse>(`/api/packs/${enc(id)}/recheck`, raceNumber == null ? {} : { raceNumber }),
   fetchResults: (id: string, raceNumber?: number) =>
     post<JobIdResponse>(`/api/packs/${enc(id)}/results`, raceNumber == null ? {} : { raceNumber }),
+  /** The phone's quiet catch-up: the server checks only the races its own schedule says are due, as an automatic check. */
+  catchUpResults: (id: string) => post<CatchupResponse>(`/api/packs/${enc(id)}/results`, { catchup: true }),
   manualResult: (id: string, raceNumber: number, placings: number[][]) =>
-    post<MeetingPack>(`/api/packs/${enc(id)}/results/manual`, { raceNumber, placings }),
+    post<MeetingPack | QueuedReply>(`/api/packs/${enc(id)}/results/manual`, { raceNumber, placings }),
 
   getRace: (id: string, raceNumber: number) => get<RaceDetailResponse>(`/api/packs/${enc(id)}/races/${raceNumber}`),
 };
@@ -252,7 +272,10 @@ export interface JobPollState {
   error: string | null;
   /** True while we are still waiting for the job to finish. */
   active: boolean;
+  /** The job reported done or error. */
   finished: boolean;
+  /** The server no longer knows the job (404s, e.g. after a restart): polling stopped and it will never finish. */
+  gone: boolean;
 }
 
 export function isJobFinished(job: JobProgress | null | undefined): boolean {
@@ -266,6 +289,8 @@ export function isJobFinished(job: JobProgress | null | undefined): boolean {
 export function useJobPoll(jobId: string | null | undefined, intervalMs = 1000): JobPollState {
   const [job, setJob] = useState<JobProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Keyed by job id so a lost earlier job can never make a new one look lost on its first render.
+  const [goneFor, setGoneFor] = useState<string | null>(null);
 
   useEffect(() => {
     setJob(null);
@@ -287,8 +312,11 @@ export function useJobPoll(jobId: string | null | undefined, intervalMs = 1000):
         if (cancelled) return;
         misses += 1;
         setError(errorMessage(e));
-        // A job the server no longer knows about will never finish: stop after a few tries.
-        if (e instanceof ApiError && e.status === 404 && misses >= 3) return;
+        // A job the server no longer knows about will never finish: stop after a few tries and say so.
+        if (e instanceof ApiError && e.status === 404 && misses >= 3) {
+          setGoneFor(jobId);
+          return;
+        }
       }
       timer = window.setTimeout(tick, intervalMs);
     };
@@ -301,7 +329,8 @@ export function useJobPoll(jobId: string | null | undefined, intervalMs = 1000):
   }, [jobId, intervalMs]);
 
   const finished = isJobFinished(job);
-  return { job, error, active: !!jobId && !finished, finished };
+  const gone = !!jobId && goneFor === jobId && !finished;
+  return { job, error, active: !!jobId && !finished && !gone, finished, gone };
 }
 
 /** Alias kept for readability at call sites. */

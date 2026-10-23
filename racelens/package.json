@@ -5,7 +5,7 @@
   "description": "RaceLens — multi-source horse racing research, verification and finishing-order prediction",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "scripts": {
     "dev": "concurrently -k -n server,web -c blue,magenta \"npm:dev:server\" \"npm:dev:web\"",
@@ -14,6 +14,7 @@
     "build": "npm run build:web && npm run build:server",
     "build:web": "vite build --config vite.config.ts",
     "build:server": "tsc -p tsconfig.server.json",
+    "build:termux": "npm run build:web && npx --yes -p typescript@5.9.3 tsc -p tsconfig.server.json",
     "start": "node dist/server/index.js",
     "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.web.json --noEmit",
     "test": "vitest run",
@@ -23,7 +24,8 @@
     "demo": "cross-env RACELENS_MODE=demo tsx src/server/index.ts",
     "start:demo": "cross-env RACELENS_MODE=demo node dist/server/index.js",
     "start:phone": "cross-env RACELENS_HOST=0.0.0.0 node dist/server/index.js",
-    "start:phone:demo": "cross-env RACELENS_MODE=demo RACELENS_HOST=0.0.0.0 node dist/server/index.js"
+    "start:phone:demo": "cross-env RACELENS_MODE=demo RACELENS_HOST=0.0.0.0 node dist/server/index.js",
+    "start:phone:rehearse": "cross-env RACELENS_MODE=demo RACELENS_HOST=0.0.0.0 RACELENS_DATA_DIR=./data-rehearse RACELENS_FAKE_NOW=2026-10-24T12:15:00+11:00 node dist/server/index.js"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

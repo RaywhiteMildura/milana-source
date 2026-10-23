@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { FieldAgreement, JobProgress, MeetingPack, MeetingSummary, Race, RaceResult, Runner } from '../../shared/types.js';
-import type { FetchContext } from '../adapters/types.js';
+import type { FieldAgreement, JobProgress, MeetingPack, MeetingSummary, Race, RaceRaw, RaceResult, RaceStatus, Runner } from '../../shared/types.js';
+import type { FetchContext, SourceAdapter } from '../adapters/types.js';
 import { AdapterRegistry } from '../adapters/registry.js';
 import { silentLogger } from '../core/logger.js';
 import { DEFAULT_SETTINGS } from '../store/store.js';
 import { JobHandle } from './manager.js';
-import { buildNewsQueries, collectAndRerate, confirmationChecks, isResultSettled, mergeMeetingSummaries, predictAll, type ResearchDeps } from './research.js';
+import { buildNewsQueries, chooseResult, collectAndRerate, confirmationChecks, dueResultChecks, isResultSettled, mergeMeetingSummaries, predictAll, recheckMeeting, type ResearchDeps } from './research.js';
 
 const meeting: MeetingSummary = { id: '2026-10-24:flemington', date: '2026-10-24', venue: 'Flemington', venueSlug: 'flemington', raceType: 'thoroughbred', sourceRefs: {}, sources: [] };
 
@@ -104,9 +104,10 @@ function makePack(): MeetingPack {
 
 type Reporter = (raceNumber: number) => RaceResult | null;
 
-function deps(sources: Record<string, Reporter>, now: Date): ResearchDeps {
+function deps(sources: Record<string, Reporter>, now: Date, extra: SourceAdapter[] = []): ResearchDeps {
   const registry = new AdapterRegistry();
   for (const [id, fn] of Object.entries(sources)) registry.register({ id, name: id, kind: 'official', capabilities: ['results'], fetchResults: async (_m, n) => fn(n) });
+  for (const a of extra) registry.register(a);
   const ctx = { http: { bound: () => ({}) }, log: silentLogger, now: () => now, jurisdiction: 'VIC' } as unknown as FetchContext;
   return { registry, ctx, settings: DEFAULT_SETTINGS, now: () => now };
 }
@@ -122,6 +123,7 @@ const report =
     raceNumber === 1 ? { raceNumber, placings, recordedAt: iso(3), source, status } : null;
 const nothing: Reporter = () => null;
 const steps = (j: JobHandle) => j.progress.steps.map((s) => `${s.key}:${s.status}`);
+const ON = { autoResults: true };
 
 describe('collectAndRerate', () => {
   it('records a result two sources agree on, settles the watch, re-rates only the remaining races and writes one history line', async () => {
@@ -133,7 +135,8 @@ describe('collectAndRerate', () => {
     expect(pack.results[1]).toMatchObject({ status: 'final', confirmedBy: ['a', 'b'], placings: [[2], [1], [3]] });
     expect(pack.results[1].scorecard).toBeDefined();
     expect(pack.races[0].status).toBe('final');
-    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(3), attempts: 1, note: 'Confirmed by 2 sources' });
+    // Settled; one late look at +30 min is booked for a correction (protest).
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(3), attempts: 1, note: 'Confirmed by 2 sources', correctionCheckAt: iso(30) });
     expect(isResultSettled(pack, 1)).toBe(true);
     // Re-rated the race still to run, not the one just resulted.
     expect(pack.predictions[2].generatedAt).toBe(iso(3));
@@ -167,11 +170,20 @@ describe('collectAndRerate', () => {
       expect(steps(j)).toEqual(['results:done', 'patterns:skipped', 'repredict:skipped']);
     }
     await collectAndRerate(deps(src, at(8)), pack, job(), [1], { automatic: true });
-    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(8), attempts: 4, note: 'One source only' });
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(8), attempts: 4, note: 'One source only', correctionCheckAt: iso(30) });
     expect(isResultSettled(pack, 1)).toBe(true);
     expect(pack.predictions[2].generatedAt).toBe(rated);
     // The three "no change" checks collapsed into a single history line.
     expect(pack.history.map((h) => h.summary)).toEqual(['Automatic results check: R1 result in - Bravo (2) won; R2 re-rated', 'Automatic results check R1: still from one source (3 checks so far)']);
+
+    // Its late-correction look at +30 finds nothing new: it stays accepted (the confirmation phase does not restart) and is never polled again.
+    expect(dueResultChecks(pack, at(29), ON)).toEqual([]);
+    expect(dueResultChecks(pack, at(30), ON)).toEqual([1]);
+    await collectAndRerate(deps(src, at(30)), pack, job(), dueResultChecks(pack, at(30), ON), { automatic: true });
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(30), attempts: 5, note: 'One source only' });
+    expect(isResultSettled(pack, 1)).toBe(true);
+    expect(pack.history.at(-1)?.summary).toBe('Automatic results check R1: no change (4 checks so far)');
+    expect(dueResultChecks(pack, at(60), ON)).not.toContain(1);
   });
 
   it('a second source arriving later confirms the result and settles the watch', async () => {
@@ -181,7 +193,7 @@ describe('collectAndRerate', () => {
     const out = await collectAndRerate(deps({ a: report('a', [[2], [1], [3]]), b: report('b', [[2], [1], [3]]) }, at(5)), pack, job(), [1], { automatic: true });
     expect(out.newly).toEqual([1]);
     expect(pack.results[1].confirmedBy).toEqual(['a', 'b']);
-    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(5), attempts: 2, note: 'Confirmed by 2 sources' });
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(5), attempts: 2, note: 'Confirmed by 2 sources', correctionCheckAt: iso(30) });
     expect(pack.history.at(-1)?.summary).toBe('Automatic results check: R1 result confirmed by 2 sources - Bravo (2) won; R2 re-rated');
     expect(pack.predictions[2].generatedAt).not.toBe(rated); // firmed-up result: patterns and ratings refreshed
   });
@@ -213,7 +225,7 @@ describe('collectAndRerate', () => {
     expect(out.newly).toEqual([1]);
     expect(pack.results[1].placings[0]).toEqual([1]);
     expect(pack.results[1].confirmedBy).toEqual(['a', 'b']);
-    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(9), attempts: 2, note: 'Confirmed by 2 sources' });
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(9), attempts: 2, note: 'Confirmed by 2 sources', correctionCheckAt: iso(30) });
     expect(pack.history.at(-1)?.summary).toBe('Results check: R1 result corrected - Alpha (1) won; R2 re-rated');
   });
 
@@ -291,5 +303,267 @@ describe('collectAndRerate', () => {
     expect(out).toEqual({ newly: [], checked: [] });
     expect(j.progress.steps[0]).toMatchObject({ key: 'results', status: 'warn' });
     expect(pack.history.at(-1)?.summary).toBe('Automatic results check: no results source available');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// One set of rules for every results path (review fixes)
+// ---------------------------------------------------------------------------
+
+/** R1 at START, R2 forty minutes later, R3 eighty minutes later. */
+function makePack3(): MeetingPack {
+  const pack = makePack();
+  pack.races.push(race(3, 80));
+  predictAll(pack, DEFAULT_SETTINGS, at(-60));
+  return pack;
+}
+
+const manualResult = (placings: number[][]): RaceResult => ({ raceNumber: 1, placings, recordedAt: iso(20), source: 'manual', status: 'final', confirmedBy: ['manual'] });
+
+/** A race-card source that reports a race's status (used to learn of an abandonment). */
+function card(id: string, status: () => RaceStatus, onCall?: () => void): SourceAdapter {
+  return {
+    id,
+    name: id,
+    kind: 'official',
+    capabilities: ['racecard'],
+    fetchRace: async (_m, n) => {
+      onCall?.();
+      const r = race(n, 0);
+      return {
+        number: n,
+        name: r.name,
+        distance: r.distance,
+        startTime: r.startTime,
+        status: status(),
+        sourceRefs: {},
+        runners: r.runners.map((x) => ({ number: x.number, name: x.name, barrier: x.barrier, jockey: x.jockey, trainer: x.trainer, weight: x.weight, scratched: false, form: [], gearChanges: [], comments: [], ratings: {}, odds: [] })),
+        source: id,
+        fetchedAt: iso(0),
+      } as unknown as RaceRaw;
+    },
+  };
+}
+
+describe('chooseResult', () => {
+  const r = (source: string, status?: RaceResult['status']): RaceResult => ({ raceNumber: 1, placings: [[2], [1], [3]], recordedAt: iso(3), source, status });
+  it('keeps agreed placings interim while any agreeing source still calls them interim', () => {
+    expect(chooseResult([r('tab', 'interim'), r('racingcom', 'final')])?.result).toMatchObject({ status: 'interim', confirmedBy: ['tab', 'racingcom'] });
+    expect(chooseResult([r('tab', 'interim'), r('ra')])?.result.status).toBe('interim');
+    expect(chooseResult([r('a', 'final'), r('b')])?.result.status).toBe('final');
+    expect(chooseResult([r('a')])?.result.status).toBe('final');
+    expect(chooseResult([r('a', 'interim')])?.result.status).toBe('interim');
+  });
+});
+
+describe('results path rules', () => {
+  it('a protest-pending result is not locked by a feed that calls it final; the late look picks up the correction, then the race is left alone', async () => {
+    const pack = makePack();
+    // +3: TAB says interim, racing.com labels the same placings final.
+    await collectAndRerate(deps({ tab: report('tab', [[2], [1], [3]], 'interim'), rc: report('rc', [[2], [1], [3]], 'final') }, at(3)), pack, job(), [1], { automatic: true });
+    expect(pack.results[1]).toMatchObject({ status: 'interim', confirmedBy: ['tab', 'rc'] });
+    expect(isResultSettled(pack, 1)).toBe(false);
+    expect(pack.resultWatch?.[1]).toMatchObject({ nextCheckAt: iso(4), note: 'Interim result - waiting for it to be declared final' });
+
+    // +6: both final with the same placings: settled, one late look booked.
+    const both = (placings: number[][]) => ({ tab: report('tab', placings, 'final'), rc: report('rc', placings, 'final') });
+    await collectAndRerate(deps(both([[2], [1], [3]]), at(6)), pack, job(), [1], { automatic: true });
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(6), attempts: 2, note: 'Confirmed by 2 sources', correctionCheckAt: iso(30) });
+    expect(isResultSettled(pack, 1)).toBe(true);
+    expect(dueResultChecks(pack, at(29), ON)).toEqual([]);
+    expect(dueResultChecks(pack, at(30), ON)).toEqual([1]);
+
+    // +30: the protest was upheld and both sources now publish 1-2-3.
+    const rated = pack.predictions[2].generatedAt;
+    const out = await collectAndRerate(deps(both([[1], [2], [3]]), at(30)), pack, job(), dueResultChecks(pack, at(30), ON), { automatic: true });
+    expect(out.newly).toEqual([1]);
+    expect(pack.results[1].placings[0]).toEqual([1]);
+    expect(pack.history.at(-1)?.summary).toBe('Automatic results check: R1 result corrected - Alpha (1) won; R2 re-rated');
+    expect(pack.predictions[2].generatedAt).not.toBe(rated);
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(30), attempts: 3, note: 'Confirmed by 2 sources' });
+    // Bounded: never polled again.
+    for (const min of [31, 60, 240, 300]) expect(dueResultChecks(pack, at(min), ON)).not.toContain(1);
+  });
+
+  it('the late look at a two-source result that has not changed is a quiet no-op, and a request before it does not re-fetch', async () => {
+    const pack = makePack();
+    let calls = 0;
+    const counted: Reporter = (n) => {
+      calls++;
+      return report('b', [[2], [1], [3]])(n);
+    };
+    await collectAndRerate(deps({ a: report('a', [[2], [1], [3]]), b: counted }, at(3)), pack, job(), [1], { automatic: true });
+    calls = 0;
+    expect(await collectAndRerate(deps({ a: report('a', [[2], [1], [3]]), b: counted }, at(10)), pack, job(), [1])).toEqual({ newly: [], checked: [] });
+    expect(calls).toBe(0);
+    const out = await collectAndRerate(deps({ a: report('a', [[2], [1], [3]]), b: counted }, at(30)), pack, job(), dueResultChecks(pack, at(30), ON), { automatic: true });
+    expect(out).toEqual({ newly: [], checked: [1] });
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(30), attempts: 2, note: 'Confirmed by 2 sources' });
+    expect(pack.history.at(-1)?.summary).toBe('Automatic results check R1: no change');
+    expect(dueResultChecks(pack, at(45), ON)).not.toContain(1);
+  });
+
+  it('a late look where only one of the two agreeing sources answers keeps the two-source result', async () => {
+    const pack = makePack();
+    await collectAndRerate(deps({ a: report('a', [[2], [1], [3]]), b: report('b', [[2], [1], [3]]) }, at(3)), pack, job(), [1], { automatic: true });
+    await collectAndRerate(deps({ a: report('a', [[2], [1], [3]]), b: nothing }, at(30)), pack, job(), dueResultChecks(pack, at(30), ON), { automatic: true });
+    expect(pack.results[1].confirmedBy).toEqual(['a', 'b']);
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(30), attempts: 2, note: 'Confirmed by 2 sources' });
+    expect(isResultSettled(pack, 1)).toBe(true);
+  });
+
+  it('a pre-race check never re-fetches or replaces a result typed in by hand, whatever the sources say', async () => {
+    const pack = makePack();
+    let r1Calls = 0;
+    for (const status of [undefined, 'interim'] as const) {
+      pack.results[1] = manualResult([[1], [2], [3]]);
+      pack.races[0].status = 'final';
+      const src: Reporter = (n) => {
+        if (n === 1) r1Calls++;
+        return report('a', [[2], [1], [3]], status)(n);
+      };
+      // Pre-race check of R2 (and of the whole card) after R1 was corrected by hand.
+      await recheckMeeting(deps({ a: src }, at(31)), pack, job(), 2);
+      await recheckMeeting(deps({ a: src, b: src }, at(45)), pack, job());
+      expect(pack.results[1]).toMatchObject({ source: 'manual', placings: [[1], [2], [3]], status: 'final' });
+      expect(pack.races[0].status).toBe('final');
+      expect(dueResultChecks(pack, at(46), ON)).not.toContain(1);
+    }
+    expect(r1Calls).toBe(0);
+    expect(pack.history.some((h) => /R1 result corrected/.test(h.summary))).toBe(false);
+  });
+
+  it('a result that lands in a pre-race check keeps the watcher in step and re-rates every race still to run', async () => {
+    const pack = makePack3();
+    const two = (status: RaceResult['status']) => ({ a: report('a', [[2], [1], [3]], status), b: report('b', [[2], [1], [3]], status) });
+    await collectAndRerate(deps(two('interim'), at(3)), pack, job(), [1], { automatic: true });
+    expect(pack.resultWatch?.[1]?.nextCheckAt).toBe(iso(4));
+
+    // R2's pre-race check at +31 finds R1 declared final by both sources.
+    await recheckMeeting(deps(two('final'), at(31)), pack, job(), 2);
+    expect(pack.results[1]).toMatchObject({ status: 'final', confirmedBy: ['a', 'b'] });
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(31), attempts: 2, note: 'Confirmed by 2 sources' });
+    expect(pack.predictions[2].generatedAt).toBe(iso(31));
+    expect(pack.predictions[3].generatedAt).toBe(iso(31)); // not only the race being checked
+    expect(pack.history.at(-1)).toMatchObject({ type: 'recheck', raceNumber: 2 });
+    expect(pack.history.at(-1)?.summary).toMatch(/^Pre-race check R2: .+, results in for R1$/);
+    // Nothing left for the watcher to fetch again.
+    expect(dueResultChecks(pack, at(31), ON)).toEqual([]);
+  });
+
+  it('a pre-race check does not re-fetch a result the watcher has already settled', async () => {
+    const pack = makePack();
+    let r1Calls = 0;
+    const src = {
+      a: (n: number) => {
+        if (n === 1) r1Calls++;
+        return report('a', [[2], [1], [3]])(n);
+      },
+    };
+    for (const min of [3, 4, 6, 8]) await collectAndRerate(deps(src, at(min)), pack, job(), [1], { automatic: true });
+    expect(pack.resultWatch?.[1].note).toBe('One source only');
+    r1Calls = 0;
+    await recheckMeeting(deps(src, at(25)), pack, job(), 2);
+    await recheckMeeting(deps(src, at(28)), pack, job(), 2);
+    expect(r1Calls).toBe(0);
+  });
+
+  it('a check nobody answers keeps a recorded result and its confirmation count instead of claiming nothing was published', async () => {
+    const pack = makePack();
+    let up = true;
+    const src = { a: (n: number) => (up ? report('a', [[2], [1], [3]])(n) : null), b: nothing };
+    await collectAndRerate(deps(src, at(3)), pack, job(), [1], { automatic: true });
+    up = false;
+    await collectAndRerate(deps(src, at(4)), pack, job(), [1], { automatic: true });
+    expect(confirmationChecks(pack.resultWatch?.[1])).toBe(1);
+    expect(pack.resultWatch?.[1].note).toContain('Result from a only');
+    expect(pack.history.at(-1)?.summary).toBe('Automatic results check R1: still from one source');
+    up = true;
+    await collectAndRerate(deps(src, at(6)), pack, job(), [1], { automatic: true });
+    expect(confirmationChecks(pack.resultWatch?.[1])).toBe(2);
+    up = false;
+    await collectAndRerate(deps(src, at(8)), pack, job(), [1], { automatic: true });
+    expect(pack.resultWatch?.[1]).toMatchObject({ note: 'One source only' });
+    expect(pack.resultWatch?.[1].gaveUp).toBeUndefined();
+    expect(isResultSettled(pack, 1)).toBe(true);
+    expect(pack.history.some((h) => /nothing published/.test(h.summary))).toBe(false);
+
+    // An interim result whose sources go quiet ends with the interim note, not "No result published".
+    const interim = makePack();
+    await collectAndRerate(deps({ a: report('a', [[2], [1], [3]], 'interim') }, at(3)), interim, job(), [1], { automatic: true });
+    await collectAndRerate(deps({ a: nothing }, at(241)), interim, job(), [1], { automatic: true });
+    expect(interim.resultWatch?.[1]).toMatchObject({ gaveUp: true, note: 'Result still interim 4 hours after the jump - check it manually' });
+  });
+
+  it('tells "no results source answered" apart from "nothing published" in the note, the job step, the history and the log', async () => {
+    const pack = makePack();
+    const warnings: string[] = [];
+    const failing =
+      (message: string): Reporter =>
+      () => {
+        throw new Error(message);
+      };
+    const d = deps({ tab: failing('HTTP 403 for https://api.beta.tab.com.au/v1/x'), ra: failing('bot wall') }, at(2));
+    d.ctx = { ...d.ctx, log: { ...silentLogger, warn: (m: string) => warnings.push(m) } };
+    const j = job();
+    expect(await collectAndRerate(d, pack, j, [1], { automatic: true })).toEqual({ newly: [], checked: [1] });
+    expect(pack.resultWatch?.[1]).toEqual({ lastCheckedAt: iso(2), attempts: 1, nextCheckAt: iso(4), note: 'No results source answered (tab: HTTP 403; ra: bot wall)' });
+    expect(j.progress.steps[0]).toMatchObject({ key: 'results', status: 'warn', detail: 'No results source answered (tab: HTTP 403; ra: bot wall)' });
+    expect(pack.history.at(-1)?.summary).toBe('Automatic results check R1: no results source answered');
+    expect(pack.history.at(-1)?.changes).toEqual(['R1: no results source answered (tab: HTTP 403; ra: bot wall)']);
+    expect(warnings).toEqual(['tab results Flemington R1: HTTP 403 for https://api.beta.tab.com.au/v1/x', 'ra results Flemington R1: bot wall']);
+
+    // Still unreachable four hours on: the give-up note points at the connection, not at the sources.
+    const late = deps({ tab: failing('HTTP 403 for https://x'), ra: failing('bot wall') }, at(241));
+    await collectAndRerate(late, pack, job(), [1], { automatic: true });
+    expect(pack.resultWatch?.[1]).toMatchObject({ gaveUp: true, note: 'Could not reach the results sources for 4 hours - check the connection, then press Fetch results or enter it manually' });
+
+    // One source failing while another answers "nothing yet" is the ordinary case: the failure is only mentioned in the step.
+    const partial = makePack();
+    const pj = job();
+    await collectAndRerate(deps({ tab: failing('HTTP 403 for https://x'), b: nothing }, at(2)), partial, pj, [1], { automatic: true });
+    expect(partial.resultWatch?.[1].note).toBe('Nothing published yet');
+    expect(pj.progress.steps[0]).toMatchObject({ status: 'done', detail: 'No new results yet (tab: HTTP 403)' });
+  });
+
+  it('learns from the race card that a race was abandoned after the jump instead of polling it for four hours', async () => {
+    const pack = makePack();
+    let status: RaceStatus = 'open';
+    let cardCalls = 0;
+    const d = (min: number) => deps({ a: nothing, b: nothing }, at(min), [card('card', () => status, () => cardCalls++)]);
+    await collectAndRerate(d(2), pack, job(), [1], { automatic: true });
+    expect(cardCalls).toBe(0); // the first looks are results-only
+    await collectAndRerate(d(20), pack, job(), [1], { automatic: true });
+    expect(cardCalls).toBe(1); // 20 minutes and nothing: ask the race card once
+    expect(pack.resultWatch?.[1].note).toBe('Nothing published yet');
+    await collectAndRerate(d(22), pack, job(), [1], { automatic: true });
+    expect(cardCalls).toBe(1); // not on every look
+
+    status = 'abandoned';
+    const rated = pack.predictions[2].generatedAt;
+    const out = await collectAndRerate(d(30), pack, job(), [1], { automatic: true });
+    expect(cardCalls).toBe(2);
+    expect(out.newly).toEqual([]);
+    expect(pack.races[0].status).toBe('abandoned');
+    expect(pack.resultWatch?.[1]).toBeUndefined();
+    expect(pack.history.at(-1)?.summary).toBe('Automatic results check: R1 abandoned');
+    expect(pack.predictions[2].generatedAt).toBe(rated); // nothing to re-rate
+    expect(dueResultChecks(pack, at(35), ON)).toEqual([]); // R2 has not jumped yet
+
+    // A server that was off all afternoon learns it on its first look instead of giving up.
+    const late = makePack();
+    await collectAndRerate(deps({ a: nothing }, at(300), [card('card', () => 'abandoned')]), late, job(), [1], { automatic: true });
+    expect(late.races[0].status).toBe('abandoned');
+    expect(late.resultWatch?.[1]).toBeUndefined();
+  });
+
+  it('a pre-race check that finds the race abandoned says so and stops watching it', async () => {
+    const pack = makePack();
+    pack.resultWatch = { 1: { lastCheckedAt: iso(-1), attempts: 0, note: 'Nothing published yet', nextCheckAt: iso(2) } };
+    const { changes } = await recheckMeeting(deps({}, at(-5), [card('card', () => 'abandoned')]), pack, job(), 1);
+    expect(pack.races[0].status).toBe('abandoned');
+    expect(changes).toContain('R1: race abandoned');
+    expect(pack.resultWatch?.[1]).toBeUndefined();
+    expect(pack.history.at(-1)?.summary).toMatch(/^Pre-race check R1: \d+ changes?/);
   });
 });

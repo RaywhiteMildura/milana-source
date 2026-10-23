@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { MeetingPack, Race, RaceResult, ResultWatch } from '../../shared/types.js';
-import { AutoRecheckScheduler, dueResultChecks } from './scheduler.js';
+import type { FetchContext } from '../adapters/types.js';
+import { AdapterRegistry } from '../adapters/registry.js';
+import { silentLogger } from '../core/logger.js';
+import { AutoRecheckScheduler, dueResultChecks, RESULTS_RETRY_MS } from './scheduler.js';
+import { JobManager } from './manager.js';
 import { nextResultCheckAt, RESULT_WATCH } from './research.js';
 import { DEFAULT_SETTINGS } from '../store/store.js';
 
@@ -69,6 +73,10 @@ describe('dueResultChecks', () => {
     ['one-source final with no watch entry yet (result came from research): confirmation checks start', pack([r1()], { 1: result(['a']) }), 6, [1]],
     ['one-source final accepted after its extra checks', pack([r1()], { 1: result(['a']) }, { 1: watch(8, 4, undefined, { note: 'One source only' }) }), 10, []],
     ['manual result counts as settled', pack([r1()], { 1: { ...result(['manual']), source: 'manual' } }), 5, []],
+    ['settled early by two sources: its one late-correction look is not due before it is booked', pack([r1()], { 1: result(['a', 'b']) }, { 1: watch(4, 2, undefined, { note: 'Confirmed by 2 sources', correctionCheckAt: iso(30) }) }), 29, []],
+    ['settled early by two sources: the late-correction look is due', pack([r1()], { 1: result(['a', 'b']) }, { 1: watch(4, 2, undefined, { note: 'Confirmed by 2 sources', correctionCheckAt: iso(30) }) }), 30, [1]],
+    ['accepted one-source result: the late-correction look is due', pack([r1()], { 1: result(['a']) }, { 1: watch(8, 4, undefined, { note: 'One source only', correctionCheckAt: iso(30) }) }), 31, [1]],
+    ['manual result: never a late-correction look', pack([r1()], { 1: { ...result(['manual']), source: 'manual' } }, { 1: watch(4, 2, undefined, { correctionCheckAt: iso(30) }) }), 31, []],
     ['abandoned race: nothing', pack([race(1, iso(0), { status: 'abandoned' })]), 5, []],
     ['no start time: nothing', pack([race(1, undefined)]), 5, []],
     ['several races, each on its own clock', pack([r1(), race(2, iso(35)), race(3, iso(70))], {}, { 1: watch(2, 1, 4) }), 37.5, [1, 2]],
@@ -158,5 +166,112 @@ describe('AutoRecheckScheduler.start', () => {
     sched.stop();
     expect(sched.status().running).toBe(false);
     expect(sched.status().nextTickAt).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Results jobs started by the scheduler
+// ---------------------------------------------------------------------------
+
+describe('AutoRecheckScheduler results jobs', () => {
+  function setup(opts: { results?: boolean; failSaves?: number } = {}) {
+    let clock = at(3);
+    let stored = pack([race(1, iso(0))]);
+    let failSaves = opts.failSaves ?? 0;
+    let fetches = 0;
+    const registry = new AdapterRegistry();
+    if (opts.results !== false)
+      registry.register({
+        id: 'a',
+        name: 'a',
+        kind: 'official',
+        capabilities: ['results'],
+        fetchResults: async (_m, n) => {
+          fetches++;
+          return { raceNumber: n, placings: [[1], [2], [3]], recordedAt: clock.toISOString(), source: 'a' };
+        },
+      });
+    const ctx = { http: { bound: () => ({}) }, log: silentLogger, now: () => clock, jurisdiction: 'VIC' } as unknown as FetchContext;
+    const store = {
+      getSettings: () => DEFAULT_SETTINGS,
+      listPacks: () => [{ id: stored.id, meeting: stored.meeting, updatedAt: stored.updatedAt }],
+      getPack: () => structuredClone(stored),
+      savePack: (p: MeetingPack) => {
+        if (failSaves-- > 0) throw new Error('ENOSPC: no space left on device');
+        stored = structuredClone(p);
+      },
+    };
+    const jobs = new JobManager();
+    const log = { infos: [] as string[], warns: [] as string[] };
+    const sched = new AutoRecheckScheduler({
+      store: store as never,
+      jobs,
+      researchDeps: () => ({ registry, ctx, settings: DEFAULT_SETTINGS, now: () => clock }),
+      now: () => clock,
+      log: { info: (m) => log.infos.push(m), warn: (m) => log.warns.push(m) },
+    });
+    const settle = async () => {
+      for (const j of jobs.list()) await jobs.wait(j.id, 5_000);
+    };
+    return {
+      sched,
+      jobs,
+      log,
+      settle,
+      stored: () => stored,
+      setStored: (p: MeetingPack) => (stored = p),
+      fetches: () => fetches,
+      setClock: (min: number) => (clock = at(min)),
+    };
+  }
+
+  it('a failed results job is logged as a warning, not as success, and the meeting rests a few minutes before the next try', async () => {
+    const t = setup({ failSaves: 1 });
+    expect(await t.sched.tick()).toBe(1);
+    await t.settle();
+    expect(t.jobs.list()[0].status).toBe('error');
+    expect(t.log.warns).toEqual([`Auto results failed: Flemington R1 - trying again in ${RESULTS_RETRY_MS / 60_000} min: ENOSPC: no space left on device`]);
+    expect(t.log.infos.some((m) => /recorded/.test(m))).toBe(false); // nothing was saved, so nothing is claimed
+    expect(t.stored().results[1]).toBeUndefined();
+
+    t.setClock(4);
+    expect(await t.sched.tick()).toBe(0); // resting, not a new error job every minute
+    t.setClock(3 + RESULTS_RETRY_MS / 60_000);
+    expect(await t.sched.tick()).toBe(1);
+    await t.settle();
+    expect(t.stored().results[1]?.placings[0]).toEqual([1]);
+    expect(t.log.infos.some((m) => /Flemington R1 recorded/.test(m))).toBe(true);
+  });
+
+  it('with every results source turned off it starts nothing and says so once', async () => {
+    const t = setup({ results: false });
+    expect(await t.sched.tick()).toBe(0);
+    t.setClock(4);
+    expect(await t.sched.tick()).toBe(0);
+    expect(t.jobs.list()).toHaveLength(0);
+    expect(t.log.warns).toHaveLength(1);
+    expect(t.log.warns[0]).toMatch(/every results source is turned off/);
+  });
+
+  it('a results job queued behind another job re-reads the pack and skips races that were checked meanwhile', async () => {
+    const t = setup();
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const blocker = t.jobs.start('recheck', { meetingId: 'p' }, async () => {
+      await gate;
+    });
+    expect(await t.sched.tick()).toBe(1);
+    // While it waits, something else settles R1 (two sources agree).
+    const p = t.stored();
+    p.results[1] = { ...result(['x', 'y']), raceNumber: 1 };
+    p.resultWatch = { 1: watch(3, 1, undefined, { note: 'Confirmed by 2 sources' }) };
+    t.setStored(p);
+    release();
+    await t.jobs.wait(blocker.id);
+    await t.settle();
+    const job = t.jobs.list().find((j) => j.type === 'results')!;
+    expect(job.status).toBe('done');
+    expect(job.steps.map((s) => s.status)).toEqual(['skipped', 'skipped', 'skipped']);
+    expect(t.fetches()).toBe(0);
   });
 });

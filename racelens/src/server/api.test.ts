@@ -5,7 +5,9 @@ import path from 'node:path';
 import request from 'supertest';
 import type { JobProgress, MeetingPack, MeetingSummary } from '../shared/types.js';
 import { createApp } from './app.js';
-import { DEMO_DATE, DEMO_VENUE_SLUG } from './adapters/demo/index.js';
+import { DEMO_DATE, DEMO_MEETING_ID, DEMO_VENUE_SLUG } from './adapters/demo/index.js';
+import { dueResultChecks } from './jobs/research.js';
+import { EXCLUSIVE_WAIT_MS } from './jobs/manager.js';
 
 /**
  * End-to-end API test in demo mode: discovery → research job → pack →
@@ -219,5 +221,150 @@ describe('RaceLens API (demo mode)', () => {
   it('deletes a pack', async () => {
     await request(app).delete(`/api/packs/${encodeURIComponent(meetingId)}`).expect(200);
     await request(app).get(`/api/packs/${encodeURIComponent(meetingId)}`).expect(404);
+  });
+});
+
+/**
+ * Race-day paths from the phone, in demo mode with a movable clock: the
+ * catch-up request (only what the watcher would check, run as an automatic
+ * check), re-running research after a result was typed in by hand, and quick
+ * changes queued behind a long job. Demo race times (Melbourne, +11): R1 12:25,
+ * R2 13:00, R3 13:35 …; one results source publishes R1–R3.
+ */
+describe('RaceLens API on race day (demo mode, moving clock)', () => {
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'racelens-raceday-'));
+  const t = (hhmm: string) => new Date(`${DEMO_DATE}T${hhmm}:00.000+11:00`);
+  let clock = t('00:30');
+  const built = createApp({ mode: 'demo', dataDir, now: () => clock });
+  const { app, store, jobs } = built;
+  const id = DEMO_MEETING_ID;
+  const results = `/api/packs/${encodeURIComponent(id)}/results`;
+  const manual = `/api/packs/${encodeURIComponent(id)}/results/manual`;
+
+  afterAll(() => {
+    built.scheduler.stop();
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  });
+
+  const resultsJobs = () => jobs.list().filter((j) => j.type === 'results' && j.meetingId === id);
+
+  it('researches the meeting in the morning', async () => {
+    const start = await request(app).post('/api/research').send({ date: DEMO_DATE, venueSlug: DEMO_VENUE_SLUG }).expect(200);
+    expect((await jobs.wait(start.body.jobId, 60_000)).status).toBe('done');
+  });
+
+  it('catch-up only starts a job for races the watcher itself would check now, as an automatic check', async () => {
+    clock = t('12:26'); // R1 jumped a minute ago: too early
+    expect((await request(app).post(results).send({ catchup: true }).expect(200)).body).toEqual({ jobId: null, due: [] });
+    expect(resultsJobs()).toHaveLength(0);
+
+    clock = t('12:28');
+    const first = await request(app).post(results).send({ catchup: true }).expect(200);
+    expect(first.body.due).toEqual([1]);
+    expect((await jobs.wait(first.body.jobId, 60_000)).status).toBe('done');
+    let pack = store.getPack(id)!;
+    expect(pack.results[1]?.placings[0]).toEqual([6]);
+    expect(pack.history.at(-1)?.summary).toMatch(/^Automatic results check: R1 result in - Sugarloaf Sprite \(6\) won; R2, .+ re-rated$/);
+    expect(pack.resultWatch?.[1]).toMatchObject({ attempts: 1, nextCheckAt: t('12:29').toISOString() });
+
+    // Opening the page again straight away: the next look is booked for 12:29, so nothing is started.
+    expect((await request(app).post(results).send({ catchup: true }).expect(200)).body).toEqual({ jobId: null, due: [] });
+    expect(resultsJobs()).toHaveLength(1);
+
+    // Later catch-ups are automatic looks: they collapse in the history and use the watcher's confirmation budget.
+    for (const hhmm of ['12:29', '12:31']) {
+      clock = t(hhmm);
+      const next = await request(app).post(results).send({ catchup: true }).expect(200);
+      expect(next.body.due).toEqual([1]);
+      expect((await jobs.wait(next.body.jobId, 60_000)).status).toBe('done');
+    }
+    pack = store.getPack(id)!;
+    expect(pack.history.at(-1)?.summary).toBe('Automatic results check R1: still from one source (2 checks so far)');
+    expect(pack.resultWatch?.[1].note).toContain('extra check 2 of 3');
+  });
+
+  it('without catchup the endpoint is still the Fetch results button, and catchup is validated', async () => {
+    const res = await request(app).post(results).send({}).expect(200);
+    expect(Object.keys(res.body)).toEqual(['jobId']);
+    expect((await jobs.wait(res.body.jobId, 60_000)).status).toBe('done');
+    expect(store.getPack(id)!.history.at(-1)?.summary).toMatch(/^Results check /);
+    await request(app).post(results).send({ catchup: 'yes' }).expect(400);
+  });
+
+  it('re-running research keeps a result typed in by hand and the watcher memory of unchanged races', async () => {
+    clock = t('13:03'); // R2 has run
+    const c = await request(app).post(results).send({ catchup: true }).expect(200);
+    expect(c.body.due).toEqual(expect.arrayContaining([2]));
+    await jobs.wait(c.body.jobId, 60_000);
+    const before = store.getPack(id)!;
+    const fromSource = before.results[2].placings;
+    expect(before.results[2].source).toBe('demo-official');
+    // The owner corrects R2 by hand (say a protest the feed has not caught up with): first two swapped.
+    const typed = [fromSource[1], fromSource[0], fromSource[2]];
+    await request(app).post(manual).send({ raceNumber: 2, placings: typed }).expect(200);
+    expect(store.getPack(id)!.resultWatch?.[2]).toMatchObject({ note: 'Result entered by hand' });
+    expect(store.getPack(id)!.resultWatch?.[2].nextCheckAt).toBeUndefined();
+    const watchR1 = store.getPack(id)!.resultWatch?.[1];
+
+    clock = t('13:05');
+    const start = await request(app).post('/api/research').send({ date: DEMO_DATE, venueSlug: DEMO_VENUE_SLUG, force: true }).expect(200);
+    expect((await jobs.wait(start.body.jobId, 60_000)).status).toBe('done');
+    const after = store.getPack(id)!;
+    expect(after.results[2]).toMatchObject({ source: 'manual', placings: typed });
+    expect(after.races.find((r) => r.number === 2)!.status).toBe('final');
+    expect(after.results[1].source).toBe('demo-official');
+    expect(after.resultWatch?.[1]).toEqual(watchR1); // same result found again: the watcher's memory holds
+    expect(dueResultChecks(after, clock, { autoResults: true })).toEqual([]);
+    const research = after.history.findLastIndex((h) => h.type === 'research');
+    expect(after.history.slice(research - 3).some((h) => h.raceNumber === 2 && /^R2 result: /.test(h.summary))).toBe(false);
+    expect(after.history.at(-1)?.summary).toMatch(/^R2: kept the result entered by hand \(the sources now say /);
+  });
+
+  it('a result saved behind a long job says it is queued (not "job wait timed out"), is applied afterwards, and a retry is not a correction', async () => {
+    jobs.exclusiveWaitMs = 100;
+    try {
+      let release!: () => void;
+      const gate = new Promise<void>((r) => (release = r));
+      const ahead = jobs.start('results', { meetingId: id }, async () => {
+        await gate;
+      });
+      const race = store.getPack(id)!.races.find((r) => r.number === 3)!;
+      const active = race.runners.filter((r) => !r.scratched).map((r) => r.number);
+      const placings = [[active[0]], [active[1]], [active[2]]];
+      // 202, not an error: the change is accepted and queued, with the job to follow.
+      const res = await request(app).post(manual).send({ raceNumber: 3, placings }).expect(202);
+      expect(res.body.message).toMatch(/your result for Race 3 is queued and will be saved as soon as it finishes/);
+      expect(res.body.queued).toBe(true);
+      expect(typeof res.body.jobId).toBe('string');
+      expect(store.getPack(id)!.results[3]).toBeUndefined();
+
+      release();
+      await jobs.wait(ahead.id);
+      expect((await jobs.wait(res.body.jobId)).status).toBe('done');
+      expect(store.getPack(id)!.results[3]).toMatchObject({ source: 'manual', placings });
+
+      // The owner, unsure, enters it again: same result, so nothing changes and nothing reads "corrected".
+      await request(app).post(manual).send({ raceNumber: 3, placings }).expect(200);
+      const lines = store.getPack(id)!.history.filter((h) => h.raceNumber === 3 && h.type === 'results');
+      expect(lines).toHaveLength(1);
+      expect(lines[0].summary).toMatch(/^R3 result: /);
+
+      // Deleting the meeting behind a long job: the same plain answer, and it is deleted once the job ends.
+      let release2!: () => void;
+      const gate2 = new Promise<void>((r) => (release2 = r));
+      const ahead2 = jobs.start('results', { meetingId: id }, async () => {
+        await gate2;
+      });
+      const del = await request(app).delete(`/api/packs/${encodeURIComponent(id)}`).expect(202);
+      expect(del.body.message).toMatch(/will be deleted as soon as that job ends/);
+      expect(del.body.queued).toBe(true);
+      expect(store.getPack(id)).toBeDefined();
+      release2();
+      await jobs.wait(ahead2.id);
+      await jobs.wait(del.body.jobId);
+      expect(store.getPack(id)).toBeUndefined();
+    } finally {
+      jobs.exclusiveWaitMs = EXCLUSIVE_WAIT_MS;
+    }
   });
 });

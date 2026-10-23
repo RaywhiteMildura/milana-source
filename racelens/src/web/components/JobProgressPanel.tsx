@@ -99,10 +99,21 @@ export function JobProgressPanel({
   );
 }
 
+/** Shown when the server no longer knows a job (it restarted, or the job was cleaned up). */
+export const LOST_JOB_MESSAGE = 'We lost track of this check – the server may have restarted. Try again in a moment.';
+
+/** A job the server forgot, as a finished-with-error job so callers and the panel treat it like any failure. */
+function lostJob(jobId: string, last: JobProgress | null): JobProgress {
+  const base: JobProgress = last ?? { id: jobId, type: 'results', status: 'error', steps: [], startedAt: new Date().toISOString(), percent: 0, message: '' };
+  return { ...base, status: 'error', error: LOST_JOB_MESSAGE, message: LOST_JOB_MESSAGE };
+}
+
 /**
  * Self-contained polling panel used inline (pre-race check, results fetch,
  * source probe). Calls `onFinished` once, then `onClear` after a short pause so
- * the person sees the "complete" state before it disappears.
+ * the person sees the "complete" state before it disappears. A job the server
+ * has forgotten (404 after a restart) is reported as a failed one, so the
+ * buttons it disabled come back and the page's live refresh resumes.
  */
 export function InlineJob({
   jobId,
@@ -117,7 +128,8 @@ export function InlineJob({
   onClear: () => void;
   clearAfterMs?: number;
 }) {
-  const { job, error } = useJobPoll(jobId);
+  const { job: polled, error, gone } = useJobPoll(jobId);
+  const job = gone ? lostJob(jobId, polled) : polled;
   const handled = useRef(false);
   const finishedRef = useRef(onFinished);
   const clearRef = useRef(onClear);
@@ -136,5 +148,5 @@ export function InlineJob({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [job?.status]);
 
-  return <JobProgressPanel job={job} error={error} title={title} compact onDismiss={job?.status === 'error' ? () => clearRef.current() : undefined} />;
+  return <JobProgressPanel job={job} error={gone ? null : error} title={title} compact onDismiss={job?.status === 'error' ? () => clearRef.current() : undefined} />;
 }

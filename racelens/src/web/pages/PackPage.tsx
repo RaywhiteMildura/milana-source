@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { JobProgress, MeetingPack, NewsItem, Race } from '@shared/types';
 import { normaliseName, normalisePerson, parseTrackRating, trackRatingLabel } from '@shared/util';
-import { api, errorMessage, useJobPoll, useRequest } from '../lib/api';
+import { api, errorMessage, useJobPoll, useRequest, isQueued } from '../lib/api';
 import { countdown, deviceZone, fmtDistance, fmtLongDate, fmtMoney, fmtOdds, fmtPct, fmtRelative, fmtTime, meetingZone, plural, raceStatusLabel, verificationWord, zoneAbbrev } from '../lib/format';
-import { CATCHUP_STALE_MS, catchupDue, isSettled, newlyResulted, resultKeys, resultToast, resultWatchLine } from '../lib/raceday';
+import { CATCHUP_STALE_MS, catchupDue, newsToast, packNews, resultWatchLine, watchLineVisible } from '../lib/raceday';
 import { navigate, routes } from '../lib/router';
 import { useServerNow, useSession } from '../lib/session';
 import { BettingPlanView } from '../components/BettingPlanView';
@@ -75,26 +75,37 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   const tz = meetingZone(data?.meeting);
   const races = useMemo(() => (data ? [...(data.races ?? [])].sort((a, b) => a.number - b.number) : []), [data]);
 
+  // Shown as on until the settings arrive (the usual case), but nothing is fetched on that assumption.
   const autoResultsOn = liveSettings.data ? liveSettings.data.autoResults !== false : true;
+  const autoResultsKnownOn = !!liveSettings.data && liveSettings.data.autoResults !== false;
   const autoChip = !!session.health?.scheduler?.running && autoResultsOn;
 
   // Always the latest pack for callbacks that run from timers and DOM events.
   const dataRef = useRef<MeetingPack | null>(null);
   dataRef.current = data;
 
+  /** Refresh with a newer copy of the pack, toasting only what the owner cares about (never routine book-keeping). */
+  const applyFresh = (fresh: MeetingPack) => {
+    const news = newsToast(packNews(dataRef.current, fresh));
+    pack.setData(fresh);
+    if (news) toast.push(news.text, news.kind);
+  };
+
   // ---------------------------------------------------------------- catch-up
-  // Opening the page (or coming back to it) after a race has run: if the server
-  // has not looked for that result in the last couple of minutes, ask for it
-  // once, quietly. The server serialises jobs per meeting so this never races
-  // the automatic watcher; the toast only appears if something new arrived.
+  // Opening the page (or coming back to it) after a race has run while the
+  // server was asleep or off: if the server never looked for that result, or is
+  // well behind its own booked check, ask it to catch up once, quietly. The
+  // server only checks what its schedule says is due, as an automatic check, and
+  // answers without a job when nothing is; the toast only appears if something
+  // new arrived.
   const [catchupJobId, setCatchupJobId] = useState<string | null>(null);
   const catchupPoll = useJobPoll(catchupJobId, 2000);
-  const catchup = useRef<{ lastFiredAt: number; before: Map<number, string> }>({ lastFiredAt: 0, before: new Map() });
+  const catchup = useRef<{ lastFiredAt: number }>({ lastFiredAt: 0 });
   const jobRunning = !!packJob || !!raceJob || !!catchupJobId;
   const jobRunningRef = useRef(jobRunning);
   jobRunningRef.current = jobRunning;
-  const autoOnRef = useRef(autoResultsOn);
-  autoOnRef.current = autoResultsOn;
+  const autoOnRef = useRef(autoResultsKnownOn);
+  autoOnRef.current = autoResultsKnownOn;
 
   const maybeCatchUp = useCallback(async () => {
     const d = dataRef.current;
@@ -107,20 +118,19 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
     try {
       const busy = (await api.getJobs()).some((j) => j.meetingId === d.id && (j.status === 'queued' || j.status === 'running'));
       if (busy) return;
-      catchup.current.before = resultKeys(d);
-      const { jobId } = await api.fetchResults(d.id);
-      setCatchupJobId(jobId);
+      const { jobId } = await api.catchUpResults(d.id);
+      if (jobId) setCatchupJobId(jobId); // null: the server had nothing due
     } catch {
       /* quiet by design – the 30 s poll and the manual buttons still work */
     }
   }, []);
 
-  // On load, and again whenever the person moves to another race (throttled inside).
+  // On load, once the auto-results setting and the server's clock are known, and again whenever the person moves to another race (throttled inside).
   useEffect(() => {
     if (!data) return;
     void maybeCatchUp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, !!data, raceParam]);
+  }, [id, !!data, raceParam, autoResultsKnownOn, clockOffset]);
 
   useEffect(() => {
     const onVisible = () => {
@@ -134,16 +144,15 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
     };
   }, [maybeCatchUp]);
 
+  // Finished – or lost (the server restarted and forgot the job): refresh and let the live poll and later catch-ups run again.
   useEffect(() => {
-    if (!catchupJobId || !catchupPoll.finished) return;
+    if (!catchupJobId || !(catchupPoll.finished || catchupPoll.gone)) return;
     let cancelled = false;
     (async () => {
       try {
         const fresh = await api.getPack(id);
         if (cancelled) return;
-        const added = newlyResulted(catchup.current.before, resultKeys(fresh));
-        pack.setData(fresh);
-        if (added.length) toast.success(resultToast(added));
+        applyFresh(fresh);
       } catch {
         /* keep what we have */
       } finally {
@@ -154,11 +163,13 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [catchupJobId, catchupPoll.finished]);
+  }, [catchupJobId, catchupPoll.finished, catchupPoll.gone]);
 
   // ------------------------------------------------------------- live poll
   // The server re-checks races and collects results on its own: notice that
-  // every 30 s and refresh, naming the race when a result just landed.
+  // every 30 s and refresh silently, with a toast only for real news (a result,
+  // a correction, a scratching or rider change, new picks) – an automatic
+  // results check that found nothing also saves the pack, and that is not news.
   const seenRef = useRef<{ updatedAt?: string; resulted: number }>({ updatedAt: undefined, resulted: 0 });
   useEffect(() => {
     seenRef.current = { updatedAt: data?.updatedAt, resulted: Object.keys(data?.results ?? {}).length };
@@ -173,12 +184,7 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
         const seen = seenRef.current;
         const grew = mine.resultedRaces > seen.resulted;
         if (!grew && !(seen.updatedAt && mine.updatedAt > seen.updatedAt)) return;
-        const before = resultKeys(dataRef.current);
-        const fresh = await api.getPack(id);
-        const added = newlyResulted(before, resultKeys(fresh));
-        pack.setData(fresh);
-        if (added.length) toast.success(resultToast(added));
-        else toast.info('Updated: the server refreshed this meeting');
+        applyFresh(await api.getPack(id));
       } catch {
         /* a missed poll is harmless */
       }
@@ -207,7 +213,6 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   const prediction = race && data ? data.predictions?.[race.number] : undefined;
   const result = race && data ? data.results?.[race.number] : undefined;
   const watch = race && data ? data.resultWatch?.[race.number] : undefined;
-  const jumped = !!race?.startTime && new Date(race.startTime).getTime() <= now;
 
   // The race to head to once this one is done: the next un-resulted race after it, else any un-resulted race.
   const nextRace = useMemo(() => {
@@ -292,6 +297,12 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
     if (!data || !race) return false;
     try {
       const updated = await api.manualResult(data.id, race.number, placings);
+      if (isQueued(updated)) {
+        // Accepted, but another job for this meeting is still running: show it, and refresh when the result lands.
+        toast.info(updated.message);
+        setRaceJob({ id: updated.jobId, title: `Saving your Race ${race.number} result`, raceNumber: race.number });
+        return true;
+      }
       pack.setData(updated);
       toast.success(`Result saved for Race ${race.number}`);
       return true;
@@ -518,10 +529,11 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
               </div>
             )}
             {prediction?.summary && <p className="race-top__summary">{prediction.summary}</p>}
-            {jumped && race.status !== 'abandoned' && (!isSettled(result) || !!watch?.nextCheckAt) && (() => {
+            {watchLineVisible(race, result, watch, autoResultsOn, now) && (() => {
               const line = resultWatchLine(watch, result, autoResultsOn, now);
+              // Not a live region: its relative times tick every 30 s and would be re-announced; results are announced by the toast.
               return (
-                <p className={`result-watch result-watch--${line.tone}`} data-testid="result-watch" aria-live="polite">
+                <p className={`result-watch result-watch--${line.tone}`} data-testid="result-watch">
                   <span className="result-watch__icon" aria-hidden>
                     {line.tone === 'amber' ? '⚠' : '⟳'}
                   </span>

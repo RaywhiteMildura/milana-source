@@ -151,8 +151,9 @@ export class RacingComAdapter implements SourceAdapter {
 
   async fetchResults(meeting: MeetingSummary, raceNumber: number, ctx: FetchContext): Promise<RaceResult | null> {
     const race = await this.fetchRace(meeting, raceNumber, ctx);
-    if (race.status !== 'final' || !race.results?.length) return null;
-    return { raceNumber, placings: race.results, recordedAt: ctx.now().toISOString(), source: this.id, status: 'final', dividends: race.dividends };
+    if ((race.status !== 'final' && race.status !== 'interim') || !race.results?.length) return null;
+    // An interim result is reported as interim, so the watcher keeps looking until it is declared final.
+    return { raceNumber, placings: race.results, recordedAt: ctx.now().toISOString(), source: this.id, status: race.status, dividends: race.dividends };
   }
 
   private async fetchRaceByCode(meetCode: string, n: number, meeting: MeetingSummary, fetchedAt: string, ctx: FetchContext): Promise<RaceRaw> {
@@ -174,7 +175,8 @@ export class RacingComAdapter implements SourceAdapter {
     const statusText = `${str(r, 'raceStatus') || ''} ${str(r, 'status') || ''}`.toLowerCase();
     const resultsString = str(r, 'resultsString') || '';
     const hasResults = bool(r, 'hasResults') === true || /result|final|paying/.test(statusText) || /^\d+[^0-9]+\d+/.test(resultsString);
-    const status: RaceStatus = /abandon|cancel/.test(statusText) ? 'abandoned' : hasResults ? 'final' : /interim|running|closed/.test(statusText) ? 'interim' : 'open';
+    // Interim (protest or correction pending) wins over "has results": the placings exist but may still change.
+    const status: RaceStatus = /abandon|cancel/.test(statusText) ? 'abandoned' : /interim|protest|correct/.test(statusText) ? 'interim' : hasResults ? 'final' : /running|closed/.test(statusText) ? 'interim' : 'open';
     const cond = parseCondition([str(r, 'trackCondition'), str(r, 'trackRating')].filter(Boolean).join(' '));
 
     // Merge entries: before race day the full field lives in formRaceEntries; raceEntries win where both exist.
@@ -191,10 +193,12 @@ export class RacingComAdapter implements SourceAdapter {
       if (prev && finish != null && finish >= 100 && num(prev, 'finish') != null && num(prev, 'finish')! < 100) continue; // keep the real runner over a scratching duplicate
       byNumber.set(n, prev ? { ...prev, ...stripNull(e) } : e);
     }
-    const runners = [...byNumber.values()].map((e) => this.runner(e, status === 'final', fetchedAt)).filter((x): x is RunnerRaw => !!x && !!x.name).sort((a, b) => (a.number || 0) - (b.number || 0));
+    // Placings exist once the race is final, and also while an interim (protest-pending) result is published.
+    const placed = status === 'final' || (status === 'interim' && hasResults);
+    const runners = [...byNumber.values()].map((e) => this.runner(e, placed, fetchedAt)).filter((x): x is RunnerRaw => !!x && !!x.name).sort((a, b) => (a.number || 0) - (b.number || 0));
 
     let results: number[][] | undefined;
-    if (status === 'final') {
+    if (placed) {
       const byPlace = new Map<number, number[]>();
       for (const x of runners) if (x.finishingPosition && x.finishingPosition < 100 && x.number != null) byPlace.set(x.finishingPosition, [...(byPlace.get(x.finishingPosition) || []), x.number]);
       if (byPlace.size) results = [...byPlace.keys()].sort((a, b) => a - b).map((p) => byPlace.get(p)!.sort((a, b) => a - b));

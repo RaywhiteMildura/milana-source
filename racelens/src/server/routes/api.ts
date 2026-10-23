@@ -2,8 +2,8 @@ import { Router, type Request, type Response, type NextFunction } from 'express'
 import type { MeetingPack, MeetingSummary, RaceResult, Settings, SourceStatus } from '../../shared/types.js';
 import type { AdapterRegistry } from '../adapters/registry.js';
 import type { FetchContext } from '../adapters/types.js';
-import { JobManager } from '../jobs/manager.js';
-import { collectAndRerate, discoverMeetings, predictAll, recheckMeeting, recordResult, researchMeeting, type ResearchDeps } from '../jobs/research.js';
+import { JobManager, StillQueuedError } from '../jobs/manager.js';
+import { collectAndRerate, discoverMeetings, dueResultChecks, isManualResult, predictAll, recheckMeeting, recordResult, researchMeeting, sameResult, skipResultsJob, type ResearchDeps } from '../jobs/research.js';
 import { Store } from '../store/store.js';
 import { detectDayPatterns } from '../core/daypatterns.js';
 import { withTimeout } from '../core/http.js';
@@ -24,10 +24,38 @@ class HttpProblem extends Error {
   constructor(
     public status: number,
     message: string,
+    /** Extra fields for the JSON error body. */
+    public extra: Record<string, unknown> = {},
   ) {
     super(message);
   }
 }
+
+/** The answer for a quick change still queued behind a long job of the same meeting: 202, with the job to follow. */
+export interface QueuedReply {
+  queued: true;
+  jobId: string;
+  message: string;
+}
+
+/**
+ * Run a quick change through the meeting's queue. When it is still waiting behind
+ * a long job after a phone-sized wait, answer 202 { queued, jobId, message } – the
+ * change is not lost, it is applied as soon as the job ahead ends – instead of
+ * holding the request open or failing.
+ */
+async function queuedChange<T>(res: Response, run: () => Promise<T>, message: string): Promise<{ done: true; value: T } | { done: false }> {
+  try {
+    return { done: true, value: await run() };
+  } catch (err) {
+    if (!(err instanceof StillQueuedError)) throw err;
+    res.status(202).json({ queued: true, jobId: err.jobId, message } satisfies QueuedReply);
+    return { done: false };
+  }
+}
+
+/** Placings in a comparable form (dead heats in any order). */
+const placingsText = (placings: number[][]): string => JSON.stringify(placings.map((slot) => [...slot].sort((a, b) => a - b)));
 
 const wrap = (fn: (req: Request, res: Response) => Promise<unknown> | unknown) => (req: Request, res: Response, next: NextFunction) => {
   Promise.resolve(fn(req, res)).catch(next);
@@ -187,8 +215,8 @@ export function createApi(deps: ApiDeps): Router {
     wrap(async (req, res) => {
       const id = req.params.id as string;
       // Through the per-meeting queue so an in-flight job cannot resurrect the file afterwards.
-      const ok = await deps.jobs.exclusive(id, () => deps.store.deletePack(id));
-      res.json({ ok });
+      const out = await queuedChange(res, () => deps.jobs.exclusive(id, () => deps.store.deletePack(id), { label: 'Deleting the meeting' }), 'Still finishing another job for this meeting – it will be deleted as soon as that job ends.');
+      if (out.done) res.json({ ok: out.value });
     }),
   );
 
@@ -226,10 +254,36 @@ export function createApi(deps: ApiDeps): Router {
     wrap((req, res) => {
       const pack = deps.store.getPack(req.params.id as string);
       if (!pack) throw new HttpProblem(404, 'pack not found');
-      const raceNumber = (req.body || {}).raceNumber as number | undefined;
+      const body = (req.body || {}) as { raceNumber?: number; catchup?: unknown };
+      const raceNumber = body.raceNumber;
       if (raceNumber != null && !pack.races.some((x) => x.number === raceNumber)) throw new HttpProblem(400, 'unknown race number');
+      if (body.catchup != null && typeof body.catchup !== 'boolean') throw new HttpProblem(400, 'catchup must be true or false');
+      const plannedSteps: Array<[string, string]> = [['results', 'Fetching results'], ['patterns', 'Day patterns'], ['repredict', 'Re-rating']];
+      if (body.catchup === true) {
+        // The phone's catch-up: only what the watcher itself would look at now (its booked slots, never a settled,
+        // given-up or hand-typed result), run as an automatic check – same history and confirmation rules as the scheduler.
+        const due = dueResultChecks(pack, deps.now?.() ?? new Date(), { autoResults: true }).filter((n) => raceNumber == null || n === raceNumber);
+        if (!due.length) {
+          res.json({ jobId: null, due: [] });
+          return;
+        }
+        const job = deps.jobs.start('results', { meetingId: pack.id, raceNumber: due.length === 1 ? due[0] : undefined, plannedSteps }, async (job) => {
+          const latest = deps.store.getPack(pack.id);
+          if (!latest) throw new Error('This meeting was deleted before the results check ran');
+          // The scheduler may have looked at these races while this job was queued.
+          const still = dueResultChecks(latest, deps.now?.() ?? new Date(), { autoResults: true }).filter((n) => due.includes(n));
+          if (!still.length) {
+            skipResultsJob(job, 'Already checked');
+            return;
+          }
+          await collectAndRerate(researchDeps(), latest, job, still, { automatic: true });
+          if (deps.store.getPack(pack.id)) deps.store.savePack(latest);
+        });
+        res.json({ jobId: job.id, due });
+        return;
+      }
       // Same code path as the automatic watcher: fetch, cross-check, record, day patterns, re-rate the rest.
-      const job = deps.jobs.start('results', { meetingId: pack.id, raceNumber, plannedSteps: [['results', 'Fetching results'], ['patterns', 'Day patterns'], ['repredict', 'Re-rating']] }, async (job) => {
+      const job = deps.jobs.start('results', { meetingId: pack.id, raceNumber, plannedSteps }, async (job) => {
         const latest = deps.store.getPack(pack.id);
         if (!latest) throw new Error('This meeting was deleted before the results check ran');
         await collectAndRerate(researchDeps(), latest, job, raceNumber != null ? [raceNumber] : undefined);
@@ -254,17 +308,34 @@ export function createApi(deps: ApiDeps): Router {
       const unknown = placings.flat().filter((n) => !numbers.has(n));
       if (unknown.length) throw new HttpProblem(400, `Unknown runner number(s): ${unknown.join(', ')}`);
       // Applied through the per-meeting queue so a running job cannot overwrite the typed-in result.
-      const updated = await deps.jobs.exclusive(id, () => {
-        const pack = deps.store.getPack(id);
-        if (!pack) throw new Error('pack not found');
-        const result: RaceResult = { raceNumber: probeRace.number, placings, recordedAt: new Date().toISOString(), source: 'manual', status: 'final', confirmedBy: ['manual'] };
-        recordResult(pack, probeRace.number, result, pack.results[probeRace.number] ? 'corrected' : 'new');
-        pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
-        predictAll(pack, deps.store.getSettings(), deps.now?.() ?? new Date());
-        deps.store.savePack(pack);
-        return pack;
-      });
-      res.json(updated satisfies MeetingPack);
+      const n = probeRace.number;
+      const out = await queuedChange(res, () => deps.jobs
+        .exclusive(
+          id,
+          () => {
+            const pack = deps.store.getPack(id);
+            if (!pack) throw new Error('pack not found');
+            const existing = pack.results[n];
+            // The same entry again (e.g. a retry after a slow save) changes nothing and is not a correction.
+            if (isManualResult(existing) && placingsText(existing.placings) === placingsText(placings)) return pack;
+            const result: RaceResult = { raceNumber: n, placings, recordedAt: new Date().toISOString(), source: 'manual', status: 'final', confirmedBy: ['manual'] };
+            recordResult(pack, n, result, !existing ? 'new' : placingsText(existing.placings) !== placingsText(placings) ? 'corrected' : 'confirmed');
+            // Typed in by hand, the race is settled: the watcher stops and its "next check" line goes away.
+            const watch = pack.resultWatch?.[n];
+            if (watch) {
+              delete watch.nextCheckAt;
+              delete watch.gaveUp;
+              delete watch.correctionCheckAt;
+              watch.note = 'Result entered by hand';
+            }
+            pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
+            predictAll(pack, deps.store.getSettings(), deps.now?.() ?? new Date());
+            deps.store.savePack(pack);
+            return pack;
+          },
+          { label: `Saving the result of Race ${n}` },
+        ), `Still finishing another job for this meeting – your result for Race ${n} is queued and will be saved as soon as it finishes. No need to enter it again.`);
+      if (out.done) res.json(out.value satisfies MeetingPack);
     }),
   );
 
@@ -275,26 +346,49 @@ export function createApi(deps: ApiDeps): Router {
     void _next;
     const status = err instanceof HttpProblem ? err.status : 500;
     const message = err instanceof Error ? err.message : String(err);
-    if (status >= 500) console.error(err);
-    res.status(status).json({ error: message });
+    if (status >= 500 && !(err instanceof HttpProblem)) console.error(err);
+    res.status(status).json({ error: message, ...(err instanceof HttpProblem ? err.extra : {}) });
   });
 
   return r;
 }
 
-/** Carry results, scorecards, history and the predictions of resulted races from an older pack into a re-researched one. */
+/**
+ * Carry results, scorecards, history, the watcher's memory and the predictions of resulted races from an older
+ * pack into a re-researched one. A result typed in by hand always wins over what the sources say now.
+ */
 export function carryOver(existing: MeetingPack, pack: MeetingPack, settings: Settings, now: Date): void {
-  pack.history = [...existing.history, ...pack.history];
+  const manual = new Set(
+    Object.entries(existing.results)
+      .filter(([, r]) => isManualResult(r))
+      .map(([n]) => Number(n)),
+  );
+  // The watcher's memory still holds where the fresh research found nothing new for the race (or found the same
+  // result); where it found a different result the watcher starts that race afresh.
+  const watch = Object.entries(existing.resultWatch ?? {}).filter(([n]) => {
+    const raceNumber = Number(n);
+    const fresh = pack.results[raceNumber];
+    return manual.has(raceNumber) || !fresh || sameResult(existing.results[raceNumber], fresh);
+  });
+  // The fresh research's own lines about a hand-typed race would contradict the result that is kept.
+  pack.history = [...existing.history, ...pack.history.filter((h) => h.raceNumber == null || !manual.has(h.raceNumber))];
   for (const [n, result] of Object.entries(existing.results)) {
     const raceNumber = Number(n);
-    if (pack.results[raceNumber]) continue; // the new research already found (and cross-checked) it
+    const fresh = pack.results[raceNumber];
+    if (fresh && !manual.has(raceNumber)) continue; // the new research already found (and cross-checked) it
     if (existing.predictions[raceNumber]) pack.predictions[raceNumber] = existing.predictions[raceNumber];
-    recordResult(pack, raceNumber, result, 'confirmed');
-    pack.history.pop(); // recordResult logs a line; the original is already in the carried history
+    recordResult(pack, raceNumber, result, 'confirmed', { history: false }); // its line is already in the carried history
+    if (fresh && placingsText(fresh.placings.slice(0, 3)) !== placingsText(result.placings.slice(0, 3))) {
+      const said = fresh.placings
+        .slice(0, 3)
+        .map((slot) => slot.join('/'))
+        .join('-');
+      pack.history.push({ at: now.toISOString(), type: 'note', raceNumber, summary: `R${raceNumber}: kept the result entered by hand (the sources now say ${said})` });
+    }
   }
+  if (watch.length) pack.resultWatch = Object.fromEntries(watch);
   pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
   predictAll(pack, settings, now);
-  void now;
 }
 
 /** Express-level JSON error handler for body-parser failures that never reach the API router. */

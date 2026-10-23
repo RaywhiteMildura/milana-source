@@ -82,6 +82,10 @@ export interface RacingAustraliaOptions {
   pageCacheMs?: number;
   /** How long a fetched Results page is reused (ms); results change race by race. */
   resultsCacheMs?: number;
+  /** Most parsed pages kept at once (default 12). */
+  pageCacheMaxEntries?: number;
+  /** Most HTML (characters) behind the kept pages (default 3 MB); a parsed page holds ~30x its HTML in memory. */
+  pageCacheMaxChars?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -1085,6 +1089,10 @@ export function parseOzAcceptances(html: string | CheerioAPI, meeting: MeetingSu
 
 interface CachedPage {
   at: number;
+  /** Past this the entry is never served (cachedPage refetches), so it is dropped. */
+  expiresAt: number;
+  /** HTML length, the budget unit: a parsed DOM retains roughly 30x it (an 870 KB Form page is ~25 MB). */
+  size: number;
   $: CheerioAPI;
 }
 
@@ -1099,6 +1107,13 @@ export class RacingAustraliaAdapter implements SourceAdapter {
   private readonly hosts: string[];
   private readonly pageCacheMs: number;
   private readonly resultsCacheMs: number;
+  private readonly pageCacheMaxEntries: number;
+  private readonly pageCacheMaxChars: number;
+  /**
+   * Parsed pages by `${kind}:${meetingKey}`. Bounded, because the adapter lives as long as the server (a
+   * 256 MB machine left running for weeks): expired entries are dropped on every lookup, and past the entry /
+   * HTML budget the oldest go first, so only the meetings being worked on right now are held.
+   */
   private readonly pages = new Map<string, CachedPage>();
   private lastFetchAt = 0;
 
@@ -1108,6 +1123,8 @@ export class RacingAustraliaAdapter implements SourceAdapter {
     this.hosts = (o.hosts && o.hosts.length ? o.hosts : RA_HOSTS).map((h) => (h.endsWith('/') ? h : `${h}/`));
     this.pageCacheMs = o.pageCacheMs ?? 5 * 60_000;
     this.resultsCacheMs = o.resultsCacheMs ?? 60_000;
+    this.pageCacheMaxEntries = Math.max(1, o.pageCacheMaxEntries ?? 12);
+    this.pageCacheMaxChars = Math.max(0, o.pageCacheMaxChars ?? 3_000_000);
   }
 
   // -- public API -------------------------------------------------------------
@@ -1257,12 +1274,33 @@ export class RacingAustraliaAdapter implements SourceAdapter {
   private async cachedPage(kind: string, key: string, path: string, meeting: MeetingSummary, ctx: FetchContext, ttl: number): Promise<CheerioAPI> {
     const ck = `${kind}:${key}`;
     const now = ctx.now().getTime();
+    // Sweep before fetching, so a stale DOM is released before its replacement is parsed.
+    this.prunePages(now);
     const hit = this.pages.get(ck);
     if (hit && now - hit.at < ttl) return hit.$;
-    const { $, url } = await this.getPage(path, ctx);
+    const { $, url, html } = await this.getPage(path, ctx);
     assertMeetingPage($, meeting, key, url);
-    this.pages.set(ck, { at: now, $ });
+    this.pages.delete(ck); // re-insert so insertion order == age
+    this.pages.set(ck, { at: now, expiresAt: now + ttl, size: html.length, $ });
+    this.prunePages(now, ck);
     return $;
+  }
+
+  /**
+   * Drops expired pages; with `keep` (the page just fetched) also the oldest others until the entry and HTML
+   * budgets hold, so a page larger than the budget on its own is still reused by the run that fetched it.
+   */
+  private prunePages(now: number, keep?: string): void {
+    for (const [k, v] of this.pages) if (now >= v.expiresAt) this.pages.delete(k);
+    if (keep === undefined) return;
+    let chars = 0;
+    for (const v of this.pages.values()) chars += v.size;
+    for (const [k, v] of this.pages) {
+      if (this.pages.size <= this.pageCacheMaxEntries && chars <= this.pageCacheMaxChars) break;
+      if (k === keep) continue;
+      this.pages.delete(k);
+      chars -= v.size;
+    }
   }
 
   /** When this instance already holds a fresh Results page for the meeting, mark resulted races final (no extra request). */

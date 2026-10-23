@@ -1,7 +1,7 @@
-import type { MeetingPack, SchedulerStatus, Settings } from '../../shared/types.js';
+import type { MeetingPack, SchedulerStatus } from '../../shared/types.js';
 import type { Store } from '../store/store.js';
 import type { JobManager } from './manager.js';
-import { collectAndRerate, isResultSettled, recheckMeeting, RESULT_WATCH, type ResearchDeps } from './research.js';
+import { collectAndRerate, dueResultChecks, isResultSettled, recheckMeeting, skipResultsJob, type ResearchDeps } from './research.js';
 
 /**
  * Background scheduler. Every minute it looks at the saved packs for the
@@ -44,47 +44,11 @@ const RESULTS_STEPS: Array<[string, string]> = [
   ['repredict', 'Re-rating'],
 ];
 
-/**
- * Which races are due an automatic results check right now. Pure.
- *
- * Schedule, relative to each race's scheduled start (see RESULT_WATCH /
- * nextResultCheckAt in research.ts): first check at start + 2 min; then every
- * 2 min until start + 30 min; then every 5 min until start + 90 min; then every
- * 15 min until start + 4 h; after that the collector marks resultWatch[n].gaveUp
- * with a note ('No result published after 4 hours - enter it manually or press
- * Fetch results') and the race is left alone.
- *
- * The memory is pack.resultWatch[n] (lastCheckedAt / nextCheckAt / attempts),
- * written by collectAndRerate and persisted with the pack, so restarts do not
- * matter: a race with no entry yet is due as soon as start + 2 min has passed
- * (also the catch-up path for a server that was off while races were run); a
- * race with an entry is due once its nextCheckAt has passed.
- *
- * A race is skipped when it has no start time, is abandoned, is settled (a
- * manual result; a final result confirmed by two sources; or a final result from
- * one source whose extra confirmation checks are used up), when the watcher gave
- * up on it, or when settings.autoResults is false.
- */
-export function dueResultChecks(pack: MeetingPack, now: Date, settings: Pick<Settings, 'autoResults'>): number[] {
-  if (settings.autoResults === false) return [];
-  const t = now.getTime();
-  const due: number[] = [];
-  for (const race of pack.races) {
-    if (!race.startTime || race.status === 'abandoned') continue;
-    const start = Date.parse(race.startTime);
-    if (!Number.isFinite(start) || t < start + RESULT_WATCH.firstCheckMs) continue;
-    if (isResultSettled(pack, race.number)) continue;
-    const watch = pack.resultWatch?.[race.number];
-    if (!watch) {
-      due.push(race.number);
-      continue;
-    }
-    if (watch.gaveUp || !watch.nextCheckAt) continue;
-    const next = Date.parse(watch.nextCheckAt);
-    if (!Number.isFinite(next) || t >= next) due.push(race.number);
-  }
-  return due;
-}
+/** Which races are due an automatic results check right now – the shared rule lives with the results pass in research.ts. */
+export { dueResultChecks };
+
+/** After a results job for a meeting fails (e.g. the disk is full), the scheduler leaves that meeting alone this long before trying again. */
+export const RESULTS_RETRY_MS = 5 * 60_000;
 
 export class AutoRecheckScheduler {
   private timer?: NodeJS.Timeout;
@@ -96,6 +60,10 @@ export class AutoRecheckScheduler {
   private fired = new Set<string>();
   /** Watch entries per pack, keyed by the pack's updatedAt so unchanged packs are not re-read on every health poll. */
   private watchCache = new Map<string, { updatedAt: string; entries: SchedulerStatus['watching'] }>();
+  /** When the last automatic results job of a meeting failed; cleared by the next one that succeeds. */
+  private resultsFailedAt = new Map<string, number>();
+  /** Said once that results are due but no results source is enabled (instead of starting a pointless job every minute). */
+  private warnedNoResultsSource = false;
 
   constructor(private readonly deps: SchedulerDeps) {}
 
@@ -185,6 +153,9 @@ export class AutoRecheckScheduler {
     const minutes = settings.autoRecheckMinutesBeforeRace;
     const autoResults = settings.autoResults !== false;
     let started = 0;
+    let resultSources: number | undefined;
+    const haveResultSources = () => (resultSources ??= this.deps.researchDeps().registry.withCapability('results', settings.disabledSources).length) > 0;
+    const errorText = (err: unknown) => (err instanceof Error ? err.message : String(err));
     // Pre-race checks concern meetings on today's or tomorrow's local date; results concern today's or yesterday's.
     const preRaceDates = localDates(now, [0, 1]);
     const resultDates = localDates(now, [-1, 0]);
@@ -209,27 +180,55 @@ export class AutoRecheckScheduler {
           this.deps.jobs.start('recheck', { meetingId: pack.id, raceNumber, plannedSteps: [['results', 'Results so far'], ['patterns', 'Day patterns'], ['repredict', 'Re-rating']] }, async (job) => {
             const latest = this.deps.store.getPack(pack.id);
             if (!latest) return; // deleted meanwhile
-            await recheckMeeting(this.deps.researchDeps(), latest, job, raceNumber);
-            const last = latest.history[latest.history.length - 1];
-            if (last) last.summary = `Automatic ${last.summary.replace(/^Pre-race check/, 'pre-race check')}`;
-            if (this.deps.store.getPack(pack.id)) this.deps.store.savePack(latest);
+            try {
+              await recheckMeeting(this.deps.researchDeps(), latest, job, raceNumber);
+              const last = latest.history[latest.history.length - 1];
+              if (last) last.summary = `Automatic ${last.summary.replace(/^Pre-race check/, 'pre-race check')}`;
+              if (this.deps.store.getPack(pack.id)) this.deps.store.savePack(latest);
+            } catch (err) {
+              this.deps.log?.warn(`Auto pre-race check failed: ${pack.meeting.venue} R${raceNumber}: ${errorText(err)}`);
+              throw err;
+            }
           });
         }
       }
 
       if (wantResults && !activeResults.has(pack.id)) {
+        // A meeting whose last results job failed gets a short rest, not a retry (and an error job) every minute.
+        const failedAt = this.resultsFailedAt.get(pack.id);
+        if (failedAt !== undefined && now.getTime() - failedAt < RESULTS_RETRY_MS) continue;
         const due = dueResultChecks(pack, now, settings);
         if (!due.length) continue;
+        if (!haveResultSources()) {
+          if (!this.warnedNoResultsSource) this.deps.log?.warn('Automatic results: races are waiting for a result but every results source is turned off in Settings');
+          this.warnedNoResultsSource = true;
+          continue;
+        }
+        this.warnedNoResultsSource = false;
         started++;
         activeResults.add(pack.id);
         for (const n of due) this.deps.log?.info(`Auto results: ${pack.meeting.venue} R${n} (attempt ${(pack.resultWatch?.[n]?.attempts ?? 0) + 1})`);
         this.deps.jobs.start('results', { meetingId: pack.id, raceNumber: due.length === 1 ? due[0] : undefined, plannedSteps: RESULTS_STEPS }, async (job) => {
           const latest = this.deps.store.getPack(pack.id);
           if (!latest) return; // deleted meanwhile
-          const { newly } = await collectAndRerate(this.deps.researchDeps(), latest, job, due, { automatic: true });
-          if (newly.length) this.deps.log?.info(`Auto results: ${pack.meeting.venue} R${newly.join(', R')} recorded, remaining races re-rated`);
-          if (this.deps.store.getPack(pack.id)) this.deps.store.savePack(latest);
-          this.watchCache.delete(pack.id);
+          try {
+            // Re-read at run time: a pre-race check, the phone's catch-up or a button press may have looked at these races since the tick.
+            const still = dueResultChecks(latest, this.deps.now?.() ?? new Date(), this.deps.store.getSettings());
+            if (!still.length) {
+              skipResultsJob(job, 'Already checked');
+              return;
+            }
+            const { newly } = await collectAndRerate(this.deps.researchDeps(), latest, job, still, { automatic: true });
+            if (this.deps.store.getPack(pack.id)) this.deps.store.savePack(latest);
+            this.resultsFailedAt.delete(pack.id);
+            if (newly.length) this.deps.log?.info(`Auto results: ${pack.meeting.venue} R${newly.join(', R')} recorded, remaining races re-rated`);
+          } catch (err) {
+            this.resultsFailedAt.set(pack.id, (this.deps.now?.() ?? new Date()).getTime());
+            this.deps.log?.warn(`Auto results failed: ${pack.meeting.venue} R${due.join(', R')} - trying again in ${RESULTS_RETRY_MS / 60_000} min: ${errorText(err)}`);
+            throw err; // the job still shows as failed
+          } finally {
+            this.watchCache.delete(pack.id);
+          }
         });
       }
     }

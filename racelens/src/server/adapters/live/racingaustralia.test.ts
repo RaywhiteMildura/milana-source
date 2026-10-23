@@ -286,6 +286,48 @@ describe('RacingAustraliaAdapter', () => {
     });
   });
 
+  describe('page cache stays bounded on a long-running server', () => {
+    const cachedKeys = (adapter: RacingAustraliaAdapter) => [...(adapter as unknown as { pages: Map<string, unknown> }).pages.keys()];
+
+    it('drops pages once they have expired instead of keeping every meeting for the life of the process', async () => {
+      let now = new Date('2026-10-24T00:00:00.000Z');
+      const { ctx } = harness([FORM_ROUTE, RESULTS_ROUTE]);
+      ctx.now = () => now;
+      const adapter = new RacingAustraliaAdapter({ delayMs: 0, pageCacheMs: 5 * 60_000, resultsCacheMs: 60_000 });
+      await adapter.fetchMeeting(FLEM, ctx);
+      await adapter.fetchResults(CAULFIELD, 7, ctx);
+      expect(cachedKeys(adapter).sort()).toEqual(['form:2026Oct24,VIC,Flemington', 'results:2025Oct18,VIC,Caulfield']);
+      // Two minutes on: the results page (60 s) is gone, the form page (5 min) is still served.
+      now = new Date('2026-10-24T00:02:00.000Z');
+      await adapter.fetchMeeting(FLEM, ctx);
+      expect(cachedKeys(adapter)).toEqual(['form:2026Oct24,VIC,Flemington']);
+      // Later the watcher polls one meeting again: only that page is held.
+      now = new Date('2026-10-24T03:00:00.000Z');
+      await adapter.fetchResults(CAULFIELD, 7, ctx);
+      expect(cachedKeys(adapter)).toEqual(['results:2025Oct18,VIC,Caulfield']);
+    });
+
+    it('caps how many pages, and how much HTML, it holds at once - oldest first, never the page just fetched', async () => {
+      const { ctx, hits } = harness([FORM_ROUTE, RESULTS_ROUTE]);
+      const byCount = new RacingAustraliaAdapter({ delayMs: 0, pageCacheMaxEntries: 1 });
+      await byCount.fetchMeeting(FLEM, ctx);
+      await byCount.fetchResults(CAULFIELD, 7, ctx);
+      expect(cachedKeys(byCount)).toEqual(['results:2025Oct18,VIC,Caulfield']);
+      await byCount.fetchMeeting(FLEM, ctx); // evicted, so fetched again
+      expect(hits).toHaveLength(3);
+      expect(cachedKeys(byCount)).toEqual(['form:2026Oct24,VIC,Flemington']);
+
+      const bySize = new RacingAustraliaAdapter({ delayMs: 0, pageCacheMaxChars: 1 });
+      await bySize.fetchMeeting(FLEM, ctx);
+      expect(cachedKeys(bySize)).toEqual(['form:2026Oct24,VIC,Flemington']);
+      // Still reused within one research run (fetchForm right after fetchMeeting makes no request).
+      await bySize.fetchForm(FLEM, 2, ctx);
+      expect(hits).toHaveLength(4);
+      await bySize.fetchResults(CAULFIELD, 7, ctx);
+      expect(cachedKeys(bySize)).toEqual(['results:2025Oct18,VIC,Caulfield']);
+    });
+  });
+
   describe('identity checks', () => {
     it('refuses a page for a different venue', async () => {
       const wrong = meeting({ date: '2026-10-24', venue: 'Caulfield', state: 'VIC', sourceRefs: { racingaustralia: '2026Oct24,VIC,Caulfield' } });

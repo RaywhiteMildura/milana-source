@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 
 /**
  * Nudges phone users to add RaceLens to their home screen so it opens like an
- * app (full screen, its own icon). Shown only on touch devices that are not
- * already running the installed app; dismissal is remembered on the device.
+ * app (full screen, its own icon). Shown only on phones and tablets (a coarse
+ * primary pointer, or iOS) that are not already running the installed app – not
+ * on touch-screen laptops, whose primary pointer is a mouse or trackpad – with
+ * the steps for that platform. Dismissal is remembered on the device.
  */
 const DISMISS_KEY = 'racelens.installHintDismissed';
 
@@ -22,18 +24,28 @@ function isStandalone(): boolean {
   }
 }
 
-function isTouchDevice(): boolean {
+function isIos(): boolean {
+  const ua = navigator.userAgent || '';
+  // iPadOS Safari reports a Mac; a real Mac has no touch points.
+  return /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+}
+
+function isAndroid(): boolean {
+  return /Android/i.test(navigator.userAgent || '');
+}
+
+/**
+ * A phone or tablet. `maxTouchPoints` alone is not enough: Windows touch-screen
+ * laptops report touch points while their primary pointer is fine. iOS is
+ * included for an iPad driven with a trackpad (and iOS never offers its own
+ * install prompt).
+ */
+function isPhoneOrTablet(): boolean {
   try {
-    if (window.matchMedia('(pointer: coarse)').matches) return true;
-    return navigator.maxTouchPoints > 0;
+    return window.matchMedia('(pointer: coarse)').matches || isIos();
   } catch {
     return false;
   }
-}
-
-function isIos(): boolean {
-  const ua = navigator.userAgent || '';
-  return /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
 }
 
 function wasDismissed(): boolean {
@@ -45,7 +57,7 @@ function wasDismissed(): boolean {
 }
 
 export function InstallHint() {
-  const [visible, setVisible] = useState(() => isTouchDevice() && !isStandalone() && !wasDismissed());
+  const [visible, setVisible] = useState(() => isPhoneOrTablet() && !isStandalone() && !wasDismissed());
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
@@ -99,9 +111,21 @@ export function InstallHint() {
               </span>{' '}
               then <strong>Add to Home Screen</strong>.
             </>
+          ) : isAndroid() ? (
+            <>
+              Android: open the browser menu <span className="install-hint__key">⋮</span> then <strong>Add to Home screen</strong>
+              {typeof window !== 'undefined' && window.isSecureContext ? (
+                <>
+                  {' '}
+                  (or <strong>Install app</strong>).
+                </>
+              ) : (
+                <> (it opens in Chrome; full-screen needs an https address – see the guide).</>
+              )}
+            </>
           ) : (
             <>
-              Android: open the browser menu <span className="install-hint__key">⋮</span> then <strong>Add to Home screen</strong> (or <strong>Install app</strong>).
+              Open your browser's menu, then <strong>Install app</strong> or <strong>Add to Home screen</strong>.
             </>
           )}
         </span>

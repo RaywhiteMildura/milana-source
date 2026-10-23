@@ -529,6 +529,12 @@ export interface ResultWatch {
   gaveUp?: boolean;
   /** Human-readable state, e.g. "Result from one source only – waiting for confirmation" */
   note?: string;
+  /**
+   * One more look, after the sources settled the result early, for a late
+   * correction (a protest upheld, amended placings). Absent once that look has
+   * run, for results typed in by hand, and for results settled later on.
+   */
+  correctionCheckAt?: string;
 }
 
 export interface MeetingPack {

@@ -48,6 +48,52 @@ async function openFirstMeeting(page: Page) {
 
 const noHorizontalOverflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
 
+/** Race-day evening, after the demo card (12:25–17:05 AEDT) has run. */
+const RACE_DAY_EVENING = '2026-10-24T09:30:00.000Z';
+
+/** The page follows the server's clock (from /api/health), so this makes every race on the demo card look jumped. */
+async function pretendRaceDayEvening(page: Page) {
+  await page.route('**/api/health', async (route) => {
+    const res = await route.fetch();
+    await route.fulfill({ response: res, json: { ...(await res.json()), time: RACE_DAY_EVENING } });
+  });
+}
+
+const isPackGet = (url: string, method: string) => method === 'GET' && /^\/api\/packs\/[^/]+$/.test(new URL(url).pathname);
+const isPackList = (url: string, method: string) => method === 'GET' && new URL(url).pathname === '/api/packs';
+const isResultsPost = (url: string, method: string) => method === 'POST' && /^\/api\/packs\/[^/]+\/results$/.test(new URL(url).pathname);
+
+/**
+ * Record every toast the page shows, however briefly (a toast lives 5 s, so a
+ * retrying "no toast" assertion would pass once it had gone). Read with seenToasts().
+ */
+async function recordToasts(page: Page) {
+  await page.addInitScript(() => {
+    const seen: string[] = [];
+    (window as unknown as { __toasts: string[] }).__toasts = seen;
+    new MutationObserver((records) => {
+      for (const r of records)
+        r.addedNodes.forEach((n) => {
+          if (n instanceof HTMLElement && n.dataset.testid === 'toast') seen.push(n.textContent ?? '');
+        });
+    }).observe(document, { childList: true, subtree: true });
+  });
+}
+const seenToasts = (page: Page) => page.evaluate(() => (window as unknown as { __toasts?: string[] }).__toasts ?? []);
+
+/** Serve the saved pack with its results and results-watch book-keeping replaced, so a test does not depend on what the server did. */
+async function servePackWith(page: Page, patch: (pack: { races: Array<{ number: number }> }) => Record<string, unknown>) {
+  await page.route(
+    (url) => /^\/api\/packs\/[^/]+$/.test(url.pathname),
+    async (route) => {
+      if (route.request().method() !== 'GET') return route.fallback();
+      const res = await route.fetch();
+      const pack = await res.json();
+      await route.fulfill({ response: res, json: { ...pack, ...patch(pack) } });
+    },
+  );
+}
+
 test('home loads with the demo banner and at least one meeting card', async ({ page }) => {
   const meetingsRequest = page.waitForResponse((r) => r.url().includes(`/api/meetings?date=${DEMO_DATE}`));
   await page.goto(`/#/?date=${DEMO_DATE}`);
@@ -286,6 +332,8 @@ test('settings shows the race day automation card and the auto-results toggle ro
   await expect(page.getByTestId('automation-timeline')).toContainText(/pre-race check/i);
   await expect(page.getByTestId('automation-timeline')).toContainText(/30 seconds/i);
   await expect(page.getByTestId('scheduler-status')).toBeVisible();
+  // Its "Last look 1 min ago" ticks, so it must not be a live region that screen readers re-announce.
+  expect(await page.getByTestId('scheduler-status').getAttribute('aria-live')).toBeNull();
   await expect(page.getByTestId('phone-card')).toBeVisible();
   await expect(page.getByTestId('settings-auto-recheck')).toBeVisible();
 
@@ -319,6 +367,165 @@ test('the meeting page shows the Auto chip while the server runs its scheduler',
   await expect(chip).toHaveAttribute('title', /automatically/i);
   // No race has jumped in the demo card yet (it is dated for race day), so no next-race bar or watch line.
   await expect(page.getByTestId('pack-header')).toBeVisible();
+});
+
+test('the phone card shows the public address when hosted and the Wi-Fi addresses only on a LAN', async ({ page }) => {
+  let extra: Record<string, unknown> = { publicUrl: 'https://racelens-e2e.fly.dev', urls: [] };
+  await page.route('**/api/health', async (route) => {
+    const res = await route.fetch();
+    await route.fulfill({ response: res, json: { ...(await res.json()), ...extra } });
+  });
+  await page.goto('/#/settings');
+  const card = page.getByTestId('phone-card');
+  await expect(card.getByTestId('phone-public-url')).toContainText('https://racelens-e2e.fly.dev');
+  await expect(card).toContainText(/works anywhere/i);
+  await expect(card.getByTestId('phone-public-url').getByTestId('phone-qr')).toBeVisible();
+  await expect(card.getByTestId('phone-url')).toHaveCount(0);
+  await expect(card).not.toContainText(/same wi-fi|npm run start:phone/i);
+
+  extra = { publicUrl: undefined, urls: ['http://192.168.1.20:4851'] };
+  await page.reload();
+  await expect(card.getByTestId('phone-url')).toContainText('http://192.168.1.20:4851');
+  await expect(card).toContainText(/same wi-fi/i);
+  await expect(card.getByTestId('phone-public-url')).toHaveCount(0);
+
+  extra = { publicUrl: undefined, urls: [] };
+  await page.reload();
+  await expect(card).toContainText(/npm run start:phone/);
+  await expect(card.getByTestId('phone-qr')).toHaveCount(0);
+});
+
+test('the phone catch-up only asks the server when it is behind, and never with automatic results off or unknown', async ({ page }) => {
+  await recordToasts(page);
+  await pretendRaceDayEvening(page);
+  const catchups: unknown[] = [];
+  const jobPolls: string[] = [];
+  page.on('request', (r) => {
+    if (isResultsPost(r.url(), r.method())) catchups.push(r.postDataJSON());
+    if (new URL(r.url()).pathname.startsWith('/api/jobs/')) jobPolls.push(r.url());
+  });
+  // The server has nothing due: no job to follow.
+  await page.route((url) => /^\/api\/packs\/[^/]+\/results$/.test(url.pathname), (route) => route.fulfill({ json: { jobId: null, due: [] } }));
+
+  // 1) Races ran while the server never looked: one quiet, automatic catch-up.
+  let watch: (pack: { races: Array<{ number: number }> }) => Record<string, unknown> = () => ({ results: {}, resultWatch: {} });
+  await servePackWith(page, (pack) => watch(pack));
+  await openFirstMeeting(page);
+  await expect.poll(() => catchups.length, { message: 'a catch-up should be requested' }).toBe(1);
+  expect(catchups[0]).toEqual({ catchup: true });
+  await page.waitForTimeout(2500);
+  expect(jobPolls).toEqual([]);
+  expect(await seenToasts(page)).toEqual([]);
+
+  // 2) The server gave up on some races and has its next look booked for the others: nothing to catch up.
+  // (Both looked a while ago, which used to be enough to fire a catch-up on every open and refocus.)
+  const at = (mins: number) => new Date(Date.parse(RACE_DAY_EVENING) + mins * 60_000).toISOString();
+  watch = (pack) => ({
+    results: {},
+    resultWatch: Object.fromEntries(
+      pack.races.map((r) => [r.number, r.number % 2 ? { lastCheckedAt: at(-60), attempts: 30, gaveUp: true, note: 'No result published after 4 hours' } : { lastCheckedAt: at(-4), attempts: 20, nextCheckAt: at(1), note: 'Nothing published yet' }]),
+    ),
+  });
+  await page.reload();
+  await expect(page.getByTestId('race-detail')).toBeVisible();
+  await page.waitForTimeout(4000);
+  expect(catchups).toHaveLength(1);
+
+  // 3) Automatic results are off, and the setting arrives after the pack: still nothing, and no promise of a next check.
+  watch = () => ({ results: {}, resultWatch: {} });
+  await page.route('**/api/settings', async (route) => {
+    if (route.request().method() !== 'GET') return route.fallback();
+    const res = await route.fetch();
+    const settings = await res.json();
+    await new Promise((r) => setTimeout(r, 1500));
+    await route.fulfill({ response: res, json: { ...settings, autoResults: false } });
+  });
+  await page.reload();
+  await expect(page.getByTestId('race-detail')).toBeVisible();
+  const line = page.getByTestId('result-watch');
+  await expect(line).toContainText(/automatic results are off/i);
+  await expect(line).not.toContainText(/next|any moment/i);
+  expect(await line.getAttribute('aria-live')).toBeNull();
+  await page.waitForTimeout(3000);
+  expect(catchups).toHaveLength(1);
+});
+
+test('a catch-up job the server forgot (restart) does not stall the live refresh', async ({ page }) => {
+  await page.clock.install();
+  await recordToasts(page);
+  await pretendRaceDayEvening(page);
+  await servePackWith(page, () => ({ results: {}, resultWatch: {} }));
+  const catchups: unknown[] = [];
+  await page.route(
+    (url) => /^\/api\/packs\/[^/]+\/results$/.test(url.pathname),
+    async (route) => {
+      catchups.push(route.request().postDataJSON());
+      await route.fulfill({ json: { jobId: 'job_lost_e2e', due: [1] } });
+    },
+  );
+  let misses = 0;
+  await page.route('**/api/jobs/job_lost_e2e', async (route) => {
+    misses += 1;
+    await route.fulfill({ status: 404, json: { error: 'job not found' } });
+  });
+
+  await openFirstMeeting(page);
+  await expect.poll(() => catchups.length).toBe(1);
+  expect(catchups[0]).toEqual({ catchup: true });
+  await expect.poll(() => misses, { timeout: 20_000, message: 'the lost job is polled three times, then given up' }).toBe(3);
+
+  // The 30 s live poll carries on (it used to stay paused behind the lost job for as long as the page was open).
+  const livePoll = page.waitForRequest((r) => isPackList(r.url(), r.method()), { timeout: 15_000 });
+  await page.clock.fastForward('00:31');
+  await livePoll;
+  expect(misses).toBe(3);
+  expect(catchups).toHaveLength(1);
+  expect(await seenToasts(page)).toEqual([]);
+});
+
+test('the live refresh toasts a new result but stays quiet for a routine automatic check', async ({ page }) => {
+  await page.clock.install();
+  await recordToasts(page);
+  let phase: 'load' | 'routine' | 'result' = 'load';
+  let target = 0;
+  const later = (iso: string, mins: number) => new Date(Date.parse(iso) + mins * 60_000).toISOString();
+  await page.route(
+    (url) => url.pathname === '/api/packs',
+    async (route) => {
+      if (route.request().method() !== 'GET') return route.fallback();
+      const res = await route.fetch();
+      const list = (await res.json()) as Array<{ updatedAt: string; resultedRaces: number }>;
+      for (const p of list) {
+        if (phase !== 'load') p.updatedAt = later(p.updatedAt, phase === 'routine' ? 5 : 10);
+        if (phase === 'result') p.resultedRaces += 1;
+      }
+      await route.fulfill({ response: res, json: list });
+    },
+  );
+  await servePackWith(page, (pack) => {
+    const p = pack as unknown as { updatedAt: string; races: Array<{ number: number; runners: Array<{ number: number }> }>; results?: Record<number, unknown>; resultWatch?: Record<number, unknown> };
+    if (phase === 'load') return {};
+    const race = p.races.find((r) => !p.results?.[r.number]) ?? p.races[0];
+    target = race.number;
+    const updatedAt = later(p.updatedAt, phase === 'routine' ? 5 : 10);
+    // What an automatic results check that found nothing changes: the watch book-keeping and updatedAt.
+    const resultWatch = { ...(p.resultWatch ?? {}), [race.number]: { lastCheckedAt: updatedAt, nextCheckAt: later(updatedAt, 2), attempts: 2, note: 'Nothing published yet' } };
+    if (phase === 'routine') return { updatedAt, resultWatch };
+    const placings = race.runners.slice(0, 3).map((r) => [r.number]);
+    return { updatedAt, resultWatch, results: { ...(p.results ?? {}), [race.number]: { raceNumber: race.number, placings, recordedAt: updatedAt, source: 'racingaustralia', status: 'final' } } };
+  });
+
+  await openFirstMeeting(page);
+  phase = 'routine';
+  const refreshed = page.waitForRequest((r) => isPackGet(r.url(), r.method()), { timeout: 15_000 });
+  await page.clock.fastForward('00:31');
+  await refreshed;
+  await page.waitForTimeout(1500);
+  expect(await seenToasts(page)).toEqual([]);
+
+  phase = 'result';
+  await page.clock.fastForward('00:31');
+  await expect.poll(() => seenToasts(page)).toEqual([expect.stringContaining(`R${target} result in`)]);
 });
 
 test.describe('mobile viewport', () => {
@@ -358,6 +565,8 @@ test.describe('phone (touch) viewport', () => {
     const hint = page.getByTestId('install-hint');
     await expect(hint).toBeVisible();
     await expect(hint).toContainText(/home screen/i);
+    // Neither an Android nor an iOS browser: no platform-specific steps.
+    await expect(hint).not.toContainText(/Android|iPhone/);
     expect(await noHorizontalOverflow(page)).toBe(true);
 
     await page.getByTestId('install-dismiss').click();
@@ -368,6 +577,37 @@ test.describe('phone (touch) viewport', () => {
     await expect(page.getByTestId('meeting-card').first()).toBeVisible();
     await expect(page.getByTestId('install-hint')).toHaveCount(0);
     expect(await page.evaluate(() => localStorage.getItem('racelens.installHintDismissed'))).toBe('1');
+  });
+
+  test.describe('on Android', () => {
+    test.use({ userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36' });
+    test('the hint gives the Android steps', async ({ page }) => {
+      await gotoHome(page);
+      await expect(page.getByTestId('install-hint')).toContainText(/Android: open the browser menu/);
+    });
+  });
+
+  test.describe('on an iPhone', () => {
+    test.use({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' });
+    test('the hint gives the iPhone steps', async ({ page }) => {
+      await gotoHome(page);
+      await expect(page.getByTestId('install-hint')).toContainText(/Add to Home Screen/);
+      await expect(page.getByTestId('install-hint')).not.toContainText(/Android/);
+    });
+  });
+});
+
+test.describe('touch-screen laptop', () => {
+  test.use({ userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0' });
+
+  test('no add-to-home-screen hint when the touch screen is not the main pointer', async ({ page }) => {
+    // A Windows laptop with a touch digitiser: touch points, but a mouse/trackpad as the primary (fine) pointer.
+    await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'maxTouchPoints', { get: () => 10 }));
+    await gotoHome(page);
+    expect(await page.evaluate(() => navigator.maxTouchPoints)).toBe(10);
+    expect(await page.evaluate(() => window.matchMedia('(pointer: coarse)').matches)).toBe(false);
+    await page.waitForTimeout(500);
+    await expect(page.getByTestId('install-hint')).toHaveCount(0);
   });
 });
 

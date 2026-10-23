@@ -48,8 +48,28 @@ export class JobHandle {
   }
 }
 
+/**
+ * How long a quick change to a meeting (a result typed in by hand, deleting the
+ * meeting) waits for a job already running for that meeting before the request
+ * answers "queued". Phone-sized on purpose: a phone that sleeps or switches app
+ * mid-request can drop a long request, and a minutes-long spinner reads as a hang.
+ * The change is never dropped: it stays queued and is applied as soon as the job
+ * ahead finishes, and the caller gets the job id to follow it.
+ */
+export const EXCLUSIVE_WAIT_MS = 20_000;
+
+/** exclusive() ran out of waiting while the change was still queued behind another job; it will still be applied. */
+export class StillQueuedError extends Error {
+  constructor(public readonly jobId: string) {
+    super('Another job for this meeting is still running – the change is queued and will be applied as soon as it finishes');
+    this.name = 'StillQueuedError';
+  }
+}
+
 /** In-memory job manager: runs one job at a time per meeting, keeps recent history. */
 export class JobManager {
+  /** How long exclusive() waits by default (EXCLUSIVE_WAIT_MS; tests shorten it). */
+  exclusiveWaitMs = EXCLUSIVE_WAIT_MS;
   private jobs = new Map<string, JobProgress>();
   private order: string[] = [];
   private running = new Map<string, Promise<void>>();
@@ -108,14 +128,18 @@ export class JobManager {
     return progress;
   }
 
-  /** Run `fn` after any in-flight job for the same meeting (keeps pack writes serialised) and return its value. */
-  async exclusive<T>(meetingId: string, fn: () => Promise<T> | T): Promise<T> {
+  /**
+   * Run `fn` after any in-flight job for the same meeting (keeps pack writes serialised) and return its value.
+   * Throws StillQueuedError when `fn` has not run within the wait (`waitMs`, default exclusiveWaitMs); it still runs later.
+   */
+  async exclusive<T>(meetingId: string, fn: () => Promise<T> | T, opts: { label?: string; waitMs?: number } = {}): Promise<T> {
     let out!: T;
     const job = this.start('results', { meetingId }, async (job) => {
-      job.message('Applying change');
+      job.message(opts.label ?? 'Applying change');
       out = await fn();
     });
-    const done = await this.wait(job.id, 120_000);
+    const done = await this.settled(job.id, opts.waitMs ?? this.exclusiveWaitMs);
+    if (!done) throw new StillQueuedError(job.id);
     if (done.status === 'error') throw new Error(done.error || 'failed');
     return out;
   }
@@ -130,13 +154,20 @@ export class JobManager {
 
   /** Await completion (tests). */
   async wait(id: string, timeoutMs = 60_000): Promise<JobProgress> {
+    const done = await this.settled(id, timeoutMs);
+    if (!done) throw new Error('job wait timed out');
+    return done;
+  }
+
+  /** The finished job, or undefined when it is still queued or running after `timeoutMs`. */
+  private async settled(id: string, timeoutMs: number): Promise<JobProgress | undefined> {
     const started = Date.now();
-    while (Date.now() - started < timeoutMs) {
+    for (;;) {
       const j = this.jobs.get(id);
       if (!j) throw new Error('job not found');
       if (j.status === 'done' || j.status === 'error') return j;
+      if (Date.now() - started >= timeoutMs) return undefined;
       await new Promise((r) => setTimeout(r, 25));
     }
-    throw new Error('job wait timed out');
   }
 }

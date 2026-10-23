@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { MeetingSummary } from '@shared/types';
 import { parseTrackRating, trackRatingLabel } from '@shared/util';
-import { api, errorMessage, useRequest, type PackListItem } from '../lib/api';
+import { api, errorMessage, useRequest, type PackListItem, isQueued } from '../lib/api';
 import { addDays, defaultHomeDate, fmtLongDate, fmtRelative, fmtShortDate, fmtTime, isYmd, meetingZone, nextSaturday, pct100, plural, relativeDayLabel, sourceName, todayYmd, verificationTone } from '../lib/format';
 import { navigate, routes } from '../lib/router';
 import { useConfirm } from '../components/Confirm';
@@ -197,7 +197,20 @@ export function HomePage({ query }: { query: URLSearchParams }) {
     });
     if (!ok) return;
     try {
-      await api.deletePack(p.id);
+      const out = await api.deletePack(p.id);
+      if (isQueued(out)) {
+        // Accepted but queued behind a running check: follow the job, then refresh the list.
+        toast.info(out.message);
+        for (let i = 0; i < 150; i++) {
+          await new Promise((r) => window.setTimeout(r, 2000));
+          const job = await api.getJob(out.jobId).catch(() => null);
+          if (!job || job.status === 'done' || job.status === 'error') break;
+        }
+        const left = await api.getPacks().catch(() => null);
+        await packs.reload(true);
+        if (left && !left.some((x) => x.id === p.id)) toast.success('Research deleted');
+        return;
+      }
       toast.success('Research deleted');
       await packs.reload(true);
     } catch (e) {

@@ -4,7 +4,7 @@
 # 2. Follow docs/DEPLOY.md, option B:
 #      fly launch --no-deploy
 #      fly volumes create racelens_data --region syd --size 1
-#      fly secrets set RACELENS_PASSWORD=choose-a-password
+#      fly secrets set RACELENS_PASSWORD=choose-a-password   (required: without it the app will not start)
 #      fly deploy
 #
 # Sydney is deliberate: TAB and Sportsbet only answer Australian IP addresses.
@@ -20,7 +20,13 @@ primary_region = "syd"
   RACELENS_HOST = "0.0.0.0"
   RACELENS_PORT = "4850"
   # Fly owns the hostname (<app>.fly.dev), so any Host header is fine; the password protects the app.
+  # '*' also marks the server as hosted: it shows https://<app>.fly.dev (not container addresses) on the
+  # Settings phone card, and it refuses to start without RACELENS_PASSWORD.
   RACELENS_ALLOWED_HOSTS = "*"
+  # Fly's HTTPS proxy sits in front, so the client address it passes on is trusted (the login lock counts
+  # wrong passwords per phone). RaceLens also does this by itself on Fly (FLY_APP_NAME); kept here to be explicit.
+  RACELENS_TRUST_PROXY = "1"
+  # Custom domain? Set RACELENS_PUBLIC_URL = "https://racing.example.com" so Settings shows that address instead.
   RACELENS_DATA_DIR = "/data"
   RACELENS_QR = "0"
   # RACELENS_PASSWORD is NOT set here – it is a secret:  fly secrets set RACELENS_PASSWORD=...

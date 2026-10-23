@@ -166,7 +166,11 @@ export function SettingsPage() {
   const unitPct = bankrollNum > 0 && unitNum > 0 ? (unitNum / bankrollNum) * 100 : null;
   const scheduler = session.health?.scheduler;
   const status = schedulerLine(scheduler, now);
+  // Hosted (Fly, Render, RACELENS_PUBLIC_URL): one address that works anywhere. On a LAN: the Wi-Fi addresses (never sent when hosted).
+  const publicUrl = session.health?.publicUrl;
   const urls = session.health?.urls ?? [];
+  // Opened by a real address (not localhost) with neither of the above: that address is the one to use on the phone.
+  const pageOrigin = typeof window !== 'undefined' && !/^(localhost|127\.|\[?::1\]?$)/.test(window.location.hostname) ? window.location.origin : undefined;
   const recheckMins = Number(draft.autoRecheck) > 0 ? Number(draft.autoRecheck) : 0;
 
   return (
@@ -214,7 +218,9 @@ export function SettingsPage() {
               <strong>Before each race</strong> – a pre-race check runs {recheckMins > 0 ? `when the ${recheckMins}-minute window opens and again 3 minutes before the jump` : 'only when you tap Pre-race check (automatic checks are off)'}: scratchings, market moves and track changes.
             </li>
             <li>
-              <strong>After the jump</strong> – {draft.autoResults ? 'from 2 minutes after each race the result is polled every minute or two until two sources confirm it' : 'results are fetched only when you tap Fetch results'}.
+              <strong>After the jump</strong> – {draft.autoResults
+                ? 'from 2 minutes after each race the server checks for the result every few minutes until a second source confirms it (or a few extra checks have run), and looks once more 30 minutes after the jump in case of a protest'
+                : 'the server does not check for results between races; each pre-race check still picks up the results of earlier races, and you can tap Fetch results at any time'}.
             </li>
             <li>
               <strong>When a result lands</strong> – the remaining races are re-rated with the day's patterns (inside barriers, leaders, favourites) folded in.
@@ -223,16 +229,32 @@ export function SettingsPage() {
               <strong>On your phone</strong> – an open race page refreshes itself within 30 seconds, and opening a race after a break catches up on anything missed.
             </li>
           </ol>
-          <p className={`scheduler-status scheduler-status--${status.tone}`} data-testid="scheduler-status" aria-live="polite">
+          {/* Not a live region: "Last look 1 min ago" ticks and would be re-announced every 30 s. */}
+          <p className={`scheduler-status scheduler-status--${status.tone}`} data-testid="scheduler-status">
             <Dot tone={status.tone} /> {status.text}
           </p>
         </section>
 
         <section className="card" data-testid="phone-card">
           <h2>Use RaceLens on your phone</h2>
-          {urls.length > 0 ? (
+          {publicUrl && (
             <>
-              <p className="help">Same Wi-Fi: scan or type this on your phone. Then add it to your home screen so it opens like an app.</p>
+              <p className="help" data-testid="phone-public-help">
+                Open this on your phone – works anywhere. Scan or type it{session.authRequired ? ', sign in with your password' : ''}, then add it to your home screen so it opens like an app.
+              </p>
+              <ul className="phone-urls">
+                <li className="phone-url" data-testid="phone-public-url">
+                  <QrImage text={publicUrl} />
+                  <a href={publicUrl} className="phone-url__text mono">
+                    {publicUrl}
+                  </a>
+                </li>
+              </ul>
+            </>
+          )}
+          {urls.length > 0 && (
+            <>
+              <p className="help">Same Wi-Fi: scan or type this on your phone. Then add it to your home screen so it has its own icon (full-screen needs an https address – see docs/DEPLOY.md).</p>
               <ul className="phone-urls">
                 {urls.map((u) => (
                   <li key={u} className="phone-url" data-testid="phone-url">
@@ -244,7 +266,19 @@ export function SettingsPage() {
                 ))}
               </ul>
             </>
-          ) : (
+          )}
+          {!publicUrl && urls.length === 0 && pageOrigin && (
+            <div className="phone-urls" data-testid="phone-page-origin">
+              <p className="help">Open this address on your phone{session.authRequired ? ' and sign in with your password' : ''}, then add it to your home screen.</p>
+              <div className="phone-url">
+                <QrImage text={pageOrigin} />
+                <a href={pageOrigin} className="phone-url__text mono">
+                  {pageOrigin}
+                </a>
+              </div>
+            </div>
+          )}
+          {!publicUrl && urls.length === 0 && !pageOrigin && (
             <p className="help">
               Start it with <code className="mono">npm run start:phone</code> on your computer to get a QR code here, or see <code className="mono">docs/DEPLOY.md</code> for hosting it online (Tailscale, Fly.io or Render with a password) so it works away from home.
             </p>
@@ -367,7 +401,7 @@ export function SettingsPage() {
       {session.authRequired && (
         <section className="card" data-testid="account-card">
           <h2>Password</h2>
-          <p className="help">This RaceLens is protected by a password. You stay signed in on this device for 30 days of use; sign out if you are handing the phone to someone else.</p>
+          <p className="help">This RaceLens is protected by a password. You stay signed in on this device while you keep using it (sign in again at least every 90 days, or after the password changes); sign out if you are handing the phone to someone else.</p>
           <button type="button" className="btn btn-secondary" onClick={signOut} disabled={signingOut} data-testid="logout-btn">
             {signingOut ? 'Signing out…' : 'Sign out'}
           </button>
