@@ -206,6 +206,7 @@ Times are relative to each race's scheduled start. The server checks its to-do l
 | When | What the server does | What you see on the phone |
 |---|---|---|
 | The night before or the morning of | Nothing until you choose the meeting and press **Research this meeting** (the one thing that needs a tap) | Progress panel, then the meeting pack with every race rated |
+| Race day from 7:30 am track time, about once an hour until the last race | **Race-day refresh** of every race still to run: scratchings, emergencies that gained a start, rider changes, odds, track rating; re-rates those races (never within 15 minutes of a jump, never next to another job of that meeting; off when *Auto pre-race check* is off) | "Automatic race-day refresh" in the race history; the open page refreshes itself |
 | 10 minutes before each race (Settings → *Auto pre-race check*) | **Pre-race check** of that race: fresh odds, scratchings, rider changes and track rating; any results of earlier races that are due; day patterns; re-rates the race (and every race still to run when a result came in) | "Automatic pre-race check" in the race history; the open page refreshes itself, with a message only for a scratching, rider change or new picks |
 | Inside the final 3 minutes | A second pre-race check with the latest market | Same |
 | 2 minutes after the jump | **First results check**, asking every results source | Under the race: "The result will be fetched automatically a couple of minutes after the race", then "Nothing published yet (checked 1 min ago, next in 2 min)" |
