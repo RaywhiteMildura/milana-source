@@ -152,7 +152,7 @@ export class RacingComAdapter implements SourceAdapter {
   async fetchResults(meeting: MeetingSummary, raceNumber: number, ctx: FetchContext): Promise<RaceResult | null> {
     const race = await this.fetchRace(meeting, raceNumber, ctx);
     if (race.status !== 'final' || !race.results?.length) return null;
-    return { raceNumber, placings: race.results, recordedAt: ctx.now().toISOString(), source: this.id, dividends: race.dividends };
+    return { raceNumber, placings: race.results, recordedAt: ctx.now().toISOString(), source: this.id, status: 'final', dividends: race.dividends };
   }
 
   private async fetchRaceByCode(meetCode: string, n: number, meeting: MeetingSummary, fetchedAt: string, ctx: FetchContext): Promise<RaceRaw> {
@@ -272,7 +272,7 @@ export class RacingComAdapter implements SourceAdapter {
     const p800 = num(e, 'positionAt800');
     const p400 = num(e, 'positionAt400');
     const inRun = [settled, p800, p400].filter((x) => x != null);
-    if (inRun.length && comments.length === 0 && resulted) comments.push(`Settled ${inRun.join('-')}`);
+    const inRunning = resulted && inRun.length ? inRun.join('-') : undefined;
     const jw = toNum(pick(jockey, 'winPercent'));
     const jrw = toNum(pick(jockey, 'recentWinPercent'));
     const tw = toNum(pick(trainer, 'winPercent'));
@@ -310,6 +310,7 @@ export class RacingComAdapter implements SourceAdapter {
       odds: odds.length ? odds : undefined,
       finishingPosition: finish != null && finish < 100 ? finish : undefined,
       margin: resulted ? parseMargin(pick(e, 'beatenMargin') ?? pick(e, 'margin')) : undefined,
+      inRunning,
       jockeyStats: jw != null || jrw != null ? { winPct: jw ?? undefined, recentWinPct: jrw ?? undefined, source: this.id } : undefined,
       trainerStats: tw != null || trw != null ? { winPct: tw ?? undefined, recentWinPct: trw ?? undefined, source: this.id } : undefined,
     };

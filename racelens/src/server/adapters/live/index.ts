@@ -1,5 +1,7 @@
 import type { AdapterRegistry } from '../registry.js';
+import { RacingAustraliaAdapter } from './racingaustralia.js';
 import { TabAdapter } from './tab.js';
+import { RacingComAdapter } from './racingcom.js';
 import { SportsbetAdapter } from './sportsbet.js';
 import { EntainAdapter } from './entain.js';
 import { GoogleNewsAdapter } from './googlenews.js';
@@ -14,6 +16,8 @@ import { OpenMeteoAdapter } from './openmeteo.js';
  */
 export function registerLiveAdapters(registry: AdapterRegistry): void {
   registry
+    .register(new RacingAustraliaAdapter())
+    .register(new RacingComAdapter())
     .register(new TabAdapter())
     .register(new SportsbetAdapter())
     .register(new EntainAdapter())

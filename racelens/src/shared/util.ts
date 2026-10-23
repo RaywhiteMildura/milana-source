@@ -9,16 +9,38 @@ export function normaliseName(name: string): string {
     .replace(/\s+/g, ' ');
 }
 
-/** Normalise a person name: handles "J. McDonald" vs "James McDonald" by surname + first initial. */
+/**
+ * Keys for the people in a name: "J. McDonald (a2)" → ["j mcdonald"];
+ * "Gai Waterhouse & Adrian Bott" → ["g waterhouse", "a bott"]. Each key is
+ * first initial + surname so "James McDonald" and "J McDonald" match.
+ */
+export function personKeys(name: string): string[] {
+  const cleaned = (name || '')
+    .replace(/\(\s*a\s*\d*(?:\.\d+)?\s*\)/gi, ' ') // apprentice claim "(a2)" / "(a)"
+    .replace(/\b(?:jnr|jr|snr|sr)\b\.?/gi, ' ');
+  const parts = cleaned.split(/\s*(?:&|\band\b|\/|,)\s*/i).map((p) => p.trim()).filter(Boolean);
+  const keys: string[] = [];
+  for (const part of parts) {
+    const n = normaliseName(part).replace(/\b(ms|mr|mrs|miss|dr)\b/g, '').trim();
+    if (!n) continue;
+    const toks = n.split(' ').filter(Boolean);
+    keys.push(toks.length === 1 ? toks[0] : `${toks[0][0]} ${toks[toks.length - 1]}`);
+  }
+  return [...new Set(keys)];
+}
+
+/** Normalise a person (or partnership) name to a comparable key. */
 export function normalisePerson(name: string): string {
-  const n = normaliseName(name).replace(/\b(ms|mr|mrs|dr)\b/g, '').trim();
-  if (!n) return '';
-  const parts = n.split(' ').filter(Boolean);
-  if (parts.length === 1) return parts[0];
-  // Drop apprentice claim suffixes like "(a3)" already stripped by normaliseName; keep first initial + surname
-  const first = parts[0][0];
-  const surname = parts[parts.length - 1];
-  return `${first} ${surname}`;
+  return personKeys(name).sort().join('|');
+}
+
+/** True when the people in `a` are the same as, or a subset of, the people in `b` (or vice versa). */
+export function samePeople(a: string, b: string): boolean {
+  const ka = personKeys(a);
+  const kb = personKeys(b);
+  if (!ka.length || !kb.length) return false;
+  const [small, big] = ka.length <= kb.length ? [ka, kb] : [kb, ka];
+  return small.every((k) => big.includes(k));
 }
 
 export function slugify(s: string): string {

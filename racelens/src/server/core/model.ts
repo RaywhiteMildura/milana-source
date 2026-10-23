@@ -99,7 +99,7 @@ export function simulateOrders(probs: number[], sims: number, seed = 42): { plac
   };
 }
 
-export function strengthFromFactors(factors: FactorScore[]): { strength: number; completeness: number } {
+export function strengthFromFactors(factors: FactorScore[]): { strength: number; completeness: number; raw: number; evidence: number } {
   let num = 0;
   let den = 0;
   let applicable = 0;
@@ -111,9 +111,16 @@ export function strengthFromFactors(factors: FactorScore[]): { strength: number;
     applicable++;
     if (f.dataQuality >= 0.5) backed++;
   }
-  // Shrink toward 0 when little data backs the view (den small).
-  const strength = den > 0 ? (num / den) * Math.min(1, den / 3.5) : 0;
-  return { strength: round(strength, 4), completeness: applicable ? round(backed / applicable, 3) : 0 };
+  const raw = den > 0 ? num / den : 0;
+  // Shrink toward 0 when little data backs the view (den small). predictRace re-centres this on the field mean.
+  const strength = raw * Math.min(1, den / 3.5);
+  return { strength: round(strength, 4), completeness: applicable ? round(backed / applicable, 3) : 0, raw: round(raw, 4), evidence: round(den, 4) };
+}
+
+/** Forecast-only drift: the declared rating already reflects rain that has fallen; only race-day rain still to come should move it. */
+export function forecastDrift(weather?: WeatherSummary): number {
+  const mm = weather?.rainRaceDayMm ?? 0;
+  return mm > 15 ? 2 : mm > 5 ? 1 : 0;
 }
 
 export function spearman(a: number[], b: number[]): number {
@@ -196,6 +203,10 @@ export function rateConfidence(args: {
   // Honesty caps (research §14): a top pick under 25% can never be more than "Fair"; under 35% never "High".
   if (p1 < 0.25) overall = Math.min(overall, 61);
   else if (p1 < 0.35) overall = Math.min(overall, 77);
+  if ((ranked[0]?.dataCompleteness ?? 1) < 0.3) {
+    overall = Math.min(overall, 61);
+    notes.push('Our top pick has very little data behind it – do not trust this race.');
+  }
   const label: ConfidenceRating['label'] = overall < 45 ? 'Low' : overall < 62 ? 'Fair' : overall < 78 ? 'Good' : 'High';
   if (p1 < 0.25 && !notes.some((n) => /open race/.test(n))) notes.push(`Top pick is only ${Math.round(p1 * 100)}% to win – treat this as an open race.`);
   return { overall, label, components: { dataCompleteness, sourceAgreement, separation, marketAlignment, fieldSize, freshness }, notes };
@@ -217,7 +228,7 @@ export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
   const active = race.runners.filter((r) => !r.scratched);
   const patterns = opts.dayPatterns || [];
   const weights = applyDayPatterns(BASE_WEIGHTS, patterns);
-  const expectedRating = expectedTrackRating(race.trackRating, opts.weather?.conditionDrift);
+  const expectedRating = expectedTrackRating(race.trackRating, forecastDrift(opts.weather));
   const ctx: FactorContext = {
     race,
     venueSlug: opts.venueSlug,
@@ -227,11 +238,20 @@ export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
     fieldStats: computeFieldStats(race),
   };
 
-  const evaluated = active.map((runner) => {
+  const scored = active.map((runner) => {
     const factors = evaluateRunner(runner, ctx, weights, patterns);
-    const { strength, completeness } = strengthFromFactors(factors);
+    const s = strengthFromFactors(factors);
     const bias = patterns.length ? patternBias(patterns, runner, active.length) : 0;
-    return { runner, factors, strength: strength + bias, completeness };
+    return { runner, factors, ...s, bias };
+  });
+  // Shrink thin-data runners toward the field mean of data-backed runners, not toward "average horse" (0):
+  // a debutant with no data must not out-rate a field whose data says they are below average.
+  const backed = scored.filter((e) => e.completeness >= 0.4);
+  const fieldMean = backed.length ? mean(backed.map((e) => e.raw)) : 0;
+  const evaluated = scored.map((e) => {
+    const shrink = Math.min(1, e.evidence / 3.5);
+    const strength = fieldMean + (e.raw - fieldMean) * shrink + e.bias;
+    return { runner: e.runner, factors: e.factors, strength, completeness: e.completeness };
   });
 
   const beta = opts.beta ?? 3.0;
@@ -242,7 +262,8 @@ export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
   const lambda = marketAvailable ? (opts.marketWeight ?? 0.55) : 0;
   let pooled = evaluated.map((e, i) => {
     const mp = marketProbs[i];
-    const m = mp != null && mp > 0 ? mp : marketAvailable ? 0.02 : modelProbs[i];
+    // A runner nobody has priced gets a neutral market opinion (its own model probability), never a punitive guess.
+    const m = mp != null && mp > 0 ? mp : modelProbs[i];
     return Math.exp((1 - lambda) * Math.log(Math.max(modelProbs[i], 1e-6)) + lambda * Math.log(Math.max(m, 1e-6)));
   });
   const total = pooled.reduce((a, b) => a + b, 0) || 1;
@@ -256,6 +277,8 @@ export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
       const winProb = round(pooled[i], 4);
       const { reasons, concerns } = reasonsAndConcerns(e.factors, e.runner);
       const mp = marketProbs[i];
+      if (marketAvailable && (mp == null || mp <= 0)) concerns.push('No price found for this runner – market cross-check unavailable');
+      if (e.completeness < 0.3) concerns.push('Very little data on this runner – rating is mostly a guess');
       return {
         runnerId: e.runner.id,
         number: e.runner.number,
@@ -271,6 +294,7 @@ export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
         concerns,
         marketWinProb: mp != null ? round(mp, 4) : undefined,
         bestOdds: e.runner.market?.bestWin,
+        bestPlace: e.runner.market?.bestPlace,
         fairOdds: round(1 / Math.max(winProb, 0.001), 2),
         valueEdge: mp != null ? round(winProb - mp, 4) : undefined,
         dataCompleteness: e.completeness,

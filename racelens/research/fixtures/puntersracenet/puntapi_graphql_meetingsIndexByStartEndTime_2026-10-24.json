@@ -1,0 +1,124 @@
+{
+  "_fixtureNote": "CONSTRUCTED (not a live capture). Models GET https://puntapi.com/graphql-horse-racing?operationName=meetingsIndexByStartEndTime&variables={\"startTime\":\"2026-10-23T13:00:00.000Z\",\"endTime\":\"2026-10-24T13:00:00.000Z\",\"limit\":100,\"sportIds\":1}&extensions={\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"<hash>\"}} with header authorization: Bearer none. Field names data.meetingsGrouped[].group / meetings[].name|slug / events[].id|eventNumber|name|slug|startTime are evidenced by two independent clients (l0rdwalker/betshock_v2 racenet_horses.py and datawookie/stackoverflow 78597613/scrape.py, which used the sibling operation meetingsIndexByStartEndDate). The operation meetingsByStartEndDate(startDate,endDate) and meetingsByStartEndDateAndCountryName(startDate,endDate,country) are listed by afobsidian/Racenet-API. Event ids and meeting ids are fictional. Fields marked in _unverifiedFields are plausible extras, NOT evidenced.",
+  "_unverifiedFields": [
+    "meetings[].id",
+    "meetings[].venue",
+    "meetings[].country",
+    "meetings[].state",
+    "meetings[].trackCondition",
+    "events[].status",
+    "events[].distance"
+  ],
+  "data": {
+    "meetingsGrouped": [
+      {
+        "group": "Australia",
+        "meetings": [
+          {
+            "id": "238907",
+            "name": "Flemington",
+            "slug": "flemington-20261024",
+            "events": [
+              {
+                "id": "1788415",
+                "eventNumber": 1,
+                "name": "Maribyrnong Plate",
+                "slug": "maribyrnong-plate-race-1",
+                "startTime": "2026-10-24T01:20:00.000Z"
+              },
+              {
+                "id": "1788416",
+                "eventNumber": 2,
+                "name": "Carbine Club Stakes",
+                "slug": "carbine-club-stakes-race-2",
+                "startTime": "2026-10-24T01:55:00.000Z"
+              },
+              {
+                "id": "1788417",
+                "eventNumber": 3,
+                "name": "Super Impose Stakes",
+                "slug": "super-impose-stakes-race-3",
+                "startTime": "2026-10-24T02:35:00.000Z"
+              },
+              {
+                "id": "1788418",
+                "eventNumber": 4,
+                "name": "Fillies And Mares BM84 Handicap",
+                "slug": "fillies-and-mares-bm84-handicap-race-4",
+                "startTime": "2026-10-24T03:10:00.000Z"
+              },
+              {
+                "id": "1788419",
+                "eventNumber": 5,
+                "name": "Three-Year-Old BM78 Handicap",
+                "slug": "three-year-old-bm78-handicap-race-5",
+                "startTime": "2026-10-24T03:50:00.000Z"
+              },
+              {
+                "id": "1788420",
+                "eventNumber": 6,
+                "name": "Straight Six BM100 Handicap",
+                "slug": "straight-six-bm100-handicap-race-6",
+                "startTime": "2026-10-24T04:30:00.000Z"
+              },
+              {
+                "id": "1788421",
+                "eventNumber": 7,
+                "name": "Spring Sprint Final BM90 Handicap",
+                "slug": "spring-sprint-final-bm90-handicap-race-7",
+                "startTime": "2026-10-24T05:10:00.000Z"
+              },
+              {
+                "id": "1788422",
+                "eventNumber": 8,
+                "name": "Flemington Mile BM90 Handicap",
+                "slug": "flemington-mile-bm90-handicap-race-8",
+                "startTime": "2026-10-24T05:50:00.000Z"
+              },
+              {
+                "id": "1788423",
+                "eventNumber": 9,
+                "name": "Twilight Sprint BM78 Handicap",
+                "slug": "twilight-sprint-bm78-handicap-race-9",
+                "startTime": "2026-10-24T06:30:00.000Z"
+              }
+            ]
+          },
+          {
+            "id": "238911",
+            "name": "Randwick",
+            "slug": "randwick-20261024",
+            "events": [
+              {
+                "id": "1788430",
+                "eventNumber": 1,
+                "name": "Spring Preview Plate",
+                "slug": "spring-preview-plate-race-1",
+                "startTime": "2026-10-24T01:35:00.000Z"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": "International",
+        "meetings": [
+          {
+            "id": "238950",
+            "name": "Sha Tin",
+            "slug": "sha-tin-20261024",
+            "events": [
+              {
+                "id": "1788501",
+                "eventNumber": 1,
+                "name": "Tsing Yi Handicap",
+                "slug": "tsing-yi-handicap-race-1",
+                "startTime": "2026-10-24T05:00:00.000Z"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

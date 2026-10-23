@@ -82,26 +82,28 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
     const edge = t1.valueEdge ?? 0;
     if (t1.winProb >= 0.2 && edge >= -0.03) {
       const k = odds1 ? kellyFraction(t1.winProb, odds1) : 0.05;
-      let units = clamp((k * profile.kelly * settings.bankroll) / unit, 0.5, 2) * scale;
+      const perLeg = clamp((k * profile.kelly * settings.bankroll) / unit, 0.5, 2) * scale;
       const eachWay = odds1 != null && odds1 >= 4 && odds1 <= 12 && slots === 3 && t1.placeProb >= 0.5;
-      units = spend(units);
-      if (units > 0) {
+      // Each-way is two bets: both legs count against the profile cap.
+      const units = spend(eachWay ? perLeg * 2 : perLeg);
+      if (units >= MIN_UNITS) {
+        const leg = eachWay ? units / 2 : units;
         suggestions.push({
           type: eachWay ? 'each-way' : 'win',
           runners: [t1.number],
-          stakeUnits: units,
-          stakeAmount: money(units * (eachWay ? 2 : 1)),
+          stakeUnits: round(units, 2),
+          stakeAmount: money(units),
           rationale: eachWay
-            ? `${t1.name} is our top pick (${pct(t1.winProb)} win, ${pct(t1.placeProb)} place) at a price where each-way protects the stake.`
+            ? `${t1.name} is our top pick (${pct(t1.winProb)} win, ${pct(t1.placeProb)} place) at a price where each-way protects the stake – $${money(leg)} win + $${money(leg)} place.`
             : `${t1.name} is our top pick at ${pct(t1.winProb)} to win${odds1 ? ` – fair odds $${fair1.toFixed(2)} vs $${odds1.toFixed(2)} available` : ''}.`,
-          estimatedReturn: odds1 ? `≈ $${round(units * unit * odds1, 0)} if it wins` : undefined,
+          estimatedReturn: odds1 ? estimateReturn(leg * unit, odds1, eachWay ? placeOddsFor(t1) : undefined) : undefined,
           priority: 'core',
         });
       }
     } else if (t1.winProb >= 0.2) {
       notes.push(`${t1.name} is the most likely winner but is shorter than we rate it – the value is elsewhere.`);
       const units = spend(0.75 * scale);
-      if (units > 0 && slots > 0 && t1.placeProb >= 0.6)
+      if (units >= MIN_UNITS && slots > 0 && t1.placeProb >= 0.6)
         suggestions.push({ type: 'place', runners: [t1.number], stakeUnits: units, stakeAmount: money(units), rationale: `${t1.name} looks very hard to keep out of the placings (${pct(t1.placeProb)}).`, priority: 'core' });
     }
 
@@ -109,16 +111,18 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
     const value = top.filter((r) => r !== t1 && (r.valueEdge ?? 0) >= 0.035 && (r.bestOdds ?? 0) >= 4 && r.winProb >= 0.08).slice(0, 2);
     for (const v of value) {
       const k = v.bestOdds ? kellyFraction(v.winProb, v.bestOdds) : 0.03;
-      const units = spend(clamp((k * profile.kelly * settings.bankroll) / unit, 0.25, 1) * scale);
-      if (units <= 0) break;
       const ew = v.bestOdds! >= 6 && slots === 3 && v.placeProb >= 0.35;
+      const perLeg = clamp((k * profile.kelly * settings.bankroll) / unit, 0.25, 1) * scale;
+      const units = spend(ew ? perLeg * 2 : perLeg);
+      if (units < MIN_UNITS) break;
+      const leg = ew ? units / 2 : units;
       suggestions.push({
         type: ew ? 'each-way' : 'win',
         runners: [v.number],
-        stakeUnits: units,
-        stakeAmount: money(units * (ew ? 2 : 1)),
-        rationale: `${v.name}: we rate it ${pct(v.winProb)} (fair $${v.fairOdds.toFixed(2)}) but $${v.bestOdds!.toFixed(2)} is on offer – ${pct(v.valueEdge!)} edge.`,
-        estimatedReturn: `≈ $${round(units * unit * v.bestOdds!, 0)} if it wins`,
+        stakeUnits: round(units, 2),
+        stakeAmount: money(units),
+        rationale: `${v.name}: we rate it ${pct(v.winProb)} (fair $${v.fairOdds.toFixed(2)}) but $${v.bestOdds!.toFixed(2)} is on offer – ${pct(v.valueEdge!)} edge.${ew ? ` $${money(leg)} win + $${money(leg)} place.` : ''}`,
+        estimatedReturn: estimateReturn(leg * unit, v.bestOdds!, ew ? placeOddsFor(v) : undefined),
         priority: 'value',
       });
     }
@@ -128,13 +132,13 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
       const quinellaProb = t1.winProb + t2.winProb; // crude but honest: top-2 share
       if (quinellaProb >= 0.45 && n >= 6) {
         const units = spend(0.5 * scale);
-        if (units > 0)
+        if (units >= MIN_UNITS)
           suggestions.push({ type: 'quinella', runners: [t1.number, t2.number], stakeUnits: units, stakeAmount: money(units), rationale: `Top two picks in either order; together they hold ${pct(quinellaProb)} of the win chance.`, priority: 'value' });
       }
       if (confidence.overall >= 55 && t1.winProb >= 0.28) {
         const legs = [[t1.number], [t2.number, t3.number]];
         const units = spend(0.5 * scale);
-        if (units > 0)
+        if (units >= MIN_UNITS)
           suggestions.push({ type: 'exacta', runners: [t1.number, t2.number, t3.number], legs, stakeUnits: units, stakeAmount: money(units), combinations: 2, rationale: `${t1.name} to win with ${t2.name} or ${t3.name} second.`, priority: 'value' });
       }
       // Exotics carry ~21-22% takeout: only box when our top picks hold a real share of the win chance (research §15.2).
@@ -144,7 +148,7 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
       if (boxCount >= 3 && n >= 7 && top3Share >= 0.5) {
         const combos = permutations(boxCount, 3);
         const budget = spend(1 * scale);
-        if (budget > 0) {
+        if (budget >= MIN_UNITS) {
           const flexi = round((money(budget) / combos) * 100, 1);
           suggestions.push({
             type: 'trifecta',
@@ -161,7 +165,7 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
       if (profile.first4 && top.length >= 5 && confidence.overall >= 60 && n >= 8 && top5Share >= 0.7) {
         const combos = permutations(5, 4);
         const budget = spend(1 * scale);
-        if (budget > 0) {
+        if (budget >= MIN_UNITS) {
           const flexi = round((money(budget) / combos) * 100, 1);
           suggestions.push({ type: 'first4', runners: top.slice(0, 5).map((r) => r.number), stakeUnits: budget, stakeAmount: money(budget), combinations: combos, flexiPct: flexi, rationale: `Box top 5 in the First 4 (${combos} combinations, ${flexi}% flexi).`, priority: 'fun' });
         }
@@ -171,7 +175,7 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
     // Saver -----------------------------------------------------------------
     if (settings.riskProfile === 'conservative' && t2 && slots > 0 && t2.placeProb >= 0.55) {
       const units = spend(0.5 * scale);
-      if (units > 0) suggestions.push({ type: 'saver', runners: [t2.number], stakeUnits: units, stakeAmount: money(units), rationale: `Place saver on ${t2.name} (${pct(t2.placeProb)} to place).`, priority: 'saver' });
+      if (units >= MIN_UNITS) suggestions.push({ type: 'saver', runners: [t2.number], stakeUnits: units, stakeAmount: money(units), rationale: `Place saver on ${t2.name} (${pct(t2.placeProb)} to place).`, priority: 'saver' });
     }
   }
 
@@ -196,4 +200,19 @@ export function buildBettingPlan(args: { race: Race; ranked: RunnerAssessment[];
 
 function pct(p: number): string {
   return `${Math.round(p * 100)}%`;
+}
+
+/** Smallest suggestion worth making (a quarter unit; bookmakers reject sub-$1 legs). */
+const MIN_UNITS = 0.25;
+
+/** Best place price, or the usual quarter-odds place terms when no place price is quoted. */
+function placeOddsFor(r: RunnerAssessment): number | undefined {
+  if (r.bestPlace && r.bestPlace > 1) return r.bestPlace;
+  if (r.bestOdds && r.bestOdds > 1) return round(1 + (r.bestOdds - 1) / 4, 2);
+  return undefined;
+}
+
+function estimateReturn(legStake: number, winOdds: number, placeOdds?: number): string {
+  if (placeOdds) return `≈ $${round(legStake * winOdds + legStake * placeOdds, 0)} if it wins, ≈ $${round(legStake * placeOdds, 0)} if it only places`;
+  return `≈ $${round(legStake * winOdds, 0)} if it wins`;
 }

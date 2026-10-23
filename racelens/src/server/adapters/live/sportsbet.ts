@@ -136,7 +136,7 @@ export class SportsbetAdapter implements SourceAdapter {
   async fetchResults(meeting: MeetingSummary, raceNumber: number, ctx: FetchContext): Promise<RaceResult | null> {
     const race = await this.fetchRace(meeting, raceNumber, ctx);
     if (race.status !== 'final' || !race.results?.length) return null;
-    return { raceNumber, placings: race.results, recordedAt: ctx.now().toISOString(), source: this.id, dividends: race.dividends };
+    return { raceNumber, placings: race.results, recordedAt: ctx.now().toISOString(), source: this.id, status: 'final', dividends: race.dividends };
   }
 
   private async fetchRaceById(eventId: string, classId: string, raceNumber: number, meeting: MeetingSummary, ctx: FetchContext): Promise<RaceRaw> {

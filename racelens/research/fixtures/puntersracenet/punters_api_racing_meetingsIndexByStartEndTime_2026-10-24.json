@@ -1,0 +1,288 @@
+{
+  "_fixtureNote": "CONSTRUCTED (not a live capture). Models POST https://api.punters.com.au/racing with body {query: Q_MEETINGS, variables: {startDate:'2026-10-24', endDate:'2026-10-24'}, operationName:'meetingsIndexByStartEndTime'} executed from inside a logged-in punters.com.au page (Authorization: Bearer <rampart_token cookie>). The selection set is copied VERBATIM from Kelvin1761/Kelvin-Agents .agents/skills/au_racing/punters/punters_fetch.py Q_MEETINGS, and punters_store.py ingests exactly these paths (data.meetings[].slug, .venue.name, .events[].id/eventNumber, .selections[].id/competitorNumber/barrierNumber/status/selectionResult/officialMargin/ratingOfficial/competitor{id,name,slug}/prediction{...}) -> HIGH confidence for field names. Status values seen in that code: 'RESULTED', 'SCRATCHED'; selectionResult is an integer finish position once resulted. Values here are fictional. Meeting slugs ending in '-bt' are barrier trials (punters_store.py filters them).",
+  "data": {
+    "meetings": [
+      {
+        "id": "238907",
+        "slug": "flemington-20261024",
+        "venue": {
+          "name": "Flemington"
+        },
+        "events": [
+          {
+            "id": "1788421",
+            "eventNumber": 7,
+            "selections": [
+              {
+                "id": "9931201",
+                "competitorNumber": 1,
+                "barrierNumber": 4,
+                "status": "OPEN",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 89,
+                "competitor": {
+                  "id": "1046001",
+                  "name": "Riverina Dawn",
+                  "slug": "riverina-dawn"
+                },
+                "prediction": {
+                  "normSpeedMeasure": 0.84,
+                  "speedMeasureRatingName": "On-pace",
+                  "barrierSpeedRating": 3,
+                  "closingSpeedRating": 4,
+                  "modelOutput": 0.13299999999999998,
+                  "modelRank": 1,
+                  "width": 1,
+                  "length": 7,
+                  "winningChance": 0.217,
+                  "speedMeasure": 60.3,
+                  "finishSpeed": 58.9
+                }
+              },
+              {
+                "id": "9931202",
+                "competitorNumber": 2,
+                "barrierNumber": 9,
+                "status": "OPEN",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 90,
+                "competitor": {
+                  "id": "1046002",
+                  "name": "Coastal Ember",
+                  "slug": "coastal-ember"
+                },
+                "prediction": {
+                  "normSpeedMeasure": 0.81,
+                  "speedMeasureRatingName": "Midfield",
+                  "barrierSpeedRating": 3,
+                  "closingSpeedRating": 4,
+                  "modelOutput": 0.12399999999999999,
+                  "modelRank": 2,
+                  "width": 1,
+                  "length": 8,
+                  "winningChance": 0.263,
+                  "speedMeasure": 59.3,
+                  "finishSpeed": 58.9
+                }
+              },
+              {
+                "id": "9931203",
+                "competitorNumber": 3,
+                "barrierNumber": 1,
+                "status": "OPEN",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 91,
+                "competitor": {
+                  "id": "1046003",
+                  "name": "Tarrawarra Gold",
+                  "slug": "tarrawarra-gold"
+                },
+                "prediction": {
+                  "normSpeedMeasure": 0.78,
+                  "speedMeasureRatingName": "Backmarker",
+                  "barrierSpeedRating": 3,
+                  "closingSpeedRating": 4,
+                  "modelOutput": 0.11499999999999999,
+                  "modelRank": 3,
+                  "width": 1,
+                  "length": 9,
+                  "winningChance": 0.133,
+                  "speedMeasure": 58.3,
+                  "finishSpeed": 58.9
+                }
+              },
+              {
+                "id": "9931204",
+                "competitorNumber": 4,
+                "barrierNumber": 12,
+                "status": "SCRATCHED",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 92,
+                "competitor": {
+                  "id": "1046004",
+                  "name": "Southern Causeway",
+                  "slug": "southern-causeway"
+                },
+                "prediction": null
+              },
+              {
+                "id": "9931205",
+                "competitorNumber": 5,
+                "barrierNumber": 6,
+                "status": "OPEN",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 88,
+                "competitor": {
+                  "id": "1046005",
+                  "name": "Night Parade",
+                  "slug": "night-parade"
+                },
+                "prediction": {
+                  "normSpeedMeasure": 0.72,
+                  "speedMeasureRatingName": "On-pace",
+                  "barrierSpeedRating": 3,
+                  "closingSpeedRating": 4,
+                  "modelOutput": 0.09699999999999999,
+                  "modelRank": 5,
+                  "width": 1,
+                  "length": 7,
+                  "winningChance": 0.111,
+                  "speedMeasure": 56.3,
+                  "finishSpeed": 58.9
+                }
+              },
+              {
+                "id": "9931206",
+                "competitorNumber": 6,
+                "barrierNumber": 2,
+                "status": "OPEN",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 89,
+                "competitor": {
+                  "id": "1046006",
+                  "name": "Larrikin Lane",
+                  "slug": "larrikin-lane"
+                },
+                "prediction": {
+                  "normSpeedMeasure": 0.69,
+                  "speedMeasureRatingName": "Midfield",
+                  "barrierSpeedRating": 3,
+                  "closingSpeedRating": 4,
+                  "modelOutput": 0.088,
+                  "modelRank": 6,
+                  "width": 1,
+                  "length": 8,
+                  "winningChance": 0.083,
+                  "speedMeasure": 55.3,
+                  "finishSpeed": 58.9
+                }
+              },
+              {
+                "id": "9931207",
+                "competitorNumber": 7,
+                "barrierNumber": 7,
+                "status": "OPEN",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 90,
+                "competitor": {
+                  "id": "1046007",
+                  "name": "Seaspray Queen",
+                  "slug": "seaspray-queen"
+                },
+                "prediction": {
+                  "normSpeedMeasure": 0.66,
+                  "speedMeasureRatingName": "Backmarker",
+                  "barrierSpeedRating": 3,
+                  "closingSpeedRating": 4,
+                  "modelOutput": 0.07899999999999999,
+                  "modelRank": 7,
+                  "width": 1,
+                  "length": 9,
+                  "winningChance": 0.167,
+                  "speedMeasure": 54.3,
+                  "finishSpeed": 58.9
+                }
+              },
+              {
+                "id": "9931208",
+                "competitorNumber": 8,
+                "barrierNumber": 3,
+                "status": "OPEN",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 91,
+                "competitor": {
+                  "id": "1046008",
+                  "name": "Monaro Mist",
+                  "slug": "monaro-mist"
+                },
+                "prediction": {
+                  "normSpeedMeasure": 0.63,
+                  "speedMeasureRatingName": "Leader",
+                  "barrierSpeedRating": 3,
+                  "closingSpeedRating": 4,
+                  "modelOutput": 0.06999999999999999,
+                  "modelRank": 8,
+                  "width": 1,
+                  "length": 6,
+                  "winningChance": 0.067,
+                  "speedMeasure": 53.3,
+                  "finishSpeed": 58.9
+                }
+              },
+              {
+                "id": "9931209",
+                "competitorNumber": 9,
+                "barrierNumber": 10,
+                "status": "OPEN",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 92,
+                "competitor": {
+                  "id": "1046009",
+                  "name": "Kirribilli Star",
+                  "slug": "kirribilli-star"
+                },
+                "prediction": {
+                  "normSpeedMeasure": 0.6,
+                  "speedMeasureRatingName": "On-pace",
+                  "barrierSpeedRating": 3,
+                  "closingSpeedRating": 4,
+                  "modelOutput": 0.061,
+                  "modelRank": 9,
+                  "width": 1,
+                  "length": 7,
+                  "winningChance": 0.048,
+                  "speedMeasure": 52.3,
+                  "finishSpeed": 58.9
+                }
+              },
+              {
+                "id": "9931210",
+                "competitorNumber": 10,
+                "barrierNumber": 5,
+                "status": "OPEN",
+                "selectionResult": null,
+                "officialMargin": null,
+                "ratingOfficial": 88,
+                "competitor": {
+                  "id": "1046010",
+                  "name": "Bellarine Breeze",
+                  "slug": "bellarine-breeze"
+                },
+                "prediction": {
+                  "normSpeedMeasure": 0.5700000000000001,
+                  "speedMeasureRatingName": "Midfield",
+                  "barrierSpeedRating": 3,
+                  "closingSpeedRating": 4,
+                  "modelOutput": 0.05199999999999999,
+                  "modelRank": 10,
+                  "width": 1,
+                  "length": 8,
+                  "winningChance": 0.038,
+                  "speedMeasure": 51.3,
+                  "finishSpeed": 58.9
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "238999",
+        "slug": "cranbourne-20261024-bt",
+        "venue": {
+          "name": "Cranbourne"
+        },
+        "events": []
+      }
+    ]
+  }
+}

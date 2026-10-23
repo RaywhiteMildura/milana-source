@@ -12,7 +12,7 @@ import type {
   SourceKind,
   Verification,
 } from '../../shared/types.js';
-import { normaliseName, normalisePerson, round } from '../../shared/util.js';
+import { normaliseName, round, samePeople } from '../../shared/util.js';
 
 /**
  * Reconciliation engine: merges the same meeting as seen by many sources into a
@@ -33,6 +33,19 @@ const KIND_WEIGHT: Record<SourceKind, number> = {
   news: 0.1,
   weather: 0.1,
 };
+
+/** Deterministic tie-break between sources of equal weight (official feeds first). */
+export const SOURCE_PRIORITY = ['racingaustralia', 'racingcom', 'demo-official', 'tab', 'sportsbet', 'entain', 'demo-form', 'punters', 'racenet', 'demo-odds-a', 'demo-odds-b'];
+
+export function sourceRank(id: SourceId): number {
+  const i = SOURCE_PRIORITY.indexOf(id);
+  return i === -1 ? SOURCE_PRIORITY.length + (id.charCodeAt(0) || 0) / 1000 : i;
+}
+
+/** Highest weight first, then fixed source priority, then id – never HTTP arrival order. */
+export function orderSources<T extends { source: SourceId; weight: number }>(items: T[]): T[] {
+  return [...items].sort((a, b) => b.weight - a.weight || sourceRank(a.source) - sourceRank(b.source) || a.source.localeCompare(b.source));
+}
 
 const STATUS_RANK: Record<RaceStatus, number> = {
   unknown: 0,
@@ -82,18 +95,26 @@ interface Vote<T> {
   weight: number;
 }
 
-function agree<T>(votes: Vote<T>[], keyFn: (v: T) => string = (v) => String(v)): FieldAgreement<T> {
+function groupRank(g: { votes: Vote<unknown>[] }): number {
+  return Math.min(...g.votes.map((v) => sourceRank(v.source)));
+}
+
+function agree<T>(votes: Vote<T>[], keyFn: (v: T) => string = (v) => String(v), same?: (a: T, b: T) => boolean): FieldAgreement<T> {
   const valid = votes.filter((v) => v.value !== undefined && v.value !== null && !(typeof v.value === 'number' && Number.isNaN(v.value)) && String(v.value) !== '');
   if (!valid.length) return { value: undefined, agree: [], disagree: [], confidence: 0 };
   const groups = new Map<string, { weight: number; votes: Vote<T>[] }>();
-  for (const v of valid) {
-    const k = keyFn(v.value);
+  for (const v of orderSources(valid)) {
+    let k = keyFn(v.value);
+    if (same) {
+      // Fuzzy grouping (e.g. "C Maher" vs "C. Maher & D. Eustace"): join an existing group when the values describe the same people.
+      for (const [gk, g] of groups) if (g.votes.some((x) => same(x.value, v.value))) { k = gk; break; }
+    }
     const g = groups.get(k) || { weight: 0, votes: [] };
     g.weight += v.weight;
     g.votes.push(v);
     groups.set(k, g);
   }
-  const ranked = [...groups.values()].sort((a, b) => b.weight - a.weight);
+  const ranked = [...groups.values()].sort((a, b) => b.weight - a.weight || groupRank(a) - groupRank(b));
   const winner = ranked[0];
   const totalWeight = valid.reduce((a, v) => a + v.weight, 0);
   const share = winner.weight / totalWeight;
@@ -127,14 +148,20 @@ export function clusterRunners(entries: Array<{ source: SourceId; weight: number
       const key = normaliseName(runner.name);
       let target = clusters.find((c) => c.key === key && !c.members.some((m) => m.source === entry.source));
       if (!target) {
-        // Fuzzy: same number and similar name, or very similar name alone
+        // Fuzzy: same number and similar name, or very similar name alone. Two runners that BOTH carry
+        // saddlecloth numbers that differ are different horses unless the names are near-identical and
+        // the barriers agree ("Mr Brightside" #1 vs "Mrs Brightside" #2 must stay apart).
         let best: { c: Cluster; s: number } | undefined;
         for (const c of clusters) {
           if (c.members.some((m) => m.source === entry.source)) continue;
           const s = similarity(c.key, key);
-          const anchorNumber = c.members[0].runner.number;
-          const sameNumber = runner.number != null && anchorNumber != null && runner.number === anchorNumber;
-          const ok = s >= threshold || (sameNumber && s >= 0.5) || (sameNumber && key.split(' ')[0] === c.key.split(' ')[0]);
+          const anchor = c.members[0].runner;
+          const anchorNumber = anchor.number;
+          const bothNumbered = runner.number != null && anchorNumber != null;
+          const sameNumber = bothNumbered && runner.number === anchorNumber;
+          const differentNumber = bothNumbered && runner.number !== anchorNumber;
+          const sameBarrier = runner.barrier != null && anchor.barrier != null && runner.barrier === anchor.barrier;
+          const ok = differentNumber ? s >= 0.95 && sameBarrier : s >= threshold || (sameNumber && s >= 0.5) || (sameNumber && key.split(' ')[0] === c.key.split(' ')[0]);
           if (ok && (!best || s > best.s)) best = { c, s };
         }
         target = best?.c;
@@ -188,14 +215,16 @@ export function reconcileRunner(cluster: Cluster, raceSources: SourceId[]): Runn
 
   const number = agree(votes((r) => r.number));
   const barrier = agree(votes((r) => r.barrier));
-  const jockey = agree(votes((r) => r.jockey), (v) => normalisePerson(v));
-  const trainer = agree(votes((r) => r.trainer), (v) => normalisePerson(v));
+  const jockey = agree(votes((r) => r.jockey), (v) => v.toLowerCase(), samePeople);
+  const trainer = agree(votes((r) => r.trainer), (v) => v.toLowerCase(), samePeople);
   const weight = agree(votes((r) => r.weight), (v) => String(Math.round(v * 2) / 2));
-  // Scratched: any official/form source saying scratched wins; otherwise majority.
+  // Scratched is sticky: any source positively reporting a scratching wins unless a strictly heavier
+  // source explicitly says the horse is running (a bookmaker that is slow to scratch must not un-scratch it).
   const scratchVotes = votes((r) => r.scratched);
   const scratchedAgreement = agree(scratchVotes.length ? scratchVotes : ms.map((m) => ({ source: m.source, weight: m.weight, value: false })));
-  const anyScratched = scratchVotes.some((v) => v.value === true && v.weight >= 0.8);
-  const scratched = anyScratched ? true : scratchedAgreement.value === true;
+  const maxScratchedWeight = Math.max(-1, ...scratchVotes.filter((v) => v.value === true).map((v) => v.weight));
+  const maxRunningWeight = Math.max(-1, ...scratchVotes.filter((v) => v.value === false).map((v) => v.weight));
+  const scratched = maxScratchedWeight >= 0 ? !(maxRunningWeight > maxScratchedWeight) : scratchedAgreement.value === true;
 
   const conflicts: string[] = [];
   const checks: Array<[string, FieldAgreement<unknown>]> = [
@@ -264,6 +293,7 @@ export function reconcileRunner(cluster: Cluster, raceSources: SourceId[]): Runn
     finishingPosition: pick(ms, (r) => r.finishingPosition),
     margin: pick(ms, (r) => r.margin),
     silk: pick(ms, (r) => r.silk),
+    inRunning: pick(ms, (r) => r.inRunning),
     jockeyStats: pick(ms, (r) => r.jockeyStats),
     trainerStats: pick(ms, (r) => r.trainerStats),
     fields: { barrier, jockey, trainer, weight, scratched: scratchedAgreement, number },
@@ -279,18 +309,29 @@ function fmt(v: unknown): string {
 }
 
 export function reconcileRace(raws: Array<{ source: SourceId; weight: number; race: RaceRaw }>): Race {
-  const ordered = [...raws].sort((a, b) => b.weight - a.weight);
+  const ordered = orderSources(raws);
   const anchor = ordered[0].race;
   const sources = ordered.map((r) => r.source);
   const clusters = clusterRunners(ordered.map((r) => ({ source: r.source, weight: r.weight, runners: r.race.runners })));
   const runners = clusters.map((c) => reconcileRunner(c, sources)).sort((a, b) => a.number - b.number);
 
-  // Resolve duplicate saddlecloth numbers (e.g. a fuzzy miss): keep the first, zero the rest' conflicts noted.
-  const seen = new Set<number>();
-  for (const r of runners) {
-    if (r.number && seen.has(r.number)) r.verification.conflicts.push(`Saddlecloth ${r.number} is claimed by another runner`);
-    seen.add(r.number);
+  // Resolve duplicate saddlecloth numbers (e.g. a fuzzy miss): the better-covered runner keeps it; the
+  // other takes a number one of its sources suggested, else 0, and the conflict is recorded on both.
+  const taken = new Map<number, Runner>();
+  for (const r of [...runners].sort((a, b) => b.sources.length - a.sources.length || b.verification.score - a.verification.score)) {
+    if (!r.number) continue;
+    const holder = taken.get(r.number);
+    if (!holder) {
+      taken.set(r.number, r);
+      continue;
+    }
+    const alt = r.fields.number.disagree.map((d) => d.value).find((n) => n > 0 && !taken.has(n));
+    holder.verification.conflicts.push(`Saddlecloth ${r.number} was also claimed by ${r.name}`);
+    r.verification.conflicts.push(`Saddlecloth ${r.number} is held by ${holder.name}; ${alt ? `using ${alt} instead` : 'number unresolved'}`);
+    r.number = alt ?? 0;
+    if (alt) taken.set(alt, r);
   }
+  runners.sort((a, b) => a.number - b.number);
 
   const status = ordered.map((r) => r.race.status).sort((a, b) => STATUS_RANK[b] - STATUS_RANK[a])[0] || 'unknown';
   const withResults = ordered.find((r) => r.race.results && r.race.results.length);
@@ -343,7 +384,7 @@ export function reconcileRace(raws: Array<{ source: SourceId; weight: number; ra
 export function reconcileMeeting(raws: MeetingRaw[], opts: ReconcileOptions): ReconciledMeeting {
   const weightOf = (id: SourceId) => KIND_WEIGHT[opts.sources.find((s) => s.id === id)?.kind || 'odds'] ?? 0.6;
   const byNumber = new Map<number, Array<{ source: SourceId; weight: number; race: RaceRaw }>>();
-  for (const m of raws) {
+  for (const m of orderSources(raws.map((r) => ({ ...r, weight: weightOf(r.source) })))) {
     for (const race of m.races) {
       if (!race.number) continue;
       const arr = byNumber.get(race.number) || [];
@@ -380,9 +421,21 @@ export function mergeRaceRefresh(previous: Race, fresh: Race): Race {
   const runners: Runner[] = fresh.runners.map((f) => {
     const p = prevByKey.get(f.id) || previous.runners.find((r) => similarity(r.id, f.id) > 0.85 || (r.number === f.number && r.number > 0));
     if (!p) return f;
+    // Scratchings are sticky: one source showing a scratched horse as running does not reinstate it.
+    let scratched = f.scratched;
+    const conflicts = [...f.verification.conflicts];
+    if (p.scratched && !f.scratched) {
+      if (f.sources.length >= 2) conflicts.push(`Reinstated: ${f.sources.join(', ')} now show it running`);
+      else {
+        scratched = true;
+        conflicts.push(`Still treated as scratched: only ${f.sources.join(', ')} showed it running on refresh`);
+      }
+    }
     return {
       ...p,
       ...f,
+      scratched,
+      verification: { ...f.verification, conflicts },
       form: f.form.length >= p.form.length ? f.form : p.form,
       splits: f.splits || p.splits,
       career: f.career || p.career,
@@ -404,12 +457,31 @@ export function mergeRaceRefresh(previous: Race, fresh: Race): Race {
       news: p.news,
     };
   });
-  // Runners that vanished from every source on refresh are most likely scratched.
+  // Runners that vanished on refresh: scratched only when the sources that used to list them answered and dropped them.
   for (const p of previous.runners) {
-    if (!runners.some((r) => r.id === p.id || (r.number === p.number && p.number > 0))) {
-      runners.push({ ...p, scratched: true, verification: { ...p.verification, conflicts: [...p.verification.conflicts, 'Missing from all sources on refresh; treated as scratched'] } });
+    if (runners.some((r) => r.id === p.id || (r.number === p.number && p.number > 0))) continue;
+    const responded = p.sources.filter((s) => fresh.sources.includes(s));
+    if (responded.length) {
+      runners.push({ ...p, scratched: true, verification: { ...p.verification, conflicts: [...p.verification.conflicts, `Dropped by ${responded.join(', ')} on refresh; treated as scratched`] } });
+    } else {
+      runners.push({ ...p, verification: { ...p.verification, conflicts: [...p.verification.conflicts, 'Not covered by the sources that responded on refresh – unchanged'] } });
     }
   }
   runners.sort((a, b) => a.number - b.number);
-  return { ...previous, ...fresh, runners, fieldSize: runners.filter((r) => !r.scratched).length };
+  // Keep researched race facts when the refresh did not supply them.
+  const defined: Partial<Race> = {};
+  for (const [k, v] of Object.entries(fresh)) if (v !== undefined) (defined as Record<string, unknown>)[k] = v;
+  return {
+    ...previous,
+    ...defined,
+    sourceRefs: { ...previous.sourceRefs, ...fresh.sourceRefs },
+    trackRating: fresh.trackRating ?? previous.trackRating,
+    trackCondition: fresh.trackCondition || previous.trackCondition,
+    startTime: fresh.startTime || previous.startTime,
+    raceClass: fresh.raceClass || previous.raceClass,
+    group: fresh.group || previous.group,
+    prize: fresh.prize ?? previous.prize,
+    runners,
+    fieldSize: runners.filter((r) => !r.scratched).length,
+  };
 }

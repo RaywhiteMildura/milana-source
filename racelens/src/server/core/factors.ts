@@ -93,7 +93,7 @@ export function computeFieldStats(race: Race): FieldStats {
     meanWeight: weights.length ? mean(weights) : undefined,
     meanCareerWin: winRates.length ? mean(winRates) : 0.12,
     meanCareerPlace: placeRates.length ? mean(placeRates) : 0.35,
-    leaders: active.filter((r) => r.speedMapPosition === 'leader').length,
+    leaders: active.filter((r) => (r.speedMapPosition || inferPosition(r)) === 'leader').length,
     active: active.length,
     ratingStats,
     prizeLevel: race.prize,
@@ -165,8 +165,35 @@ const CLASS_ORDER: Array<[RegExp, number]> = [
   [/\bopen\b|\bquality\b|\bhcp\b|\bhandicap\b/i, 5],
 ];
 
+/** Rating-band classes: "Rtg 64", "0-64", "0 - 58", "Class 2 Plate" style. */
+function ratingBandLevel(text: string): number | undefined {
+  const m = text.match(/\b(?:rtg|rating|r)\s?(\d{2,3})\b|\b0\s?-\s?(\d{2,3})\b/i);
+  if (!m) return undefined;
+  const n = Number(m[1] || m[2]);
+  if (!Number.isFinite(n)) return undefined;
+  return n >= 90 ? 5.5 : n >= 70 ? 4.5 : n >= 50 ? 3.5 : 3;
+}
+
+export function classLevelFromText(text?: string): number | undefined {
+  if (!text) return undefined;
+  for (const [re, lvl] of CLASS_ORDER) if (re.test(text)) return lvl;
+  return ratingBandLevel(text);
+}
+
+export function classLevelFromPrize(prize?: number): number | undefined {
+  if (!prize) return undefined;
+  if (prize >= 1_000_000) return 9;
+  if (prize >= 300_000) return 7.5;
+  if (prize >= 150_000) return 6;
+  if (prize >= 80_000) return 5;
+  if (prize >= 40_000) return 4;
+  if (prize >= 20_000) return 3;
+  return 2;
+}
+
 export function classLevel(text?: string, prize?: number): number | undefined {
-  if (text) for (const [re, lvl] of CLASS_ORDER) if (re.test(text)) return lvl;
+  const t = classLevelFromText(text);
+  if (t != null) return t;
   if (prize) {
     if (prize >= 1_000_000) return 9;
     if (prize >= 300_000) return 7.5;
@@ -180,8 +207,19 @@ export function classLevel(text?: string, prize?: number): number | undefined {
 }
 
 export const classSuitability: FactorFn = (r, ctx) => {
-  const today = classLevel(ctx.race.raceClass || ctx.race.group || ctx.race.name, ctx.race.prize);
-  const recent = r.form.slice(0, 4).map((f) => ({ lvl: classLevel(f.raceClass, f.prize), q: runQuality(f) })).filter((x) => x.lvl != null) as Array<{ lvl: number; q: number }>;
+  // Compare like with like: class text against class text, prize money against prize money.
+  const todayText = classLevelFromText(ctx.race.raceClass || ctx.race.group || ctx.race.name);
+  const todayPrize = classLevelFromPrize(ctx.race.prize);
+  const recent = r.form
+    .slice(0, 4)
+    .map((f) => {
+      const t = classLevelFromText(f.raceClass);
+      const p = classLevelFromPrize(f.prize);
+      const pair = todayText != null && t != null ? { today: todayText, lvl: t } : todayPrize != null && p != null ? { today: todayPrize, lvl: p } : undefined;
+      return pair ? { ...pair, q: runQuality(f) } : undefined;
+    })
+    .filter((x): x is { today: number; lvl: number; q: number } => !!x);
+  const today = recent[0]?.today;
   if (today == null || !recent.length) return neutral('classSuitability', 'Class of recent races unknown');
   const avg = mean(recent.map((x) => x.lvl));
   const diff = avg - today; // positive: dropping in class
@@ -257,7 +295,8 @@ export const barrier: FactorFn = (r, ctx) => {
   if (tweak) distFactor *= tweak(d);
   const sizeFactor = n <= 8 ? 0.6 : n <= 12 ? 0.85 : 1.0;
   // Inside third mild positive, middle neutral, outside third negative (wider is worse).
-  let raw = rel < 0.33 ? 0.3 - rel * 0.3 : rel < 0.66 ? 0.05 - (rel - 0.33) * 0.4 : -0.1 - (rel - 0.66) * 1.2;
+  // Continuous: +0.3 on the rail falling to -0.6 at the widest gate (no cliffs between neighbouring barriers).
+  let raw = 0.3 - rel * 0.9;
   // Very inside barriers in big fields over middle distances can get trapped: soften slightly.
   if (r.barrier <= 2 && n >= 14 && d >= 1400) raw -= 0.08;
   const score = clamp(raw * distFactor * sizeFactor, -1, 1);
@@ -388,14 +427,15 @@ export const fitness: FactorFn = (r, ctx) => {
     score = -0.25;
     evidence = `Resumes after ${days} days`;
     if (firstUp) {
-      score += (firstUp.win - 0.15) * 2 + (firstUp.place - 0.4) * 0.8;
+      const shrink = firstUp.n / (firstUp.n + 3);
+      score += clamp(((firstUp.win - 0.15) * 2 + (firstUp.place - 0.4) * 0.8) * shrink, -0.5, 0.5);
       evidence += `; first-up record ${r.splits!.firstUp!.wins}-${r.splits!.firstUp!.seconds}-${r.splits!.firstUp!.thirds} from ${firstUp.n}`;
     }
   }
   // Second-up: previous start was first-up (gap > 90 days before it)
   const prevGap = r.form.length >= 2 ? Math.round((new Date(r.form[0].date).getTime() - new Date(r.form[1].date).getTime()) / 86400000) : undefined;
   if (prevGap != null && prevGap > 90 && days <= 35 && secondUp) {
-    score += (secondUp.win - 0.15) * 1.5;
+    score += clamp((secondUp.win - 0.15) * 1.5 * (secondUp.n / (secondUp.n + 3)), -0.5, 0.5);
     evidence += `; second-up record ${r.splits!.secondUp!.wins} wins from ${secondUp.n}`;
   }
   return { key: 'fitness', label: FACTOR_LABELS.fitness, score: round(clamp(score, -1, 1), 3), evidence, dataQuality: 0.7 };
@@ -410,10 +450,20 @@ export const careerStrike: FactorFn = (r, ctx) => {
   return { key: 'careerStrike', label: FACTOR_LABELS.careerStrike, score: round(score, 3), evidence: `${r.career!.starts}: ${r.career!.wins}-${r.career!.seconds}-${r.career!.thirds} (${Math.round(c.win * 100)}% win, ${Math.round(c.place * 100)}% place)`, dataQuality: Math.min(1, 0.4 + c.n * 0.05) };
 };
 
+/** Ratings that are price- or speed-derived are not "quality" ratings: using them would double count the market. */
+export function isQualityRating(key: string, expectedTrackRating?: number): boolean {
+  const k = key.toLowerCase();
+  if (/winprobability|probability|earlyspeed|speedrating|speed|tempo|price|odds/.test(k)) return false;
+  if (k.endsWith('wetrating')) return expectedTrackRating != null && expectedTrackRating >= 5;
+  if (k.endsWith('dryrating')) return expectedTrackRating == null || expectedTrackRating < 5;
+  return true;
+}
+
 export const sourceRatings: FactorFn = (r, ctx) => {
   const zs: number[] = [];
   const names: string[] = [];
   for (const [k, st] of Object.entries(ctx.fieldStats.ratingStats)) {
+    if (!isQualityRating(k, ctx.expectedTrackRating ?? ctx.race.trackRating)) continue;
     const v = r.ratings?.[k];
     if (typeof v !== 'number') continue;
     zs.push((v - st.mean) / (st.sd || 1));

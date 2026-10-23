@@ -159,15 +159,63 @@ describe('mergeRaceRefresh', () => {
       { source: 'form', weight: 0.85, race: race('form', [{ number: 1, name: 'A', form: [{ date: '2026-10-01', venue: 'X', distance: 1200, position: 1, starters: 8 }], odds: [{ source: 'form', bookmaker: 'T', type: 'tote', win: 3, fetchedAt: 't' }] }, { number: 2, name: 'B' }]) },
     ]);
     const fresh = reconcileRace([
-      { source: 'odds', weight: 0.65, race: race('odds', [{ number: 1, name: 'A', odds: [{ source: 'odds', bookmaker: 'Z', type: 'fixed', win: 2.6, fetchedAt: 't2' }] }], { fetchedAt: '2026-10-24T05:00:00.000Z' }) },
+      { source: 'form', weight: 0.85, race: race('form', [{ number: 1, name: 'A', odds: [{ source: 'form', bookmaker: 'Z', type: 'fixed', win: 2.6, fetchedAt: 't2' }] }], { fetchedAt: '2026-10-24T05:00:00.000Z', trackRating: undefined, startTime: undefined }) },
     ]);
-    const merged: Race = mergeRaceRefresh(previous, fresh);
+    const merged: Race = mergeRaceRefresh({ ...previous, trackRating: 4, startTime: '2026-10-24T01:00:00.000Z' }, fresh);
     const a = merged.runners.find((r) => r.name === 'A')!;
     expect(a.form).toHaveLength(1);
     expect(a.odds[0].win).toBe(2.6);
     const b = merged.runners.find((r) => r.name === 'B')!;
-    expect(b.scratched).toBe(true);
+    expect(b.scratched).toBe(true); // the source that listed B answered and dropped it
     expect(merged.fieldSize).toBe(1);
     expect(merged.fetchedAt).toBe('2026-10-24T05:00:00.000Z');
+    expect(merged.trackRating).toBe(4); // researched facts survive a refresh that lacks them
+    expect(merged.startTime).toBe('2026-10-24T01:00:00.000Z');
+  });
+
+  it('does not scratch a runner just because a different source did not list it, and does not un-scratch on one source', () => {
+    const previous = reconcileRace([
+      { source: 'official', weight: 1, race: race('official', [{ number: 1, name: 'A' }, { number: 2, name: 'B', scratched: true }, { number: 3, name: 'C' }]) },
+    ]);
+    const fresh = reconcileRace([{ source: 'odds', weight: 0.65, race: race('odds', [{ number: 1, name: 'A' }, { number: 2, name: 'B', scratched: false }]) }]);
+    const merged = mergeRaceRefresh(previous, fresh);
+    const c = merged.runners.find((r) => r.name === 'C')!;
+    expect(c.scratched).toBe(false); // 'official' did not respond, so C is simply unchanged
+    expect(c.verification.conflicts.join(' ')).toMatch(/Not covered/);
+    const b = merged.runners.find((r) => r.name === 'B')!;
+    expect(b.scratched).toBe(true); // one bookmaker showing it running does not reinstate it
+    expect(b.verification.conflicts.join(' ')).toMatch(/Still treated as scratched/);
+    // Two fresh sources agreeing do reinstate it
+    const fresh2 = reconcileRace([
+      { source: 'odds', weight: 0.65, race: race('odds', [{ number: 2, name: 'B', scratched: false }]) },
+      { source: 'form', weight: 0.85, race: race('form', [{ number: 2, name: 'B', scratched: false }]) },
+    ]);
+    expect(mergeRaceRefresh(previous, fresh2).runners.find((r) => r.name === 'B')!.scratched).toBe(false);
+  });
+});
+
+describe('source priority and sticky scratchings', () => {
+  it('breaks equal-weight ties by a fixed source order, not arrival order', () => {
+    const a = { source: 'sportsbet', weight: 0.65, race: race('sportsbet', [{ number: 1, name: 'A', barrier: 5 }]) };
+    const b = { source: 'tab', weight: 0.65, race: race('tab', [{ number: 1, name: 'A', barrier: 6 }]) };
+    expect(reconcileRace([a, b]).runners[0].barrier).toBe(6);
+    expect(reconcileRace([b, a]).runners[0].barrier).toBe(6);
+  });
+  it('keeps a horse scratched when an equal-weight source still shows it running, but lets a heavier source overrule', () => {
+    const scratchedByTab = { source: 'tab', weight: 0.65, race: race('tab', [{ number: 1, name: 'A', scratched: true }]) };
+    const runningBySb = { source: 'sportsbet', weight: 0.65, race: race('sportsbet', [{ number: 1, name: 'A', scratched: false }]) };
+    expect(reconcileRace([runningBySb, scratchedByTab]).runners[0].scratched).toBe(true);
+    const runningOfficial = { source: 'official', weight: 1, race: race('official', [{ number: 1, name: 'A', scratched: false }]) };
+    expect(reconcileRace([scratchedByTab, runningOfficial]).runners[0].scratched).toBe(false);
+  });
+  it('keeps similarly named horses with different numbers apart, and matches trainer partnerships', () => {
+    const r = reconcileRace([
+      { source: 'tab', weight: 0.65, race: race('tab', [{ number: 1, name: 'Mr Brightside', trainer: 'C Maher' }]) },
+      { source: 'sportsbet', weight: 0.65, race: race('sportsbet', [{ number: 2, name: 'Mrs Brightside', trainer: 'C. Maher & D. Eustace' }, { number: 1, name: 'Mr Brightside', trainer: 'C. Maher & D. Eustace' }]) },
+    ]);
+    expect(r.runners).toHaveLength(2);
+    const mr = r.runners.find((x) => x.number === 1)!;
+    expect(mr.fields.trainer.disagree).toHaveLength(0);
+    expect(mr.trainer).toBe('C. Maher & D. Eustace');
   });
 });

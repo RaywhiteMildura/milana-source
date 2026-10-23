@@ -12,7 +12,7 @@ import type {
   SourceStatus,
   WeatherSummary,
 } from '../../shared/types.js';
-import { normaliseName } from '../../shared/util.js';
+import { mean, normaliseName, round, samePeople } from '../../shared/util.js';
 import type { FetchContext, SourceAdapter } from '../adapters/types.js';
 import type { AdapterRegistry } from '../adapters/registry.js';
 import type { JobHandle } from './manager.js';
@@ -124,10 +124,15 @@ async function fetchDeepForm(deps: ResearchDeps, meeting: MeetingSummary, raws: 
   let added = 0;
   let failures = 0;
   for (const a of adapters) {
-    const existing = raws.find((m) => m.source === a.id);
+    let existing = raws.find((m) => m.source === a.id);
     // Only call fetchForm when the adapter's racecard didn't already include form lines.
     const alreadyHasForm = existing?.races.some((r) => r.runners.some((x) => (x.form?.length || 0) > 0));
     if (alreadyHasForm) continue;
+    if (!existing) {
+      // The race card call failed or timed out but form may still answer: keep it as its own (form-only) source.
+      existing = { meeting, races: [], source: a.id, fetchedAt: new Date().toISOString() };
+      raws.push(existing);
+    }
     await mapLimit(raceNumbers, 3, async (n) => {
       const r = await timed(() => a.fetchForm!(meeting, n, deps.ctx), `${a.name} form R${n}`);
       if (r.error || !r.value) {
@@ -325,11 +330,47 @@ export async function researchMeeting(deps: ResearchDeps, meeting: MeetingSummar
   return pack;
 }
 
-/** Pull results for races that have finished. Returns race numbers newly resulted. */
+/** First three placings as a comparable key. */
+function placingsKey(placings: number[][]): string {
+  return placings
+    .slice(0, 3)
+    .map((slot) => [...slot].sort((a, b) => a - b).join('/'))
+    .join('>');
+}
+
+/**
+ * Choose one result from what the sources reported: two sources agreeing on the first three placings
+ * make a result "confirmed"; a lone source is recorded but flagged; disagreement prefers a source that
+ * calls the result final and records the conflict.
+ */
+export function chooseResult(reports: RaceResult[]): { result: RaceResult; note?: string } | undefined {
+  const valid = reports.filter((r) => r.placings?.length);
+  if (!valid.length) return undefined;
+  const groups = new Map<string, RaceResult[]>();
+  for (const r of valid) {
+    const k = placingsKey(r.placings);
+    groups.set(k, [...(groups.get(k) || []), r]);
+  }
+  const ranked = [...groups.values()].sort((a, b) => b.length - a.length || (b.some((r) => r.status === 'final') ? 1 : 0) - (a.some((r) => r.status === 'final') ? 1 : 0));
+  const best = ranked[0];
+  const chosen = best.find((r) => r.status === 'final') || best[0];
+  const confirmedBy = best.map((r) => r.source);
+  const anyFinal = best.some((r) => r.status === 'final' || r.status === undefined);
+  const status: RaceResult['status'] = best.length >= 2 || anyFinal ? (best.every((r) => r.status === 'interim') ? 'interim' : 'final') : 'interim';
+  const result: RaceResult = { ...chosen, status, confirmedBy, dividends: Object.assign({}, ...best.map((r) => r.dividends || {})) };
+  if (!Object.keys(result.dividends || {}).length) delete result.dividends;
+  let note: string | undefined;
+  if (ranked.length > 1) note = `Sources disagree on the placings: ${ranked.map((g) => `${g.map((r) => r.source).join('+')} say ${g[0].placings.slice(0, 3).map((s) => s.join('/')).join('-')}`).join('; ')}`;
+  else if (best.length === 1 && valid.length === 1) note = `Only ${chosen.source} has reported this result so far`;
+  return { result, note };
+}
+
+/** Pull results for races that have finished. Returns race numbers newly resulted or corrected. */
 export async function collectResults(deps: ResearchDeps, pack: MeetingPack, job: JobHandle, verbose = true, only?: number): Promise<number[]> {
   const adapters = deps.registry.withCapability('results', deps.settings.disabledSources);
   const now = deps.now?.() ?? new Date();
-  const candidates = pack.races.filter((r) => (only ? r.number === only : true) && !pack.results[r.number] && (!r.startTime || new Date(r.startTime).getTime() <= now.getTime() + 60_000 || r.status === 'final' || r.status === 'interim' || only));
+  const unsettled = (n: number) => !pack.results[n] || pack.results[n].status === 'interim' || (pack.results[n].confirmedBy?.length || 0) < 2;
+  const candidates = pack.races.filter((r) => (only ? r.number === only : true) && unsettled(r.number) && (!r.startTime || new Date(r.startTime).getTime() <= now.getTime() + 60_000 || r.status === 'final' || r.status === 'interim' || only));
   if (!adapters.length || !candidates.length) {
     if (verbose) {
       job.start('results', 'Collecting results of races already run');
@@ -340,43 +381,45 @@ export async function collectResults(deps: ResearchDeps, pack: MeetingPack, job:
   if (verbose) job.start('results', 'Collecting results of races already run');
   const newly: number[] = [];
   for (const race of candidates) {
-    let result: RaceResult | null = null;
-    for (const a of adapters) {
-      const r = await timed(() => a.fetchResults!(pack.meeting, race.number, deps.ctx), `${a.name} results R${race.number}`);
-      if (r.value) {
-        result = r.value;
-        break;
-      }
-    }
-    if (result && result.placings.length) {
-      recordResult(pack, race.number, result);
-      newly.push(race.number);
-    }
+    // Ask every results source, then cross-check – one feed is never enough to settle a race.
+    const reports = (await mapLimit(adapters, 3, async (a) => (await timed(() => a.fetchResults!(pack.meeting, race.number, deps.ctx), `${a.name} results R${race.number}`)).value || null)).filter((r): r is RaceResult => !!r);
+    const chosen = chooseResult(reports);
+    if (!chosen) continue;
+    const existing = pack.results[race.number];
+    const changed = !existing || placingsKey(existing.placings) !== placingsKey(chosen.result.placings) || existing.status !== chosen.result.status || (existing.confirmedBy?.length || 0) !== (chosen.result.confirmedBy?.length || 0);
+    if (!changed) continue;
+    const corrected = !!existing && placingsKey(existing.placings) !== placingsKey(chosen.result.placings);
+    recordResult(pack, race.number, chosen.result, corrected ? 'corrected' : existing ? 'confirmed' : 'new');
+    if (chosen.note) pack.history.push({ at: now.toISOString(), type: 'note', raceNumber: race.number, summary: `R${race.number}: ${chosen.note}` });
+    newly.push(race.number);
   }
   if (verbose) job.finish('results', 'done', newly.length ? `Results in for R${newly.join(', R')}` : 'No new results yet');
   return newly;
 }
 
-export function recordResult(pack: MeetingPack, raceNumber: number, result: RaceResult): void {
+export function recordResult(pack: MeetingPack, raceNumber: number, result: RaceResult, kind: 'new' | 'confirmed' | 'corrected' = 'new'): void {
   const race = pack.races.find((r) => r.number === raceNumber);
   const prediction = pack.predictions[raceNumber];
-  const stored: RaceResult = { ...result, raceNumber, recordedAt: result.recordedAt || new Date().toISOString() };
+  const stored: RaceResult = { ...result, raceNumber, status: result.status || 'final', recordedAt: result.recordedAt || new Date().toISOString() };
   if (prediction) stored.scorecard = scorePrediction(prediction, stored);
   pack.results[raceNumber] = stored;
   if (race) {
-    race.status = 'final';
+    race.status = stored.status === 'interim' ? 'interim' : 'final';
     race.results = stored.placings;
     for (const r of race.runners) {
       const pos = stored.placings.findIndex((slot) => slot.includes(r.number));
-      if (pos >= 0) r.finishingPosition = pos + 1;
+      r.finishingPosition = pos >= 0 ? pos + 1 : r.finishingPosition;
     }
   }
   const winner = race?.runners.find((r) => stored.placings[0]?.includes(r.number));
+  const who = winner ? `${winner.name} (${winner.number})` : `#${stored.placings[0]?.join('/')}`;
+  const tag = stored.status === 'interim' ? ' (interim)' : '';
+  const by = stored.confirmedBy?.length ? ` – ${stored.confirmedBy.length >= 2 ? `confirmed by ${stored.confirmedBy.join(', ')}` : `from ${stored.confirmedBy[0]} only`}` : '';
   pack.history.push({
     at: stored.recordedAt,
     type: 'results',
     raceNumber,
-    summary: `R${raceNumber} result: ${winner ? `${winner.name} (${winner.number})` : `#${stored.placings[0]?.join('/')}`} won${stored.scorecard ? ` – our pick ranked ${stored.scorecard.winnerRank ?? '?'}${stored.scorecard.trifectaBoxHit ? ', trifecta box hit' : ''}` : ''}`,
+    summary: kind === 'corrected' ? `R${raceNumber} result corrected: ${who} won${tag}${by}` : kind === 'confirmed' ? `R${raceNumber} result confirmed: ${who} won${by}` : `R${raceNumber} result: ${who} won${tag}${by}${stored.scorecard ? ` – our pick ranked ${stored.scorecard.winnerRank ?? '?'}${stored.scorecard.trifectaBoxHit ? ', trifecta box hit' : ''}` : ''}`,
   });
 }
 
@@ -422,7 +465,8 @@ export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job:
         continue;
       }
       if (!prev.scratched && r.scratched) changes.push(`R${race.number}: ${r.name} (${r.number}) scratched`);
-      if (prev.jockey && r.jockey && normaliseName(prev.jockey) !== normaliseName(r.jockey)) changes.push(`R${race.number}: ${r.name} jockey change ${prev.jockey} → ${r.jockey}`);
+      if (prev.scratched && !r.scratched) changes.push(`R${race.number}: ${r.name} (${r.number}) reinstated`);
+      if (prev.jockey && r.jockey && !samePeople(prev.jockey, r.jockey)) changes.push(`R${race.number}: ${r.name} jockey change ${prev.jockey} → ${r.jockey}`);
       if (prev.barrier && r.barrier && prev.barrier !== r.barrier) changes.push(`R${race.number}: ${r.name} barrier ${prev.barrier} → ${r.barrier}`);
     }
     if (before.trackRating && merged.trackRating && before.trackRating !== merged.trackRating) changes.push(`R${race.number}: track rating ${before.trackRating} → ${merged.trackRating}`);
@@ -453,6 +497,10 @@ export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job:
     else if (p && previous[n]) p.changes = p.changes || [];
   }
   job.finish('repredict', 'done', `${toPredict.length} race${toPredict.length === 1 ? '' : 's'} re-rated`);
+
+  // The headline verification must describe the data the picks now rest on.
+  pack.verificationScore = round(mean(pack.races.map((r) => r.verification.score)), 3);
+  pack.meeting.sources = [...new Set(pack.races.flatMap((r) => r.sources))];
 
   pack.history.push({
     at: now.toISOString(),

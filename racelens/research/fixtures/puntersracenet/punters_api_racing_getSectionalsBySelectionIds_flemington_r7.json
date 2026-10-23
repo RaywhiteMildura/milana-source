@@ -1,0 +1,387 @@
+{
+  "_fixtureNote": "CONSTRUCTED (not a live capture). Models POST https://api.punters.com.au/racing body {query: Q_SECTIONALS, variables:{selectionIds:['9931201','9931202'], limit:15}, operationName:'getSectionalsBySelectionIds'}. Selection set copied VERBATIM from Kelvin1761/Kelvin-Agents punters_fetch.py Q_SECTIONALS (v3, 2026-10-13) and ingested by punters_store.py form_row() -> HIGH confidence for field names/paths (data.competitorForms[].count/selectionId/forms[]). Trials are returned together with races; split on isTrial. The puntapi.com persisted operation fullFormsBySelectionIds(selectionIds, limit) and getSectionalsBySelectionIds(selectionIds) (afobsidian/Racenet-API) take the same variables and very likely return the same CompetitorForm type (MEDIUM). Values fictional.",
+  "data": {
+    "competitorForms": [
+      {
+        "count": 3,
+        "selectionId": "9931201",
+        "forms": [
+          {
+            "id": "55100001",
+            "isTrial": false,
+            "statusAbv": null,
+            "finishPosition": 2,
+            "eventStarters": 12,
+            "meetingDate": "2026-10-03T00:00:00.000Z",
+            "meetingName": "Caulfield",
+            "eventDistance": 1200,
+            "eventDistanceUnit": "m",
+            "trackType": "Turf",
+            "trackCondition": "Good",
+            "trackConditionRating": 4,
+            "eventNumber": 5,
+            "eventNameForm": "BM84 Hcp",
+            "groupType": null,
+            "finishTime": 70.50999999999999,
+            "venue": {
+              "name": "Caulfield"
+            },
+            "margin": 0.8,
+            "secondMarginDecimal": 0.75,
+            "weight": 58.0,
+            "barrier": 6,
+            "barrierRow": null,
+            "barrierHandicap": null,
+            "prizeMoney": 130000,
+            "startingWinPriceDecimal": 5.5,
+            "daysSinceLastRun": 28,
+            "isFirstUp": false,
+            "isSecondUp": true,
+            "isThirdUp": false,
+            "videoComment": "Settled midfield, peeled out at the 400m and finished off strongly.",
+            "videoNote": "Hard held late.",
+            "stewardsReport": "Slow to begin. Raced wide without cover.",
+            "jockey": {
+              "id": "3001",
+              "name": "Jye McNeil"
+            },
+            "trainer": {
+              "id": "5001",
+              "name": "Ciaron Maher"
+            },
+            "winnerName": "Other Winner",
+            "secondName": "Runner Up",
+            "thirdName": "Third Horse",
+            "formLine": {
+              "places": [
+                {
+                  "finishPosition": 1,
+                  "competitorName": "Other Winner",
+                  "competitorId": "1046001",
+                  "details": "58kg 1.0L $4.60"
+                },
+                {
+                  "finishPosition": 2,
+                  "competitorName": "Runner Up",
+                  "competitorId": "1046999",
+                  "details": "57kg 0.75L $9.00"
+                }
+              ]
+            },
+            "sectionalTimeSummary": {
+              "earlySpeed": 59.8,
+              "midSpeed": 61.0,
+              "lateSpeed": 60.2,
+              "averageSpeed": 60.4,
+              "averageTime": 11.9
+            },
+            "sectionalTime": {
+              "l800": {
+                "split": 47.1,
+                "speed": 61.1
+              },
+              "l600": {
+                "split": 34.62,
+                "speed": 62.4
+              },
+              "l400": {
+                "split": 22.95,
+                "speed": 62.7
+              },
+              "l200": {
+                "split": 11.71,
+                "speed": 61.5
+              },
+              "finish": {
+                "split": 70.50999999999999,
+                "speed": 60.4
+              }
+            }
+          },
+          {
+            "id": "55100002",
+            "isTrial": false,
+            "statusAbv": null,
+            "finishPosition": 1,
+            "eventStarters": 10,
+            "meetingDate": "2026-09-12T00:00:00.000Z",
+            "meetingName": "Moonee Valley",
+            "eventDistance": 1200,
+            "eventDistanceUnit": "m",
+            "trackType": "Turf",
+            "trackCondition": "Soft",
+            "trackConditionRating": 5,
+            "eventNumber": 5,
+            "eventNameForm": "BM84 Hcp",
+            "groupType": null,
+            "finishTime": 70.61,
+            "venue": {
+              "name": "Moonee Valley"
+            },
+            "margin": 0.0,
+            "secondMarginDecimal": 0.75,
+            "weight": 57.5,
+            "barrier": 3,
+            "barrierRow": null,
+            "barrierHandicap": null,
+            "prizeMoney": 130000,
+            "startingWinPriceDecimal": 4.2,
+            "daysSinceLastRun": 35,
+            "isFirstUp": true,
+            "isSecondUp": false,
+            "isThirdUp": false,
+            "videoComment": "Settled midfield, peeled out at the 400m and finished off strongly.",
+            "videoNote": "Hard held late.",
+            "stewardsReport": null,
+            "jockey": {
+              "id": "3001",
+              "name": "Jye McNeil"
+            },
+            "trainer": {
+              "id": "5001",
+              "name": "Ciaron Maher"
+            },
+            "winnerName": "Riverina Dawn",
+            "secondName": "Runner Up",
+            "thirdName": "Third Horse",
+            "formLine": {
+              "places": [
+                {
+                  "finishPosition": 1,
+                  "competitorName": "Riverina Dawn",
+                  "competitorId": "1046001",
+                  "details": "58kg 1.0L $4.60"
+                },
+                {
+                  "finishPosition": 2,
+                  "competitorName": "Runner Up",
+                  "competitorId": "1046999",
+                  "details": "57kg 0.75L $9.00"
+                }
+              ]
+            },
+            "sectionalTimeSummary": {
+              "earlySpeed": 59.8,
+              "midSpeed": 61.0,
+              "lateSpeed": 60.2,
+              "averageSpeed": 60.4,
+              "averageTime": 11.9
+            },
+            "sectionalTime": {
+              "l800": {
+                "split": 47.1,
+                "speed": 61.1
+              },
+              "l600": {
+                "split": 34.62,
+                "speed": 62.4
+              },
+              "l400": {
+                "split": 22.95,
+                "speed": 62.7
+              },
+              "l200": {
+                "split": 11.71,
+                "speed": 61.5
+              },
+              "finish": {
+                "split": 70.61,
+                "speed": 60.4
+              }
+            }
+          },
+          {
+            "id": "55100003",
+            "isTrial": true,
+            "statusAbv": null,
+            "finishPosition": 1,
+            "eventStarters": 6,
+            "meetingDate": "2026-08-25T00:00:00.000Z",
+            "meetingName": "Cranbourne",
+            "eventDistance": 990,
+            "eventDistanceUnit": "m",
+            "trackType": "Turf",
+            "trackCondition": "Synthetic",
+            "trackConditionRating": 0,
+            "eventNumber": 5,
+            "eventNameForm": "Barrier Trial",
+            "groupType": null,
+            "finishTime": 70.71,
+            "venue": {
+              "name": "Cranbourne"
+            },
+            "margin": 0.0,
+            "secondMarginDecimal": 0.75,
+            "weight": 0,
+            "barrier": 2,
+            "barrierRow": null,
+            "barrierHandicap": null,
+            "prizeMoney": 0,
+            "startingWinPriceDecimal": null,
+            "daysSinceLastRun": 42,
+            "isFirstUp": false,
+            "isSecondUp": false,
+            "isThirdUp": false,
+            "videoComment": null,
+            "videoNote": null,
+            "stewardsReport": null,
+            "jockey": {
+              "id": "3001",
+              "name": "Jye McNeil"
+            },
+            "trainer": {
+              "id": "5001",
+              "name": "Ciaron Maher"
+            },
+            "winnerName": "Riverina Dawn",
+            "secondName": "Runner Up",
+            "thirdName": "Third Horse",
+            "formLine": {
+              "places": [
+                {
+                  "finishPosition": 1,
+                  "competitorName": "Riverina Dawn",
+                  "competitorId": "1046001",
+                  "details": "58kg 1.0L $4.60"
+                },
+                {
+                  "finishPosition": 2,
+                  "competitorName": "Runner Up",
+                  "competitorId": "1046999",
+                  "details": "57kg 0.75L $9.00"
+                }
+              ]
+            },
+            "sectionalTimeSummary": {
+              "earlySpeed": 59.8,
+              "midSpeed": 61.0,
+              "lateSpeed": 60.2,
+              "averageSpeed": 60.4,
+              "averageTime": 11.9
+            },
+            "sectionalTime": {
+              "l800": {
+                "split": 47.1,
+                "speed": 61.1
+              },
+              "l600": {
+                "split": 34.62,
+                "speed": 62.4
+              },
+              "l400": {
+                "split": 22.95,
+                "speed": 62.7
+              },
+              "l200": {
+                "split": 11.71,
+                "speed": 61.5
+              },
+              "finish": {
+                "split": 70.71,
+                "speed": 60.4
+              }
+            }
+          }
+        ]
+      },
+      {
+        "count": 1,
+        "selectionId": "9931202",
+        "forms": [
+          {
+            "id": "55100004",
+            "isTrial": false,
+            "statusAbv": null,
+            "finishPosition": 3,
+            "eventStarters": 14,
+            "meetingDate": "2026-10-10T00:00:00.000Z",
+            "meetingName": "Randwick",
+            "eventDistance": 1200,
+            "eventDistanceUnit": "m",
+            "trackType": "Turf",
+            "trackCondition": "Good",
+            "trackConditionRating": 3,
+            "eventNumber": 5,
+            "eventNameForm": "BM84 Hcp",
+            "groupType": null,
+            "finishTime": 70.81,
+            "venue": {
+              "name": "Randwick"
+            },
+            "margin": 1.6,
+            "secondMarginDecimal": 0.75,
+            "weight": 57.0,
+            "barrier": 11,
+            "barrierRow": null,
+            "barrierHandicap": null,
+            "prizeMoney": 130000,
+            "startingWinPriceDecimal": 3.1,
+            "daysSinceLastRun": 49,
+            "isFirstUp": false,
+            "isSecondUp": false,
+            "isThirdUp": false,
+            "videoComment": "Settled midfield, peeled out at the 400m and finished off strongly.",
+            "videoNote": "Hard held late.",
+            "stewardsReport": null,
+            "jockey": {
+              "id": "3001",
+              "name": "Damian Lane"
+            },
+            "trainer": {
+              "id": "5001",
+              "name": "Chris Waller"
+            },
+            "winnerName": "Other Winner",
+            "secondName": "Runner Up",
+            "thirdName": "Third Horse",
+            "formLine": {
+              "places": [
+                {
+                  "finishPosition": 1,
+                  "competitorName": "Other Winner",
+                  "competitorId": "1046001",
+                  "details": "58kg 1.0L $4.60"
+                },
+                {
+                  "finishPosition": 2,
+                  "competitorName": "Runner Up",
+                  "competitorId": "1046999",
+                  "details": "57kg 0.75L $9.00"
+                }
+              ]
+            },
+            "sectionalTimeSummary": {
+              "earlySpeed": 59.8,
+              "midSpeed": 61.0,
+              "lateSpeed": 60.2,
+              "averageSpeed": 60.4,
+              "averageTime": 11.9
+            },
+            "sectionalTime": {
+              "l800": {
+                "split": 47.1,
+                "speed": 61.1
+              },
+              "l600": {
+                "split": 34.62,
+                "speed": 62.4
+              },
+              "l400": {
+                "split": 22.95,
+                "speed": 62.7
+              },
+              "l200": {
+                "split": 11.71,
+                "speed": 61.5
+              },
+              "finish": {
+                "split": 70.81,
+                "speed": 60.4
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

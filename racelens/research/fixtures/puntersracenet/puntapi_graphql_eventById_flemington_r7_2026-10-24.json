@@ -1,0 +1,1830 @@
+{
+  "_fixtureNote": "CONSTRUCTED (not a live capture). Models GET https://puntapi.com/graphql-horse-racing?operationName=eventById&variables={\"eventId\":\"1788421\"}&extensions={\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"<hash>\"}} (authorization: Bearer none). HIGH-confidence paths (read by l0rdwalker/betshock_v2): data.event.selections[].id, .competitor.name, .status == 'SCRATCHED'. MEDIUM: the remaining Selection/Competitor/Jockey/Trainer/Event/Meeting field names are the names the SAME GraphQL schema exposes through racenet.com.au's Apollo cache (Kelvin1761/Kelvin-Agents au_race_extractor/scripts/extractor.py, claw_racenet_results.py) and through api.punters.com.au/racing (punters_fetch.py Q_MEETINGS). Whether eventById's persisted selection-set includes every one of them is NOT verified; weather/trackCondition are stored under $Event:<id>.weather / .trackCondition in the Apollo cache, here inlined. All names, ids and numbers are fictional.",
+  "data": {
+    "event": {
+      "id": "1788421",
+      "eventNumber": 7,
+      "name": "Spring Sprint Final BM90 Handicap",
+      "slug": "spring-sprint-final-bm90-handicap-race-7",
+      "startTime": "2026-10-24T05:10:00.000Z",
+      "distance": 1200,
+      "distanceUnit": "metres",
+      "eventClass": "BM90",
+      "racePrizeMoney": 200000,
+      "trackType": "Turf",
+      "isResulted": false,
+      "starters": 9,
+      "pace": null,
+      "winningTime": null,
+      "weather": {
+        "condition": "partly cloudy",
+        "temperature": 21,
+        "feelsLike": 20,
+        "wind": "SW 18 km/h",
+        "humidity": 54,
+        "conditionIcon": "partly-cloudy",
+        "trackConditionRating": 4,
+        "trackConditionOverall": "Good"
+      },
+      "trackCondition": {
+        "overall": "Good",
+        "rating": 4,
+        "surface": "Turf"
+      },
+      "meeting": {
+        "id": "238907",
+        "name": "Flemington",
+        "slug": "flemington-20261024",
+        "railPosition": "True Entire Course",
+        "meetingDateUtc": "2026-10-23T13:00:00.000Z",
+        "meetingDateLocal": "2026-10-24",
+        "trackComments": "Track rated Good 4 at 7:30am. Penetrometer 4.78. 2mm irrigation Thursday.",
+        "venue": {
+          "name": "Flemington",
+          "state": "VIC",
+          "country": "AUS"
+        }
+      },
+      "selections": [
+        {
+          "id": "9931201",
+          "competitorNumber": 1,
+          "barrierNumber": 4,
+          "status": "OPEN",
+          "statusAbv": null,
+          "weight": 58.5,
+          "jockeyWeightClaim": null,
+          "ratingOfficial": 89,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046001",
+            "name": "Riverina Dawn",
+            "slug": "riverina-dawn",
+            "age": 5,
+            "sexShort": "G",
+            "colour": "Bay",
+            "sire": "Zoustar",
+            "dam": "Dawn Chorus",
+            "sireOfDam": "Fastnet Rock",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3001",
+            "name": "Jye McNeil",
+            "slug": "jye-mcneil",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5001",
+            "name": "Ciaron Maher",
+            "slug": "ciaron-maher",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 15,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 26.7,
+            "placePercentage": 60.0,
+            "totalPrizeMoney": 413350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [
+            {
+              "value": 5.29
+            },
+            {
+              "value": 4.83
+            },
+            {
+              "value": 4.6
+            }
+          ],
+          "prediction": {
+            "speedMeasureRatingName": "On-pace",
+            "speedMeasure": 60.3,
+            "normSpeedMeasure": 0.84,
+            "barrierSpeedRating": 3,
+            "closingSpeedRating": 4,
+            "modelOutput": 0.13299999999999998,
+            "modelRank": 1,
+            "width": 1,
+            "length": 7,
+            "winningChance": 0.217,
+            "finishSpeed": 58.9
+          }
+        },
+        {
+          "id": "9931202",
+          "competitorNumber": 2,
+          "barrierNumber": 9,
+          "status": "OPEN",
+          "statusAbv": null,
+          "weight": 58.0,
+          "jockeyWeightClaim": null,
+          "ratingOfficial": 90,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046002",
+            "name": "Coastal Ember",
+            "slug": "coastal-ember",
+            "age": 4,
+            "sexShort": "G",
+            "colour": "Chestnut",
+            "sire": "Snitzel",
+            "dam": "Ember Glow",
+            "sireOfDam": "Redoute's Choice",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3002",
+            "name": "Damian Lane",
+            "slug": "damian-lane",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5002",
+            "name": "Chris Waller",
+            "slug": "chris-waller",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 16,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 25.0,
+            "placePercentage": 56.2,
+            "totalPrizeMoney": 414350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [
+            {
+              "value": 4.37
+            },
+            {
+              "value": 3.99
+            },
+            {
+              "value": 3.8
+            }
+          ],
+          "prediction": {
+            "speedMeasureRatingName": "Midfield",
+            "speedMeasure": 59.3,
+            "normSpeedMeasure": 0.81,
+            "barrierSpeedRating": 3,
+            "closingSpeedRating": 4,
+            "modelOutput": 0.12399999999999999,
+            "modelRank": 2,
+            "width": 1,
+            "length": 8,
+            "winningChance": 0.263,
+            "finishSpeed": 58.9
+          }
+        },
+        {
+          "id": "9931203",
+          "competitorNumber": 3,
+          "barrierNumber": 1,
+          "status": "OPEN",
+          "statusAbv": null,
+          "weight": 57.5,
+          "jockeyWeightClaim": null,
+          "ratingOfficial": 91,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046003",
+            "name": "Tarrawarra Gold",
+            "slug": "tarrawarra-gold",
+            "age": 6,
+            "sexShort": "G",
+            "colour": "Brown",
+            "sire": "Written Tycoon",
+            "dam": "Golden Veil",
+            "sireOfDam": "Lonhro",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3003",
+            "name": "Craig Williams",
+            "slug": "craig-williams",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5003",
+            "name": "Anthony & Sam Freedman",
+            "slug": "anthony-sam-freedman",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 17,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 23.5,
+            "placePercentage": 52.9,
+            "totalPrizeMoney": 415350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [
+            {
+              "value": 8.62
+            },
+            {
+              "value": 7.88
+            },
+            {
+              "value": 7.5
+            }
+          ],
+          "prediction": {
+            "speedMeasureRatingName": "Backmarker",
+            "speedMeasure": 58.3,
+            "normSpeedMeasure": 0.78,
+            "barrierSpeedRating": 3,
+            "closingSpeedRating": 4,
+            "modelOutput": 0.11499999999999999,
+            "modelRank": 3,
+            "width": 1,
+            "length": 9,
+            "winningChance": 0.133,
+            "finishSpeed": 58.9
+          }
+        },
+        {
+          "id": "9931204",
+          "competitorNumber": 4,
+          "barrierNumber": 12,
+          "status": "SCRATCHED",
+          "statusAbv": "S",
+          "weight": 57.0,
+          "jockeyWeightClaim": null,
+          "ratingOfficial": 92,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046004",
+            "name": "Southern Causeway",
+            "slug": "southern-causeway",
+            "age": 5,
+            "sexShort": "M",
+            "colour": "Bay",
+            "sire": "I Am Invincible",
+            "dam": "Causeway Lass",
+            "sireOfDam": "Encosta de Lago",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3004",
+            "name": "Blake Shinn",
+            "slug": "blake-shinn",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5004",
+            "name": "Lindsey Smith",
+            "slug": "lindsey-smith",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 18,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 22.2,
+            "placePercentage": 50.0,
+            "totalPrizeMoney": 416350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [],
+          "prediction": null
+        },
+        {
+          "id": "9931205",
+          "competitorNumber": 5,
+          "barrierNumber": 6,
+          "status": "OPEN",
+          "statusAbv": null,
+          "weight": 56.5,
+          "jockeyWeightClaim": null,
+          "ratingOfficial": 88,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046005",
+            "name": "Night Parade",
+            "slug": "night-parade",
+            "age": 4,
+            "sexShort": "G",
+            "colour": "Bay",
+            "sire": "Capitalist",
+            "dam": "Parade Night",
+            "sireOfDam": "Street Cry",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3005",
+            "name": "Ethan Brown",
+            "slug": "ethan-brown",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5005",
+            "name": "Mick Price & Michael Kent Jnr",
+            "slug": "mick-price-michael-kent-jnr",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 19,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 21.1,
+            "placePercentage": 47.4,
+            "totalPrizeMoney": 417350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [
+            {
+              "value": 10.35
+            },
+            {
+              "value": 9.45
+            },
+            {
+              "value": 9.0
+            }
+          ],
+          "prediction": {
+            "speedMeasureRatingName": "On-pace",
+            "speedMeasure": 56.3,
+            "normSpeedMeasure": 0.72,
+            "barrierSpeedRating": 3,
+            "closingSpeedRating": 4,
+            "modelOutput": 0.09699999999999999,
+            "modelRank": 5,
+            "width": 1,
+            "length": 7,
+            "winningChance": 0.111,
+            "finishSpeed": 58.9
+          }
+        },
+        {
+          "id": "9931206",
+          "competitorNumber": 6,
+          "barrierNumber": 2,
+          "status": "OPEN",
+          "statusAbv": null,
+          "weight": 56.0,
+          "jockeyWeightClaim": -2.0,
+          "ratingOfficial": 89,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046006",
+            "name": "Larrikin Lane",
+            "slug": "larrikin-lane",
+            "age": 4,
+            "sexShort": "G",
+            "colour": "Grey",
+            "sire": "Toronado",
+            "dam": "Lane Way",
+            "sireOfDam": "Exceed And Excel",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3006",
+            "name": "Celine Gaudray",
+            "slug": "celine-gaudray",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5006",
+            "name": "Danny O'Brien",
+            "slug": "danny-o'brien",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 20,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 20.0,
+            "placePercentage": 45.0,
+            "totalPrizeMoney": 418350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [
+            {
+              "value": 13.8
+            },
+            {
+              "value": 12.6
+            },
+            {
+              "value": 12.0
+            }
+          ],
+          "prediction": {
+            "speedMeasureRatingName": "Midfield",
+            "speedMeasure": 55.3,
+            "normSpeedMeasure": 0.69,
+            "barrierSpeedRating": 3,
+            "closingSpeedRating": 4,
+            "modelOutput": 0.088,
+            "modelRank": 6,
+            "width": 1,
+            "length": 8,
+            "winningChance": 0.083,
+            "finishSpeed": 58.9
+          }
+        },
+        {
+          "id": "9931207",
+          "competitorNumber": 7,
+          "barrierNumber": 7,
+          "status": "OPEN",
+          "statusAbv": null,
+          "weight": 55.5,
+          "jockeyWeightClaim": null,
+          "ratingOfficial": 90,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046007",
+            "name": "Seaspray Queen",
+            "slug": "seaspray-queen",
+            "age": 4,
+            "sexShort": "M",
+            "colour": "Bay",
+            "sire": "Pierro",
+            "dam": "Spray Mist",
+            "sireOfDam": "Galileo",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3007",
+            "name": "Jamie Kah",
+            "slug": "jamie-kah",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5007",
+            "name": "Gai Waterhouse & Adrian Bott",
+            "slug": "gai-waterhouse-adrian-bott",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 21,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 19.0,
+            "placePercentage": 42.9,
+            "totalPrizeMoney": 419350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [
+            {
+              "value": 6.9
+            },
+            {
+              "value": 6.3
+            },
+            {
+              "value": 6.0
+            }
+          ],
+          "prediction": {
+            "speedMeasureRatingName": "Backmarker",
+            "speedMeasure": 54.3,
+            "normSpeedMeasure": 0.66,
+            "barrierSpeedRating": 3,
+            "closingSpeedRating": 4,
+            "modelOutput": 0.07899999999999999,
+            "modelRank": 7,
+            "width": 1,
+            "length": 9,
+            "winningChance": 0.167,
+            "finishSpeed": 58.9
+          }
+        },
+        {
+          "id": "9931208",
+          "competitorNumber": 8,
+          "barrierNumber": 3,
+          "status": "OPEN",
+          "statusAbv": null,
+          "weight": 55.0,
+          "jockeyWeightClaim": null,
+          "ratingOfficial": 91,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046008",
+            "name": "Monaro Mist",
+            "slug": "monaro-mist",
+            "age": 5,
+            "sexShort": "G",
+            "colour": "Bay",
+            "sire": "Russian Revolution",
+            "dam": "Misty Monaro",
+            "sireOfDam": "Commands",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3008",
+            "name": "Mark Zahra",
+            "slug": "mark-zahra",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5008",
+            "name": "Peter Moody & Katherine Coleman",
+            "slug": "peter-moody-katherine-coleman",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 22,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 18.2,
+            "placePercentage": 40.9,
+            "totalPrizeMoney": 420350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [
+            {
+              "value": 17.25
+            },
+            {
+              "value": 15.75
+            },
+            {
+              "value": 15.0
+            }
+          ],
+          "prediction": {
+            "speedMeasureRatingName": "Leader",
+            "speedMeasure": 53.3,
+            "normSpeedMeasure": 0.63,
+            "barrierSpeedRating": 3,
+            "closingSpeedRating": 4,
+            "modelOutput": 0.06999999999999999,
+            "modelRank": 8,
+            "width": 1,
+            "length": 6,
+            "winningChance": 0.067,
+            "finishSpeed": 58.9
+          }
+        },
+        {
+          "id": "9931209",
+          "competitorNumber": 9,
+          "barrierNumber": 10,
+          "status": "OPEN",
+          "statusAbv": null,
+          "weight": 54.5,
+          "jockeyWeightClaim": null,
+          "ratingOfficial": 92,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046009",
+            "name": "Kirribilli Star",
+            "slug": "kirribilli-star",
+            "age": 3,
+            "sexShort": "F",
+            "colour": "Bay",
+            "sire": "Brazen Beau",
+            "dam": "Star Harbour",
+            "sireOfDam": "Danehill Dancer",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3009",
+            "name": "Beau Mertens",
+            "slug": "beau-mertens",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5009",
+            "name": "Tony & Calvin McEvoy",
+            "slug": "tony-calvin-mcevoy",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 23,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 17.4,
+            "placePercentage": 39.1,
+            "totalPrizeMoney": 421350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [
+            {
+              "value": 24.15
+            },
+            {
+              "value": 22.05
+            },
+            {
+              "value": 21.0
+            }
+          ],
+          "prediction": {
+            "speedMeasureRatingName": "On-pace",
+            "speedMeasure": 52.3,
+            "normSpeedMeasure": 0.6,
+            "barrierSpeedRating": 3,
+            "closingSpeedRating": 4,
+            "modelOutput": 0.061,
+            "modelRank": 9,
+            "width": 1,
+            "length": 7,
+            "winningChance": 0.048,
+            "finishSpeed": 58.9
+          }
+        },
+        {
+          "id": "9931210",
+          "competitorNumber": 10,
+          "barrierNumber": 5,
+          "status": "OPEN",
+          "statusAbv": null,
+          "weight": 54.0,
+          "jockeyWeightClaim": null,
+          "ratingOfficial": 88,
+          "startingPrice": null,
+          "competitor": {
+            "id": "1046010",
+            "name": "Bellarine Breeze",
+            "slug": "bellarine-breeze",
+            "age": 4,
+            "sexShort": "M",
+            "colour": "Bay",
+            "sire": "Dundeel",
+            "dam": "Breezy Bay",
+            "sireOfDam": "More Than Ready",
+            "owner": "Fictional Racing Syndicate (Mgr: A Example)"
+          },
+          "jockey": {
+            "id": "3010",
+            "name": "Harry Coffey",
+            "slug": "harry-coffey",
+            "stats": {
+              "lastYear": {
+                "starts": 812,
+                "wins": 118,
+                "seconds": 104,
+                "thirds": 97,
+                "winPercentage": 14.5,
+                "placePercentage": 39.3
+              }
+            }
+          },
+          "trainer": {
+            "id": "5010",
+            "name": "Matt Cumani",
+            "slug": "matt-cumani",
+            "stats": {
+              "lastYear": {
+                "starts": 1540,
+                "wins": 262,
+                "seconds": 221,
+                "thirds": 198,
+                "winPercentage": 17.0,
+                "placePercentage": 44.2
+              }
+            }
+          },
+          "stats": {
+            "career": {
+              "starts": 24,
+              "wins": 4,
+              "seconds": 3,
+              "thirds": 2
+            },
+            "lastTenFigure": "x213451x62",
+            "winPercentage": 16.7,
+            "placePercentage": 37.5,
+            "totalPrizeMoney": 422350,
+            "roi": -8.4,
+            "track": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "distance": {
+              "starts": 5,
+              "wins": 2,
+              "seconds": 1,
+              "thirds": 1
+            },
+            "trackDistance": {
+              "starts": 1,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "firm": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "good": {
+              "starts": 10,
+              "wins": 3,
+              "seconds": 2,
+              "thirds": 2
+            },
+            "soft": {
+              "starts": 4,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "heavy": {
+              "starts": 1,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "synthetic": {
+              "starts": 0,
+              "wins": 0,
+              "seconds": 0,
+              "thirds": 0
+            },
+            "class": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "firstUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 0,
+              "thirds": 1
+            },
+            "secondUp": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "thirdUp": {
+              "starts": 2,
+              "wins": 0,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "currentSeason": {
+              "starts": 3,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            },
+            "lastYear": {
+              "starts": 7,
+              "wins": 2,
+              "seconds": 2,
+              "thirds": 1
+            },
+            "fav": {
+              "starts": 2,
+              "wins": 1,
+              "seconds": 1,
+              "thirds": 0
+            }
+          },
+          "flucOdds": [
+            {
+              "value": 29.9
+            },
+            {
+              "value": 27.3
+            },
+            {
+              "value": 26.0
+            }
+          ],
+          "prediction": {
+            "speedMeasureRatingName": "Midfield",
+            "speedMeasure": 51.3,
+            "normSpeedMeasure": 0.5700000000000001,
+            "barrierSpeedRating": 3,
+            "closingSpeedRating": 4,
+            "modelOutput": 0.05199999999999999,
+            "modelRank": 10,
+            "width": 1,
+            "length": 8,
+            "winningChance": 0.038,
+            "finishSpeed": 58.9
+          }
+        }
+      ]
+    }
+  }
+}

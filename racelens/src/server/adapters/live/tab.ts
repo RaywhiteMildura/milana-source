@@ -156,7 +156,7 @@ export class TabAdapter implements SourceAdapter {
         if (tote?.place && !dividends.place1) dividends.place1 = tote.place;
       }
     }
-    return { raceNumber, placings: race.results, recordedAt: ctx.now().toISOString(), source: this.id, dividends: Object.keys(dividends).length ? dividends : undefined };
+    return { raceNumber, placings: race.results, recordedAt: ctx.now().toISOString(), source: this.id, status: race.status === 'final' ? 'final' : 'interim', dividends: Object.keys(dividends).length ? dividends : undefined };
   }
 
   // ---------------------------------------------------------------------------

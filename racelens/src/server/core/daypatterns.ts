@@ -107,7 +107,17 @@ function mostRecentForm(form: FormLine[] | undefined): FormLine | undefined {
  * the first settling position of the most recent form line's `inRunning`
  * string ("4-3-2" -> 4th at settling) mapped by field size.
  */
-export function settlingPosition(runner: Runner): SpeedMapPosition | undefined {
+export function settlingPosition(runner: Runner, fieldSize?: number): SpeedMapPosition | undefined {
+  // Today's actual in-running positions (from a results feed) beat any pre-race map.
+  const today = runner.inRunning?.match(/\d+/);
+  if (today) {
+    const settle = Number(today[0]);
+    const n = fieldSize && fieldSize > 0 ? fieldSize : 10;
+    if (settle === 1) return 'leader';
+    if (settle <= Math.max(3, Math.ceil(n * 0.3))) return 'on-pace';
+    if (settle <= Math.max(4, Math.ceil(n * 0.65))) return 'midfield';
+    return 'backmarker';
+  }
   if (runner.speedMapPosition) return runner.speedMapPosition;
   const line = mostRecentForm(runner.form);
   if (!line?.inRunning) return undefined;
@@ -395,7 +405,7 @@ function detectWetFormPattern(completed: CompletedRace[]): DayPattern | undefine
 
   for (const c of completed) {
     const rating = raceRating(c.race);
-    if (rating === undefined || rating < 6) continue;
+    if (rating === undefined || rating < 5) continue;
     let used = false;
     for (const w of c.winners) {
       const stats = wetStats(w);

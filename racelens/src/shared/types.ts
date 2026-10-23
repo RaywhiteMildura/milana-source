@@ -181,6 +181,8 @@ export interface RunnerRaw {
   finishingPosition?: number;
   margin?: number;
   silk?: string;
+  /** Today's in-running positions once the race has been run, e.g. "3-3-2" */
+  inRunning?: string;
   /** Rider statistics where a source supplies them (strike rates in %). */
   jockeyStats?: PersonStats;
   trainerStats?: PersonStats;
@@ -313,6 +315,7 @@ export interface Runner {
   finishingPosition?: number;
   margin?: number;
   silk?: string;
+  inRunning?: string;
   jockeyStats?: PersonStats;
   trainerStats?: PersonStats;
   fields: {
@@ -387,6 +390,7 @@ export interface RunnerAssessment {
   concerns: string[];
   marketWinProb?: number;
   bestOdds?: number;
+  bestPlace?: number;
   fairOdds: number;
   /** winProb - marketWinProb */
   valueEdge?: number;
@@ -478,6 +482,10 @@ export interface RaceResult {
   dividends?: Record<string, number>;
   recordedAt: string;
   source: SourceId;
+  /** Interim placings may still change (protest, correction); final ones do not. */
+  status?: 'interim' | 'final';
+  /** Sources that agreed on these placings */
+  confirmedBy?: SourceId[];
   /** How the prediction did */
   scorecard?: {
     winnerRank?: number;

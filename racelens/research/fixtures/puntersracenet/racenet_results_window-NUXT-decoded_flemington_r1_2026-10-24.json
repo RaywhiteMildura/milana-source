@@ -1,0 +1,540 @@
+{
+  "_fixtureNote": "CONSTRUCTED (not a live capture). Models window.__NUXT__ of https://www.racenet.com.au/results/horse-racing/flemington-20261024/all-races after Race 1 was run. Keys read by Kelvin1761/Kelvin-Agents claw_racenet_results.py, scratch/au_extract_finishes.py, au_extract_positions.py, au_extract_racenet_sp.py (HIGH for names): Event.isResulted/winningTime/starters/pace/trackType; Selection.startingPrice (CLOSING price = SP), status/statusAbv ('S' and 'LR' = scratched/late-reserve), competitorNumber, barrierNumber, weight; $Selection:<id>.result (also referenced as selectionResult) with finishPosition (-1 = scratched / no result), margin, finishTime, competitorPositionSummary[] (distanceText 'Settled'/'800m'/'400m', positionText, distance 0/800/400, position); ExoticResult(tote, exoticMarket, amount, results). Apollo-2 ref/generated-key format copied from the real homepage capture. Values fictional.",
+  "layout": "twoColumn",
+  "serverRendered": true,
+  "routePath": "/results/horse-racing/flemington-20261024/all-races",
+  "fetch": {},
+  "state": {
+    "ResultsTabs": {
+      "chosenDate": "2026-10-24"
+    },
+    "SelectionResults": {
+      "eventWithOdds": [
+        {}
+      ]
+    }
+  },
+  "apollo": {
+    "defaultClient": {
+      "Meeting:238907": {
+        "id": "238907",
+        "name": "Flemington",
+        "slug": "flemington-20261024",
+        "railPosition": "True Entire Course",
+        "meetingDateUtc": "2026-10-23T13:00:00.000Z",
+        "meetingDateLocal": "2026-10-24",
+        "trackComments": "Track upgraded to Good 3 after Race 2.",
+        "events": [
+          {
+            "type": "id",
+            "generated": false,
+            "id": "Event:1788415",
+            "typename": "Event"
+          }
+        ],
+        "__typename": "Meeting"
+      },
+      "Event:1788415": {
+        "id": "1788415",
+        "eventNumber": 1,
+        "name": "Maribyrnong Plate",
+        "slug": "maribyrnong-plate-race-1",
+        "startTime": "2026-10-24T01:20:00.000Z",
+        "distance": 1000,
+        "distanceUnit": "metres",
+        "eventClass": "Group 3",
+        "racePrizeMoney": 200000,
+        "trackType": "Turf",
+        "isResulted": true,
+        "starters": 8,
+        "pace": "Genuine",
+        "winningTime": "0:57.63",
+        "weather": {
+          "type": "id",
+          "generated": true,
+          "id": "$Event:1788415.weather",
+          "typename": "Weather"
+        },
+        "trackCondition": {
+          "type": "id",
+          "generated": true,
+          "id": "$Event:1788415.trackCondition",
+          "typename": "TrackCondition"
+        },
+        "selections": [
+          {
+            "type": "id",
+            "generated": false,
+            "id": "Selection:8800001",
+            "typename": "Selection"
+          },
+          {
+            "type": "id",
+            "generated": false,
+            "id": "Selection:8800002",
+            "typename": "Selection"
+          },
+          {
+            "type": "id",
+            "generated": false,
+            "id": "Selection:8800003",
+            "typename": "Selection"
+          },
+          {
+            "type": "id",
+            "generated": false,
+            "id": "Selection:8800004",
+            "typename": "Selection"
+          }
+        ],
+        "__typename": "Event"
+      },
+      "$Event:1788415.weather": {
+        "condition": "fine",
+        "temperature": 18,
+        "wind": "S 12 km/h",
+        "humidity": 61,
+        "__typename": "Weather"
+      },
+      "$Event:1788415.trackCondition": {
+        "overall": "Good",
+        "rating": 4,
+        "surface": "Turf",
+        "__typename": "TrackCondition"
+      },
+      "Competitor:1047001": {
+        "id": "1047001",
+        "name": "Little Avenue",
+        "age": 2,
+        "sexShort": "C",
+        "colour": "Bay",
+        "sire": "Zoustar",
+        "dam": "Fictional Dam",
+        "sireOfDam": "Lonhro",
+        "__typename": "Competitor"
+      },
+      "Jockey:3101": {
+        "id": "3101",
+        "name": "Jamie Kah",
+        "__typename": "Jockey"
+      },
+      "Trainer:5101": {
+        "id": "5101",
+        "name": "Ciaron Maher",
+        "__typename": "Trainer"
+      },
+      "Selection:8800001": {
+        "id": "8800001",
+        "competitorNumber": 1,
+        "barrierNumber": 3,
+        "status": "RESULTED",
+        "statusAbv": null,
+        "weight": 57.0,
+        "jockeyWeightClaim": null,
+        "startingPrice": 2.8,
+        "comments": null,
+        "competitor": {
+          "type": "id",
+          "generated": false,
+          "id": "Competitor:1047001",
+          "typename": "Competitor"
+        },
+        "jockey": {
+          "type": "id",
+          "generated": false,
+          "id": "Jockey:3101",
+          "typename": "Jockey"
+        },
+        "trainer": {
+          "type": "id",
+          "generated": false,
+          "id": "Trainer:5101",
+          "typename": "Trainer"
+        },
+        "result": {
+          "type": "id",
+          "generated": true,
+          "id": "$Selection:8800001.result",
+          "typename": "SelectionResult"
+        },
+        "selectionResult": {
+          "type": "id",
+          "generated": true,
+          "id": "$Selection:8800001.result",
+          "typename": "SelectionResult"
+        },
+        "__typename": "Selection"
+      },
+      "$Selection:8800001.result": {
+        "finishPosition": 1,
+        "margin": 0.0,
+        "finishTime": "0:57.63",
+        "competitorPositionSummary": [
+          {
+            "type": "id",
+            "generated": true,
+            "id": "$Selection:8800001.result.competitorPositionSummary.0",
+            "typename": "CompetitorPositionSummary"
+          },
+          {
+            "type": "id",
+            "generated": true,
+            "id": "$Selection:8800001.result.competitorPositionSummary.1",
+            "typename": "CompetitorPositionSummary"
+          },
+          {
+            "type": "id",
+            "generated": true,
+            "id": "$Selection:8800001.result.competitorPositionSummary.2",
+            "typename": "CompetitorPositionSummary"
+          }
+        ],
+        "__typename": "SelectionResult"
+      },
+      "$Selection:8800001.result.competitorPositionSummary.0": {
+        "distanceText": "Settled",
+        "positionText": "2nd",
+        "distance": 0,
+        "position": 2,
+        "time": null,
+        "__typename": "CompetitorPositionSummary"
+      },
+      "$Selection:8800001.result.competitorPositionSummary.1": {
+        "distanceText": "800m",
+        "positionText": "2nd",
+        "distance": 800,
+        "position": 2,
+        "time": null,
+        "__typename": "CompetitorPositionSummary"
+      },
+      "$Selection:8800001.result.competitorPositionSummary.2": {
+        "distanceText": "400m",
+        "positionText": "1st",
+        "distance": 400,
+        "position": 1,
+        "time": null,
+        "__typename": "CompetitorPositionSummary"
+      },
+      "Competitor:1047002": {
+        "id": "1047002",
+        "name": "Pier Nine",
+        "age": 2,
+        "sexShort": "F",
+        "colour": "Bay",
+        "sire": "Zoustar",
+        "dam": "Fictional Dam",
+        "sireOfDam": "Lonhro",
+        "__typename": "Competitor"
+      },
+      "Jockey:3102": {
+        "id": "3102",
+        "name": "Blake Shinn",
+        "__typename": "Jockey"
+      },
+      "Trainer:5102": {
+        "id": "5102",
+        "name": "Chris Waller",
+        "__typename": "Trainer"
+      },
+      "Selection:8800002": {
+        "id": "8800002",
+        "competitorNumber": 2,
+        "barrierNumber": 7,
+        "status": "RESULTED",
+        "statusAbv": null,
+        "weight": 57.0,
+        "jockeyWeightClaim": null,
+        "startingPrice": 6.5,
+        "comments": null,
+        "competitor": {
+          "type": "id",
+          "generated": false,
+          "id": "Competitor:1047002",
+          "typename": "Competitor"
+        },
+        "jockey": {
+          "type": "id",
+          "generated": false,
+          "id": "Jockey:3102",
+          "typename": "Jockey"
+        },
+        "trainer": {
+          "type": "id",
+          "generated": false,
+          "id": "Trainer:5102",
+          "typename": "Trainer"
+        },
+        "result": {
+          "type": "id",
+          "generated": true,
+          "id": "$Selection:8800002.result",
+          "typename": "SelectionResult"
+        },
+        "selectionResult": {
+          "type": "id",
+          "generated": true,
+          "id": "$Selection:8800002.result",
+          "typename": "SelectionResult"
+        },
+        "__typename": "Selection"
+      },
+      "$Selection:8800002.result": {
+        "finishPosition": 2,
+        "margin": 1.25,
+        "finishTime": null,
+        "competitorPositionSummary": [
+          {
+            "type": "id",
+            "generated": true,
+            "id": "$Selection:8800002.result.competitorPositionSummary.0",
+            "typename": "CompetitorPositionSummary"
+          },
+          {
+            "type": "id",
+            "generated": true,
+            "id": "$Selection:8800002.result.competitorPositionSummary.1",
+            "typename": "CompetitorPositionSummary"
+          },
+          {
+            "type": "id",
+            "generated": true,
+            "id": "$Selection:8800002.result.competitorPositionSummary.2",
+            "typename": "CompetitorPositionSummary"
+          }
+        ],
+        "__typename": "SelectionResult"
+      },
+      "$Selection:8800002.result.competitorPositionSummary.0": {
+        "distanceText": "Settled",
+        "positionText": "5th",
+        "distance": 0,
+        "position": 5,
+        "time": null,
+        "__typename": "CompetitorPositionSummary"
+      },
+      "$Selection:8800002.result.competitorPositionSummary.1": {
+        "distanceText": "800m",
+        "positionText": "5th",
+        "distance": 800,
+        "position": 5,
+        "time": null,
+        "__typename": "CompetitorPositionSummary"
+      },
+      "$Selection:8800002.result.competitorPositionSummary.2": {
+        "distanceText": "400m",
+        "positionText": "3rd",
+        "distance": 400,
+        "position": 3,
+        "time": null,
+        "__typename": "CompetitorPositionSummary"
+      },
+      "Competitor:1047003": {
+        "id": "1047003",
+        "name": "Yarra Glen Lad",
+        "age": 2,
+        "sexShort": "C",
+        "colour": "Bay",
+        "sire": "Zoustar",
+        "dam": "Fictional Dam",
+        "sireOfDam": "Lonhro",
+        "__typename": "Competitor"
+      },
+      "Jockey:3103": {
+        "id": "3103",
+        "name": "Craig Williams",
+        "__typename": "Jockey"
+      },
+      "Trainer:5103": {
+        "id": "5103",
+        "name": "Mick Price & Michael Kent Jnr",
+        "__typename": "Trainer"
+      },
+      "Selection:8800003": {
+        "id": "8800003",
+        "competitorNumber": 3,
+        "barrierNumber": 1,
+        "status": "RESULTED",
+        "statusAbv": null,
+        "weight": 57.0,
+        "jockeyWeightClaim": null,
+        "startingPrice": 4.4,
+        "comments": null,
+        "competitor": {
+          "type": "id",
+          "generated": false,
+          "id": "Competitor:1047003",
+          "typename": "Competitor"
+        },
+        "jockey": {
+          "type": "id",
+          "generated": false,
+          "id": "Jockey:3103",
+          "typename": "Jockey"
+        },
+        "trainer": {
+          "type": "id",
+          "generated": false,
+          "id": "Trainer:5103",
+          "typename": "Trainer"
+        },
+        "result": {
+          "type": "id",
+          "generated": true,
+          "id": "$Selection:8800003.result",
+          "typename": "SelectionResult"
+        },
+        "selectionResult": {
+          "type": "id",
+          "generated": true,
+          "id": "$Selection:8800003.result",
+          "typename": "SelectionResult"
+        },
+        "__typename": "Selection"
+      },
+      "$Selection:8800003.result": {
+        "finishPosition": 3,
+        "margin": 1.75,
+        "finishTime": null,
+        "competitorPositionSummary": [
+          {
+            "type": "id",
+            "generated": true,
+            "id": "$Selection:8800003.result.competitorPositionSummary.0",
+            "typename": "CompetitorPositionSummary"
+          },
+          {
+            "type": "id",
+            "generated": true,
+            "id": "$Selection:8800003.result.competitorPositionSummary.1",
+            "typename": "CompetitorPositionSummary"
+          },
+          {
+            "type": "id",
+            "generated": true,
+            "id": "$Selection:8800003.result.competitorPositionSummary.2",
+            "typename": "CompetitorPositionSummary"
+          }
+        ],
+        "__typename": "SelectionResult"
+      },
+      "$Selection:8800003.result.competitorPositionSummary.0": {
+        "distanceText": "Settled",
+        "positionText": "1st",
+        "distance": 0,
+        "position": 1,
+        "time": null,
+        "__typename": "CompetitorPositionSummary"
+      },
+      "$Selection:8800003.result.competitorPositionSummary.1": {
+        "distanceText": "800m",
+        "positionText": "1st",
+        "distance": 800,
+        "position": 1,
+        "time": null,
+        "__typename": "CompetitorPositionSummary"
+      },
+      "$Selection:8800003.result.competitorPositionSummary.2": {
+        "distanceText": "400m",
+        "positionText": "2nd",
+        "distance": 400,
+        "position": 2,
+        "time": null,
+        "__typename": "CompetitorPositionSummary"
+      },
+      "Competitor:1047004": {
+        "id": "1047004",
+        "name": "Docklands Dash",
+        "age": 2,
+        "sexShort": "C",
+        "colour": "Bay",
+        "sire": "Zoustar",
+        "dam": "Fictional Dam",
+        "sireOfDam": "Lonhro",
+        "__typename": "Competitor"
+      },
+      "Jockey:3104": {
+        "id": "3104",
+        "name": "Damian Lane",
+        "__typename": "Jockey"
+      },
+      "Trainer:5104": {
+        "id": "5104",
+        "name": "Lindsey Smith",
+        "__typename": "Trainer"
+      },
+      "Selection:8800004": {
+        "id": "8800004",
+        "competitorNumber": 4,
+        "barrierNumber": 5,
+        "status": "SCRATCHED",
+        "statusAbv": "S",
+        "weight": 57.0,
+        "jockeyWeightClaim": null,
+        "startingPrice": null,
+        "comments": null,
+        "competitor": {
+          "type": "id",
+          "generated": false,
+          "id": "Competitor:1047004",
+          "typename": "Competitor"
+        },
+        "jockey": {
+          "type": "id",
+          "generated": false,
+          "id": "Jockey:3104",
+          "typename": "Jockey"
+        },
+        "trainer": {
+          "type": "id",
+          "generated": false,
+          "id": "Trainer:5104",
+          "typename": "Trainer"
+        },
+        "result": {
+          "type": "id",
+          "generated": true,
+          "id": "$Selection:8800004.result",
+          "typename": "SelectionResult"
+        },
+        "selectionResult": {
+          "type": "id",
+          "generated": true,
+          "id": "$Selection:8800004.result",
+          "typename": "SelectionResult"
+        },
+        "__typename": "Selection"
+      },
+      "$Selection:8800004.result": {
+        "finishPosition": -1,
+        "margin": null,
+        "finishTime": null,
+        "competitorPositionSummary": [],
+        "__typename": "SelectionResult"
+      },
+      "ExoticResult:1": {
+        "id": "1",
+        "tote": "VIC",
+        "exoticMarket": "Quinella",
+        "amount": 9.8,
+        "results": "1,2",
+        "__typename": "ExoticResult"
+      },
+      "ExoticResult:2": {
+        "id": "2",
+        "tote": "VIC",
+        "exoticMarket": "Trifecta",
+        "amount": 48.3,
+        "results": "1,2,3",
+        "__typename": "ExoticResult"
+      },
+      "ExoticResult:3": {
+        "id": "3",
+        "tote": "VIC",
+        "exoticMarket": "First Four",
+        "amount": 112.6,
+        "results": "1,2,3,5",
+        "__typename": "ExoticResult"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "_fixtureNote": "CONSTRUCTED, LOW confidence on exact wording. afobsidian/Racenet-API treats any response with a non-null 'errors' key as failure and retries; its README says puntapi.com/graphql-horse-racing 'requires either a raw GraphQL document or a persisted-query hash', and stale hashes are the usual failure (hashes rotate with site deploys). The message/code below is the Apollo Server standard for an unknown persisted query.",
+  "errors": [
+    {
+      "message": "PersistedQueryNotFound",
+      "extensions": {
+        "code": "PERSISTED_QUERY_NOT_FOUND"
+      }
+    }
+  ]
+}

@@ -298,7 +298,7 @@ export function wetTrackFactor(runner: Runner, expectedRating: number | undefine
   if (expectedRating === undefined || !Number.isFinite(expectedRating)) {
     return { score: 0, evidence: 'Track condition unknown', dataQuality: 0 };
   }
-  const wet = expectedRating >= 6;
+  const wet = expectedRating >= 5; // Soft 5 and worse count as wet (Australian rating scale)
   const splits = runner.splits ?? {};
   const label = trackRatingLabel(expectedRating);
 

@@ -196,11 +196,11 @@ function shortDate(day: string, mon: string, year: string): string | undefined {
 
 /** Detect bodies that are not the requested meeting page. */
 export function classifyPage(html: string): Exclude<UnavailableReason, 'transport'> | undefined {
-  const t = html.trim();
+  const t = html.replace(/<!--[\s\S]*?-->/g, '').trim();
   if (/not currently available/i.test(t)) return 'not-available';
-  if (t.length < 400) return 'empty';
   if (/race-venue-date|race-title|race-strip-fields|Key=|(?:Acceptances|Nominations|Weights|Results|Form) on /i.test(t)) return undefined;
   if (/just a moment|checking your browser|enable javascript and cookies|access denied|captcha|request unsuccessful|incapsula|cf-browser-verification|verify you are human|pardon our interruption|attention required/i.test(t.slice(0, 8000))) return 'bot-wall';
+  if (t.length < 400) return 'empty';
   return undefined;
 }
 
@@ -260,7 +260,8 @@ function venueMatches(headerTitle: string, wanted: string[]): boolean {
     if (!w) continue;
     const cands = new Set([normaliseName(w), normaliseName(w.replace(SPONSOR_PREFIX, '')), normaliseName(canonicalVenue(w))]);
     for (const c of cands) {
-      if (c && (header.includes(c) || c.includes(header.split(' ')[0]) && header.split(' ')[0].length > 3)) return true;
+      const first = header.split(' ')[0];
+      if (c && (header.includes(c) || (first.length > 3 && c.includes(first)))) return true;
     }
   }
   return false;
@@ -394,7 +395,12 @@ function parseRaceInfo(info: string): RaceInfo {
     .split('\n')
     .map(oneLine)
     .filter(Boolean)
-    .map((l) => l.replace(/^Of\s+\$[\d,]+\.?\s*(?:1st\s+\$[\d,]+.*)?$/i, '').trim())
+    .map((l) =>
+      l
+        .replace(/^Of\s+\$[\d,]+\.?\s*/i, '')
+        .replace(/^(?:(?:1st|2nd|3rd|\d+th)\s+\$[\d,]+[,.\s]*)+/i, '')
+        .trim(),
+    )
     .filter(Boolean);
   const condLines = lines.filter(
     (l) =>
@@ -496,7 +502,7 @@ function parseStripTable($: CheerioAPI, table: Sel): StripRow[] {
       const cell = (cls: string, i: number): Sel | undefined => {
         const byClass = row.find(`td.${cls}`).first();
         if (byClass.length) return byClass;
-        return i >= 0 && i < tds.length ? $(tds[i]) : undefined;
+        return i >= 0 && i < tds.length ? tds.eq(i) : undefined;
       };
       const cellText = (cls: string, i: number) => {
         const c = cell(cls, i);
@@ -523,7 +529,7 @@ function parseStripTable($: CheerioAPI, table: Sel): StripRow[] {
       const silk = row.find('img[src*="JockeySilks"]').first().attr('src');
       out.push({
         number: noM ? Number(noM[1]) : toNum(noText),
-        emergency: !!(noM && noM[2]) || /\bemergency\b/i.test(row.text()) || undefined,
+        emergency: !!(noM && noM[2]) || /\((?:E|EM)\)/i.test(horseCell.text()) || undefined,
         name: horseCase(name),
         country,
         scratched,
@@ -993,7 +999,7 @@ export function parseOzAcceptances(html: string | CheerioAPI, meeting: MeetingSu
     try {
       const t = $(el);
       const cells = t.find('tr').first().find('td');
-      const c0 = oneLine($(cells.get(0)).text());
+      const c0 = oneLine(cells.eq(0).text());
       const hm = c0.match(/^(\d+)\s*-\s*(\d{1,2})[.:](\d{2})$/);
       if (hm && cells.length >= 2) {
         let info = '';
@@ -1007,8 +1013,8 @@ export function parseOzAcceptances(html: string | CheerioAPI, meeting: MeetingSu
           number: Number(hm[1]),
           h: Number(hm[2]),
           m: Number(hm[3]),
-          name: horseCase($(cells.get(1)).text()) || `Race ${hm[1]}`,
-          distance: toNum($(cells.get(2)).text()) || 0,
+          name: horseCase(cells.eq(1).text()) || `Race ${hm[1]}`,
+          distance: toNum(cells.eq(2).text()) || 0,
           info: txt(info),
           rows: [],
         });
@@ -1229,7 +1235,7 @@ export class RacingAustraliaAdapter implements SourceAdapter {
       await this.polite();
       let html: string;
       try {
-        html = await ctx.http.getText(url, { headers: HEADERS, retries: 0, signal: ctx.signal } as Parameters<typeof ctx.http.getText>[1]);
+        html = await ctx.http.getText(url, { headers: HEADERS, retries: 0 });
       } catch (err) {
         reasons.push('transport');
         errors.push(`${new URL(url).hostname}: ${err instanceof Error ? err.message : String(err)}`);

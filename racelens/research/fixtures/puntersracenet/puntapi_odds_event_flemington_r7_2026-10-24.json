@@ -1,0 +1,2759 @@
+{
+  "_fixtureNote": "CONSTRUCTED (not a live capture). Models GET https://puntapi.com/odds/au/event/1788421?betTypes=fixed-win,fixed-place&priceFluctuations=50&type=best,bookmaker&bookmaker=sportsbet,tabtouch,ladbrokes,neds,bet365,pointsbet,betr,unibet,bluebet,betfair,racenetstandard (headers: accept: application/json, text/plain, */*; origin/referer racenet.com.au). HIGH-confidence paths (l0rdwalker/betshock_v2 racenet_horses.py + afobsidian/Racenet-API api_queries.py): top-level 'odds' array; odds[].betType ('fixed-win'); odds[].price.value; odds[].selectionId; odds[].bookmakerId. LOW/UNVERIFIED: whether bookmakerId is the slug (as here) or the numeric Bookmaker.id seen in racenet's Apollo cache; the 'flucs' sub-array shape (priceFluctuations=N is requested by every client but nobody read it back); the 'best' pseudo-bookmaker row for type=best. Probe on the user's machine and adjust.",
+  "odds": [
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.46
+      },
+      "flucs": [
+        {
+          "value": 5.0,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.46,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.96
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.74
+      },
+      "flucs": [
+        {
+          "value": 5.31,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.74,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.04
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.32
+      },
+      "flucs": [
+        {
+          "value": 4.84,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.32,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.92
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "neds",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.6
+      },
+      "flucs": [
+        {
+          "value": 5.15,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.6,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "neds",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.0
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "bet365",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.88
+      },
+      "flucs": [
+        {
+          "value": 5.47,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.88,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "bet365",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.08
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.46
+      },
+      "flucs": [
+        {
+          "value": 5.0,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.46,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.96
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "betr",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.74
+      },
+      "flucs": [
+        {
+          "value": 5.31,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.74,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "betr",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.04
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "unibet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.32
+      },
+      "flucs": [
+        {
+          "value": 4.84,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.32,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "unibet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.92
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.6
+      },
+      "flucs": [
+        {
+          "value": 5.15,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.6,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.0
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "betfair",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.88
+      },
+      "flucs": [
+        {
+          "value": 5.47,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.88,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "betfair",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.08
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.46
+      },
+      "flucs": [
+        {
+          "value": 5.0,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.46,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.96
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931201,
+      "bookmakerId": "best",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.88
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 3.8
+      },
+      "flucs": [
+        {
+          "value": 4.26,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 3.8,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.78
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.03
+      },
+      "flucs": [
+        {
+          "value": 4.51,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.03,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.84
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-win",
+      "price": {
+        "value": 3.69
+      },
+      "flucs": [
+        {
+          "value": 4.13,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 3.69,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.75
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "neds",
+      "betType": "fixed-win",
+      "price": {
+        "value": 3.91
+      },
+      "flucs": [
+        {
+          "value": 4.38,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 3.91,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "neds",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.81
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "bet365",
+      "betType": "fixed-win",
+      "price": {
+        "value": 3.57
+      },
+      "flucs": [
+        {
+          "value": 4.0,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 3.57,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "bet365",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.71
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 3.8
+      },
+      "flucs": [
+        {
+          "value": 4.26,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 3.8,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.78
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "betr",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.03
+      },
+      "flucs": [
+        {
+          "value": 4.51,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 4.03,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "betr",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.84
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "unibet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 3.69
+      },
+      "flucs": [
+        {
+          "value": 4.13,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 3.69,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "unibet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.75
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 3.91
+      },
+      "flucs": [
+        {
+          "value": 4.38,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 3.91,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.81
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "betfair",
+      "betType": "fixed-win",
+      "price": {
+        "value": 3.57
+      },
+      "flucs": [
+        {
+          "value": 4.0,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 3.57,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "betfair",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.71
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-win",
+      "price": {
+        "value": 3.8
+      },
+      "flucs": [
+        {
+          "value": 4.26,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 3.8,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-place",
+      "price": {
+        "value": 1.78
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931202,
+      "bookmakerId": "best",
+      "betType": "fixed-win",
+      "price": {
+        "value": 4.03
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.73
+      },
+      "flucs": [
+        {
+          "value": 8.66,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.73,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.87
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.05
+      },
+      "flucs": [
+        {
+          "value": 7.9,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.05,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.68
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.5
+      },
+      "flucs": [
+        {
+          "value": 8.4,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.5,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.81
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "neds",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.95
+      },
+      "flucs": [
+        {
+          "value": 8.9,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.95,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "neds",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.93
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "bet365",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.27
+      },
+      "flucs": [
+        {
+          "value": 8.14,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.27,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "bet365",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.74
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.73
+      },
+      "flucs": [
+        {
+          "value": 8.66,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.73,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.87
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "betr",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.05
+      },
+      "flucs": [
+        {
+          "value": 7.9,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.05,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "betr",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.68
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "unibet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.5
+      },
+      "flucs": [
+        {
+          "value": 8.4,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.5,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "unibet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.81
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.95
+      },
+      "flucs": [
+        {
+          "value": 8.9,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.95,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.93
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "betfair",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.27
+      },
+      "flucs": [
+        {
+          "value": 8.14,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.27,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "betfair",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.74
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.73
+      },
+      "flucs": [
+        {
+          "value": 8.66,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 7.73,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.87
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931203,
+      "bookmakerId": "best",
+      "betType": "fixed-win",
+      "price": {
+        "value": 7.95
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 8.46
+      },
+      "flucs": [
+        {
+          "value": 9.48,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 8.46,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.07
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-win",
+      "price": {
+        "value": 9.0
+      },
+      "flucs": [
+        {
+          "value": 10.08,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 9.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.22
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-win",
+      "price": {
+        "value": 9.54
+      },
+      "flucs": [
+        {
+          "value": 10.68,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 9.54,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.37
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "neds",
+      "betType": "fixed-win",
+      "price": {
+        "value": 8.73
+      },
+      "flucs": [
+        {
+          "value": 9.78,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 8.73,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "neds",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.15
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "bet365",
+      "betType": "fixed-win",
+      "price": {
+        "value": 9.27
+      },
+      "flucs": [
+        {
+          "value": 10.38,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 9.27,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "bet365",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.3
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 8.46
+      },
+      "flucs": [
+        {
+          "value": 9.48,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 8.46,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.07
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "betr",
+      "betType": "fixed-win",
+      "price": {
+        "value": 9.0
+      },
+      "flucs": [
+        {
+          "value": 10.08,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 9.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "betr",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.22
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "unibet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 9.54
+      },
+      "flucs": [
+        {
+          "value": 10.68,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 9.54,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "unibet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.37
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 8.73
+      },
+      "flucs": [
+        {
+          "value": 9.78,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 8.73,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.15
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "betfair",
+      "betType": "fixed-win",
+      "price": {
+        "value": 9.27
+      },
+      "flucs": [
+        {
+          "value": 10.38,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 9.27,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "betfair",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.3
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-win",
+      "price": {
+        "value": 8.46
+      },
+      "flucs": [
+        {
+          "value": 9.48,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 8.46,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.07
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931205,
+      "bookmakerId": "best",
+      "betType": "fixed-win",
+      "price": {
+        "value": 9.54
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 11.64
+      },
+      "flucs": [
+        {
+          "value": 13.04,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 11.64,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.96
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-win",
+      "price": {
+        "value": 12.36
+      },
+      "flucs": [
+        {
+          "value": 13.84,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 12.36,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.16
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-win",
+      "price": {
+        "value": 11.28
+      },
+      "flucs": [
+        {
+          "value": 12.63,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 11.28,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.86
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "neds",
+      "betType": "fixed-win",
+      "price": {
+        "value": 12.0
+      },
+      "flucs": [
+        {
+          "value": 13.44,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 12.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "neds",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.06
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "bet365",
+      "betType": "fixed-win",
+      "price": {
+        "value": 12.72
+      },
+      "flucs": [
+        {
+          "value": 14.25,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 12.72,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "bet365",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.26
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 11.64
+      },
+      "flucs": [
+        {
+          "value": 13.04,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 11.64,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.96
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "betr",
+      "betType": "fixed-win",
+      "price": {
+        "value": 12.36
+      },
+      "flucs": [
+        {
+          "value": 13.84,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 12.36,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "betr",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.16
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "unibet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 11.28
+      },
+      "flucs": [
+        {
+          "value": 12.63,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 11.28,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "unibet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.86
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 12.0
+      },
+      "flucs": [
+        {
+          "value": 13.44,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 12.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.06
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "betfair",
+      "betType": "fixed-win",
+      "price": {
+        "value": 12.72
+      },
+      "flucs": [
+        {
+          "value": 14.25,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 12.72,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "betfair",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.26
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-win",
+      "price": {
+        "value": 11.64
+      },
+      "flucs": [
+        {
+          "value": 13.04,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 11.64,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-place",
+      "price": {
+        "value": 3.96
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931206,
+      "bookmakerId": "best",
+      "betType": "fixed-win",
+      "price": {
+        "value": 12.72
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 6.0
+      },
+      "flucs": [
+        {
+          "value": 6.72,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 6.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.39
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-win",
+      "price": {
+        "value": 6.36
+      },
+      "flucs": [
+        {
+          "value": 7.12,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 6.36,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.49
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-win",
+      "price": {
+        "value": 5.82
+      },
+      "flucs": [
+        {
+          "value": 6.52,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 5.82,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.34
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "neds",
+      "betType": "fixed-win",
+      "price": {
+        "value": 6.18
+      },
+      "flucs": [
+        {
+          "value": 6.92,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 6.18,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "neds",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.44
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "bet365",
+      "betType": "fixed-win",
+      "price": {
+        "value": 5.64
+      },
+      "flucs": [
+        {
+          "value": 6.32,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 5.64,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "bet365",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.29
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 6.0
+      },
+      "flucs": [
+        {
+          "value": 6.72,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 6.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.39
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "betr",
+      "betType": "fixed-win",
+      "price": {
+        "value": 6.36
+      },
+      "flucs": [
+        {
+          "value": 7.12,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 6.36,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "betr",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.49
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "unibet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 5.82
+      },
+      "flucs": [
+        {
+          "value": 6.52,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 5.82,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "unibet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.34
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 6.18
+      },
+      "flucs": [
+        {
+          "value": 6.92,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 6.18,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.44
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "betfair",
+      "betType": "fixed-win",
+      "price": {
+        "value": 5.64
+      },
+      "flucs": [
+        {
+          "value": 6.32,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 5.64,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "betfair",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.29
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-win",
+      "price": {
+        "value": 6.0
+      },
+      "flucs": [
+        {
+          "value": 6.72,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 6.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-place",
+      "price": {
+        "value": 2.39
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931207,
+      "bookmakerId": "best",
+      "betType": "fixed-win",
+      "price": {
+        "value": 6.36
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 15.45
+      },
+      "flucs": [
+        {
+          "value": 17.3,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 15.45,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 5.01
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-win",
+      "price": {
+        "value": 14.1
+      },
+      "flucs": [
+        {
+          "value": 15.79,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 14.1,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.64
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-win",
+      "price": {
+        "value": 15.0
+      },
+      "flucs": [
+        {
+          "value": 16.8,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 15.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.89
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "neds",
+      "betType": "fixed-win",
+      "price": {
+        "value": 15.9
+      },
+      "flucs": [
+        {
+          "value": 17.81,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 15.9,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "neds",
+      "betType": "fixed-place",
+      "price": {
+        "value": 5.14
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "bet365",
+      "betType": "fixed-win",
+      "price": {
+        "value": 14.55
+      },
+      "flucs": [
+        {
+          "value": 16.3,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 14.55,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "bet365",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.76
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 15.45
+      },
+      "flucs": [
+        {
+          "value": 17.3,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 15.45,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 5.01
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "betr",
+      "betType": "fixed-win",
+      "price": {
+        "value": 14.1
+      },
+      "flucs": [
+        {
+          "value": 15.79,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 14.1,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "betr",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.64
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "unibet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 15.0
+      },
+      "flucs": [
+        {
+          "value": 16.8,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 15.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "unibet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.89
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 15.9
+      },
+      "flucs": [
+        {
+          "value": 17.81,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 15.9,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 5.14
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "betfair",
+      "betType": "fixed-win",
+      "price": {
+        "value": 14.55
+      },
+      "flucs": [
+        {
+          "value": 16.3,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 14.55,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "betfair",
+      "betType": "fixed-place",
+      "price": {
+        "value": 4.76
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-win",
+      "price": {
+        "value": 15.45
+      },
+      "flucs": [
+        {
+          "value": 17.3,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 15.45,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-place",
+      "price": {
+        "value": 5.01
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931208,
+      "bookmakerId": "best",
+      "betType": "fixed-win",
+      "price": {
+        "value": 15.9
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 22.26
+      },
+      "flucs": [
+        {
+          "value": 24.93,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 22.26,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.91
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-win",
+      "price": {
+        "value": 20.37
+      },
+      "flucs": [
+        {
+          "value": 22.81,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 20.37,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.38
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-win",
+      "price": {
+        "value": 21.63
+      },
+      "flucs": [
+        {
+          "value": 24.23,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 21.63,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.73
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "neds",
+      "betType": "fixed-win",
+      "price": {
+        "value": 19.74
+      },
+      "flucs": [
+        {
+          "value": 22.11,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 19.74,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "neds",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.21
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "bet365",
+      "betType": "fixed-win",
+      "price": {
+        "value": 21.0
+      },
+      "flucs": [
+        {
+          "value": 23.52,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 21.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "bet365",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.56
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 22.26
+      },
+      "flucs": [
+        {
+          "value": 24.93,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 22.26,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.91
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "betr",
+      "betType": "fixed-win",
+      "price": {
+        "value": 20.37
+      },
+      "flucs": [
+        {
+          "value": 22.81,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 20.37,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "betr",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.38
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "unibet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 21.63
+      },
+      "flucs": [
+        {
+          "value": 24.23,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 21.63,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "unibet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.73
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 19.74
+      },
+      "flucs": [
+        {
+          "value": 22.11,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 19.74,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.21
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "betfair",
+      "betType": "fixed-win",
+      "price": {
+        "value": 21.0
+      },
+      "flucs": [
+        {
+          "value": 23.52,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 21.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "betfair",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.56
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-win",
+      "price": {
+        "value": 22.26
+      },
+      "flucs": [
+        {
+          "value": 24.93,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 22.26,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-place",
+      "price": {
+        "value": 6.91
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931209,
+      "bookmakerId": "best",
+      "betType": "fixed-win",
+      "price": {
+        "value": 22.26
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 24.44
+      },
+      "flucs": [
+        {
+          "value": 27.37,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 24.44,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "sportsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 7.51
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-win",
+      "price": {
+        "value": 26.0
+      },
+      "flucs": [
+        {
+          "value": 29.12,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 26.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "tabtouch",
+      "betType": "fixed-place",
+      "price": {
+        "value": 7.94
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-win",
+      "price": {
+        "value": 27.56
+      },
+      "flucs": [
+        {
+          "value": 30.87,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 27.56,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "ladbrokes",
+      "betType": "fixed-place",
+      "price": {
+        "value": 8.38
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "neds",
+      "betType": "fixed-win",
+      "price": {
+        "value": 25.22
+      },
+      "flucs": [
+        {
+          "value": 28.25,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 25.22,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "neds",
+      "betType": "fixed-place",
+      "price": {
+        "value": 7.73
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "bet365",
+      "betType": "fixed-win",
+      "price": {
+        "value": 26.78
+      },
+      "flucs": [
+        {
+          "value": 29.99,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 26.78,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "bet365",
+      "betType": "fixed-place",
+      "price": {
+        "value": 8.16
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 24.44
+      },
+      "flucs": [
+        {
+          "value": 27.37,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 24.44,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "pointsbet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 7.51
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "betr",
+      "betType": "fixed-win",
+      "price": {
+        "value": 26.0
+      },
+      "flucs": [
+        {
+          "value": 29.12,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 26.0,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "betr",
+      "betType": "fixed-place",
+      "price": {
+        "value": 7.94
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "unibet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 27.56
+      },
+      "flucs": [
+        {
+          "value": 30.87,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 27.56,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "unibet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 8.38
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-win",
+      "price": {
+        "value": 25.22
+      },
+      "flucs": [
+        {
+          "value": 28.25,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 25.22,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "bluebet",
+      "betType": "fixed-place",
+      "price": {
+        "value": 7.73
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "betfair",
+      "betType": "fixed-win",
+      "price": {
+        "value": 26.78
+      },
+      "flucs": [
+        {
+          "value": 29.99,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 26.78,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "betfair",
+      "betType": "fixed-place",
+      "price": {
+        "value": 8.16
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-win",
+      "price": {
+        "value": 24.44
+      },
+      "flucs": [
+        {
+          "value": 27.37,
+          "time": "2026-10-23T22:05:11.000Z"
+        },
+        {
+          "value": 24.44,
+          "time": "2026-10-24T04:40:02.000Z"
+        }
+      ]
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "racenetstandard",
+      "betType": "fixed-place",
+      "price": {
+        "value": 7.51
+      },
+      "flucs": []
+    },
+    {
+      "selectionId": 9931210,
+      "bookmakerId": "best",
+      "betType": "fixed-win",
+      "price": {
+        "value": 27.56
+      },
+      "flucs": []
+    }
+  ]
+}
