@@ -1,0 +1,53 @@
+# fly.toml – Fly.io configuration for RaceLens.
+#
+# 1. Change the app name below to something unique (or let `fly launch` pick one).
+# 2. Follow docs/DEPLOY.md, option B:
+#      fly launch --no-deploy
+#      fly volumes create racelens_data --region syd --size 1
+#      fly secrets set RACELENS_PASSWORD=choose-a-password
+#      fly deploy
+#
+# Sydney is deliberate: TAB and Sportsbet only answer Australian IP addresses.
+
+app = "racelens-<yourname>"
+primary_region = "syd"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  RACELENS_HOST = "0.0.0.0"
+  RACELENS_PORT = "4850"
+  # Fly owns the hostname (<app>.fly.dev), so any Host header is fine; the password protects the app.
+  RACELENS_ALLOWED_HOSTS = "*"
+  RACELENS_DATA_DIR = "/data"
+  RACELENS_QR = "0"
+  # RACELENS_PASSWORD is NOT set here – it is a secret:  fly secrets set RACELENS_PASSWORD=...
+
+[http_service]
+  internal_port = 4850
+  force_https = true
+  # The background scheduler (pre-race checks, results polling) must keep running
+  # on race day, so the machine is never stopped for being idle. (Older flyctl: false.)
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "GET"
+    path = "/api/health"
+
+# Research packs, settings and the login secret live here and survive deploys.
+[[mounts]]
+  source = "racelens_data"
+  destination = "/data"
+
+# 256 MB is enough for normal use. If researching a 10-race meeting feels slow,
+# run `fly scale memory 512` (or change memory below and deploy again).
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

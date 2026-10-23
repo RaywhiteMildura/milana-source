@@ -1,0 +1,11 @@
+# Keep the image build small and reproducible: the build stage runs npm ci and
+# npm run build itself, so nothing generated locally should be sent to it.
+node_modules
+dist
+data*
+test-results
+playwright-report
+fixtures/recorded
+.git
+.env
+*.log

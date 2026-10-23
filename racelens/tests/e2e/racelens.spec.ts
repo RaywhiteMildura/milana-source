@@ -243,6 +243,84 @@ test('settings save and round-trip after reload', async ({ page }) => {
   await expect(page.getByTestId('settings-jurisdiction')).toHaveValue('VIC');
 });
 
+test('the app is installable: manifest link, manifest and service worker are served', async ({ page }) => {
+  await page.goto(`/#/?date=${DEMO_DATE}`);
+  const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
+  expect(manifestHref).toBe('/manifest.webmanifest');
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', /apple-touch-icon\.png$/);
+  await expect(page.locator('meta[name="apple-mobile-web-app-capable"]')).toHaveAttribute('content', 'yes');
+
+  const manifest = await page.request.get('/manifest.webmanifest');
+  expect(manifest.status()).toBe(200);
+  expect(manifest.headers()['content-type']).toMatch(/manifest\+json|application\/json/);
+  const m = (await manifest.json()) as { name: string; display: string; start_url: string; icons: Array<{ src: string; sizes: string; purpose?: string }> };
+  expect(m.name).toBe('RaceLens');
+  expect(m.display).toBe('standalone');
+  expect(m.start_url).toBe('/');
+  expect(m.icons.some((i) => i.sizes === '192x192')).toBe(true);
+  expect(m.icons.some((i) => i.sizes === '512x512')).toBe(true);
+  expect(m.icons.some((i) => i.purpose === 'maskable')).toBe(true);
+  for (const icon of m.icons) {
+    const res = await page.request.get(icon.src);
+    expect(res.status(), icon.src).toBe(200);
+    expect(res.headers()['content-type']).toMatch(/image\/png/);
+  }
+
+  const sw = await page.request.get('/sw.js');
+  expect(sw.status()).toBe(200);
+  expect(sw.headers()['content-type']).toMatch(/javascript/);
+  const body = await sw.text();
+  expect(body).toContain('addEventListener');
+  expect(body).toContain('/api/');
+
+  // The production build registers the worker; give it a moment and check it took.
+  await expect
+    .poll(async () => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length), { timeout: 15_000 })
+    .toBeGreaterThan(0);
+});
+
+test('settings shows the race day automation card and the auto-results toggle round-trips', async ({ page }) => {
+  await page.goto('/#/settings');
+  await expect(page.getByTestId('automation-card')).toBeVisible();
+  await expect(page.getByTestId('automation-card')).toContainText(/Race day automation/i);
+  await expect(page.getByTestId('automation-timeline')).toContainText(/pre-race check/i);
+  await expect(page.getByTestId('automation-timeline')).toContainText(/30 seconds/i);
+  await expect(page.getByTestId('scheduler-status')).toBeVisible();
+  await expect(page.getByTestId('phone-card')).toBeVisible();
+  await expect(page.getByTestId('settings-auto-recheck')).toBeVisible();
+
+  const toggle = page.getByTestId('settings-auto-results');
+  const label = page.getByTestId('settings-auto-results-toggle');
+  await expect(toggle).toBeChecked();
+
+  // Off, save, reload: stays off and the server agrees.
+  await label.click();
+  await expect(toggle).not.toBeChecked();
+  await page.getByTestId('settings-save').click();
+  await expect(page.getByTestId('settings-saved')).toBeVisible();
+  await page.reload();
+  await expect(page.getByTestId('settings-auto-results')).not.toBeChecked();
+  expect(((await (await page.request.get('/api/settings')).json()) as { autoResults: boolean }).autoResults).toBe(false);
+
+  // Back on so the rest of the suite (and race day) runs with automation.
+  await page.getByTestId('settings-auto-results-toggle').click();
+  await expect(page.getByTestId('settings-auto-results')).toBeChecked();
+  await page.getByTestId('settings-save').click();
+  await expect(page.getByTestId('settings-saved')).toBeVisible();
+  await page.reload();
+  await expect(page.getByTestId('settings-auto-results')).toBeChecked();
+  expect(((await (await page.request.get('/api/settings')).json()) as { autoResults: boolean }).autoResults).toBe(true);
+});
+
+test('the meeting page shows the Auto chip while the server runs its scheduler', async ({ page }) => {
+  await openFirstMeeting(page);
+  const chip = page.getByTestId('auto-chip');
+  await expect(chip).toBeVisible();
+  await expect(chip).toHaveAttribute('title', /automatically/i);
+  // No race has jumped in the demo card yet (it is dated for race day), so no next-race bar or watch line.
+  await expect(page.getByTestId('pack-header')).toBeVisible();
+});
+
 test.describe('mobile viewport', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
@@ -269,6 +347,27 @@ test.describe('mobile viewport', () => {
     await page.getByTestId('verification-tab').click();
     await expect(page.getByTestId('verification-panel')).toBeVisible();
     expect(await noHorizontalOverflow(page)).toBe(true);
+  });
+});
+
+test.describe('phone (touch) viewport', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('the add-to-home-screen hint shows on a phone and can be dismissed for good', async ({ page }) => {
+    await gotoHome(page);
+    const hint = page.getByTestId('install-hint');
+    await expect(hint).toBeVisible();
+    await expect(hint).toContainText(/home screen/i);
+    expect(await noHorizontalOverflow(page)).toBe(true);
+
+    await page.getByTestId('install-dismiss').click();
+    await expect(hint).toHaveCount(0);
+
+    // Dismissal is remembered on the device.
+    await page.reload();
+    await expect(page.getByTestId('meeting-card').first()).toBeVisible();
+    await expect(page.getByTestId('install-hint')).toHaveCount(0);
+    expect(await page.evaluate(() => localStorage.getItem('racelens.installHintDismissed'))).toBe('1');
   });
 });
 

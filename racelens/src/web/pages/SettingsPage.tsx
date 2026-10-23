@@ -1,9 +1,13 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import QRCode from 'qrcode';
 import type { Settings } from '@shared/types';
 import { api, errorMessage, useRequest } from '../lib/api';
 import { fmtMoney } from '../lib/format';
+import { useServerNow } from '../lib/session';
+import { schedulerLine } from '../lib/raceday';
+import { useSession } from '../lib/session';
 import { useToast } from '../components/Toast';
-import { Chip, ErrorState, SkeletonCard } from '../components/ui';
+import { Chip, Dot, ErrorState, SkeletonCard } from '../components/ui';
 
 const JURISDICTIONS = ['VIC', 'NSW', 'QLD', 'SA', 'WA', 'TAS', 'ACT', 'NT'];
 
@@ -17,6 +21,7 @@ interface Draft {
   bankroll: string;
   unitAmount: string;
   autoRecheck: string;
+  autoResults: boolean;
   riskProfile: Settings['riskProfile'];
   jurisdiction: string;
   disabledSources: string[];
@@ -27,25 +32,56 @@ function toDraft(s: Settings): Draft {
     bankroll: String(s.bankroll ?? ''),
     unitAmount: String(s.unitAmount ?? ''),
     autoRecheck: String(s.autoRecheckMinutesBeforeRace ?? ''),
+    autoResults: s.autoResults !== false,
     riskProfile: s.riskProfile ?? 'balanced',
     jurisdiction: s.jurisdiction || 'VIC',
     disabledSources: [...(s.disabledSources ?? [])],
   };
 }
 
+function QrImage({ text }: { text: string }) {
+  const [src, setSrc] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    QRCode.toDataURL(text, { margin: 1, width: 180 })
+      .then((url) => {
+        if (!cancelled) setSrc(url);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [text]);
+  if (failed) return <span className="small muted">QR code unavailable</span>;
+  if (!src) return <span className="qr qr--empty" aria-hidden />;
+  return <img className="qr" src={src} width={180} height={180} alt={`QR code for ${text}`} data-testid="phone-qr" />;
+}
+
 export function SettingsPage() {
   const toast = useToast();
+  const session = useSession();
+  const now = useServerNow(15_000);
   const settings = useRequest(() => api.getSettings(), []);
   const sources = useRequest(() => api.getSources().then((r) => r.sources), []);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
     if (settings.data && !draft) setDraft(toDraft(settings.data));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.data]);
+
+  // Keep the scheduler status fresh while this page is open.
+  useEffect(() => {
+    const t = window.setInterval(() => void session.reloadHealth(), 30_000);
+    return () => window.clearInterval(t);
+  }, [session.reloadHealth]);
 
   const update = (patch: Partial<Draft>) => {
     setDraft((d) => (d ? { ...d, ...patch } : d));
@@ -80,6 +116,7 @@ export function SettingsPage() {
         bankroll,
         unitAmount: unit,
         autoRecheckMinutesBeforeRace: auto,
+        autoResults: draft.autoResults,
         riskProfile: draft.riskProfile,
         jurisdiction: draft.jurisdiction,
         disabledSources: draft.disabledSources,
@@ -88,10 +125,21 @@ export function SettingsPage() {
       setDraft(toDraft(saved));
       setSavedAt(Date.now());
       toast.success('Settings saved');
+      void session.reloadHealth();
     } catch (err) {
       toast.error(errorMessage(err));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const signOut = async () => {
+    setSigningOut(true);
+    try {
+      await session.signOut();
+    } catch (err) {
+      toast.error(errorMessage(err));
+      setSigningOut(false);
     }
   };
 
@@ -116,14 +164,93 @@ export function SettingsPage() {
   const bankrollNum = Number(draft.bankroll);
   const unitNum = Number(draft.unitAmount);
   const unitPct = bankrollNum > 0 && unitNum > 0 ? (unitNum / bankrollNum) * 100 : null;
+  const scheduler = session.health?.scheduler;
+  const status = schedulerLine(scheduler, now);
+  const urls = session.health?.urls ?? [];
+  const recheckMins = Number(draft.autoRecheck) > 0 ? Number(draft.autoRecheck) : 0;
 
   return (
     <div className="page page--settings">
       <div className="section-title">
         <h1>Settings</h1>
-        <span className="small muted">These shape the betting suggestions and which sources we use.</span>
+        <span className="small muted">These shape the betting suggestions, which sources we use and what runs by itself on race day.</span>
       </div>
       <form onSubmit={save} className="settings" data-testid="settings-form" noValidate>
+        <section className="card" data-testid="automation-card">
+          <h2>Race day automation</h2>
+          <p className="help">The server does the race-day legwork by itself. Your phone only needs to be open to see it.</p>
+          <div className="settings__grid">
+            <label className="form-row">
+              <span className="label">Auto pre-race check</span>
+              <span className="help">Minutes before each race to automatically re-check scratchings, odds and track. 0 turns it off.</span>
+              <div className="input-money">
+                <input type="number" inputMode="numeric" min={0} step="1" className="input" value={draft.autoRecheck} onChange={(e) => update({ autoRecheck: e.target.value })} data-testid="settings-auto-recheck" aria-invalid={!!errors.autoRecheck} />
+                <span>min</span>
+              </div>
+              {errors.autoRecheck && <span className="text-error small">{errors.autoRecheck}</span>}
+            </label>
+            <div className="form-row">
+              <span className="label">Results</span>
+              <span className="help">Poll the sources after each race and re-rate the rest of the card when a result lands.</span>
+              <ul className="toggle-list">
+                <li className={`toggle ${draft.autoResults ? '' : 'is-off'}`}>
+                  <label data-testid="settings-auto-results-toggle">
+                    <input type="checkbox" checked={draft.autoResults} onChange={(e) => update({ autoResults: e.target.checked })} data-testid="settings-auto-results" />
+                    <span className="toggle__switch" aria-hidden />
+                    <span className="toggle__body">
+                      <strong>Fetch results automatically after each race</strong>
+                    </span>
+                    <Chip tone={draft.autoResults ? 'green' : 'neutral'} className="chip--xs">
+                      {draft.autoResults ? 'On' : 'Off'}
+                    </Chip>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <h4>What happens by itself on race day</h4>
+          <ol className="timeline-plain" data-testid="automation-timeline">
+            <li>
+              <strong>Before each race</strong> – a pre-race check runs {recheckMins > 0 ? `when the ${recheckMins}-minute window opens and again 3 minutes before the jump` : 'only when you tap Pre-race check (automatic checks are off)'}: scratchings, market moves and track changes.
+            </li>
+            <li>
+              <strong>After the jump</strong> – {draft.autoResults ? 'from 2 minutes after each race the result is polled every minute or two until two sources confirm it' : 'results are fetched only when you tap Fetch results'}.
+            </li>
+            <li>
+              <strong>When a result lands</strong> – the remaining races are re-rated with the day's patterns (inside barriers, leaders, favourites) folded in.
+            </li>
+            <li>
+              <strong>On your phone</strong> – an open race page refreshes itself within 30 seconds, and opening a race after a break catches up on anything missed.
+            </li>
+          </ol>
+          <p className={`scheduler-status scheduler-status--${status.tone}`} data-testid="scheduler-status" aria-live="polite">
+            <Dot tone={status.tone} /> {status.text}
+          </p>
+        </section>
+
+        <section className="card" data-testid="phone-card">
+          <h2>Use RaceLens on your phone</h2>
+          {urls.length > 0 ? (
+            <>
+              <p className="help">Same Wi-Fi: scan or type this on your phone. Then add it to your home screen so it opens like an app.</p>
+              <ul className="phone-urls">
+                {urls.map((u) => (
+                  <li key={u} className="phone-url" data-testid="phone-url">
+                    <QrImage text={u} />
+                    <a href={u} className="phone-url__text mono">
+                      {u}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className="help">
+              Start it with <code className="mono">npm run start:phone</code> on your computer to get a QR code here, or see <code className="mono">docs/DEPLOY.md</code> for hosting it online (Tailscale, Fly.io or Render with a password) so it works away from home.
+            </p>
+          )}
+        </section>
+
         <section className="card">
           <h2>Your bank</h2>
           <div className="settings__grid">
@@ -183,15 +310,6 @@ export function SettingsPage() {
                 ))}
               </select>
             </label>
-            <label className="form-row">
-              <span className="label">Auto pre-race check</span>
-              <span className="help">Minutes before each race to automatically re-check scratchings, odds and track. 0 turns it off.</span>
-              <div className="input-money">
-                <input type="number" inputMode="numeric" min={0} step="1" className="input" value={draft.autoRecheck} onChange={(e) => update({ autoRecheck: e.target.value })} data-testid="settings-auto-recheck" aria-invalid={!!errors.autoRecheck} />
-                <span>min</span>
-              </div>
-              {errors.autoRecheck && <span className="text-error small">{errors.autoRecheck}</span>}
-            </label>
           </div>
         </section>
 
@@ -245,6 +363,16 @@ export function SettingsPage() {
         </div>
         <p className="disclaimer">Suggestions only. Bet responsibly. Gambling Help 1800 858 858. Your current unit is {fmtMoney(unitNum || 0)}.</p>
       </form>
+
+      {session.authRequired && (
+        <section className="card" data-testid="account-card">
+          <h2>Password</h2>
+          <p className="help">This RaceLens is protected by a password. You stay signed in on this device for 30 days of use; sign out if you are handing the phone to someone else.</p>
+          <button type="button" className="btn btn-secondary" onClick={signOut} disabled={signingOut} data-testid="logout-btn">
+            {signingOut ? 'Signing out…' : 'Sign out'}
+          </button>
+        </section>
+      )}
     </div>
   );
 }

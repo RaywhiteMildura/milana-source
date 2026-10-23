@@ -11,6 +11,7 @@ import type {
   Prediction,
   Race,
   RaceResult,
+  SchedulerStatus,
   Settings,
   SourceId,
   SourceKind,
@@ -26,7 +27,18 @@ export interface Health {
   mode: 'live' | 'demo';
   version?: string;
   time?: string;
+  /** True when the server wants a password before it answers the rest of the API. */
+  authRequired: boolean;
+  // The fields below are only present once signed in (or when no password is set).
   dataDir?: string;
+  /** Addresses a phone on the same network can use (empty unless the server listens on 0.0.0.0). */
+  urls?: string[];
+  scheduler?: SchedulerStatus;
+}
+
+export interface AuthState {
+  required: boolean;
+  authenticated: boolean;
 }
 
 export interface SourceInfo {
@@ -118,6 +130,9 @@ function extractError(data: unknown): string | undefined {
   return undefined;
 }
 
+/** Fired on `window` whenever an API call is refused for want of a login. */
+export const AUTH_REQUIRED_EVENT = 'racelens:auth-required';
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (init.body !== undefined) headers['Content-Type'] = 'application/json';
@@ -132,6 +147,10 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     }
   }
   if (!res.ok) {
+    if (res.status === 401 && data && typeof data === 'object' && (data as { code?: unknown }).code === 'auth') {
+      // The session cookie is missing or expired: let the app shell drop back to the login screen.
+      window.dispatchEvent(new CustomEvent(AUTH_REQUIRED_EVENT));
+    }
     throw new ApiError(res.status, extractError(data) ?? `${res.status} ${res.statusText || 'request failed'}`, path);
   }
   return data as T;
@@ -150,6 +169,10 @@ const enc = encodeURIComponent;
 
 export const api = {
   health: () => get<Health>('/api/health'),
+
+  auth: () => get<AuthState>('/api/auth'),
+  login: (password: string) => post<{ ok: boolean }>('/api/login', { password }),
+  logout: () => post<{ ok: boolean }>('/api/logout'),
 
   getSettings: () => get<Settings>('/api/settings'),
   saveSettings: (patch: Partial<Settings>) => put<Settings>('/api/settings', patch),

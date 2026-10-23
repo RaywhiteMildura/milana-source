@@ -11,3 +11,11 @@ createRoot(el).render(
     <App />
   </React.StrictMode>,
 );
+
+// Installable app: the service worker caches the built assets and the shell so
+// a phone opens RaceLens instantly. Dev builds skip it so Vite's HMR stays simple.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((err) => console.warn('RaceLens: service worker not registered', err));
+  });
+}

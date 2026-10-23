@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { JobProgress, MeetingPack, NewsItem, Race } from '@shared/types';
 import { normaliseName, normalisePerson, parseTrackRating, trackRatingLabel } from '@shared/util';
-import { api, errorMessage, useRequest } from '../lib/api';
+import { api, errorMessage, useJobPoll, useRequest } from '../lib/api';
 import { countdown, deviceZone, fmtDistance, fmtLongDate, fmtMoney, fmtOdds, fmtPct, fmtRelative, fmtTime, meetingZone, plural, raceStatusLabel, verificationWord, zoneAbbrev } from '../lib/format';
-import { useNow } from '../lib/hooks';
+import { CATCHUP_STALE_MS, catchupDue, isSettled, newlyResulted, resultKeys, resultToast, resultWatchLine } from '../lib/raceday';
 import { navigate, routes } from '../lib/router';
+import { useServerNow, useSession } from '../lib/session';
 import { BettingPlanView } from '../components/BettingPlanView';
 import { ConfidenceMeter } from '../components/ConfidenceMeter';
 import { DayPatterns } from '../components/DayPatterns';
@@ -56,7 +57,11 @@ interface ActiveJob {
 
 export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) {
   const toast = useToast();
-  const now = useNow(30_000);
+  const session = useSession();
+  const now = useServerNow(30_000);
+  const { clockOffset } = session;
+  const clockOffsetRef = useRef(clockOffset);
+  clockOffsetRef.current = clockOffset;
   const pack = useRequest(() => api.getPack(id), [id]);
   const sources = useRequest(() => api.getSources().then((r) => Object.fromEntries(r.sources.map((s) => [s.id, s.name])) as Record<string, string>), []);
   const liveSettings = useRequest(() => api.getSettings(), []);
@@ -70,36 +75,125 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   const tz = meetingZone(data?.meeting);
   const races = useMemo(() => (data ? [...(data.races ?? [])].sort((a, b) => a.number - b.number) : []), [data]);
 
-  // The server re-checks races on its own before the jump: notice that and refresh.
-  const updatedAtRef = useRef<string | undefined>(undefined);
+  const autoResultsOn = liveSettings.data ? liveSettings.data.autoResults !== false : true;
+  const autoChip = !!session.health?.scheduler?.running && autoResultsOn;
+
+  // Always the latest pack for callbacks that run from timers and DOM events.
+  const dataRef = useRef<MeetingPack | null>(null);
+  dataRef.current = data;
+
+  // ---------------------------------------------------------------- catch-up
+  // Opening the page (or coming back to it) after a race has run: if the server
+  // has not looked for that result in the last couple of minutes, ask for it
+  // once, quietly. The server serialises jobs per meeting so this never races
+  // the automatic watcher; the toast only appears if something new arrived.
+  const [catchupJobId, setCatchupJobId] = useState<string | null>(null);
+  const catchupPoll = useJobPoll(catchupJobId, 2000);
+  const catchup = useRef<{ lastFiredAt: number; before: Map<number, string> }>({ lastFiredAt: 0, before: new Map() });
+  const jobRunning = !!packJob || !!raceJob || !!catchupJobId;
+  const jobRunningRef = useRef(jobRunning);
+  jobRunningRef.current = jobRunning;
+  const autoOnRef = useRef(autoResultsOn);
+  autoOnRef.current = autoResultsOn;
+
+  const maybeCatchUp = useCallback(async () => {
+    const d = dataRef.current;
+    if (!d || jobRunningRef.current || !autoOnRef.current) return;
+    if (document.visibilityState === 'hidden') return;
+    const t = Date.now() + clockOffsetRef.current;
+    if (t - catchup.current.lastFiredAt < CATCHUP_STALE_MS) return;
+    if (!catchupDue(d, t)) return;
+    catchup.current.lastFiredAt = t;
+    try {
+      const busy = (await api.getJobs()).some((j) => j.meetingId === d.id && (j.status === 'queued' || j.status === 'running'));
+      if (busy) return;
+      catchup.current.before = resultKeys(d);
+      const { jobId } = await api.fetchResults(d.id);
+      setCatchupJobId(jobId);
+    } catch {
+      /* quiet by design – the 30 s poll and the manual buttons still work */
+    }
+  }, []);
+
+  // On load, and again whenever the person moves to another race (throttled inside).
   useEffect(() => {
-    updatedAtRef.current = data?.updatedAt;
-  }, [data?.updatedAt]);
-  const jobRunning = !!packJob || !!raceJob;
+    if (!data) return;
+    void maybeCatchUp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, !!data, raceParam]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void maybeCatchUp();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, [maybeCatchUp]);
+
+  useEffect(() => {
+    if (!catchupJobId || !catchupPoll.finished) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const fresh = await api.getPack(id);
+        if (cancelled) return;
+        const added = newlyResulted(catchup.current.before, resultKeys(fresh));
+        pack.setData(fresh);
+        if (added.length) toast.success(resultToast(added));
+      } catch {
+        /* keep what we have */
+      } finally {
+        if (!cancelled) setCatchupJobId(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catchupJobId, catchupPoll.finished]);
+
+  // ------------------------------------------------------------- live poll
+  // The server re-checks races and collects results on its own: notice that
+  // every 30 s and refresh, naming the race when a result just landed.
+  const seenRef = useRef<{ updatedAt?: string; resulted: number }>({ updatedAt: undefined, resulted: 0 });
+  useEffect(() => {
+    seenRef.current = { updatedAt: data?.updatedAt, resulted: Object.keys(data?.results ?? {}).length };
+  }, [data?.updatedAt, data?.results]);
   useEffect(() => {
     if (!data) return;
     const timer = window.setInterval(async () => {
-      if (jobRunning) return;
+      if (jobRunningRef.current) return;
       try {
         const mine = (await api.getPacks()).find((p) => p.id === id);
-        if (mine && updatedAtRef.current && mine.updatedAt > updatedAtRef.current) {
-          await pack.reload(true);
-          toast.info('Updated: an automatic pre-race check changed this meeting');
-        }
+        if (!mine) return;
+        const seen = seenRef.current;
+        const grew = mine.resultedRaces > seen.resulted;
+        if (!grew && !(seen.updatedAt && mine.updatedAt > seen.updatedAt)) return;
+        const before = resultKeys(dataRef.current);
+        const fresh = await api.getPack(id);
+        const added = newlyResulted(before, resultKeys(fresh));
+        pack.setData(fresh);
+        if (added.length) toast.success(resultToast(added));
+        else toast.info('Updated: the server refreshed this meeting');
       } catch {
         /* a missed poll is harmless */
       }
     }, 30_000);
     return () => window.clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, !!data, jobRunning]);
+  }, [id, !!data]);
 
   const selectedNumber = useMemo(() => {
     if (!data || !races.length) return null;
     const fromParam = raceParam ? Number(raceParam) : NaN;
     if (Number.isInteger(fromParam) && races.some((r) => r.number === fromParam)) return fromParam;
     const results = data.results ?? {};
-    const upcoming = races.find((r) => !results[r.number] && r.status !== 'abandoned' && (!r.startTime || new Date(r.startTime).getTime() > Date.now()));
+    const serverNow = Date.now() + clockOffsetRef.current;
+    const upcoming = races.find((r) => !results[r.number] && r.status !== 'abandoned' && (!r.startTime || new Date(r.startTime).getTime() > serverNow));
     return (upcoming ?? races.find((r) => !results[r.number]) ?? races[0]).number;
   }, [data, races, raceParam]);
 
@@ -112,6 +206,15 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
   const race = races.find((r) => r.number === selectedNumber);
   const prediction = race && data ? data.predictions?.[race.number] : undefined;
   const result = race && data ? data.results?.[race.number] : undefined;
+  const watch = race && data ? data.resultWatch?.[race.number] : undefined;
+  const jumped = !!race?.startTime && new Date(race.startTime).getTime() <= now;
+
+  // The race to head to once this one is done: the next un-resulted race after it, else any un-resulted race.
+  const nextRace = useMemo(() => {
+    if (!data || !race) return undefined;
+    const open = (r: Race) => !data.results?.[r.number] && r.status !== 'abandoned';
+    return races.find((r) => r.number > race.number && open(r)) ?? races.find((r) => r.number !== race.number && open(r));
+  }, [data, race, races]);
 
   const runnerById = useMemo(() => new Map((race?.runners ?? []).map((r) => [r.id, r])), [race]);
   const runnerByNo = useMemo(() => new Map((race?.runners ?? []).map((r) => [r.number, r])), [race]);
@@ -287,6 +390,11 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
                   Times {zoneAbbrev(tz)}
                 </Chip>
               )}
+              {autoChip && (
+                <Chip tone="green" title="Results and pre-race checks run automatically while the server is on" testId="auto-chip">
+                  ⟳ Auto
+                </Chip>
+              )}
             </div>
             {w && (w.rainLast72hMm != null || w.rainRaceDayMm != null || w.maxTempC != null || w.windKmhMax != null) && (
               <p className="small muted pack-head__weather">
@@ -410,7 +518,42 @@ export function PackPage({ id, raceParam }: { id: string; raceParam?: string }) 
               </div>
             )}
             {prediction?.summary && <p className="race-top__summary">{prediction.summary}</p>}
+            {jumped && race.status !== 'abandoned' && (!isSettled(result) || !!watch?.nextCheckAt) && (() => {
+              const line = resultWatchLine(watch, result, autoResultsOn, now);
+              return (
+                <p className={`result-watch result-watch--${line.tone}`} data-testid="result-watch" aria-live="polite">
+                  <span className="result-watch__icon" aria-hidden>
+                    {line.tone === 'amber' ? '⚠' : '⟳'}
+                  </span>
+                  {line.text}
+                </p>
+              );
+            })()}
           </section>
+
+          {result &&
+            (nextRace ? (
+              <a href={routes.pack(id, nextRace.number)} className="next-race" data-testid="next-race-bar" data-race={nextRace.number}>
+                <span className="next-race__label">Next:</span>
+                <strong>
+                  R{nextRace.number}
+                  {(() => {
+                    const c = countdown(nextRace.startTime, now);
+                    return c.tone === 'unknown' ? '' : ` ${c.text.charAt(0).toLowerCase()}${c.text.slice(1)}`;
+                  })()}
+                </strong>
+                <span className="next-race__meta small">
+                  {nextRace.name} · {fmtDistance(nextRace.distance)} · {fmtTime(nextRace.startTime, tz)}
+                </span>
+                <span className="next-race__arrow" aria-hidden>
+                  →
+                </span>
+              </a>
+            ) : (
+              <p className="next-race next-race--done" data-testid="next-race-bar">
+                <span className="next-race__label">That's the card:</span> <strong>every race has a result.</strong>
+              </p>
+            ))}
 
           {/* ------------------------------------------------ section tabs */}
           <nav className="section-tabs" role="tablist" aria-label="Race details" data-testid="section-tabs">

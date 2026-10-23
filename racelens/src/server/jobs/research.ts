@@ -4,10 +4,12 @@ import type {
   MeetingRaw,
   MeetingSummary,
   NewsItem,
+  PackEvent,
   Prediction,
   Race,
   RaceRaw,
   RaceResult,
+  ResultWatch,
   Settings,
   SourceStatus,
   WeatherSummary,
@@ -41,6 +43,64 @@ const SOURCE_TIMEOUT_MS = 45_000;
 /** No Australian meeting has more than 12 races; anything beyond this is a broken feed. */
 export const MAX_RACES = 20;
 export const clampRaceNumbers = (numbers: number[]): number[] => [...new Set(numbers.filter((n) => Number.isInteger(n) && n >= 1 && n <= MAX_RACES))].sort((a, b) => a - b);
+
+// ---------------------------------------------------------------------------
+// Automatic results watcher – schedule and bookkeeping
+// ---------------------------------------------------------------------------
+
+/**
+ * Results-watch schedule, relative to a race's scheduled start: first check
+ * 2 minutes after the jump, then every 2 minutes until +30 min, every 5 minutes
+ * until +90 min, every 15 minutes until +4 h. After that the watcher gives up on
+ * the race (the result can still be fetched with the button or typed in).
+ * The per-race memory lives in pack.resultWatch, saved with the pack, so a
+ * restarted server simply carries on from the next slot.
+ */
+export const RESULT_WATCH = {
+  firstCheckMs: 2 * 60_000,
+  giveUpMs: 4 * 60 * 60_000,
+  /** Extra checks allowed once a final result has arrived from a single source, looking for a second source that confirms it. */
+  confirmationChecks: 3,
+} as const;
+
+/** Check slots in ms after the jump: 2,4,…,30 | 35,40,…,90 | 105,120,…,240 minutes. */
+const RESULT_CHECK_SLOTS_MS: readonly number[] = (() => {
+  const slots: number[] = [];
+  for (let m = 2; m <= 30; m += 2) slots.push(m * 60_000);
+  for (let m = 35; m <= 90; m += 5) slots.push(m * 60_000);
+  for (let m = 105; m <= 240; m += 15) slots.push(m * 60_000);
+  return slots;
+})();
+
+/** The next check slot strictly after `nowMs` for a race that jumped at `startMs`; undefined once the schedule is exhausted (4 h after the jump). */
+export function nextResultCheckAt(startMs: number, nowMs: number): number | undefined {
+  for (const slot of RESULT_CHECK_SLOTS_MS) if (startMs + slot > nowMs) return startMs + slot;
+  return undefined;
+}
+
+/** How many of the extra one-source confirmation checks have run, as recorded in the watch note. */
+export function confirmationChecks(watch: ResultWatch | undefined): number {
+  const m = watch?.note?.match(/extra check (\d+) of \d+/);
+  return m ? Number(m[1]) : 0;
+}
+
+export const isManualResult = (result: RaceResult | undefined): boolean => !!result && (result.source === 'manual' || !!result.confirmedBy?.includes('manual'));
+
+/**
+ * A race's result is settled – nothing left to poll for – when it was typed in
+ * by hand, when two sources agree on a final result, or when a final result from
+ * a single source has used up its confirmation checks (the watcher then carries
+ * no nextCheckAt). Interim results and missing results are never settled.
+ */
+export function isResultSettled(pack: MeetingPack, raceNumber: number): boolean {
+  const result = pack.results[raceNumber];
+  if (!result) return false;
+  if (isManualResult(result)) return true;
+  if (result.status === 'interim') return false;
+  if ((result.confirmedBy?.length ?? 0) >= 2) return true;
+  const watch = pack.resultWatch?.[raceNumber];
+  return !!watch && (!watch.nextCheckAt || confirmationChecks(watch) >= RESULT_WATCH.confirmationChecks);
+}
 
 function statusOf(a: SourceAdapter, ok: boolean, ms: number, extra: Partial<SourceStatus> = {}): SourceStatus {
   return { source: a.id, name: a.name, kind: a.kind, ok, ms, fetchedAt: new Date().toISOString(), url: a.homepage, ...extra };
@@ -381,6 +441,24 @@ export function chooseResult(reports: RaceResult[]): { result: RaceResult; note?
   return { result, note };
 }
 
+/** Ask every results source about one race and cross-check the answers – one feed is never enough to settle a race. */
+async function fetchResultReports(deps: ResearchDeps, adapters: SourceAdapter[], pack: MeetingPack, raceNumber: number): Promise<RaceResult[]> {
+  const reports = await mapLimit(adapters, 3, async (a) => (await timed((c) => a.fetchResults!(pack.meeting, raceNumber, c || deps.ctx), `${a.name} results R${raceNumber}`, deps.ctx, 30_000)).value || null);
+  return reports.filter((r): r is RaceResult => !!r);
+}
+
+type ResultKind = 'new' | 'confirmed' | 'corrected';
+
+/** Record a chosen result when it tells us something the pack does not already know; returns what kind of news it was. */
+function applyChosenResult(pack: MeetingPack, raceNumber: number, result: RaceResult, opts: { history: boolean }): ResultKind | undefined {
+  const existing = pack.results[raceNumber];
+  const changed = !existing || placingsKey(existing.placings) !== placingsKey(result.placings) || existing.status !== result.status || (existing.confirmedBy?.length || 0) !== (result.confirmedBy?.length || 0);
+  if (!changed) return undefined;
+  const kind: ResultKind = existing && placingsKey(existing.placings) !== placingsKey(result.placings) ? 'corrected' : existing ? 'confirmed' : 'new';
+  recordResult(pack, raceNumber, result, kind, opts);
+  return kind;
+}
+
 /** Pull results for races that have finished. Returns race numbers newly resulted or corrected. */
 export async function collectResults(deps: ResearchDeps, pack: MeetingPack, job: JobHandle, verbose = true, only?: number): Promise<number[]> {
   const adapters = deps.registry.withCapability('results', deps.settings.disabledSources);
@@ -397,15 +475,9 @@ export async function collectResults(deps: ResearchDeps, pack: MeetingPack, job:
   if (verbose) job.start('results', 'Collecting results of races already run');
   const newly: number[] = [];
   for (const race of candidates) {
-    // Ask every results source, then cross-check – one feed is never enough to settle a race.
-    const reports = (await mapLimit(adapters, 3, async (a) => (await timed((c) => a.fetchResults!(pack.meeting, race.number, c || deps.ctx), `${a.name} results R${race.number}`, deps.ctx, 30_000)).value || null)).filter((r): r is RaceResult => !!r);
-    const chosen = chooseResult(reports);
+    const chosen = chooseResult(await fetchResultReports(deps, adapters, pack, race.number));
     if (!chosen) continue;
-    const existing = pack.results[race.number];
-    const changed = !existing || placingsKey(existing.placings) !== placingsKey(chosen.result.placings) || existing.status !== chosen.result.status || (existing.confirmedBy?.length || 0) !== (chosen.result.confirmedBy?.length || 0);
-    if (!changed) continue;
-    const corrected = !!existing && placingsKey(existing.placings) !== placingsKey(chosen.result.placings);
-    recordResult(pack, race.number, chosen.result, corrected ? 'corrected' : existing ? 'confirmed' : 'new');
+    if (!applyChosenResult(pack, race.number, chosen.result, { history: true })) continue;
     if (chosen.note) pack.history.push({ at: now.toISOString(), type: 'note', raceNumber: race.number, summary: `R${race.number}: ${chosen.note}` });
     newly.push(race.number);
   }
@@ -413,7 +485,181 @@ export async function collectResults(deps: ResearchDeps, pack: MeetingPack, job:
   return newly;
 }
 
-export function recordResult(pack: MeetingPack, raceNumber: number, result: RaceResult, kind: 'new' | 'confirmed' | 'corrected' = 'new'): void {
+/** Races whose result is worth asking for right now: jumped (or reported running/finished) and not yet settled. */
+function resultCandidates(pack: MeetingPack, now: Date): Race[] {
+  const unsettled = (n: number) => {
+    const r = pack.results[n];
+    return !r || (!isManualResult(r) && (r.status === 'interim' || (r.confirmedBy?.length || 0) < 2));
+  };
+  return pack.races.filter((r) => r.status !== 'abandoned' && unsettled(r.number) && (!r.startTime || new Date(r.startTime).getTime() <= now.getTime() + 60_000 || r.status === 'final' || r.status === 'interim'));
+}
+
+function describeWinner(pack: MeetingPack, result: RaceResult): string {
+  const race = pack.races.find((r) => r.number === result.raceNumber);
+  const winner = race?.runners.find((r) => result.placings[0]?.includes(r.number));
+  return winner ? `${winner.name} (${winner.number})` : `#${result.placings[0]?.join('/')}`;
+}
+
+function scorecardLine(sc: NonNullable<RaceResult['scorecard']>): string {
+  const parts = [sc.winnerRank ? `winner was our #${sc.winnerRank}` : 'winner was not in our ranking'];
+  if (sc.trifectaBoxHit) parts.push('trifecta box hit');
+  else if (sc.quinellaHit) parts.push('quinella hit');
+  if (sc.exactaHit) parts.push('exacta hit');
+  return parts.join(', ');
+}
+
+export interface CollectAndRerateOptions {
+  /** True when the server ran the check by itself (the history line then starts with "Automatic"). */
+  automatic?: boolean;
+}
+
+/**
+ * Results check behind the automatic watcher and the "Fetch results" button.
+ * Asks every results source about the races given (or every race that has
+ * jumped), cross-checks the answers, records what is new, keeps the per-race
+ * watch bookkeeping in pack.resultWatch (when to look again, or that the race
+ * is settled / given up), and – only when something new arrived – refreshes the
+ * day patterns and re-rates the races still to be run. Nothing else is touched.
+ * Writes a single history line describing the whole check.
+ */
+export async function collectAndRerate(deps: ResearchDeps, pack: MeetingPack, job: JobHandle, only?: number[], opts: CollectAndRerateOptions = {}): Promise<{ newly: number[]; checked: number[] }> {
+  const now = deps.now?.() ?? new Date();
+  const at = now.toISOString();
+  const automatic = opts.automatic === true;
+  const prefix = automatic ? 'Automatic results check' : 'Results check';
+  const adapters = deps.registry.withCapability('results', deps.settings.disabledSources);
+  const wanted = only ? clampRaceNumbers(only) : undefined;
+  // A result typed in by hand, or final and agreed by two sources, is never re-fetched – not even on request.
+  const settledForGood = (n: number) => {
+    const r = pack.results[n];
+    return !!r && (isManualResult(r) || (r.status !== 'interim' && (r.confirmedBy?.length || 0) >= 2));
+  };
+  const candidates = wanted ? pack.races.filter((r) => wanted.includes(r.number) && r.status !== 'abandoned' && !settledForGood(r.number)) : resultCandidates(pack, now);
+  const newly: number[] = [];
+  const checked: number[] = [];
+  const headlines: string[] = [];
+  const waiting: string[] = [];
+  const details: string[] = [];
+
+  job.start('results', 'Fetching results');
+  if (adapters.length && candidates.length) {
+    const watchMap = (pack.resultWatch ??= {});
+    for (const race of candidates) {
+      checked.push(race.number);
+      const chosen = chooseResult(await fetchResultReports(deps, adapters, pack, race.number));
+      const watch = (watchMap[race.number] ??= { lastCheckedAt: at, attempts: 0 });
+      watch.lastCheckedAt = at;
+      watch.attempts += 1;
+      const start = race.startTime ? Date.parse(race.startTime) : NaN;
+      const next = Number.isFinite(start) ? nextResultCheckAt(start, now.getTime()) : undefined;
+      /** Book the next check; false when the schedule is exhausted. */
+      const schedule = (note: string): boolean => {
+        if (!next) {
+          delete watch.nextCheckAt;
+          return false;
+        }
+        watch.nextCheckAt = new Date(next).toISOString();
+        delete watch.gaveUp;
+        watch.note = note;
+        return true;
+      };
+      const settle = (note: string): void => {
+        delete watch.nextCheckAt;
+        delete watch.gaveUp;
+        watch.note = note;
+      };
+
+      if (!chosen) {
+        if (!schedule('Nothing published yet')) {
+          if (Number.isFinite(start)) {
+            watch.gaveUp = true;
+            watch.note = 'No result published after 4 hours - enter it manually or press Fetch results';
+          } else watch.note = 'Nothing published yet';
+        }
+        waiting.push(`R${race.number} nothing published yet`);
+        continue;
+      }
+
+      const kind = applyChosenResult(pack, race.number, chosen.result, { history: false });
+      const stored = pack.results[race.number];
+      const sources = stored.confirmedBy?.length ?? 1;
+      const who = describeWinner(pack, stored);
+      if (kind) {
+        newly.push(race.number);
+        headlines.push(
+          kind === 'corrected'
+            ? `R${race.number} result corrected - ${who} won`
+            : kind === 'confirmed' && stored.status === 'final' && sources >= 2
+              ? `R${race.number} result confirmed by ${sources} sources - ${who} won`
+              : `R${race.number} ${stored.status === 'interim' ? 'interim result' : 'result'} in - ${who} won`,
+        );
+        if (stored.scorecard) details.push(`R${race.number}: ${scorecardLine(stored.scorecard)}`);
+      }
+      if (chosen.note && /disagree/i.test(chosen.note)) details.push(`R${race.number}: ${chosen.note}`);
+
+      if (stored.status === 'interim') {
+        if (!schedule('Interim result - waiting for it to be declared final')) {
+          watch.gaveUp = true;
+          watch.note = 'Result still interim 4 hours after the jump - check it manually';
+        }
+        if (!kind) waiting.push(`R${race.number} still interim`);
+      } else if (sources >= 2) {
+        settle(`Confirmed by ${sources} sources`);
+      } else {
+        // Final, but one source only: a few more looks for a second opinion, then accept it.
+        const k = kind ? 0 : confirmationChecks(watch) + 1;
+        const sourceName = deps.registry.get(stored.source)?.name ?? stored.source;
+        if (k >= RESULT_WATCH.confirmationChecks || !schedule(`Result from ${sourceName} only - waiting for a second source (extra check ${k} of ${RESULT_WATCH.confirmationChecks})`)) settle('One source only');
+        if (!kind) waiting.push(`R${race.number} still from one source`);
+      }
+    }
+  }
+  job.finish(
+    'results',
+    adapters.length ? 'done' : 'warn',
+    !adapters.length ? 'No results source available' : !candidates.length ? (wanted ? 'Nothing to check - already settled' : 'No races have been run yet') : newly.length ? `Results in for R${newly.join(', R')}` : 'No new results yet',
+  );
+
+  // Only news changes the picture: patterns and the remaining races are re-rated when a result arrived, changed or firmed up.
+  let rerated: number[] = [];
+  if (newly.length) {
+    job.start('patterns', 'Day patterns');
+    pack.dayPatterns = detectDayPatterns(pack.races, pack.results);
+    const resulted = Object.keys(pack.results).length;
+    job.finish('patterns', 'done', pack.dayPatterns.length ? pack.dayPatterns.map((p) => p.label).join('; ') : `No strong patterns yet (${resulted} result${resulted === 1 ? '' : 's'} in)`);
+    rerated = pack.races.filter((r) => !pack.results[r.number] && r.status !== 'abandoned').map((r) => r.number);
+    job.start('repredict', 'Re-rating');
+    predictAll(pack, deps.settings, now, rerated);
+    job.finish('repredict', 'done', rerated.length ? `${rerated.length} race${rerated.length === 1 ? '' : 's'} re-rated` : 'No races left to rate');
+  } else {
+    job.step('patterns', 'Day patterns');
+    job.finish('patterns', 'skipped', 'No new results');
+    job.step('repredict', 'Re-rating');
+    job.finish('repredict', 'skipped', 'No new results');
+  }
+
+  // One history line for the whole check. Consecutive automatic "nothing yet" lines collapse into one so the day's story stays readable.
+  let summary: string;
+  if (newly.length) summary = `${prefix}: ${headlines.join('; ')}${rerated.length ? `; R${rerated.join(', R')} re-rated` : ''}`;
+  else if (!checked.length) summary = `${prefix}: ${!adapters.length ? 'no results source available' : wanted ? `R${wanted.join(', R')} already settled` : 'no races have been run yet'}`;
+  else {
+    const states = new Set(waiting.map((w) => w.replace(/^R\d+ /, '')));
+    summary = `${prefix} R${checked.join(', R')}: ${states.size === 1 ? [...states][0] : waiting.join('; ')}`;
+  }
+  const event: PackEvent = { at, type: 'results', summary };
+  if (checked.length === 1) event.raceNumber = checked[0];
+  if (details.length) event.changes = details;
+  const last = pack.history[pack.history.length - 1];
+  if (automatic && !newly.length && checked.length && last?.type === 'results' && last.summary.startsWith(`${prefix} R`)) {
+    const m = last.summary.match(/ \((\d+) checks so far\)$/);
+    event.summary = `${summary} (${(m ? Number(m[1]) : 1) + 1} checks so far)`;
+    pack.history[pack.history.length - 1] = event;
+  } else pack.history.push(event);
+  job.message(newly.length ? `Results recorded for R${newly.join(', R')}` : 'No new results yet');
+  return { newly, checked };
+}
+
+export function recordResult(pack: MeetingPack, raceNumber: number, result: RaceResult, kind: ResultKind = 'new', opts: { history?: boolean } = {}): void {
   const race = pack.races.find((r) => r.number === raceNumber);
   const prediction = pack.predictions[raceNumber];
   const stored: RaceResult = { ...result, raceNumber, status: result.status || 'final', recordedAt: result.recordedAt || new Date().toISOString() };
@@ -427,8 +673,8 @@ export function recordResult(pack: MeetingPack, raceNumber: number, result: Race
       r.finishingPosition = pos >= 0 ? pos + 1 : r.finishingPosition;
     }
   }
-  const winner = race?.runners.find((r) => stored.placings[0]?.includes(r.number));
-  const who = winner ? `${winner.name} (${winner.number})` : `#${stored.placings[0]?.join('/')}`;
+  if (opts.history === false) return;
+  const who = describeWinner(pack, stored);
   const tag = stored.status === 'interim' ? ' (interim)' : '';
   const by = stored.confirmedBy?.length ? ` – ${stored.confirmedBy.length >= 2 ? `confirmed by ${stored.confirmedBy.join(', ')}` : `from ${stored.confirmedBy[0]} only`}` : '';
   pack.history.push({

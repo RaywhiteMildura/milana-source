@@ -30,6 +30,23 @@ export interface AppOptions {
 export const VERSION = '0.1.0';
 
 /**
+ * Demo mode only: RACELENS_FAKE_NOW=<ISO date-time> starts the server's clock at
+ * that instant (and lets it run from there), so the race-day automation can be
+ * rehearsed on any day against the bundled meeting. Ignored in live mode.
+ */
+export function makeClock(mode: Mode, fakeNow = process.env.RACELENS_FAKE_NOW): () => Date {
+  if (mode !== 'demo' || !fakeNow) return () => new Date();
+  const start = new Date(fakeNow).getTime();
+  if (!Number.isFinite(start)) {
+    logger.warn(`RACELENS_FAKE_NOW is not a valid date-time: ${fakeNow} – using the real clock`);
+    return () => new Date();
+  }
+  const realStart = Date.now();
+  logger.warn(`Demo clock starts at ${new Date(start).toISOString()} (RACELENS_FAKE_NOW)`);
+  return () => new Date(start + (Date.now() - realStart));
+}
+
+/**
  * Only answer requests addressed to this machine (localhost, its own network
  * addresses, or RACELENS_ALLOWED_HOSTS). Defeats DNS-rebinding pages that try to
  * reach http://127.0.0.1:4850 through a hostname they control.
@@ -55,6 +72,7 @@ export function createApp(opts: AppOptions = {}) {
   const here = path.dirname(fileURLToPath(import.meta.url));
   const mode: Mode = opts.mode ?? ((process.env.RACELENS_MODE as Mode) || 'live');
   const dataDir = path.resolve(opts.dataDir ?? process.env.RACELENS_DATA_DIR ?? 'data');
+  const now = opts.now ?? makeClock(mode);
   const store = new Store(dataDir);
   const registry = createRegistry(mode);
   const settings = store.getSettings();
@@ -65,7 +83,7 @@ export function createApp(opts: AppOptions = {}) {
   const ctx: FetchContext = {
     http,
     log: logger,
-    now: opts.now ?? (() => new Date()),
+    now,
     // Always the current setting, not a snapshot taken at start-up.
     get jurisdiction() {
       return store.getSettings().jurisdiction;
@@ -73,7 +91,7 @@ export function createApp(opts: AppOptions = {}) {
   };
   void settings;
   const jobs = new JobManager();
-  const auth = createAuth({ password: opts.password ?? process.env.RACELENS_PASSWORD, secret: store.getSecret(), now: opts.now });
+  const auth = createAuth({ password: opts.password ?? process.env.RACELENS_PASSWORD, secret: store.getSecret(), now });
 
   const app = express();
   app.disable('x-powered-by');
@@ -86,11 +104,11 @@ export function createApp(opts: AppOptions = {}) {
   const scheduler = new AutoRecheckScheduler({
     store,
     jobs,
-    researchDeps: () => ({ registry, ctx, settings: store.getSettings(), now: opts.now }),
-    now: opts.now,
+    researchDeps: () => ({ registry, ctx, settings: store.getSettings(), now }),
+    now,
     log: logger,
   });
-  app.use('/api', createApi({ registry, store, ctx, jobs, mode, version: VERSION, now: opts.now, healthExtras: () => ({ urls: opts.urls?.() ?? [], scheduler: scheduler.status() }) }));
+  app.use('/api', createApi({ registry, store, ctx, jobs, mode, version: VERSION, now, healthExtras: () => ({ urls: opts.urls?.() ?? [], scheduler: scheduler.status() }) }));
   app.use('/api', jsonErrorHandler);
 
   // Static web app (built by vite into dist/web). When running from src via tsx, look for ../../dist/web too.

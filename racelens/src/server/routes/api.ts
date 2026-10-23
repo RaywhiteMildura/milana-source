@@ -3,7 +3,7 @@ import type { MeetingPack, MeetingSummary, RaceResult, Settings, SourceStatus } 
 import type { AdapterRegistry } from '../adapters/registry.js';
 import type { FetchContext } from '../adapters/types.js';
 import { JobManager } from '../jobs/manager.js';
-import { collectResults, discoverMeetings, predictAll, recheckMeeting, recordResult, researchMeeting, type ResearchDeps } from '../jobs/research.js';
+import { collectAndRerate, discoverMeetings, predictAll, recheckMeeting, recordResult, researchMeeting, type ResearchDeps } from '../jobs/research.js';
 import { Store } from '../store/store.js';
 import { detectDayPatterns } from '../core/daypatterns.js';
 import { withTimeout } from '../core/http.js';
@@ -42,7 +42,8 @@ export function createApi(deps: ApiDeps): Router {
   r.get('/health', (_req, res) => {
     // Public part: enough for the app shell, deploy health checks and the login screen.
     const auth = (res.locals.auth as { required: boolean; authenticated: boolean } | undefined) ?? { required: false, authenticated: true };
-    const body: Record<string, unknown> = { ok: true, mode: deps.mode, version: deps.version, time: new Date().toISOString(), authRequired: auth.required };
+    // `time` is the server's own clock (the one the automation runs on); the web app aligns its countdowns to it.
+    const body: Record<string, unknown> = { ok: true, mode: deps.mode, version: deps.version, time: (deps.now?.() ?? new Date()).toISOString(), authRequired: auth.required };
     if (auth.authenticated) Object.assign(body, { dataDir: deps.store.dir }, deps.healthExtras?.() ?? {});
     res.json(body);
   });
@@ -226,16 +227,13 @@ export function createApi(deps: ApiDeps): Router {
       const pack = deps.store.getPack(req.params.id as string);
       if (!pack) throw new HttpProblem(404, 'pack not found');
       const raceNumber = (req.body || {}).raceNumber as number | undefined;
-      const job = deps.jobs.start('results', { meetingId: pack.id, raceNumber, plannedSteps: [['results', 'Fetching results'], ['patterns', 'Day patterns']] }, async (job) => {
+      if (raceNumber != null && !pack.races.some((x) => x.number === raceNumber)) throw new HttpProblem(400, 'unknown race number');
+      // Same code path as the automatic watcher: fetch, cross-check, record, day patterns, re-rate the rest.
+      const job = deps.jobs.start('results', { meetingId: pack.id, raceNumber, plannedSteps: [['results', 'Fetching results'], ['patterns', 'Day patterns'], ['repredict', 'Re-rating']] }, async (job) => {
         const latest = deps.store.getPack(pack.id);
         if (!latest) throw new Error('This meeting was deleted before the results check ran');
-        const newly = await collectResults(researchDeps(), latest, job, true, raceNumber);
-        job.start('patterns', 'Updating day patterns');
-        latest.dayPatterns = detectDayPatterns(latest.races, latest.results);
-        if (newly.length) predictAll(latest, deps.store.getSettings(), deps.now?.() ?? new Date());
-        job.finish('patterns', 'done', latest.dayPatterns.length ? latest.dayPatterns.map((p) => p.label).join('; ') : 'No strong patterns');
+        await collectAndRerate(researchDeps(), latest, job, raceNumber != null ? [raceNumber] : undefined);
         if (deps.store.getPack(pack.id)) deps.store.savePack(latest);
-        job.message(newly.length ? `Results recorded for R${newly.join(', R')}` : 'No new results available yet');
       });
       res.json({ jobId: job.id });
     }),

@@ -1,0 +1,47 @@
+# render.yaml – Render Blueprint for RaceLens (Docker web service + persistent disk).
+#
+# Render reads this file from the ROOT of the GitHub repository. This repo keeps
+# the app in the racelens/ folder, so copy this file to the top folder once
+# (`cp racelens/render.yaml render.yaml`, commit, push) – rootDir below already
+# points at racelens/. Then, in the Render dashboard (works from a phone):
+# New -> Blueprint -> pick the repo -> enter RACELENS_PASSWORD -> Apply.
+#
+# Region: Singapore is the closest Render region to Australia. It is NOT an
+# Australian IP, so TAB and Sportsbet (which geo-block overseas addresses) will
+# not answer; the official Racing Australia / Racing.com sources, Ladbrokes/Neds,
+# news and weather still work. For an Australian IP use Fly.io (Sydney) instead.
+#
+# Plan: the free tier puts the service to sleep when idle, which would stop the
+# automatic pre-race checks and results polling – use Starter (paid) or better.
+services:
+  - type: web
+    name: racelens
+    runtime: docker
+    region: singapore
+    plan: starter
+    rootDir: racelens
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: RACELENS_PASSWORD
+        sync: false            # typed in the dashboard when the Blueprint is applied; never stored in git
+      - key: NODE_ENV
+        value: production
+      - key: RACELENS_HOST
+        value: 0.0.0.0
+      - key: RACELENS_PORT
+        value: "4850"
+      - key: PORT
+        value: "4850"          # tells Render which port the container listens on
+      - key: RACELENS_ALLOWED_HOSTS
+        value: "*"
+      - key: RACELENS_DATA_DIR
+        value: /data
+      - key: RACELENS_QR
+        value: "0"
+    disk:
+      name: racelens-data
+      mountPath: /data
+      sizeGB: 1
