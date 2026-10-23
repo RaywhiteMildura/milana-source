@@ -28,7 +28,7 @@ const V = (name: string, state: string, lat: number, lon: number, tz: string, al
 
 export const VENUES: VenueInfo[] = [
   V('Flemington', 'VIC', -37.7903, 144.912, 'Australia/Melbourne', ['Flemington Racecourse'], 'FLM'),
-  V('Caulfield', 'VIC', -37.8794, 145.0397, 'Australia/Melbourne', ['Caulfield Heath']),
+  V('Caulfield', 'VIC', -37.8794, 145.0397, 'Australia/Melbourne', ['Caulfield Heath', 'Caulfield Heath Track']),
   V('Moonee Valley', 'VIC', -37.7664, 144.928, 'Australia/Melbourne', ['The Valley', 'Moonee Valley Racecourse']),
   V('Sandown', 'VIC', -37.9497, 145.13, 'Australia/Melbourne', ['Sandown Hillside', 'Sandown Lakeside', 'Sandown Park']),
   V('Geelong', 'VIC', -38.175, 144.383, 'Australia/Melbourne', []),
@@ -58,7 +58,7 @@ export const VENUES: VenueInfo[] = [
   V('Stawell', 'VIC', -37.06, 142.77, 'Australia/Melbourne', []),
   V('Benalla', 'VIC', -36.55, 145.98, 'Australia/Melbourne', []),
   V('Wodonga', 'VIC', -36.13, 146.86, 'Australia/Melbourne', []),
-  V('Randwick', 'NSW', -33.905, 151.227, 'Australia/Sydney', ['Royal Randwick', 'Randwick Kensington', 'Kensington']),
+  V('Randwick', 'NSW', -33.905, 151.227, 'Australia/Sydney', ['Royal Randwick', 'Randwick Kensington', 'Kensington', 'Randwick Kensington Track']),
   V('Rosehill', 'NSW', -33.8237, 151.0247, 'Australia/Sydney', ['Rosehill Gardens']),
   V('Warwick Farm', 'NSW', -33.917, 150.938, 'Australia/Sydney', []),
   V('Canterbury', 'NSW', -33.911, 151.115, 'Australia/Sydney', ['Canterbury Park']),
@@ -71,7 +71,7 @@ export const VENUES: VenueInfo[] = [
   V('Canberra', 'ACT', -35.338, 149.067, 'Australia/Sydney', ['Thoroughbred Park']),
   V('Eagle Farm', 'QLD', -27.427, 153.068, 'Australia/Brisbane', []),
   V('Doomben', 'QLD', -27.426, 153.062, 'Australia/Brisbane', []),
-  V('Gold Coast', 'QLD', -28.006, 153.365, 'Australia/Brisbane', ['Aquis Park']),
+  V('Gold Coast', 'QLD', -28.006, 153.365, 'Australia/Brisbane', ['Aquis Park', 'Gold Coast Poly', 'Gold Coast Synthetic']),
   V('Sunshine Coast', 'QLD', -26.652, 153.067, 'Australia/Brisbane', ['Corbould Park', 'Caloundra'], 'SSC'),
   V('Ipswich', 'QLD', -27.608, 152.776, 'Australia/Brisbane', []),
   V('Toowoomba', 'QLD', -27.561, 151.92, 'Australia/Brisbane', ['Clifford Park']),
@@ -102,7 +102,8 @@ export function findVenue(nameOrSlug: string): VenueInfo | undefined {
     VENUES.find((v) => norm(v.name) === n || v.slug === n.replace(/\s+/g, '-')) ||
     VENUES.find((v) => v.aliases?.some((a) => norm(a) === n)) ||
     VENUES.find((v) => v.tab && v.tab.toLowerCase() === n) ||
-    VENUES.find((v) => n.startsWith(norm(v.name)) || norm(v.name).startsWith(n))
+    // "Flemington Racecourse" / "Sandown Hillside" style suffixes only; never "Newcastle UK" / "Ascot UK".
+    VENUES.find((v) => n.startsWith(norm(v.name) + ' ') && !/\b(uk|gb|nz|usa|hk|ire|fr|jpn|sgp|za)$/.test(n))
   );
 }
 

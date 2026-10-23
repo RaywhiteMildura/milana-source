@@ -51,10 +51,18 @@ describe('news adapters', () => {
     expect(items[0].url).toBe('https://www.racenet.com.au/news/aeliana');
     expect(items[0].source).toBe('googlenews');
   });
-  it('Bing News maps items', async () => {
+  it('Bing News maps items, reads News:Source and unwraps the click tracker', async () => {
     const items = await new BingNewsAdapter().searchNews('Cox Plate', ctxFor({ 'bing.com/news/search': { body: RSS } }));
     expect(items).toHaveLength(2);
     expect(items[0].source).toBe('bingnews');
+    expect(items[0].title).toBe('Aeliana primed for Cox Plate glory - Racenet'); // Bing titles are not "title - outlet"
+    const bing = `<rss version="2.0" xmlns:News="https://www.bing.com/news/search?q=x&amp;format=rss"><channel><title>x</title>
+      <item><title>Cox Plate: who wins the Cup?</title><link>http://www.bing.com/news/apiclick.aspx?ref=FexRss&amp;aid=&amp;tid=abc&amp;url=https%3a%2f%2fwww.racenet.com.au%2fnews%2fcox&amp;c=1&amp;mkt=en-au</link><pubDate>Thu, 22 Oct 2026 03:00:00 GMT</pubDate><description>Preview.</description><News:Source>Racenet</News:Source></item>
+      </channel></rss>`;
+    const [it] = await new BingNewsAdapter().searchNews('Cox Plate', ctxFor({ 'bing.com/news/search': { body: bing } }));
+    expect(it.outlet).toBe('Racenet');
+    expect(it.title).toBe('Cox Plate: who wins the Cup?');
+    expect(it.url).toBe('https://www.racenet.com.au/news/cox');
   });
   it('Reddit maps listing JSON', async () => {
     const body = JSON.stringify({ data: { children: [{ data: { title: 'Cox Plate thoughts?', selftext: 'Aeliana looks the one', permalink: '/r/horseracing/comments/abc/cox_plate', created_utc: 1761100000, subreddit: 'horseracing' } }, { data: {} }] } });
@@ -71,11 +79,11 @@ describe('news adapters', () => {
 
 describe('Open-Meteo adapter', () => {
   it('builds a weather summary for a known venue', async () => {
-    const times: string[] = [];
+    const times: number[] = [];
     const rain: number[] = [];
     const temp: number[] = [];
     for (let d = 21; d <= 26; d++) for (let h = 0; h < 24; h++) {
-      times.push(`2026-10-${d}T${String(h).padStart(2, '0')}:00`);
+      times.push(Date.UTC(2026, 9, d, h) / 1000); // Open-Meteo unixtime (seconds, UTC)
       rain.push(d === 22 && h < 6 ? 2 : 0);
       temp.push(12 + h / 2);
     }
@@ -97,9 +105,13 @@ describe('venues', () => {
     expect(findVenue('Flemington')!.state).toBe('VIC');
     expect(findVenue('The Valley')!.name).toBe('Moonee Valley');
     expect(findVenue('moonee-valley')!.name).toBe('Moonee Valley');
-    expect(findVenue('RAN')!.name).toBe('Randwick');
+    expect(findVenue('FLM')!.name).toBe('Flemington');
     expect(findVenue('Sandown Hillside')!.name).toBe('Sandown');
+    expect(findVenue('Caulfield Heath')!.name).toBe('Caulfield');
     expect(findVenue('Mildura')!.tz).toBe('Australia/Melbourne');
+    expect(findVenue('Newcastle UK')).toBeUndefined();
+    expect(findVenue('Ascot UK')).toBeUndefined();
+    expect(findVenue('Flemington Racecourse')!.name).toBe('Flemington');
   });
 });
 

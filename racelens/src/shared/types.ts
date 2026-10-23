@@ -142,6 +142,7 @@ export interface OddsQuote {
   win?: number;
   place?: number;
   opening?: number;
+  /** Price history, oldest first (the current price is the last entry when supplied). */
   flucs?: Array<{ price: number; at?: string }>;
   fetchedAt: string;
 }

@@ -368,6 +368,44 @@
                   "displayName": "R1 Flemington"
                 }
               ]
+            },
+            {
+              "id": 900,
+              "name": "Newcastle",
+              "classId": 2,
+              "isInternational": true,
+              "className": "Horses - International",
+              "regionName": "United Kingdom",
+              "events": [
+                {
+                  "id": 999,
+                  "raceNumber": 1,
+                  "startTime": 1792830000,
+                  "name": "R1 Newcastle UK",
+                  "statusCode": "A",
+                  "bettingStatus": "PRICED",
+                  "distance": "1600"
+                }
+              ]
+            },
+            {
+              "id": 901,
+              "name": "Caulfield Heath",
+              "classId": 1,
+              "isInternational": false,
+              "className": "Horses - Aus/NZ",
+              "regionName": "Australia",
+              "events": [
+                {
+                  "id": 998,
+                  "raceNumber": 1,
+                  "startTime": 1792800000,
+                  "name": "R1 Heath Hcp",
+                  "statusCode": "A",
+                  "bettingStatus": "PRICED",
+                  "distance": "1200"
+                }
+              ]
             }
           ]
         },

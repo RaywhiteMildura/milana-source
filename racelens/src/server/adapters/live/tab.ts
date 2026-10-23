@@ -3,6 +3,16 @@ import { normaliseName } from '../../../shared/util.js';
 import type { FetchContext, SourceAdapter } from '../types.js';
 import { arr, bool, num, obj, parseCondition, parseMargin, parseStats, pick, splitCountry, str, titleCase, toISODateOnly, toNum, type Dict } from './parse.js';
 import { findVenue } from './venues.js';
+import { sleep } from '../../core/http.js';
+
+const AU_STATES = new Set(['NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT']);
+const WEATHER_CODES: Record<string, string> = { FINE: 'Fine', OCAST: 'Overcast', SHWRY: 'Showery', RAIN: 'Rain', STORM: 'Storm', CLOUDY: 'Cloudy', WINDY: 'Windy' };
+
+/** TAB abbreviates conditions ("HVY8", "AWT"): expand before parsing so every source votes with the same words. */
+function tabCondition(text?: string): string | undefined {
+  if (!text) return undefined;
+  return text.replace(/^HVY/i, 'Heavy').replace(/^AWT$/i, 'Synthetic').replace(/^SYNTH(ETIC)?$/i, 'Synthetic').replace(/^DEAD/i, 'Soft');
+}
 
 /**
  * TAB (Tabcorp) "tab-info-service" – the richest free Australian racing feed:
@@ -39,6 +49,12 @@ export class TabAdapter implements SourceAdapter {
   capabilities = ['meetings' as const, 'racecard' as const, 'form' as const, 'odds' as const, 'results' as const, 'conditions' as const];
   homepage = 'https://www.tab.com.au';
 
+  /** Pause between race-card calls: TAB sits behind Akamai and throttles bursts (research: ~2 req/s sustained). */
+  constructor(private readonly delayMs = 450) {}
+
+  /** The form route can answer 401 on the anonymous tier; remember that for the session instead of hammering it. */
+  private formUnavailable = false;
+
   private jurisdiction(ctx: FetchContext): string {
     return (ctx.jurisdiction || 'VIC').toUpperCase();
   }
@@ -54,10 +70,13 @@ export class TabAdapter implements SourceAdapter {
   private meetingSummary(m: Dict, date: string): MeetingSummary | undefined {
     const name = titleCase(str(m, 'meetingName', 'name'));
     if (!name) return undefined;
+    const location = (str(m, 'location', 'state') || '').toUpperCase();
+    // Overseas meetings (ASCOT UK, NEWCASTLE UK, HAMILTON NZ...) must never merge with the Australian venue of the same name.
+    if (location && !AU_STATES.has(location)) return undefined;
     const typeCode = (str(m, 'raceType', 'meetingType') || 'R').toUpperCase().charAt(0);
     const raceType = RACE_TYPE[typeCode] || 'thoroughbred';
     const venue = findVenue(name);
-    const cond = parseCondition(str(m, 'trackCondition'));
+    const cond = parseCondition(tabCondition(str(m, 'trackCondition')));
     const races = arr(m.races).map(obj);
     const first = races.map((r) => str(r, 'raceStartTime', 'startTime')).filter(Boolean).sort()[0];
     const mnemonic = str(m, 'venueMnemonic', 'mnemonic') || name.slice(0, 3).toUpperCase();
@@ -67,13 +86,13 @@ export class TabAdapter implements SourceAdapter {
       date,
       venue: venue?.name && raceType === 'thoroughbred' ? venue.name : name,
       venueSlug: slug,
-      state: str(m, 'location', 'state') || venue?.state,
-      country: /^(AUS|NZ|NZL|HK|SGP|GB|IRE|FR|USA|JPN|ZA|RSA)$/i.test(str(m, 'location') || '') && !venue ? str(m, 'location') : 'AUS',
+      state: location || venue?.state,
+      country: 'AUS',
       raceType,
       raceCount: races.length || num(m, 'numberOfRaces'),
       trackCondition: cond.text,
       trackRating: cond.rating,
-      weather: titleCase(str(m, 'weatherCondition', 'weather')),
+      weather: WEATHER_CODES[(str(m, 'weatherCondition', 'weather') || '').toUpperCase()] || titleCase(str(m, 'weatherCondition', 'weather')),
       rail: str(m, 'railPosition', 'rail'),
       firstRaceTime: first,
       sourceRefs: { tab: `${typeCode}/${mnemonic}` },
@@ -115,6 +134,7 @@ export class TabAdapter implements SourceAdapter {
         ctx.log.warn(`TAB: race ${n} failed: ${err instanceof Error ? err.message : err}`);
         if (!skeleton.length && races.length === 0 && n >= 3) break; // unknown race count and nothing is coming back
       }
+      if (this.delayMs && n !== numbers[numbers.length - 1]) await sleep(this.delayMs);
     }
     return { meeting: { ...meeting, ...(header || {}), id: meeting.id, venueSlug: meeting.venueSlug, sources: [this.id] }, races, source: this.id, fetchedAt };
   }
@@ -137,9 +157,18 @@ export class TabAdapter implements SourceAdapter {
   }
 
   async fetchForm(meeting: MeetingSummary, raceNumber: number, ctx: FetchContext): Promise<RunnerRaw[]> {
+    if (this.formUnavailable) return [];
     const ref = this.ref(meeting) || (await this.discoverRef(meeting, ctx));
     if (!ref) return [];
-    const raw = obj(await ctx.http.getJson(`${BASE}/dates/${meeting.date}/meetings/${ref.type}/${ref.mnemonic}/races/${raceNumber}/form?jurisdiction=${this.jurisdiction(ctx)}`, { expect: 'json', headers: HEADERS }));
+    if (this.delayMs) await sleep(this.delayMs);
+    const res = await ctx.http.get(`${BASE}/dates/${meeting.date}/meetings/${ref.type}/${ref.mnemonic}/races/${raceNumber}/form?jurisdiction=${this.jurisdiction(ctx)}`, { expect: 'json', headers: HEADERS });
+    if (res.status === 401 || res.status === 403) {
+      this.formUnavailable = true;
+      ctx.log.warn(`TAB: form endpoint answered ${res.status} – skipping TAB form for the rest of this session (other sources supply form)`);
+      return [];
+    }
+    if (!res.ok || res.json === undefined) throw new Error(`TAB form HTTP ${res.status}`);
+    const raw = obj(res.json);
     const list = arr(pick(raw, 'form', 'formData', 'runners', 'formRunners'));
     return list.map((f) => this.formRunner(obj(f))).filter((r): r is RunnerRaw => !!r && !!r.name);
   }
@@ -172,7 +201,7 @@ export class TabAdapter implements SourceAdapter {
 
   private race(raw: Dict, raceNumber: number, fetchedAt: string, skeleton?: Dict): RaceRaw {
     const status = this.status(str(raw, 'raceStatus') || str(skeleton || {}, 'raceStatus'));
-    const cond = parseCondition(str(raw, 'trackCondition') || str(obj(raw.meeting), 'trackCondition'));
+    const cond = parseCondition(tabCondition(str(raw, 'trackCondition') || str(obj(raw.meeting), 'trackCondition')));
     const scratchedNumbers = new Set([...arr(raw.scratchings), ...arr(skeleton?.scratchings)].map((x) => num(obj(x), 'runnerNumber')).filter((n): n is number => n != null));
     const winPredictions = new Map<number, number>();
     for (const p of arr(raw.predictions).map(obj)) {
@@ -259,11 +288,13 @@ export class TabAdapter implements SourceAdapter {
     const fw = num(fixed, 'returnWin');
     const fp = num(fixed, 'returnPlace');
     if (fw && fw > 1) {
+      // TAB lists flucs newest-first; OddsQuote.flucs is oldest-first.
       const flucs = arr(fixed.flucs)
         .map(obj)
         .map((f) => ({ price: num(f, 'returnWin', 'price') || 0, at: str(f, 'returnWinTime', 'time') }))
-        .filter((f) => f.price > 1);
-      odds.push({ source: this.id, bookmaker: 'TAB Fixed', type: 'fixed', win: fw, place: fp && fp > 1 ? fp : undefined, opening: num(fixed, 'returnWinOpen', 'openingPrice') || flucs[0]?.price, flucs: flucs.length ? flucs : undefined, fetchedAt });
+        .filter((f) => f.price > 1)
+        .reverse();
+      odds.push({ source: this.id, bookmaker: 'TAB Fixed', type: 'fixed', win: fw, place: fp && fp > 1 ? fp : undefined, opening: num(fixed, 'returnWinOpen', 'returnWinOpenDaily', 'openingPrice') || flucs[0]?.price, flucs: flucs.length ? flucs : undefined, fetchedAt });
     }
     const tw = num(tote, 'returnWin');
     const tp = num(tote, 'returnPlace');

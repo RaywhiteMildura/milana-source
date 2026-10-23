@@ -42,6 +42,9 @@ describe('parse helpers', () => {
     expect(parseStats('12: 4-2-1')).toEqual({ starts: 12, wins: 4, seconds: 2, thirds: 1 });
     expect(parseStats('4-2-1 (12)')).toEqual({ starts: 12, wins: 4, seconds: 2, thirds: 1 });
     expect(parseStats({ starts: 10, wins: 2, placings: 4 })).toMatchObject({ starts: 10, wins: 2, seconds: 2, thirds: 2 });
+    expect(parseStats('12-4-2-1')).toEqual({ starts: 12, wins: 4, seconds: 2, thirds: 1 });
+    expect(parseStats('6:2-1-0')).toEqual({ starts: 6, wins: 2, seconds: 1, thirds: 0 });
+    expect(parseStats('1-4-2-3')).toBeUndefined(); // placings exceed starts: not a record
     expect(parseStats(undefined)).toBeUndefined();
     expect(parseStats('rubbish')).toBeUndefined();
   });
@@ -63,8 +66,10 @@ describe('TabAdapter', () => {
   it('lists meetings with conditions and venue codes', async () => {
     const ctx = ctxFor(routes);
     const meetings = await tab.listMeetings('2026-10-24', ctx);
-    expect(meetings).toHaveLength(3);
+    expect(meetings).toHaveLength(3); // the NEWCASTLE UK (GBR) row is skipped
+    expect(meetings.some((m) => /newcastle/i.test(m.venue))).toBe(false);
     const flem = meetings.find((m) => m.venue === 'Flemington')!;
+    expect(flem.country).toBe('AUS');
     expect(flem.venueSlug).toBe('flemington');
     expect(flem.state).toBe('VIC');
     expect(flem.trackRating).toBe(4);
@@ -102,6 +107,7 @@ describe('TabAdapter', () => {
     expect(fixed.win).toBe(2.8);
     expect(fixed.opening).toBe(3.2);
     expect(fixed.flucs).toHaveLength(2);
+    expect(fixed.flucs![0].price).toBe(3.2); // oldest first
     const scratched = r1.runners[1];
     expect(scratched.scratched).toBe(true);
     expect(scratched.name).toBe('Late Scratch');

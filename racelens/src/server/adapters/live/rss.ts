@@ -44,7 +44,7 @@ export function parseRss(xml: string): RssItem[] {
       const title = stripHtml(text(it.title));
       const link = text(it.link) || text((it as { guid?: unknown }).guid);
       if (!title || !link) return undefined;
-      const source = text(it.source) || text((it as { author?: unknown }).author);
+      const source = text(it.source) || text(it['News:Source']) || text(it['news:Source']) || text((it as { author?: unknown }).author);
       return {
         title,
         link,
@@ -74,11 +74,19 @@ export function stripHtml(s: string): string {
     .trim();
 }
 
-export function toNewsItem(source: string, it: RssItem, defaultOutlet?: string): NewsItem {
+export function toNewsItem(source: string, it: RssItem, defaultOutlet?: string, opts: { titleSuffixIsOutlet?: boolean } = {}): NewsItem {
   let title = it.title;
   let outlet = it.source || defaultOutlet;
+  let link = it.link;
+  // Bing wraps links in a click tracker: unwrap to the publisher URL so the same story de-duplicates across channels.
+  try {
+    const u = new URL(link);
+    if (/(^|\.)bing\.com$/i.test(u.hostname) && u.searchParams.get('url')) link = u.searchParams.get('url')!;
+  } catch {
+    /* keep as is */
+  }
   // Google News titles end with " - Outlet"
-  const m = title.match(/^(.*)\s[-–]\s([^-–]{2,60})$/);
+  const m = opts.titleSuffixIsOutlet !== false ? title.match(/^(.*)\s[-–]\s([^-–]{2,60})$/) : null;
   if (m) {
     const suffix = m[2].trim();
     const same = it.source && suffix.toLowerCase().replace(/[^a-z0-9]/g, '') === it.source.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -89,11 +97,11 @@ export function toNewsItem(source: string, it: RssItem, defaultOutlet?: string):
   }
   const publishedAt = it.pubDate ? safeDate(it.pubDate) : undefined;
   return {
-    id: `${source}:${hash(it.link || title)}`,
+    id: `${source}:${hash(link || title)}`,
     source,
     outlet,
     title,
-    url: it.link,
+    url: link,
     publishedAt,
     snippet: it.description,
     mentions: [],

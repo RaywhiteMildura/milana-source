@@ -16,6 +16,6 @@ export class BingNewsAdapter implements SourceAdapter {
     const xml = await ctx.http.getText(url, { timeoutMs: 10_000, headers: { Accept: 'application/rss+xml, application/xml, text/xml, */*' } });
     return parseRss(xml)
       .slice(0, 25)
-      .map((it) => toNewsItem(this.id, it, it.source));
+      .map((it) => toNewsItem(this.id, it, it.source, { titleSuffixIsOutlet: false }));
   }
 }

@@ -90,9 +90,14 @@ export function splitCountry(name?: string): { name: string; country?: string } 
 export function parseStats(v: unknown): CareerStats | undefined {
   if (v == null) return undefined;
   if (typeof v === 'string') {
-    let m = v.match(/(\d+)\s*[:(]?\s*(\d+)\s*[-,]\s*(\d+)\s*[-,]\s*(\d+)/);
+    // "12: 4-2-1", "12:4,2,1", "12 (4-2-1)"
+    let m = v.match(/^\s*(\d+)\s*[:(]\s*(\d+)\s*[-,]\s*(\d+)\s*[-,]\s*(\d+)/);
     if (m) return { starts: +m[1], wins: +m[2], seconds: +m[3], thirds: +m[4] };
-    m = v.match(/(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*\(?\s*(\d+)\s*\)?/);
+    // "12-4-2-1" (starts first) – reject nonsense where placings exceed starts
+    m = v.match(/^\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*$/);
+    if (m && +m[2] + +m[3] + +m[4] <= +m[1]) return { starts: +m[1], wins: +m[2], seconds: +m[3], thirds: +m[4] };
+    // "4-2-1 (12)"
+    m = v.match(/^\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*\(\s*(\d+)\s*\)/);
     if (m) return { starts: +m[4], wins: +m[1], seconds: +m[2], thirds: +m[3] };
     return undefined;
   }

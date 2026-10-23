@@ -10,7 +10,7 @@ import { findVenue } from './venues.js';
  */
 interface OpenMeteoResponse {
   hourly?: {
-    time?: string[];
+    time?: Array<string | number>;
     temperature_2m?: Array<number | null>;
     precipitation?: Array<number | null>;
     precipitation_probability?: Array<number | null>;
@@ -33,12 +33,15 @@ export class OpenMeteoAdapter implements SourceAdapter {
       ctx.log.warn(`openmeteo: unknown venue ${venue}`);
       return null;
     }
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${v.lat}&longitude=${v.lon}&hourly=temperature_2m,precipitation,precipitation_probability,wind_speed_10m,wind_direction_10m&past_days=3&forecast_days=3&timezone=${encodeURIComponent(v.tz)}`;
+    // Unix timestamps (unambiguous instants) and a forecast window that reaches the race date even when researching days ahead.
+    const daysAhead = Math.ceil((new Date(`${date}T00:00:00Z`).getTime() - ctx.now().getTime()) / 86400000);
+    const forecastDays = Math.min(16, Math.max(2, daysAhead + 2));
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${v.lat}&longitude=${v.lon}&hourly=temperature_2m,precipitation,precipitation_probability,wind_speed_10m,wind_direction_10m&past_days=3&forecast_days=${forecastDays}&timezone=UTC&timeformat=unixtime`;
     const data = await ctx.http.getJson<OpenMeteoResponse>(url, { expect: 'json', timeoutMs: 10_000 });
     const h = data.hourly || {};
-    const times = h.time || [];
+    const times = (h.time || []) as Array<string | number>;
     const hourly: WeatherHour[] = times.map((t, i) => ({
-      time: t,
+      time: typeof t === 'number' ? new Date(t * 1000).toISOString() : /Z$|[+-]\d{2}:\d{2}$/.test(t) ? t : `${t}Z`,
       tempC: num(h.temperature_2m?.[i]),
       rainMm: num(h.precipitation?.[i]),
       rainProb: num(h.precipitation_probability?.[i]),

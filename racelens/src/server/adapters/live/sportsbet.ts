@@ -4,6 +4,7 @@ import type { FetchContext, SourceAdapter } from '../types.js';
 import { sleep } from '../../core/http.js';
 import { arr, bool, num, obj, parseCondition, parseMargin, parseStats, pick, splitCountry, str, titleCase, toISODateOnly, toNum, type Dict } from './parse.js';
 import { groupFrom } from './tab.js';
+import { findVenue } from './venues.js';
 
 /**
  * Sportsbet racing gateway. Anonymous JSON used by sportsbet.com.au's own web
@@ -55,11 +56,16 @@ export class SportsbetAdapter implements SourceAdapter {
   }
 
   private meetingSummary(m: Dict, raceType: MeetingSummary['raceType'], date: string): MeetingSummary | undefined {
-    const name = str(m, 'name');
-    if (!name) return undefined;
-    const events = arr(m.events).map(obj);
+    const rawName = str(m, 'name');
+    if (!rawName) return undefined;
     const region = str(m, 'regionName', 'region') || '';
-    const country = /australia/i.test(region) ? 'AUS' : /new zealand/i.test(region) ? 'NZ' : region || undefined;
+    const country = /australia/i.test(region) ? 'AUS' : /new zealand/i.test(region) ? 'NZ' : undefined;
+    // International meetings (Newcastle UK, Sandown UK...) share names with Australian tracks: never let them in.
+    if (!country || bool(m, 'isInternational') === true) return undefined;
+    // Sportsbet names tracks by configuration ("Caulfield Heath", "Sandown Hillside"): use the canonical venue so sources merge.
+    const known = country === 'AUS' ? findVenue(rawName) : undefined;
+    const name = known?.name || rawName;
+    const events = arr(m.events).map(obj);
     const starts = events.map((e) => num(e, 'startTime')).filter((n): n is number => !!n);
     const first = starts.length ? epochToIso(Math.min(...starts)) : undefined;
     const slug = normaliseName(name).replace(/\s+/g, '-');
@@ -80,7 +86,8 @@ export class SportsbetAdapter implements SourceAdapter {
       trackCondition: cond.text,
       trackRating: cond.rating,
       firstRaceTime: first,
-      sourceRefs: { sportsbet: `${str(m, 'id') || ''}|${str(m, 'classId') || '1'}|${eventRefs}` },
+      state: known?.state,
+      sourceRefs: { sportsbet: `${str(m, 'id') || ''}|${str(m, 'classId') || '1'}|${eventRefs}`, 'sportsbet.venue': rawName },
       sources: [this.id],
     };
   }
@@ -145,7 +152,8 @@ export class SportsbetAdapter implements SourceAdapter {
     const n = num(ev, 'raceNumber');
     if (n != null && n !== raceNumber) throw new Error(`Sportsbet returned race ${n} when ${raceNumber} was requested`);
     const comp = str(ev, 'competitionName');
-    if (comp && normaliseName(comp) !== normaliseName(meeting.venue) && !normaliseName(comp).startsWith(normaliseName(meeting.venue).split(' ')[0])) {
+    const expected = [meeting.venue, meeting.sourceRefs?.['sportsbet.venue'], findVenue(meeting.venue)?.name].filter((x): x is string => !!x).map(normaliseName);
+    if (comp && !expected.includes(normaliseName(comp)) && findVenue(comp)?.name !== findVenue(meeting.venue)?.name) {
       throw new Error(`Sportsbet returned ${comp} when ${meeting.venue} was requested`);
     }
     return this.race(ev, raceNumber, ctx.now().toISOString());
@@ -187,13 +195,19 @@ export class SportsbetAdapter implements SourceAdapter {
     let dividends: Record<string, number> | undefined;
     if (resulted) {
       dividends = {};
+      // winPrice/placePrice are Sportsbet's own fixed prices; the tote dividends live in dividend[] strings like "NSW/PL:4.4/1.7".
+      const TOTES = ['VIC', 'NSW', 'QLD', 'UNI', 'MID', 'STAB'];
       for (const res of arr(ev.results).map(obj)) {
-        if (num(res, 'place') === 1) {
-          const w = num(res, 'winPrice');
-          const pl = num(res, 'placePrice');
-          if (w) dividends.win = w;
-          if (pl) dividends.place1 = pl;
+        if (num(res, 'place') !== 1) continue;
+        const strings = arr(res.dividend).map(String);
+        const tote = TOTES.map((t) => strings.find((s) => s.toUpperCase().startsWith(`${t}/PL:`))).find(Boolean);
+        const m = tote?.match(/PL:([\d.]+)\/([\d.]+)/i);
+        if (m) {
+          dividends.win = Number(m[1]);
+          dividends.place1 = Number(m[2]);
         }
+        const sp = strings.find((s) => /^SP:/i.test(s))?.match(/SP:([\d.]+)/i);
+        if (sp) dividends.startingPrice = Number(sp[1]);
       }
       for (const ex of arr(ev.exoticResults).map(obj)) {
         const key = (str(ex, 'name') || '').toLowerCase().replace(/\s+/g, '');

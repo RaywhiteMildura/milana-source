@@ -44,7 +44,7 @@ export class RacingRssAdapter implements SourceAdapter {
           okFeeds++;
           for (const it of parseRss(xml)) {
             const hay = normaliseName(`${it.title} ${it.description || ''}`);
-            if (matches(hay)) out.push(toNewsItem(this.id, it, feed.outlet));
+            if (matches(hay)) out.push(toNewsItem(this.id, it, feed.outlet, { titleSuffixIsOutlet: false }));
           }
         } catch (err) {
           lastError = err;

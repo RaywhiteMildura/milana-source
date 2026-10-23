@@ -37,6 +37,11 @@ describe('SportsbetAdapter', () => {
     expect(flem.sourceRefs.sportsbet.startsWith('356|1|')).toBe(true);
     expect(flem.firstRaceTime).toMatch(/^2026-10-2/);
     expect(meetings.find((m) => m.venue === 'Ruakaka')!.country).toBe('NZ');
+    expect(meetings.filter((m) => m.venue === 'Newcastle')).toHaveLength(0); // international meeting skipped
+    const heath = meetings.find((m) => m.venue === 'Caulfield')!; // "Caulfield Heath" canonicalised
+    expect(heath).toBeDefined();
+    expect(heath.sourceRefs['sportsbet.venue']).toBe('Caulfield Heath');
+    expect(heath.state).toBe('VIC');
     expect(meetings.find((m) => m.venue === 'The Meadows')!.raceType).toBe('greyhound');
     expect(meetings.find((m) => m.venue === 'Melton')!.raceType).toBe('harness');
   });

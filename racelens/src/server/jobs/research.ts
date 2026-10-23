@@ -58,7 +58,7 @@ export function mergeMeetingSummaries(lists: Array<{ source: string; meetings: M
   const out = new Map<string, MeetingSummary>();
   for (const { source, meetings } of lists) {
     for (const m of meetings) {
-      const key = `${m.date}:${normaliseName(m.venue).replace(/\s+/g, '-')}:${m.raceType}`;
+      const key = `${m.date}:${normaliseName(m.venue).replace(/\s+/g, '-')}:${m.raceType}:${(m.country || 'AUS').toUpperCase()}`;
       const existing = out.get(key);
       if (!existing) {
         out.set(key, { ...m, id: `${m.date}:${normaliseName(m.venue).replace(/\s+/g, '-')}`, venueSlug: normaliseName(m.venue).replace(/\s+/g, '-'), sources: [source], sourceRefs: { ...m.sourceRefs } });
