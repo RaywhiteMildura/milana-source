@@ -139,6 +139,8 @@ export class ApiError extends Error {
 }
 
 export const UNREACHABLE_MESSAGE = 'The Mac mini is not answering – check Tailscale is on and you have signal.';
+/** The request went out but no answer came in time: RaceLens may well be busy on it (fetching from the racing sites). */
+export const SLOW_MESSAGE = 'RaceLens is taking a long time to answer – it may still be working; try again in a minute.';
 /** An error page from what stands in front of RaceLens (Tailscale Serve answers 502 while the Mac restarts it). */
 const RESTARTING_MESSAGE = 'RaceLens on the Mac mini is restarting or not running – try again in a minute.';
 
@@ -148,10 +150,13 @@ export class UnreachableError extends Error {
     public readonly path: string,
     public readonly timedOut: boolean,
   ) {
-    super(UNREACHABLE_MESSAGE);
+    super(timedOut ? SLOW_MESSAGE : UNREACHABLE_MESSAGE);
     this.name = 'UnreachableError';
   }
 }
+
+/** One of the messages above, which already say what to do (a page need not add "check your connection"). */
+export const givesAdvice = (message: string): boolean => [UNREACHABLE_MESSAGE, SLOW_MESSAGE, RESTARTING_MESSAGE].includes(message);
 
 /** RaceLens itself did not answer (see above, or a 5xx such as that 502): a saved copy may stand in. */
 export function isUnreachable(e: unknown): boolean {
@@ -198,6 +203,12 @@ export const AUTH_REQUIRED_EVENT = 'racelens:auth-required';
 const READ_TIMEOUT_MS = 15_000;
 /** Writes and job starts: the server may take a moment before it answers. */
 const WRITE_TIMEOUT_MS = 30_000;
+/**
+ * Requests the server answers only after asking the racing sites itself
+ * (finding a day's meetings: up to 20 s per source, plus politeness delays and
+ * mirror fallbacks), so the first byte can take well over READ_TIMEOUT_MS.
+ */
+const SLOW_FIRST_BYTE_MS = 45_000;
 
 /** The body as text, calling `onProgress` as each piece arrives. */
 async function readBody(res: Response, onProgress: () => void): Promise<string> {
@@ -213,7 +224,12 @@ async function readBody(res: Response, onProgress: () => void): Promise<string> 
   }
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+interface RequestOptions {
+  /** How long to wait for the answer to start (default READ_TIMEOUT_MS for a GET, WRITE_TIMEOUT_MS otherwise). */
+  firstByteMs?: number;
+}
+
+async function request<T>(path: string, init: RequestInit = {}, opts: RequestOptions = {}): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (init.body !== undefined) headers['Content-Type'] = 'application/json';
   const ctrl = new AbortController();
@@ -229,7 +245,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   };
   let res: Response;
   let text: string;
-  wait(!init.method || init.method === 'GET' ? READ_TIMEOUT_MS : WRITE_TIMEOUT_MS);
+  wait(opts.firstByteMs ?? (!init.method || init.method === 'GET' ? READ_TIMEOUT_MS : WRITE_TIMEOUT_MS));
   try {
     res = await fetch(path, { ...init, signal: ctrl.signal, headers: { ...headers, ...(init.headers as Record<string, string> | undefined) } });
     wait(READ_TIMEOUT_MS);
@@ -261,8 +277,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return data as T;
 }
 
-const get = <T,>(path: string) => request<T>(path);
-const post = <T,>(path: string, body: unknown = {}) => request<T>(path, { method: 'POST', body: JSON.stringify(body) });
+const get = <T,>(path: string, opts?: RequestOptions) => request<T>(path, {}, opts);
+const post = <T,>(path: string, body: unknown = {}, opts?: RequestOptions) => request<T>(path, { method: 'POST', body: JSON.stringify(body) }, opts);
 const put = <T,>(path: string, body: unknown) => request<T>(path, { method: 'PUT', body: JSON.stringify(body) });
 const del = <T,>(path: string) => request<T>(path, { method: 'DELETE' });
 
@@ -293,9 +309,10 @@ export const api = {
   getSources: () => get<SourcesResponse>('/api/sources'),
   probeSources: () => post<JobIdResponse>('/api/sources/probe'),
 
-  getMeetings: (date: string) => get<MeetingsResponse>(`/api/meetings?date=${enc(date)}`),
+  // Both may wait for live discovery of the day's meetings on the server (research only when they are not cached).
+  getMeetings: (date: string) => get<MeetingsResponse>(`/api/meetings?date=${enc(date)}`, { firstByteMs: SLOW_FIRST_BYTE_MS }),
 
-  research: (body: { date: string; venueSlug: string; force?: boolean }) => post<ResearchResponse>('/api/research', body),
+  research: (body: { date: string; venueSlug: string; force?: boolean }) => post<ResearchResponse>('/api/research', body, { firstByteMs: SLOW_FIRST_BYTE_MS }),
 
   getJobs: () => get<JobProgress[]>('/api/jobs'),
   getJob: (id: string) => get<JobProgress>(`/api/jobs/${enc(id)}`),

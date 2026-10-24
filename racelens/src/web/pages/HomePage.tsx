@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MeetingSummary } from '@shared/types';
 import { parseTrackRating, trackRatingLabel } from '@shared/util';
-import { api, errorMessage, useRequest, type PackListItem, isQueued } from '../lib/api';
+import { api, errorMessage, givesAdvice, useRequest, type PackListItem, isQueued } from '../lib/api';
 import { addDays, defaultHomeDate, fmtLongDate, fmtRelative, fmtShortDate, fmtTime, isYmd, meetingZone, nextSaturday, pct100, plural, relativeDayLabel, sourceName, todayYmd, verificationTone } from '../lib/format';
 import { navigate, routes } from '../lib/router';
 import { savedKeys } from '../lib/saved';
@@ -314,7 +314,7 @@ export function HomePage({ query }: { query: URLSearchParams }) {
                 <SkeletonCard lines={4} />
               </div>
             ) : meetings.error ? (
-              <ErrorState title="Couldn't load meetings" message={`${meetings.error.replace(/[.!]?\s*$/, '')}. Check your internet connection and try again.`} onRetry={() => meetings.reload()} />
+              <ErrorState title="Couldn't load meetings" message={givesAdvice(meetings.error) ? meetings.error : `${meetings.error.replace(/[.!]?\s*$/, '')}. Check your internet connection and try again.`} onRetry={() => meetings.reload()} />
             ) : !meetings.data || meetings.data.meetings.length === 0 ? (
               <EmptyState icon="📅" title="No meetings found for this date" action={<button type="button" className="btn btn-secondary" onClick={() => meetings.reload()}>Try again</button>}>
                 No meetings found for this date from any source. Check your internet or try another date.

@@ -1,6 +1,11 @@
 /* RaceLens service worker.
  *
- * - Precaches nothing at install (the app shell is tiny and always fetched fresh).
+ * - Install: keeps the current app shell and the assets it names, best effort,
+ *   so the app opens offline from the next launch (even right after a first
+ *   visit, or a deploy). Activate: carries the shell and good assets over from
+ *   an older version's cache before dropping it – the page that version just
+ *   served must still open with no signal next time, and so must the meetings
+ *   saved on the phone.
  * - /assets/* (hashed filenames from the Vite build): cache-first, so repeat
  *   opens on a phone are instant and work on a flaky signal. Only real assets
  *   (JavaScript, CSS, fonts, images) are kept: the server answers a file it
@@ -31,16 +36,28 @@ const NAV_TIMEOUT_MS = 5000;
 /** Content types worth keeping under /assets/. */
 const ASSET_TYPE = /javascript|ecmascript|text\/css|font|image\/|manifest\+json|wasm/i;
 const TIMED_OUT = Symbol('timed out');
+/** A real asset (not an HTML page answered for one), worth keeping under /assets/. */
+const isAsset = (res) => !!res && res.ok && ASSET_TYPE.test(res.headers.get('Content-Type') || '');
 
-self.addEventListener('install', () => {
+/** How long install waits for the app shell and its assets before going ahead without them. */
+const PRECACHE_TIMEOUT_MS = 30000;
+
+self.addEventListener('install', (event) => {
   self.skipWaiting();
+  // Best effort: a failure (no signal, a 502 while the Mac restarts) never stops the update; activate still carries the old copy over.
+  event.waitUntil(Promise.race([precache().catch(() => undefined), new Promise((resolve) => setTimeout(resolve, PRECACHE_TIMEOUT_MS))]));
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      const keys = await caches.keys();
-      await Promise.all(keys.filter((k) => k.startsWith('racelens-') && k !== CACHE_NAME).map((k) => caches.delete(k)));
+      const old = (await caches.keys()).filter((k) => k.startsWith('racelens-') && k !== CACHE_NAME);
+      try {
+        await carryOver(old);
+      } catch {
+        /* start afresh: the next open with a signal keeps the shell again */
+      }
+      await Promise.all(old.map((k) => caches.delete(k)));
       await self.clients.claim();
     })(),
   );
@@ -51,28 +68,83 @@ async function cacheFirst(request) {
   const hit = await cache.match(request);
   if (hit) return hit;
   const res = await fetch(request);
-  if (res.ok && ASSET_TYPE.test(res.headers.get('Content-Type') || '')) cache.put(request, res.clone()).catch(() => undefined);
+  if (isAsset(res)) cache.put(request, res.clone()).catch(() => undefined);
   return res;
 }
 
 /** The app's own index.html (names its /assets/), not an error or Wi-Fi login page. */
 const isShell = (html) => /(?:src|href)=["']?\/assets\//.test(html);
 
-/** Delete cached /assets/* entries that this index.html does not reference. */
-async function pruneAssets(cache, html) {
+/** The full URLs of the /assets/* files this index.html references. */
+function namedAssets(html) {
   const live = new Set();
   for (const m of html.matchAll(/(?:src|href)=["']?(\/assets\/[^"'\s>]+)/g)) live.add(new URL(m[1], self.location.origin).href);
+  return live;
+}
+
+/** Delete cached /assets/* entries that this index.html does not reference. */
+async function pruneAssets(cache, html) {
+  const live = namedAssets(html);
   for (const req of await cache.keys()) {
     if (new URL(req.url).pathname.startsWith('/assets/') && !live.has(req.url)) await cache.delete(req);
   }
 }
 
+const shellResponse = (html, type) => new Response(html, { headers: { 'Content-Type': type || 'text/html; charset=utf-8' } });
+
 /** Keep a fresh app shell for the next time the network lets us down. */
 async function keepShell(cache, res) {
   const html = await res.text();
   if (!isShell(html)) return;
-  await cache.put(SHELL_KEY, new Response(html, { headers: { 'Content-Type': res.headers.get('Content-Type') || 'text/html; charset=utf-8' } }));
+  await cache.put(SHELL_KEY, shellResponse(html, res.headers.get('Content-Type')));
   await pruneAssets(cache, html);
+}
+
+/** At install: the current app shell and every asset it names, straight from the network – or nothing, if any of it fails. */
+async function precache() {
+  const res = await fetch('/', { cache: 'no-cache' });
+  if (!res.ok) return;
+  const html = await res.text();
+  if (!isShell(html)) return;
+  const urls = [...namedAssets(html)];
+  const assets = await Promise.all(urls.map((url) => fetch(url)));
+  if (!assets.every(isAsset)) return;
+  const cache = await caches.open(CACHE_NAME);
+  await Promise.all(urls.map((url, i) => cache.put(url, assets[i])));
+  await cache.put(SHELL_KEY, shellResponse(html, res.headers.get('Content-Type')));
+  await pruneAssets(cache, html);
+}
+
+/**
+ * At activate: the app shell and assets an older version of this worker kept,
+ * for whatever install could not fetch – that version served the page now on
+ * screen, so without them the next launch with no signal could not open the
+ * app at all. Only what passes today's checks comes over: real assets (never
+ * an HTML page kept under an asset's name), and an index.html that is the app
+ * shell with every asset it names at hand (a shell without its script would
+ * open a blank app).
+ */
+async function carryOver(oldNames) {
+  const cache = await caches.open(CACHE_NAME);
+  // Newest first: caches.keys() lists them in the order they were made.
+  for (const name of [...oldNames].reverse()) {
+    const old = await caches.open(name);
+    for (const req of await old.keys()) {
+      if (!new URL(req.url).pathname.startsWith('/assets/') || (await cache.match(req))) continue;
+      const res = await old.match(req);
+      if (isAsset(res)) await cache.put(req, res);
+    }
+    if (await cache.match(SHELL_KEY)) continue;
+    const shell = await old.match(SHELL_KEY);
+    if (!shell || !shell.ok) continue;
+    const html = await shell.text();
+    if (!isShell(html)) continue;
+    const have = await Promise.all([...namedAssets(html)].map((url) => cache.match(url)));
+    if (have.every(Boolean)) await cache.put(SHELL_KEY, shellResponse(html, shell.headers.get('Content-Type')));
+  }
+  // Only the assets of the shell kept stay (install may already have kept a newer one).
+  const kept = await cache.match(SHELL_KEY);
+  if (kept) await pruneAssets(cache, await kept.text());
 }
 
 async function navigationNetworkFirst(request, keepAlive) {

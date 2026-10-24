@@ -120,13 +120,17 @@ export default function App() {
   useEffect(() => {
     const onRequired = () => {
       void clearSaved();
+      // RaceLens answered, so this is no longer the saved-copy mode of a Mac that cannot be reached.
+      setOffline(false);
+      setAuthError(null);
       setAuth((a) => (a && a.required && !a.authenticated ? a : { required: true, authenticated: false }));
     };
     window.addEventListener(AUTH_REQUIRED_EVENT, onRequired);
     return () => window.removeEventListener(AUTH_REQUIRED_EVENT, onRequired);
   }, []);
 
-  const signedIn = offline || (!!auth && (!auth.required || auth.authenticated));
+  // What the server said decides; until it has said anything, the copies saved on this phone open the app.
+  const signedIn = auth ? !auth.required || auth.authenticated : offline;
 
   // Health carries the scheduler status and LAN urls only once signed in, so re-fetch it after a login (and once back online).
   const health = useRequest(() => (signedIn && !offline ? api.health() : Promise.resolve(null)), [signedIn, offline]);

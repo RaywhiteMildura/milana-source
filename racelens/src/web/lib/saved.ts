@@ -57,7 +57,11 @@ function openDb(): Promise<IDBDatabase | null> {
         }
         db.onversionchange = () => {
           db.close();
-          dbPromise = null;
+          if (dbPromise === p) dbPromise = null;
+        };
+        // iOS closes the connection of an app left in the background: open a new one next time, or the copies stop updating.
+        db.onclose = () => {
+          if (dbPromise === p) dbPromise = null;
         };
         resolve(db);
       };
@@ -73,6 +77,32 @@ function openDb(): Promise<IDBDatabase | null> {
     if (!db && dbPromise === p) dbPromise = null;
   });
   return p;
+}
+
+/** The connection died under us (iOS: InvalidStateError from transaction(), or UnknownError "Connection to Indexed Database server lost"). */
+const isDeadConnection = (e: unknown): boolean => {
+  const name = (e as { name?: unknown } | null)?.name;
+  return name === 'InvalidStateError' || name === 'UnknownError';
+};
+
+/**
+ * Run `fn` on the database (null when there is none). A connection found dead
+ * is dropped, so the next call opens a new one, and `fn` gets one more go on it.
+ */
+async function withDb<T>(fn: (db: IDBDatabase | null) => Promise<T>): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    const conn = openDb();
+    try {
+      return await fn(await conn);
+    } catch (e) {
+      if (!isDeadConnection(e)) throw e;
+      if (dbPromise === conn) {
+        dbPromise = null;
+        void conn.then((db) => db?.close());
+      }
+      if (attempt > 0) throw e;
+    }
+  }
 }
 
 function finished(tx: IDBTransaction): Promise<void> {
@@ -98,23 +128,24 @@ export function savedGeneration(): number {
 /** Keep `data` as the latest good copy for `key`. */
 export async function saveCopy(key: string, data: unknown, gen = generation): Promise<void> {
   try {
-    const db = await openDb();
-    if (!db || gen !== generation) return;
-    const tx = db.transaction(STORE, 'readwrite');
-    const store = tx.objectStore(STORE);
-    store.put({ key, savedAt: new Date().toISOString(), data } satisfies Row);
-    if (key.startsWith('pack:')) {
-      // Newest first (this one included): drop the meetings beyond KEEP_PACKS.
-      let kept = 0;
-      const cursor = store.index('savedAt').openKeyCursor(null, 'prev');
-      cursor.onsuccess = () => {
-        const c = cursor.result;
-        if (!c) return;
-        if (String(c.primaryKey).startsWith('pack:') && ++kept > KEEP_PACKS) store.delete(c.primaryKey);
-        c.continue();
-      };
-    }
-    await finished(tx);
+    await withDb(async (db) => {
+      if (!db || gen !== generation) return;
+      const tx = db.transaction(STORE, 'readwrite');
+      const store = tx.objectStore(STORE);
+      store.put({ key, savedAt: new Date().toISOString(), data } satisfies Row);
+      if (key.startsWith('pack:')) {
+        // Newest first (this one included): drop the meetings beyond KEEP_PACKS.
+        let kept = 0;
+        const cursor = store.index('savedAt').openKeyCursor(null, 'prev');
+        cursor.onsuccess = () => {
+          const c = cursor.result;
+          if (!c) return;
+          if (String(c.primaryKey).startsWith('pack:') && ++kept > KEEP_PACKS) store.delete(c.primaryKey);
+          c.continue();
+        };
+      }
+      await finished(tx);
+    });
   } catch {
     /* no saved copy this time */
   }
@@ -122,9 +153,7 @@ export async function saveCopy(key: string, data: unknown, gen = generation): Pr
 
 export async function readCopy<T>(key: string): Promise<SavedCopy<T> | null> {
   try {
-    const db = await openDb();
-    if (!db) return null;
-    const row = await answer<Row | undefined>(db.transaction(STORE).objectStore(STORE).get(key));
+    const row = await withDb(async (db) => (db ? answer<Row | undefined>(db.transaction(STORE).objectStore(STORE).get(key)) : undefined));
     return row ? { data: row.data as T, savedAt: row.savedAt } : null;
   } catch {
     return null;
@@ -133,11 +162,12 @@ export async function readCopy<T>(key: string): Promise<SavedCopy<T> | null> {
 
 export async function dropCopy(key: string): Promise<void> {
   try {
-    const db = await openDb();
-    if (!db) return;
-    const tx = db.transaction(STORE, 'readwrite');
-    tx.objectStore(STORE).delete(key);
-    await finished(tx);
+    await withDb(async (db) => {
+      if (!db) return;
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).delete(key);
+      await finished(tx);
+    });
   } catch {
     /* nothing to drop */
   }
@@ -145,9 +175,7 @@ export async function dropCopy(key: string): Promise<void> {
 
 export async function hasSavedCopies(): Promise<boolean> {
   try {
-    const db = await openDb();
-    if (!db) return false;
-    return (await answer(db.transaction(STORE).objectStore(STORE).count())) > 0;
+    return await withDb(async (db) => (db ? (await answer(db.transaction(STORE).objectStore(STORE).count())) > 0 : false));
   } catch {
     return false;
   }
@@ -157,11 +185,12 @@ export async function hasSavedCopies(): Promise<boolean> {
 export async function clearSaved(): Promise<void> {
   generation += 1;
   try {
-    const db = await openDb();
-    if (!db) return;
-    const tx = db.transaction(STORE, 'readwrite');
-    tx.objectStore(STORE).clear();
-    await finished(tx);
+    await withDb(async (db) => {
+      if (!db) return;
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).clear();
+      await finished(tx);
+    });
   } catch {
     /* nothing to clear */
   }

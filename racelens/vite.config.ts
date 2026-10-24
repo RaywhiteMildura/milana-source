@@ -11,6 +11,8 @@ export default defineConfig({
   build: { outDir: path.resolve(__dirname, 'dist/web'), emptyOutDir: true },
   server: {
     port: 5173,
-    proxy: { '/api': { target: 'http://localhost:4850', changeOrigin: true } },
+    // The browser's own Host goes through (no changeOrigin): the server's cross-site guard compares it with the page's
+    // Origin, so writes work whether the dev page is open at localhost, 127.0.0.1 or a LAN address of this machine.
+    proxy: { '/api': { target: 'http://localhost:4850', changeOrigin: false } },
   },
 });

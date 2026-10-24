@@ -76,13 +76,18 @@ function boot() {
     await dispatch(`/assets/index-${hash}.js`, 'no-cors');
     await dispatch(`/assets/index-${hash}.css`, 'no-cors');
   };
-  const activate = async () => {
+  const lifecycle = (type: 'install' | 'activate') => async () => {
     const pending: Promise<unknown>[] = [];
-    handlers.activate({ waitUntil: (p: Promise<unknown>) => pending.push(p) });
+    handlers[type]({ waitUntil: (p: Promise<unknown>) => pending.push(p) });
     await Promise.all(pending);
   };
+  const install = lifecycle('install');
+  const activate = lifecycle('activate');
   const cached = () => [...stores.values()].flatMap((s) => [...s.keys()].map((k) => new URL(k).pathname)).sort();
-  return { stores, deploy, openApp, dispatch, activate, cached, shell, setSite: (s: Record<string, string>) => (site = s), setFront: (f: typeof front) => (front = f) };
+  /** What the v2 worker had kept in its cache: the page it last opened under /index.html, and any good answer for an asset (HTML too). */
+  const v2Kept = (entries: Record<string, { body: string; type: string }>) =>
+    stores.set('racelens-v2', new Map(Object.entries(entries).map(([p, e]) => [`${ORIGIN}${p}`, new Response(e.body, { status: 200, headers: { 'Content-Type': e.type } })])));
+  return { stores, deploy, openApp, dispatch, install, activate, cached, shell, v2Kept, setSite: (s: Record<string, string>) => (site = s), setFront: (f: typeof front) => (front = f) };
 }
 
 describe('service worker', () => {
@@ -162,5 +167,73 @@ describe('service worker', () => {
     expect([...sw.stores.keys()]).toEqual([expect.stringMatching(/^racelens-v\d+$/)]);
     expect([...sw.stores.keys()][0]).not.toBe('racelens-v2');
     expect(sw.cached()).toEqual(['/assets/index-aaa.css', '/assets/index-aaa.js', '/index.html']);
+  });
+
+  describe('updating from the v2 worker', () => {
+    const html = 'text/html; charset=utf-8';
+    const js = 'text/javascript; charset=utf-8';
+    const css = 'text/css; charset=utf-8';
+
+    it('still opens offline: v2 kept the app (N1), this version installs with no signal and activates, the next launch (N2) has no signal', async () => {
+      const sw = boot();
+      sw.deploy('aaa');
+      // N1, served by v2: it kept the page and the assets – and, from an older deploy, an HTML page under an asset's name.
+      sw.v2Kept({
+        '/index.html': { body: sw.shell('aaa'), type: html },
+        '/assets/index-aaa.js': { body: 'js aaa', type: js },
+        '/assets/index-aaa.css': { body: 'css aaa', type: css },
+        '/assets/index-old.js': { body: '<!doctype html>', type: html },
+      });
+      // The browser's update check after N1 finds this worker; the signal drops before install can fetch anything.
+      sw.setFront('down');
+      await sw.install();
+      await sw.activate();
+      expect([...sw.stores.keys()]).toEqual(['racelens-v3']);
+      expect(sw.cached()).toEqual(['/assets/index-aaa.css', '/assets/index-aaa.js', '/index.html']);
+
+      // N2: a cold launch at the track with no signal opens the app (which then shows the meetings saved on the phone).
+      const res = await sw.dispatch('/', 'navigate');
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe(sw.shell('aaa'));
+      expect(await (await sw.dispatch('/assets/index-aaa.js', 'no-cors')).text()).toBe('js aaa');
+      expect(await (await sw.dispatch('/assets/index-aaa.css', 'no-cors')).text()).toBe('css aaa');
+    });
+
+    it('keeps the current shell and assets at install, so N2 opens offline even when v2 had not finished keeping N1’s assets', async () => {
+      const sw = boot();
+      sw.deploy('bbb');
+      // v2 kept the new page, but the bundle it was still downloading never made it into its cache.
+      sw.v2Kept({ '/index.html': { body: sw.shell('bbb'), type: html }, '/assets/index-aaa.js': { body: 'js aaa', type: js } });
+      await sw.install();
+      await sw.activate();
+      expect(sw.cached()).toEqual(['/assets/index-bbb.css', '/assets/index-bbb.js', '/index.html']);
+      sw.setFront('down');
+      expect(await (await sw.dispatch('/', 'navigate')).text()).toBe(sw.shell('bbb'));
+      expect(await (await sw.dispatch('/assets/index-bbb.js', 'no-cors')).text()).toBe('js bbb');
+    });
+
+    it('carries over no Wi-Fi page and no shell whose script is missing (that would open a blank app): the offline page says so instead', async () => {
+      const wifi = boot();
+      wifi.v2Kept({ '/index.html': { body: '<!doctype html><p>Sign in to the Wi-Fi</p>', type: html } });
+      wifi.setFront('down');
+      await wifi.install();
+      await wifi.activate();
+      expect(wifi.cached()).toEqual([]);
+
+      const sw = boot();
+      sw.v2Kept({
+        '/index.html': { body: sw.shell('aaa'), type: html },
+        '/assets/index-aaa.js': { body: '<!doctype html>', type: html },
+        '/assets/index-aaa.css': { body: 'css aaa', type: css },
+      });
+      sw.setFront({ status: 502, body: 'Bad Gateway' });
+      await sw.install();
+      await sw.activate();
+      expect(sw.cached()).toEqual(['/assets/index-aaa.css']);
+      sw.setFront('down');
+      const res = await sw.dispatch('/', 'navigate');
+      expect(res.status).toBe(503);
+      expect(await res.text()).toMatch(/Try again/);
+    });
   });
 });

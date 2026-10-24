@@ -123,6 +123,32 @@ test('signing out forgets the research saved on the phone, so a dead connection 
   await expect(page.getByTestId('saved-copy-banner')).toHaveCount(0);
 });
 
+test('open on the saved copies while the Mac is unreachable, a refused session then shows the login form at once', async ({ page }) => {
+  await signIn(page);
+  await expect.poll(() => savedKeysOnPhone(page)).toContain('packs');
+
+  // No signal: nothing under /api answers, and the app opens on the copies saved on the phone.
+  await page.route('**/api/**', (route) => route.abort('internetdisconnected'));
+  await page.reload();
+  const banner = page.getByTestId('saved-copy-banner');
+  await expect(banner).toBeVisible();
+
+  // Back in reach, but this phone's session is gone (expired, signed out elsewhere): the page's next check of the list
+  // is refused, while /api/auth has not answered yet.
+  await page.route('**/api/packs', (route) => route.fulfill({ status: 401, json: { error: 'Login required', code: 'auth' } }));
+  await page.evaluate(() => window.dispatchEvent(new Event('online')));
+  await expect(page.getByTestId('login-form')).toBeVisible();
+  await expect(banner).toHaveCount(0);
+  await expect(page.getByTestId('meeting-card')).toHaveCount(0);
+  await expect.poll(() => savedKeysOnPhone(page)).toEqual([]);
+
+  // Signing in again works without restarting the app.
+  await page.unrouteAll();
+  await page.getByTestId('login-password').fill(PASSWORD);
+  await page.getByTestId('login-submit').click();
+  await expect(page.getByTestId('meeting-card').first()).toBeVisible();
+});
+
 test('an expired session drops the app back to the login screen', async ({ page }) => {
   await signIn(page);
   // Simulate the cookie disappearing (expiry, server secret rotated, cleared site data).
