@@ -328,7 +328,9 @@ describe('cardRefreshDue', () => {
     ['an hour after the card was fetched', '08:10', racedayPack(local('07:10').toISOString()), true],
     ['never within 15 minutes of a jump', '12:11', racedayPack(), false],
     ['between races, for the races still to run', '12:26', racedayPack(), true],
-    ['never once the last race has jumped', '13:36', racedayPack(), false],
+    ['the last race just past its start may be running late: still refreshed, and it never holds the refresh back', '13:36', racedayPack(), true],
+    ['never once the last race is 30 minutes past its start', '14:05', racedayPack(), false],
+    ['never once a feed reports the last race run', '13:36', (() => { const p = racedayPack(); p.races[2].status = 'interim'; return p; })(), false],
   ])('%s', (_name, hhmm, p, expected) => {
     expect(cardRefreshDue(p, local(hhmm))).toBe(expected);
   });
@@ -448,15 +450,16 @@ describe('AutoRecheckScheduler race-day refresh and late pre-race checks', () =>
     expect(t.calls).toEqual([1, 2, 3]);
   });
 
-  it('leaves races that have jumped alone and stops once the last race has jumped', async () => {
+  it('keeps the picks of races that have jumped (refreshing the card of one just past its start) and stops once the last race is over', async () => {
     const t = setup();
     const r1 = structuredClone(t.stored().predictions[1]);
     expect(await t.tick('12:11')).toBe(0); // R1 jumps within 15 minutes: its own pre-race checks are about to run
     expect(t.calls).toEqual([]);
     expect(await t.tick('12:26')).toBe(1);
-    expect(t.calls).toEqual([2, 3]);
-    expect(t.stored().predictions[1]).toEqual(r1);
-    expect(await t.tick('13:36')).toBe(0);
+    expect(t.calls).toEqual([1, 2, 3]); // R1 jumped a minute ago and may be running late: its card is looked at too
+    expect(t.stored().predictions[1]).toEqual(r1); // the sources still give 12:25, so it keeps the picks it jumped with
+    expect(t.stored().predictions[2].generatedAt).toBe(local('12:26').toISOString());
+    expect(await t.tick('14:05')).toBe(0);
   });
 
   it('a refresh that reaches no source is not retried every minute, and a restarted server refreshes a stale card on its first tick', async () => {
@@ -504,5 +507,25 @@ describe('AutoRecheckScheduler race-day refresh and late pre-race checks', () =>
     expect(t.calls).toEqual([]);
     expect(t.stored().predictions[1]).toEqual(r1);
     expect(t.infos).toContain('Auto pre-race check skipped: Flemington R1 has already jumped');
+  });
+});
+
+describe('a race put back to a later start time', () => {
+  it('gets its automatic pre-race checks again before the new jump', () => {
+    const sched = new AutoRecheckScheduler({ store: {} as never, jobs: {} as never, researchDeps: () => ({}) as never });
+    const pack = {
+      id: 'p',
+      meeting: { date: '2026-10-24', timezone: 'Australia/Melbourne' },
+      races: [{ number: 7, startTime: '2026-10-24T04:40:00.000Z', status: 'open' }],
+      results: {},
+    } as never as Parameters<typeof sched.dueRaces>[0];
+    expect(sched.dueRaces(pack, new Date('2026-10-24T04:31:00.000Z'), 10)).toEqual([7]);
+    expect(sched.dueRaces(pack, new Date('2026-10-24T04:38:00.000Z'), 10)).toEqual([7]);
+    expect(sched.dueRaces(pack, new Date('2026-10-24T04:39:00.000Z'), 10)).toEqual([]);
+    // The sources now say 15:55 instead of 15:40.
+    pack.races[0].startTime = '2026-10-24T04:55:00.000Z';
+    expect(sched.dueRaces(pack, new Date('2026-10-24T04:46:00.000Z'), 10)).toEqual([7]);
+    expect(sched.dueRaces(pack, new Date('2026-10-24T04:53:00.000Z'), 10)).toEqual([7]);
+    expect(sched.dueRaces(pack, new Date('2026-10-24T04:54:00.000Z'), 10)).toEqual([]);
   });
 });

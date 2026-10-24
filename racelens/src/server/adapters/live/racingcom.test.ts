@@ -130,6 +130,19 @@ describe('RacingComAdapter', () => {
     expect(res).toMatchObject({ status: 'interim', placings: [[3], [1]] });
   });
 
+  it('reports a tote that is "Closed" (suspended before the jump) or "Running" as closed, never as an interim result', async () => {
+    const meeting = { id: '2026-10-24:flemington', date: '2026-10-24', venue: 'Flemington', venueSlug: 'flemington', state: 'VIC', raceType: 'thoroughbred' as const, sourceRefs: { racingcom: 'MEET-FLM-20261024' }, sources: [] };
+    for (const [raceStatus, expected] of [['Closed', 'closed'], ['Running', 'closed'], ['Normal', 'open']] as const) {
+      const form = fx('raceform-FLM-1.json').replace(/"raceStatus": *"Normal"/, `"raceStatus": "${raceStatus}"`);
+      expect(form).toContain(`"raceStatus": "${raceStatus}"`);
+      const ctx = ctxFor([[/getRaceForm\(meetCode:"MEET-FLM-20261024", raceNumber:1\)/, form], ...routes]);
+      const race = await rc.fetchRace(meeting, 1, ctx);
+      expect(race.status).toBe(expected);
+      expect(race.results).toBeUndefined();
+      expect(await rc.fetchResults(meeting, 1, ctx)).toBeNull();
+    }
+  });
+
   it('falls back to the minimal field set when the schema rejects a rich field', async () => {
     const ctx = ctxFor(routes, { rejectRich: true });
     const meetings = await rc.listMeetings('2026-10-24', ctx);

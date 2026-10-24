@@ -752,13 +752,17 @@ function sameCard(pack: MeetingPack, onCall: (n: number) => void, change: (raw: 
 }
 
 describe('the picks a race jumped with', () => {
-  it('raceJumped: the scheduled start has passed or a feed says run or abandoned; "closed" alone only counts without a start time', () => {
+  it('raceJumped: a feed says final or abandoned, or else the scheduled start has passed; "closed" or "interim" only count without a start time', () => {
     expect(raceJumped(race(1, 0), at(-0.5))).toBe(false);
     expect(raceJumped(race(1, 0), at(0))).toBe(true);
-    for (const status of ['interim', 'final', 'abandoned'] as const) expect(raceJumped(race(1, 10, { status }), at(0))).toBe(true);
-    // TAB calls a market suspended minutes before the jump (a late scratching) "closed": still to be re-rated.
-    expect(raceJumped(race(1, 10, { status: 'closed' }), at(0))).toBe(false);
-    expect(raceJumped(race(1, 0, { status: 'closed', startTime: undefined }), at(0))).toBe(true);
+    for (const status of ['final', 'abandoned'] as const) expect(raceJumped(race(1, 10, { status }), at(0))).toBe(true);
+    // The totes call a market suspended minutes before the jump (a late scratching) "closed" – racing.com's feed
+    // used to come through as interim: still to be re-rated while the start time is ahead.
+    for (const status of ['closed', 'interim'] as const) {
+      expect(raceJumped(race(1, 10, { status }), at(0))).toBe(false);
+      expect(raceJumped(race(1, 10, { status }), at(10))).toBe(true);
+      expect(raceJumped(race(1, 0, { status, startTime: undefined }), at(0))).toBe(true);
+    }
     expect(raceJumped(race(1, 0, { status: 'open', startTime: undefined }), at(0))).toBe(false);
   });
 
@@ -782,24 +786,34 @@ describe('the picks a race jumped with', () => {
     expect(pack.history.find((h) => h.raceNumber === 2)?.summary).not.toMatch(/our pick ranked/);
   });
 
-  it('a pre-race check of a race that has jumped refreshes and re-rates nothing, and says so; a whole-card check only touches races still to run', async () => {
+  it('a pre-race check of a race that has jumped re-rates nothing, and says so; its card is refreshed only for 30 minutes past its start', async () => {
     const pack = makePack3();
     const before = structuredClone(pack.predictions);
     const calls: number[] = [];
     const src = () => [sameCard(pack, (n) => calls.push(n))];
-    const { changes } = await recheckMeeting(deps({}, at(45), src()), pack, job(), 2);
-    expect(calls).toEqual([]);
+    // R2 jumped five minutes ago and the sources still give that start time: card refreshed, picks kept.
+    const j = job();
+    const { changes } = await recheckMeeting(deps({}, at(45), src()), pack, j, 2);
+    expect(calls).toEqual([2]);
     expect(changes).toEqual([]);
     expect(pack.predictions).toEqual(before);
+    expect(pack.races[1].fetchedAt).toBe(iso(45));
     expect(pack.history.at(-1)?.summary).toBe('Pre-race check R2: the race has started - picks left as they were at the jump');
+    expect(j.progress.message).toBe('The race has started – picks left as they were');
+
+    // R1 jumped 45 minutes ago: past the grace, nothing is asked.
+    const j1 = job();
+    await recheckMeeting(deps({}, at(45), src()), pack, j1, 1);
+    expect(calls).toEqual([2]);
+    expect(j1.progress.message).toBe('The race has started – picks left as they were');
 
     await recheckMeeting(deps({}, at(46), src()), pack, job());
-    expect(calls).toEqual([3]);
+    expect(calls).toEqual([2, 2, 3]);
     expect(pack.predictions[1]).toEqual(before[1]);
     expect(pack.predictions[2]).toEqual(before[2]);
     expect(pack.predictions[3].generatedAt).toBe(iso(46));
     expect(pack.races[2].fetchedAt).toBe(iso(46));
-    expect(pack.races[1].fetchedAt).toBe(iso(-60));
+    expect(pack.races[0].fetchedAt).toBe(iso(-60));
   });
 
   it('a result that lands after a later race jumped re-rates only the races still to run', async () => {
@@ -829,5 +843,124 @@ describe('the picks a race jumped with', () => {
     recordResult(pack, 1, { raceNumber: 1, placings: [[4], [2, 3], [1]], recordedAt: iso(3), source: 'a' });
     const pos = Object.fromEntries(pack.races[0].runners.map((r) => [r.number, r.finishingPosition]));
     expect(pos).toEqual({ 4: 1, 2: 2, 3: 2, 1: 4 });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Race-day regressions: a tote suspension before the jump, a race that goes off late
+// ---------------------------------------------------------------------------
+
+const NAMES8 = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel'];
+const PRICES8 = [2.4, 4.5, 6, 8, 11, 15, 21, 31];
+
+/** R1 due to jump at START: eight runners in the market, Alpha (1) the clear favourite, rated ten minutes before. */
+function pricedPack(): MeetingPack {
+  const runners = NAMES8.map((name, i): Runner => ({ ...runner(i + 1, name), odds: [{ source: 'tab', bookmaker: 'TAB', type: 'fixed', win: PRICES8[i], fetchedAt: iso(-10) }] }));
+  const pack: MeetingPack = { id: meeting.id, createdAt: iso(-60), updatedAt: iso(-60), meeting, races: [race(1, 0, { runners, fieldSize: 8 })], predictions: {}, news: [], sourceStatuses: [], dayPatterns: [], results: {}, history: [], verificationScore: 1, settings: DEFAULT_SETTINGS };
+  predictAll(pack, DEFAULT_SETTINGS, at(-10));
+  return pack;
+}
+
+/** A race-card source answering for R1 with that field, a start time and a status of its own, and Alpha (1) scratched at the barriers. */
+function scratchingCard(id: string, kind: 'official' | 'odds', startMin: number, status: RaceStatus, onCall?: (n: number) => void): SourceAdapter {
+  return {
+    id,
+    name: id,
+    kind,
+    capabilities: ['racecard'],
+    fetchRace: async (_m, n, c) => {
+      onCall?.(n);
+      const fetchedAt = c.now().toISOString();
+      return {
+        number: n,
+        name: `R${n}`,
+        distance: 1200,
+        startTime: iso(startMin),
+        status,
+        sourceRefs: {},
+        runners: NAMES8.map((name, i) => ({ number: i + 1, name, barrier: i + 1, jockey: `Rider ${i + 1}`, trainer: 'T Trainer', weight: 56, scratched: i === 0, form: [], gearChanges: [], comments: [], ratings: {}, odds: i === 0 ? [] : [{ source: id, bookmaker: id, type: 'fixed', win: PRICES8[i] * 0.8, fetchedAt }] })),
+        source: id,
+        fetchedAt,
+      } as unknown as RaceRaw;
+    },
+  };
+}
+
+/** Every runner a prediction backs: its ranking and every leg of every suggested bet. */
+const backed = (p: MeetingPack['predictions'][number]) => new Set([...p.ranked.map((r) => r.number), ...p.betting.suggestions.flatMap((s) => [...s.runners, ...(s.legs ?? []).flat()])]);
+
+describe('late changes at the jump', () => {
+  it.each<[string, RaceStatus]>([
+    ['racing.com now reports a suspended tote as closed', 'closed'],
+    ['racing.com used to report it as interim', 'interim'],
+  ])('a T-3 check while the tote is suspended re-rates the race and drops the horse scratched at the barriers (%s)', async (_name, rcStatus) => {
+    const pack = pricedPack();
+    const before = pack.predictions[1];
+    expect(before.top[0].name).toBe('Alpha');
+    expect(backed(before).has(1)).toBe(true);
+
+    const j = job();
+    const { changes } = await recheckMeeting(deps({}, at(-3), [scratchingCard('racingcom', 'official', 0, rcStatus), scratchingCard('tab', 'odds', 0, 'closed')]), pack, j, 1);
+    expect(pack.races[0].status).toBe(rcStatus);
+    expect(pack.races[0].runners.find((r) => r.number === 1)?.scratched).toBe(true);
+    expect(changes).toContain('R1: Alpha (1) scratched');
+    const after = pack.predictions[1];
+    expect(after.generatedAt).toBe(iso(-3));
+    expect(after.postJump).toBeUndefined();
+    expect(after.top[0].name).not.toBe('Alpha');
+    expect(backed(after).has(1)).toBe(false);
+    expect(j.progress.message).toMatch(/^\d+ changes? found$/);
+
+    // The tote reopens and the owner checks again at T-2: the race is still open to a check.
+    const j2 = job();
+    await recheckMeeting(deps({}, at(-2), [scratchingCard('racingcom', 'official', 0, 'open'), scratchingCard('tab', 'odds', 0, 'open')]), pack, j2, 1);
+    expect(pack.predictions[1].generatedAt).toBe(iso(-2));
+    expect(j2.progress.message).not.toMatch(/has started/);
+  });
+
+  it.each<[string, number | undefined]>([
+    ['a check of that race', 1],
+    ['a check of every race', undefined],
+  ])('a race that goes off late: %s after its advertised start takes the new start time and a scratching, and re-rates it', async (_name, raceNumber) => {
+    // Advertised for START; an incident pushes it back 15 minutes. Four minutes after the advertised time the
+    // sources show the new time and a horse scratched.
+    const pack = pricedPack();
+    const calls: number[] = [];
+    const j = job();
+    const { changes, refreshed } = await recheckMeeting(deps({}, at(4), [scratchingCard('racingcom', 'official', 15, 'open', (n) => calls.push(n)), scratchingCard('tab', 'odds', 15, 'open')]), pack, j, raceNumber);
+    expect(calls).toEqual([1]);
+    expect(refreshed).toEqual([1]);
+    expect(pack.races[0].startTime).toBe(iso(15));
+    expect(pack.races[0].runners.find((r) => r.number === 1)?.scratched).toBe(true);
+    expect(changes).toContain('R1: Alpha (1) scratched');
+    const after = pack.predictions[1];
+    expect(after.generatedAt).toBe(iso(4));
+    expect(after.postJump).toBeUndefined();
+    expect(backed(after).has(1)).toBe(false);
+    expect(j.progress.message).toMatch(/^\d+ changes? found$/);
+    expect(pack.history.at(-1)?.summary).not.toMatch(/has started/);
+  });
+
+  it('a race that really jumped on time has its card refreshed for a while, but keeps the picks it jumped with, and says so', async () => {
+    const pack = pricedPack();
+    const before = structuredClone(pack.predictions[1]);
+    const calls: number[] = [];
+    const j = job();
+    // Four minutes after the jump the sources still give the advertised start (and a scratching only now noticed).
+    const { changes } = await recheckMeeting(deps({}, at(4), [scratchingCard('racingcom', 'official', 0, 'closed', (n) => calls.push(n))]), pack, j, 1);
+    expect(calls).toEqual([1]);
+    expect(changes).toEqual(['R1: Alpha (1) scratched']);
+    expect(pack.races[0].runners.find((r) => r.number === 1)?.scratched).toBe(true);
+    expect(pack.predictions[1]).toEqual(before);
+    expect(j.progress.message).toBe('The race has started – picks left as they were (1 change noted)');
+    expect(pack.history.at(-1)?.summary).toBe('Pre-race check R1: the race has started - picks left as they were at the jump (1 change noted)');
+
+    // Thirty minutes after its start, or once a feed reports it run, it is no longer asked about.
+    await recheckMeeting(deps({}, at(30), [scratchingCard('racingcom', 'official', 0, 'closed', (n) => calls.push(n))]), pack, job(), 1);
+    expect(calls).toEqual([1]);
+    pack.races[0].status = 'interim';
+    await recheckMeeting(deps({}, at(5), [scratchingCard('racingcom', 'official', 0, 'closed', (n) => calls.push(n))]), pack, job());
+    expect(calls).toEqual([1]);
+    expect(pack.predictions[1]).toEqual(before);
   });
 });

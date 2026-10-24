@@ -335,6 +335,26 @@ describe('a source answering with a different race', () => {
     expect(r.fieldSize).toBe(8);
   });
 
+  it('leaves out the heaviest source instead when it is the odd one out: a partial field the other sources agree is short', () => {
+    // Racing Australia's page parsed to 4 of 14 runners; racing.com, TAB and Entain all list the full field.
+    const full = Array.from({ length: 14 }, (_, i) => `Horse Number ${String.fromCharCode(65 + i)}${String.fromCharCode(97 + i)}x`);
+    const runners = (names: string[], numbered = true): RunnerRaw[] => names.map((name, i) => ({ number: numbered ? i + 1 : undefined, name, barrier: i + 1 }));
+    const r = reconcileRace([ra(runners(full.slice(0, 4))), rc(runners(full)), bookie('tab', runners(full)), bookie('entain', runners(full, false))]);
+    expect(r.sources).toEqual(['racingcom', 'tab', 'entain']);
+    expect(r.runners).toHaveLength(14);
+    expect(r.runners.map((x) => x.number)).toEqual(full.map((_, i) => i + 1));
+    expect(r.fieldSize).toBe(14);
+    expect(r.verification.conflicts).toEqual(['racingaustralia listed a different field – ignored']);
+  });
+
+  it('keeps the heaviest source when the sources it outvotes do not agree with each other either', () => {
+    const OTHER2 = ['Quartz Ridge', 'Rosewood', 'Silver Fern', 'Tidal Run', 'Umber Sky', 'Velvet Storm', 'Willow Creek', 'Xanadu Gold'];
+    const r = reconcileRace([ra(field()), bookie('tab', OTHER.map((name, i) => ({ number: i + 1, name, barrier: i + 1 }))), bookie('sportsbet', OTHER2.map((name, i) => ({ number: i + 1, name, barrier: i + 1 })))]);
+    expect(r.sources).toEqual(['racingaustralia']);
+    expect(r.runners.map((x) => x.name)).toEqual(FIELD);
+    expect(r.verification.conflicts).toEqual(['tab listed a different field – ignored', 'sportsbet listed a different field – ignored']);
+  });
+
   it('still merges a source that has one extra runner (a late addition)', () => {
     const tab = [...field().slice(0, 7), { number: 9, name: 'Quiet Achiever', barrier: 9 }];
     const r = reconcileRace([ra(field()), rc(field()), bookie('tab', tab)]);

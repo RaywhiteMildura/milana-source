@@ -49,13 +49,14 @@ describe('automatic results (demo mode)', () => {
     expect(await scheduler.tick()).toBe(1);
     expect(resultsJobs()).toHaveLength(0);
     expect(scheduler.status().lastTickAt).toBe(clock.toISOString());
-    // The card was researched at 00:30, so the first tick after 07:30 refreshes every race still to run – not R1, which has jumped.
+    // The card was researched at 00:30, so the first tick after 07:30 refreshes every race still to run. R1 jumped a
+    // minute ago: its card is looked at too (it may be running late), but the sources still give 12:25, so it keeps its picks.
     const [refresh] = jobs.list().filter((j) => j.type === 'recheck' && j.meetingId === id);
     expect(refresh.raceNumber).toBeUndefined();
     expect((await jobs.wait(refresh.id, 60_000)).status).toBe('done');
     const after = store.getPack(id)!;
     expect(after.predictions[1]).toEqual(before.predictions[1]);
-    expect(after.races.find((r) => r.number === 1)!.fetchedAt).toBe(before.races.find((r) => r.number === 1)!.fetchedAt);
+    expect(after.races.find((r) => r.number === 1)!.startTime).toBe(before.races.find((r) => r.number === 1)!.startTime);
     for (const n of [2, 3, 9]) {
       expect(after.races.find((r) => r.number === n)!.fetchedAt).toBe(clock.toISOString());
       expect(after.predictions[n].generatedAt).toBe(clock.toISOString());

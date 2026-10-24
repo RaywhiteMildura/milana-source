@@ -189,7 +189,9 @@ export class RacingComAdapter implements SourceAdapter {
     const resultsString = str(r, 'resultsString') || '';
     const hasResults = bool(r, 'hasResults') === true || /result|final|paying/.test(statusText) || /^\d+[^0-9]+\d+/.test(resultsString);
     // Interim (protest or correction pending) wins over "has results": the placings exist but may still change.
-    const status: RaceStatus = /abandon|cancel/.test(statusText) ? 'abandoned' : /interim|protest|correct/.test(statusText) ? 'interim' : hasResults ? 'final' : /running|closed/.test(statusText) ? 'interim' : 'open';
+    // A tote "Closed" (suspended, often for a late scratching minutes before the jump) or "Running" race has no
+    // result yet: it is 'closed', as TAB and Entain report it, never 'interim' (which reads as a result on the phone).
+    const status: RaceStatus = /abandon|cancel/.test(statusText) ? 'abandoned' : /interim|protest|correct/.test(statusText) ? 'interim' : hasResults ? 'final' : /running|closed/.test(statusText) ? 'closed' : 'open';
     const cond = parseCondition([str(r, 'trackCondition'), str(r, 'trackRating')].filter(Boolean).join(' '));
 
     // Merge entries: before race day the full field lives in formRaceEntries; raceEntries win where both exist.

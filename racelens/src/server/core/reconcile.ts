@@ -360,26 +360,50 @@ function fmt(v: unknown): string {
   return String(v);
 }
 
-export function reconcileRace(raws: Array<{ source: SourceId; weight: number; race: RaceRaw }>): Race {
+type SourceRace = { source: SourceId; weight: number; race: RaceRaw };
+
+const differentField = (source: SourceId) => `${source} listed a different field – ignored`;
+
+/** How many of these sources share at least half of their named runners with another of them. */
+function agreeingSources(entries: Array<{ source: SourceId; weight: number; runners: RunnerRaw[] }>): number {
+  const clusters = clusterRunners(entries);
+  return entries.filter((e) => {
+    const named = e.runners.filter((x) => x.name).length;
+    const shared = clusters.filter((c) => c.members.some((m) => m.source === e.source) && c.members.some((m) => m.source !== e.source)).length;
+    return named > 0 && shared / named >= 0.5;
+  }).length;
+}
+
+export function reconcileRace(raws: SourceRace[]): Race {
+  return reconcileRaceWithout(raws, []);
+}
+
+/** reconcileRace, with the sources already found to list a different field (`ignored`) left out and recorded. */
+function reconcileRaceWithout(raws: SourceRace[], ignored: SourceId[]): Race {
   const all = orderSources(raws);
-  const raceConflicts: string[] = [];
+  const raceConflicts: string[] = ignored.map(differentField);
   const toEntry = (r: (typeof all)[number]) => ({ source: r.source, weight: r.weight, runners: r.race.runners });
   // A source can answer with the wrong race (another meeting's R1). Each lighter source must recognise most of
   // the field the heavier ones gave: under half of its runners matching a field of 4+ means it is dropped for
   // this race rather than merged. (Its runner is always processed last, so a match is a cluster it joined.)
   const ordered = [all[0]];
+  const outvoted: typeof all = [];
   const anchorSize = all[0].race.runners.filter((r) => r.name).length;
   for (const r of all.slice(1)) {
     const named = r.race.runners.filter((x) => x.name).length;
     if (anchorSize >= 4 && named) {
       const matched = clusterRunners([...ordered, r].map(toEntry)).filter((c) => c.members.length > 1 && c.members.some((m) => m.source === r.source)).length;
       if (matched / named < 0.5) {
-        raceConflicts.push(`${r.source} listed a different field – ignored`);
+        raceConflicts.push(differentField(r.source));
+        outvoted.push(r);
         continue;
       }
     }
     ordered.push(r);
   }
+  // The heaviest source can be the wrong one (a partial field – 4 of 14 – or another race). Two or more of the
+  // sources it outvoted that agree with each other outweigh it: it is left out instead and the race run again.
+  if (outvoted.length >= 2 && agreeingSources(outvoted.map(toEntry)) >= 2) return reconcileRaceWithout(all.slice(1), [...ignored, all[0].source]);
   const anchor = ordered[0].race;
   const sources = ordered.map((r) => r.source);
   const clusters = clusterRunners(ordered.map(toEntry));

@@ -1,7 +1,7 @@
 import type { MeetingPack, SchedulerStatus } from '../../shared/types.js';
 import type { Store } from '../store/store.js';
 import type { JobManager } from './manager.js';
-import { collectAndRerate, dueResultChecks, isResultSettled, raceJumped, recheckMeeting, skipResultsJob, type ResearchDeps } from './research.js';
+import { collectAndRerate, dueResultChecks, inLateStartGrace, isResultSettled, raceJumped, recheckMeeting, skipResultsJob, type ResearchDeps } from './research.js';
 
 /**
  * Background scheduler. Every minute it looks at the saved packs for the
@@ -71,15 +71,19 @@ function localClock(now: Date, timeZone: string): { date: string; time: string }
  * Whether the race-day refresh of every race still to run is due. Pure. Due on the meeting's own date from 07:30
  * track time while a race is still to run, once the oldest race card among those races was fetched an hour ago or
  * more (so a pack researched the night before is refreshed on the first tick after 07:30, and a fresh one an hour
- * after its research) – never within 15 minutes of a jump. The scheduler adds the at-most-hourly limit per meeting.
+ * after its research) – never within 15 minutes of a jump. A race just past its scheduled start that may be running
+ * late (inLateStartGrace) still counts as to run, but never holds the refresh back. The scheduler adds the
+ * at-most-hourly limit per meeting.
  */
 export function cardRefreshDue(pack: MeetingPack, now: Date): boolean {
   const { date, time } = localClock(now, pack.meeting.timezone || 'Australia/Melbourne');
   if (date !== pack.meeting.date || time < CARD_REFRESH_FROM) return false;
   const t = now.getTime();
-  const toRun = pack.races.filter((r) => !pack.results[r.number] && r.status !== 'abandoned' && !raceJumped(r, now));
+  const toRun = pack.races.filter((r) => !pack.results[r.number] && r.status !== 'abandoned' && (!raceJumped(r, now) || inLateStartGrace(pack, r, now)));
   if (!toRun.length) return false;
-  if (toRun.some((r) => Date.parse(r.startTime ?? '') - t < CARD_REFRESH_QUIET_MS)) return false;
+  // Only a jump still to come holds the refresh back: a race past its start has no pre-race checks left to queue.
+  const untilJump = (r: (typeof toRun)[number]) => Date.parse(r.startTime ?? '') - t;
+  if (toRun.some((r) => untilJump(r) >= 0 && untilJump(r) < CARD_REFRESH_QUIET_MS)) return false;
   const oldest = Math.min(...toRun.map((r) => Date.parse(r.fetchedAt) || 0));
   return t - oldest >= CARD_REFRESH_MS;
 }
@@ -96,7 +100,7 @@ export class AutoRecheckScheduler {
   private intervalMs = 60_000;
   private lastTickAt?: string;
   private nextTickAt?: string;
-  /** `${pack}:${race}:initial|final` pre-race stages already fired */
+  /** `${pack}:${race}:${startTime}:initial|final` pre-race stages already fired (a later start time gets its own checks) */
   private fired = new Set<string>();
   /** Watch entries per pack, keyed by the pack's updatedAt so unchanged packs are not re-read on every health poll. */
   private watchCache = new Map<string, { updatedAt: string; entries: SchedulerStatus['watching'] }>();
@@ -179,9 +183,11 @@ export class AutoRecheckScheduler {
       if (minsToJump <= 0 || minsToJump > minutesBefore) continue; // already jumped, or not yet in the window
       // Exactly two automatic checks per race: one when it enters the window, one inside the final 3 minutes.
       const stage = minsToJump <= 3 && minutesBefore > 3 ? 'final' : 'initial';
-      const key = `${pack.id}:${race.number}:${stage}`;
+      // Keyed by start time too: a race put back to a later time gets its two checks again before the new jump.
+      const base = `${pack.id}:${race.number}:${race.startTime}`;
+      const key = `${base}:${stage}`;
       if (this.fired.has(key)) continue;
-      if (stage === 'final' && !this.fired.has(`${pack.id}:${race.number}:initial`)) this.fired.add(`${pack.id}:${race.number}:initial`);
+      if (stage === 'final' && !this.fired.has(`${base}:initial`)) this.fired.add(`${base}:initial`);
       this.fired.add(key);
       due.push(race.number);
     }

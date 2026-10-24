@@ -517,15 +517,31 @@ function dedupeNews(items: NewsItem[]): NewsItem[] {
 }
 
 /**
- * Whether a race has jumped: its scheduled start has passed, or a feed reports it run (interim / final) or
- * abandoned. "closed" counts only for a race without a start time: TAB reports a market suspended minutes before
- * the jump (often for a late scratching) as closed, and that pre-race check must still re-rate the race.
+ * Whether a race has jumped: a feed reports it final or abandoned, or else its scheduled start has passed. A race
+ * status of "closed" or "interim" counts only for a race without a start time: the totes report a market suspended
+ * minutes before the jump (often for a late scratching) as closed, and that pre-race check must still re-rate the race.
  */
 export function raceJumped(race: Pick<Race, 'startTime' | 'status'>, now: Date): boolean {
-  if (race.status === 'interim' || race.status === 'final' || race.status === 'abandoned') return true;
+  if (race.status === 'final' || race.status === 'abandoned') return true;
   const start = race.startTime ? Date.parse(race.startTime) : NaN;
   if (Number.isFinite(start)) return now.getTime() >= start;
-  return race.status === 'closed';
+  return race.status === 'closed' || race.status === 'interim';
+}
+
+/** How long past its scheduled start a race that may have gone off late keeps having its card refreshed. */
+export const LATE_START_GRACE_MS = 30 * 60_000;
+
+/**
+ * A race past its scheduled start by less than LATE_START_GRACE_MS that has no result and that no feed reports run
+ * (interim / final) or abandoned: it may be running late. Its card is still refreshed, so a later start time from
+ * the sources (which reopens it for re-rating) or a scratching during the delay reaches the pack. Whether it is then
+ * re-rated is decided on the refreshed start time and status (rateable).
+ */
+export function inLateStartGrace(pack: MeetingPack, race: Race, now: Date): boolean {
+  if (pack.results[race.number] || race.status === 'final' || race.status === 'interim' || race.status === 'abandoned') return false;
+  const start = race.startTime ? Date.parse(race.startTime) : NaN;
+  const t = now.getTime();
+  return Number.isFinite(start) && t >= start && t < start + LATE_START_GRACE_MS;
 }
 
 /**
@@ -1087,10 +1103,10 @@ export function recordResult(pack: MeetingPack, raceNumber: number, result: Race
 export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job: JobHandle, raceNumber?: number): Promise<{ changes: string[]; refreshed: number[] }> {
   const now = deps.now?.() ?? new Date();
   const adapters = deps.registry.withCapability('racecard', deps.settings.disabledSources);
-  // Races that have jumped keep the card and the picks they jumped with: they are neither refreshed nor re-rated.
-  const targets = pack.races.filter((r) => rateable(pack, r, now) && (raceNumber ? r.number === raceNumber : true));
-  const asked = raceNumber ? pack.races.find((r) => r.number === raceNumber) : undefined;
-  const alreadyJumped = !!asked && !pack.results[asked.number] && asked.status !== 'abandoned' && !targets.length;
+  // Races still to run are refreshed, and so is one just past its scheduled start that may be running late. Whether a
+  // race is re-rated is decided after the refresh, on the start time and status the sources give now: a race that
+  // has really jumped keeps the picks it jumped with.
+  const targets = pack.races.filter((r) => (rateable(pack, r, now) || inLateStartGrace(pack, r, now)) && (raceNumber ? r.number === raceNumber : true));
   const changes: string[] = [];
   const refreshed: number[] = [];
 
@@ -1143,6 +1159,9 @@ export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job:
     job.finish(key, 'done', `${raws.length} source${raws.length === 1 ? '' : 's'}, ${merged.fieldSize} runners`);
   }
   pack.sourceStatuses = mergeStatuses(pack.sourceStatuses, statuses);
+  // Judged on the refreshed card: a later start time from the sources means the race has not jumped after all.
+  const asked = raceNumber ? pack.races.find((r) => r.number === raceNumber) : undefined;
+  const alreadyJumped = !!asked && !pack.results[asked.number] && asked.status !== 'abandoned' && !rateable(pack, asked, now);
 
   // 2. Results of earlier races + day patterns ---------------------------------
   // Only the races the watcher would look at now, through the watcher's own pass: one set of rules for every
@@ -1186,14 +1205,16 @@ export async function recheckMeeting(deps: ResearchDeps, pack: MeetingPack, job:
   pack.verificationScore = round(mean(pack.races.map((r) => r.verification.score)), 3);
   pack.meeting.sources = [...new Set(pack.races.flatMap((r) => r.sources))];
 
+  const noted = changes.length ? ` (${changes.length} change${changes.length === 1 ? '' : 's'} noted)` : '';
   pack.history.push({
     at: now.toISOString(),
     type: 'recheck',
     raceNumber,
-    summary: raceNumber ? `Pre-race check R${raceNumber}: ${alreadyJumped ? 'the race has started - picks left as they were at the jump' : changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'}` : 'no changes'}${newly.length ? `, results in for R${newly.join(', R')}` : ''}` : `Pre-race check (all remaining): ${changes.length} change${changes.length === 1 ? '' : 's'}${newly.length ? `, results in for R${newly.join(', R')}` : ''}`,
+    summary: raceNumber ? `Pre-race check R${raceNumber}: ${alreadyJumped ? `the race has started - picks left as they were at the jump${noted}` : changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'}` : 'no changes'}${newly.length ? `, results in for R${newly.join(', R')}` : ''}` : `Pre-race check (all remaining): ${changes.length} change${changes.length === 1 ? '' : 's'}${newly.length ? `, results in for R${newly.join(', R')}` : ''}`,
     changes,
   });
-  job.message(changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'} found` : alreadyJumped ? 'The race has started – picks left as they were' : 'No changes – picks stand');
+  // A race that has jumped is never re-rated, so a change found on its card must not read as if the picks took it in.
+  job.message(alreadyJumped ? `The race has started – picks left as they were${noted}` : changes.length ? `${changes.length} change${changes.length === 1 ? '' : 's'} found` : 'No changes – picks stand');
   return { changes, refreshed };
 }
 
