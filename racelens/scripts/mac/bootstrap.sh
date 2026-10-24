@@ -32,7 +32,13 @@ if [ -z "${RACELENS_SELF_UPDATE:-}" ]; then
   LOCK_PID="$(cat "$SUPPORT/update.lock/pid" 2>/dev/null || true)"
   case "$LOCK_PID" in
     '' | *[!0-9]*) ;;
-    *) if kill -0 "$LOCK_PID" 2>/dev/null; then die "an update started from your phone is running right now. Wait a few minutes (it finishes by itself), then run this again if you still need to."; fi ;;
+    # Same rule as self-update.sh: a lock older than an hour is a leftover whatever its pid says (pids are reused
+    # after a restart), and the pid must still be the updater itself.
+    *) if [ -z "$(find "$SUPPORT/update.lock" -maxdepth 0 -mmin +60 2>/dev/null)" ] && kill -0 "$LOCK_PID" 2>/dev/null &&
+         ps -o command= -p "$LOCK_PID" 2>/dev/null | grep -q 'self-update'; then
+         die "an update started from your phone is running right now. Wait a few minutes (it finishes by itself), then run this again if you still need to."
+       fi
+       rm -rf "$SUPPORT/update.lock" ;;
   esac
 fi
 

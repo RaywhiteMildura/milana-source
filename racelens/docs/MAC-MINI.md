@@ -114,7 +114,7 @@ reach from your phone:
 | **Update RaceLens** says the update failed | RaceLens went back to the version you had, so it keeps working. Try again later. If it keeps failing, check the Mac mini's internet; the details are in `~/Library/Logs/RaceLens/update.log`. |
 | **Update RaceLens** says it works on the Mac mini installation only, or nothing happens | Run the one-line command on the Mac once; it sets up updating from the phone. |
 | Sources show red on the home page | Tap **Check sources**. If everything is red, the Mac mini has no internet. If only some are red, research still completes with the rest. |
-| You want the old version back | In Terminal: `cd ~/RaceLens && rm -rf app-broken && mv app app-broken && mv app-previous app && bash app/scripts/mac/install.sh` |
+| You want the old version back | If **Update RaceLens** said the update failed, you are already back on the old version – nothing to do. Otherwise, in Terminal: `cd ~/RaceLens && [ -d app-previous ] && rm -rf app-broken && mv app app-broken && mv app-previous app && bash app/scripts/mac/install.sh` (it does nothing when there is no previous version) |
 
 Where things live on the Mac: the app in `~/RaceLens/app` (its version in `~/RaceLens/app/VERSION.json`), your
 research and settings in `~/Library/Application Support/RaceLens`, the logs in `~/Library/Logs/RaceLens`
