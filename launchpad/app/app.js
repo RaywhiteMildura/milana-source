@@ -6,6 +6,7 @@
   const $ = (s, el) => (el || document).querySelector(s);
   const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const clone = v => (v == null ? v : JSON.parse(JSON.stringify(v)));
   const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   const uid = () => 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const todayStr = () => P.fmtDate(P.today());
@@ -57,7 +58,7 @@
     me: { id: null, name: '', email: '', isOwner: false, canEdit: false, canWrite: null },
     config: { officeName: 'Ray White Mildura', programName: 'Launchpad', targets: { geo: 300, appraisals: 30, listings: 3 }, weeks: 12, workDays: [1, 2, 3, 4, 5], managerEmails: [], nudgeHour: 18, timezone: 'Australia/Melbourne' },
     configLoaded: false, person: null, personLoaded: false, days: [], pipeline: [], learning: null,
-    roster: [], rosterLoaded: false, teamCache: {},
+    roster: [], rosterLoaded: false, teamCache: {}, teamLoading: {}, saveFailed: false, busy: 0,
     view: 'today', logDate: todayStr(), draft: null, dirty: false, saving: null, saveTimer: null, learnTimer: null,
     ui: { learnWeek: null, quiz: null, practice: null, teamPerson: null, scriptsTab: 'scripts', scriptsQuery: '', scriptsCat: 'all', openScript: null, teamFilter: 'active', confetti: null },
     unsubs: [],
@@ -72,7 +73,7 @@
   const emptyDay = date => ({ date, geo: 0, appraisals: 0, listings: 0, calls: 0, connections: 0, appointments: 0, sessions: 0, note: '', closed: false, updatedAt: null });
   const snapFor = (person, days, on) => P.snapshot(person, S.config, days, on || todayStr());
   const mySnap = () => (S.person && S.person.role !== 'manager' ? snapFor(S.person, daysWithDraft()) : null);
-  function daysWithDraft() { if (!S.draft) return S.days; const rest = S.days.filter(d => d.date !== S.draft.date); return rest.concat([S.draft]); }
+  function daysWithDraft() { if (!S.draft || (!S.dirty && !S.draft.updatedAt)) return S.days; const rest = S.days.filter(d => d.date !== S.draft.date); return rest.concat([S.draft]); }
   function defaultLearning() { return { lessonsRead: {}, drillsDone: {}, quiz: {}, practice: { count: 0, scores: [] }, updatedAt: null }; }
 
   // ---------- Toast / sheet / confetti ----------
@@ -112,6 +113,7 @@
   const myRef = () => db().doc('people/' + S.me.id);
   const dayRef = (pid, date) => db().doc('people/' + pid + '/days/' + date);
   const learnRef = pid => db().doc('people/' + pid + '/learning/progress');
+  const coachRef = pid => db().doc('coaching/' + pid);
   function writeFail(e) {
     console.error(e);
     const code = e && e.code;
@@ -119,7 +121,10 @@
     else if (code === 'quota_exceeded') toast('Storage is full. Tell your manager.', 5000);
     else toast('Could not save right now. Try again in a moment.', 4000);
   }
-  function chain(fn) { S.saving = (S.saving || Promise.resolve()).then(fn, fn).catch(writeFail); return S.saving; }
+  function chain(fn) {
+    const run = async () => { S.busy++; try { return await fn(); } finally { S.busy--; } };
+    S.saving = (S.busy ? S.saving.then(run, run) : run()).catch(writeFail); return S.saving;
+  }
 
   // ---------- Boot ----------
   async function boot() {
@@ -149,7 +154,7 @@
       render();
     }, e => console.error(e)));
     S.unsubs.push(db().collection('people/' + S.me.id + '/pipeline').onSnapshot(qs => { S.pipeline = qs.docs.map(d => Object.assign({ id: d.id }, d.data())); render(); }, e => console.error(e)));
-    S.unsubs.push(learnRef(S.me.id).onSnapshot(snap => { S.learning = snap.exists ? Object.assign(defaultLearning(), snap.data()) : defaultLearning(); render(); }, e => console.error(e)));
+    S.unsubs.push(learnRef(S.me.id).onSnapshot(snap => { S.learning = snap.exists ? Object.assign(defaultLearning(), clone(snap.data())) : defaultLearning(); render(); }, e => console.error(e)));
     if (S.person && S.person.role === 'manager') subscribeRoster();
   }
   function subscribeRoster() {
@@ -226,7 +231,7 @@
     const email = $('#onb-email').value.trim();
     const startDate = role === 'associate' ? $('#onb-start').value : todayStr();
     if (role === 'associate' && !P.parseDate(startDate)) { toast('Pick a start date'); return; }
-    const doc = { id: S.me.id, name, email, role, startDate, farm: role === 'associate' ? $('#onb-farm').value.trim() : '', status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), lastLogDate: null, summary: null, managerNotes: '' };
+    const doc = { id: S.me.id, name, email, role, startDate, farm: role === 'associate' ? $('#onb-farm').value.trim() : '', status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), lastLogDate: null, summary: null };
     const btn = $('button[type=submit]', form); btn.disabled = true;
     try { await myRef().set(doc); await learnRef(S.me.id).set(defaultLearning()); toast('Welcome aboard'); }
     catch (e) { writeFail(e); btn.disabled = false; }
@@ -246,7 +251,7 @@
     parts.push('<div class="hero"><p class="eyebrow">' + esc(S.config.officeName) + ' · ' + esc(longDate(todayStr())) + '</p><h1>G\'day ' + esc(first) + '.</h1><div class="row"><span class="pill accent">' + headline + '</span>' + (snap.streak ? '<span class="pill">' + ICONS.flame + ' ' + snap.streak + ' day streak</span>' : '') + ' ' + bandPill(snap.overall) + '</div></div>');
     if (snap.status === 'finished') parts.push(graduationCard(snap));
     // yesterday not logged
-    const prevIdx = snap.idx - 2; const prevDate = prevIdx >= 0 ? snap.cal.workDates[prevIdx] : null;
+    const prevDate = prevWorkDate(snap);
     if (prevDate && !S.days.find(x => x.date === prevDate) && S.logDate === todayStr() && snap.status === 'active') parts.push('<div class="card warn"><div class="row between"><div><strong>' + niceDate(prevDate) + ' was not logged.</strong><div class="small">Twenty seconds now keeps the picture honest.</div></div><button class="btn sm" data-logdate="' + prevDate + '">Log it</button></div></div>');
     // Log card
     const logging = S.logDate === todayStr() ? 'Today' : niceDate(S.logDate);
@@ -259,7 +264,7 @@
       '<p class="tiny muted" style="margin-top:8px">Jess\'s benchmark per 45-minute session: 18 to 24 calls, 8 to 12 connections, 1 to 3 appointments.</p></details>' +
       '<label class="f">One line about today<textarea id="day-note" rows="2" placeholder="A win, a lesson, or what got in the way">' + esc(d.note || '') + '</textarea></label>' +
       '<button class="btn primary big block" data-act="done">' + (d.closed ? 'Update today' : 'Done for today') + '</button>' +
-      '<p class="tiny muted" id="save-state">' + (S.dirty ? 'Saving…' : (d.updatedAt ? 'Saved ' + esc(new Date(d.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })) : 'Numbers save as you go.')) + '</p></div>');
+      '<p class="tiny muted" id="save-state">' + (S.saveFailed ? 'Not saved. Tap a number again to retry.' : S.dirty ? 'Saving…' : (d.updatedAt ? 'Saved ' + esc(new Date(d.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })) : 'Numbers save as you go.')) + '</p></div>');
     // pace strip
     const g = snap.metrics.geo, a = snap.metrics.appraisals, l = snap.metrics.listings;
     parts.push('<div class="card soft"><p class="eyebrow">Your pace from here</p><div class="bars">' + barRow('Geo data', g) + barRow('Appraisals', a) + barRow('Listings', l) + '</div>' +
@@ -268,6 +273,11 @@
     parts.push(practiceTeaser(Math.min(Math.max(snap.week, 1), S.config.weeks)));
     parts.push(pipelineDue());
     return parts.join('');
+  }
+  function prevWorkDate(snap) {
+    const t = todayStr(); const todayIsWork = snap.cal.workDates[snap.idx - 1] === t;
+    const i = todayIsWork ? snap.idx - 2 : snap.idx - 1;
+    return i >= 0 ? snap.cal.workDates[i] : null;
   }
   function stepper(key, label, val, hint, primary) {
     return '<div class="stepper' + (primary ? ' primary' : '') + '"><div class="lab">' + label + '</div><div class="val num" data-val="' + key + '">' + (val || 0) + '</div><div class="ctr"><button type="button" aria-label="Remove one ' + label + '" data-step="' + key + '" data-n="-1">−</button><button type="button" class="plus" aria-label="Add one ' + label + '" data-step="' + key + '" data-n="1">+</button></div><div class="hint">' + hint + '</div></div>';
@@ -314,7 +324,7 @@
     if (!S.draft) S.draft = emptyDay(S.logDate);
     const before = S.draft[key] || 0; const after = Math.max(0, before + n);
     if (after === before) return;
-    S.draft[key] = after; S.dirty = true;
+    S.draft[key] = after; S.dirty = true; S.draftRev = (S.draftRev || 0) + 1;
     const el = $('[data-val="' + key + '"]'); if (el) el.textContent = after;
     const st = $('#save-state'); if (st) st.textContent = 'Saving…';
     if (n > 0 && key === 'appraisals') openAppraisalSheet();
@@ -323,16 +333,23 @@
     if (['geo', 'appraisals', 'listings'].includes(key)) refreshPaceStrip();
   }
   function refreshPaceStrip() { /* cheap: re-render whole view after a tick when no sheet is open */ if (!$('#sheet-root').innerHTML) render(); }
-  function scheduleSave() { clearTimeout(S.saveTimer); S.saveTimer = setTimeout(() => saveDay(false), 900); }
-  function saveDay(close) {
+  function scheduleSave() { clearTimeout(S.saveTimer); S.saveFailed = false; S.saveTimer = setTimeout(() => saveDay(false), 900); }
+  function saveDay(close, retried) {
     clearTimeout(S.saveTimer);
-    if (!S.draft) return Promise.resolve();
+    if (!S.draft || (!S.dirty && !close)) return Promise.resolve();
     const note = $('#day-note'); if (note) S.draft.note = note.value;
     const doc = Object.assign({}, S.draft, { closed: close ? true : !!S.draft.closed, updatedAt: new Date().toISOString() });
     const prevTotals = { geo: P.total(S.days, 'geo'), appraisals: P.total(S.days, 'appraisals'), listings: P.total(S.days, 'listings') };
+    const rev = S.draftRev || 0;
     return chain(async () => {
-      await dayRef(S.me.id, doc.date).set(doc);
-      S.draft = doc; S.dirty = false;
+      try { await dayRef(S.me.id, doc.date).set(doc); }
+      catch (e) {
+        if (!retried && e && (e.code === 'unavailable' || e.code === 'resource_exhausted')) { setTimeout(() => saveDay(close, true), 1500 + Math.random() * 1500); return; }
+        S.saveFailed = true; const st = $('#save-state'); if (st) st.textContent = 'Not saved. Tap a number again to retry.'; throw e;
+      }
+      S.saveFailed = false;
+      if (S.draft && S.draft.date === doc.date) { S.draft.updatedAt = doc.updatedAt; S.draft.closed = doc.closed; }
+      if ((S.draftRev || 0) === rev) S.dirty = false; else scheduleSave();
       const days = daysWithDraft(); const snap = snapFor(S.person, days);
       const summary = summarize(snap);
       await myRef().update({ lastLogDate: latestDate(days), summary, updatedAt: new Date().toISOString() });
@@ -359,7 +376,7 @@
     if (celebrate) confetti();
   }
   function openDatePicker() {
-    const snap = mySnap(); const prevIdx = snap.idx - 2; const prev = prevIdx >= 0 ? snap.cal.workDates[prevIdx] : null;
+    const snap = mySnap(); const prev = prevWorkDate(snap);
     sheet('<h3>Which day are you logging?</h3><div class="list">' +
       '<button class="item" data-logdate="' + todayStr() + '"><div><div class="t">Today</div><div class="s">' + longDate(todayStr()) + '</div></div></button>' +
       (prev ? '<button class="item" data-logdate="' + prev + '"><div><div class="t">Previous working day</div><div class="s">' + longDate(prev) + (S.days.find(x => x.date === prev) ? ' · logged' : ' · not logged') + '</div></div></button>' : '') +
@@ -441,9 +458,9 @@
   }
   function chart(snap, days, metric) {
     const W = 480, H = 210, pl = 38, pr = 14, pt = 14, pb = 30; const n = snap.total; const target = snap.targets[metric];
-    const byDate = {}; for (const d of days) byDate[d.date] = d;
-    const pts = []; let acc = 0;
-    for (let i = 1; i <= Math.min(snap.idx, n); i++) { acc += Number((byDate[snap.cal.workDates[i - 1]] || {})[metric]) || 0; pts.push([i, acc]); }
+    const buckets = P.byIndex(days, snap.cal, metric, snap.asOf);
+    const pts = []; let acc = buckets[0] || 0;
+    for (let i = 1; i <= Math.min(snap.idx, n); i++) { acc += buckets[i] || 0; pts.push([i, acc]); }
     const maxY = Math.max(target, acc, 1) * 1.05;
     const x = i => pl + (i / n) * (W - pl - pr); const y = v => pt + (1 - v / maxY) * (H - pt - pb);
     const guide = []; for (let i = 0; i <= n; i++) guide.push([x(i), y(P.guideAt(metric, target, i, snap.cal))]);
@@ -464,11 +481,11 @@
     return '<div class="heat">' + snap.cal.workDates.map(dt => '<i class="' + (dt > t ? 'future' : (logged[dt] ? 'on' : (dt < t ? 'miss' : ''))) + (dt === t ? ' today' : '') + '" title="' + dt + (logged[dt] ? ' logged' : '') + '"></i>').join('') + '</div>';
   }
   function weekTable(snap, days) {
-    const byDate = {}; for (const d of days) byDate[d.date] = d; const rows = [];
+    const rows = []; const gGeo = P.weeklyGuide('geo', snap.targets.geo, snap.cal.weeks), gAp = P.weeklyGuide('appraisals', snap.targets.appraisals, snap.cal.weeks);
     for (let w = 1; w <= snap.cal.weeks; w++) {
-      const dts = P.weekDates(snap.cal, w); const sum = k => dts.reduce((s, dt) => s + (Number((byDate[dt] || {})[k]) || 0), 0);
-      const future = dts.length && dts[0] > todayStr();
-      rows.push('<tr class="' + (w === snap.week ? 'now' : '') + '"><td>Week ' + w + (future ? ' <span class="muted">·</span>' : '') + '</td><td class="num">' + sum('geo') + ' <span class="muted">/' + Math.round(P.weeklyGuide('geo', snap.targets.geo)[w - 1]) + '</span></td><td class="num">' + sum('appraisals') + ' <span class="muted">/' + Math.round(P.weeklyGuide('appraisals', snap.targets.appraisals)[w - 1]) + '</span></td><td class="num">' + sum('listings') + '</td><td class="num">' + sum('calls') + '</td><td class="num">' + sum('connections') + '</td><td class="num">' + sum('appointments') + '</td></tr>');
+      const sum = k => P.weekTotal(days, snap.cal, w, k);
+      const future = P.weekBounds(snap.cal, w)[0] > todayStr();
+      rows.push('<tr class="' + (w === snap.week ? 'now' : '') + '"><td>Week ' + w + (future ? ' <span class="muted">·</span>' : '') + '</td><td class="num">' + sum('geo') + ' <span class="muted">/' + Math.round(gGeo[w - 1]) + '</span></td><td class="num">' + sum('appraisals') + ' <span class="muted">/' + Math.round(gAp[w - 1]) + '</span></td><td class="num">' + sum('listings') + '</td><td class="num">' + sum('calls') + '</td><td class="num">' + sum('connections') + '</td><td class="num">' + sum('appointments') + '</td></tr>');
     }
     return '<div class="table-wrap"><table><thead><tr><th>Week</th><th>Geo / guide</th><th>Appraisals / guide</th><th>Listings</th><th>Calls</th><th>Conn.</th><th>Appts</th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
   }
@@ -633,11 +650,11 @@
   }
   async function practiceFeedback() {
     const pr = S.ui.practice; if (!pr || pr.busy) return;
-    pr.busy = true; pr.error = null; render();
+    pr.busy = true; pr.error = null; pr.ctl = new AbortController(); render();
     const transcript = pr.turns.filter(t => !/^\(The call connects/.test(t.content)).map(t => (t.role === 'user' ? 'ASSOCIATE: ' : 'THEM: ') + t.content.replace(/\s*END OF CALL\s*$/i, '')).join('\n');
     const prompt = 'You are a warm, direct real estate sales coach reviewing a role-play by a brand-new associate at ' + S.config.officeName + ' who is practising "' + pr.rp.title + '" (' + pr.rp.setting + '). Jess Densley\'s standard: courtesy first, a reason for the call, value before the ask, listen (why\'s that? tell me more), update details, the cash-buyer question where it fits, always offer two times, never burn a bridge.\n\nGOAL: ' + pr.rp.goal + '\n\nRUBRIC (score each 0, 1 or 2):\n' + pr.rp.rubric.map((r, i) => (i + 1) + '. ' + r).join('\n') + '\n\nTRANSCRIPT:\n' + transcript + '\n\nReply with ONLY a JSON object: {"scores":[{"criterion":"<rubric item, shortened>","score":0,"note":"<one short sentence>"}],"total":<sum>,"max":<2 x number of criteria>,"strengths":["<2-3 short items>"],"improve":["<2-3 short items>"],"oneThing":"<the single most useful change, one sentence>","wordForWord":"<one line the associate could say next time, in Jess\'s style>"}. Australian English, plain words, no em-dashes.';
     try {
-      const f = await S.caps.sample.json(prompt, { modelTier: 'default', cache: false });
+      const f = await S.caps.sample.json(prompt, { modelTier: 'default', cache: false, signal: pr.ctl.signal });
       if (f && Array.isArray(f.scores)) {
         f.max = f.max || f.scores.length * 2; f.total = Math.min(f.max, f.total || f.scores.reduce((s, x) => s + (Number(x.score) || 0), 0));
         pr.feedback = f;
@@ -645,18 +662,25 @@
         setLearning(L => { L.practice = L.practice || { count: 0, scores: [] }; L.practice.count = (L.practice.count || 0) + 1; L.practice.lastAt = new Date().toISOString(); L.practice.scores = (L.practice.scores || []).concat([{ rp: pr.rp.id, pct, at: new Date().toISOString() }]).slice(-40); });
         if (pct >= 75) confetti();
       } else pr.error = 'The coach reply was not readable. Try again.';
-    } catch (e) { pr.error = e && e.code === 'invalid_json' ? 'The coach reply was not readable. Try again.' : 'Could not get feedback right now. Try again.'; console.warn(e); }
-    pr.busy = false; render();
+    } catch (e) { if (!(e && e.code === 'cancelled')) pr.error = e && e.code === 'invalid_json' ? 'The coach reply was not readable. Try again.' : 'Could not get feedback right now. Try again.'; console.warn(e); }
+    pr.busy = false; pr.ctl = null; render();
   }
 
   // ---------- Team (managers) ----------
   function associates() { return S.roster.filter(p => p.role !== 'manager'); }
   function managerHomeHtml() { return teamHtml(); }
-  async function loadTeamDays(pid, force) {
-    const c = S.teamCache[pid]; if (c && !force && Date.now() - c.at < 120000) return c;
-    const [ds, ps, ls] = await Promise.all([db().collection('people/' + pid + '/days').get(), db().collection('people/' + pid + '/pipeline').get(), learnRef(pid).get()]);
-    const entry = { at: Date.now(), days: ds.docs.map(d => d.data()).filter(d => d && d.date), pipeline: ps.docs.map(d => Object.assign({ id: d.id }, d.data())), learning: ls.exists ? Object.assign(defaultLearning(), ls.data()) : defaultLearning() };
-    S.teamCache[pid] = entry; return entry;
+  function loadTeamDays(pid, force) {
+    const c = S.teamCache[pid]; if (c && !force && !c.error && Date.now() - c.at < 120000) return Promise.resolve(c);
+    if (S.teamLoading[pid]) return S.teamLoading[pid];
+    const p = (async () => {
+      try {
+        const [ds, ps, ls, cs] = await Promise.all([db().collection('people/' + pid + '/days').get(), db().collection('people/' + pid + '/pipeline').get(), learnRef(pid).get(), coachRef(pid).get()]);
+        const entry = { at: Date.now(), days: ds.docs.map(d => d.data()).filter(d => d && d.date), pipeline: ps.docs.map(d => Object.assign({ id: d.id }, d.data())), learning: ls.exists ? Object.assign(defaultLearning(), clone(ls.data())) : defaultLearning(), notes: cs.exists ? String(cs.data().notes || '') : '', notesVersion: cs.exists };
+        S.teamCache[pid] = entry; return entry;
+      } catch (e) { console.warn('team load', e); const entry = { at: Date.now(), error: true, days: [], pipeline: [], learning: defaultLearning(), notes: '' }; S.teamCache[pid] = entry; return entry; }
+      finally { delete S.teamLoading[pid]; }
+    })();
+    S.teamLoading[pid] = p; return p;
   }
   function teamHtml() {
     if (S.ui.teamPerson) return teamPersonHtml();
@@ -692,7 +716,7 @@
     return head + progressFor(snap, c.days, c.pipeline, c.learning, p, true) +
       '<div class="card info"><p class="eyebrow">Coaching prompts for the Monday meeting</p><ul style="margin:0;padding-left:18px">' + coach.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul><p class="small muted">Jess\'s close: Do you need any support? Can you do all that? Will you do all that?</p></div>' +
       '<div class="card"><p class="eyebrow">Last 7 logged days</p><div class="table-wrap"><table><thead><tr><th>Day</th><th>Geo</th><th>Appr</th><th>List</th><th>Calls</th><th>Conn</th><th>Appt</th><th style="text-align:left">Note</th></tr></thead><tbody>' + (recent.length ? recent.map(d => '<tr><td>' + niceDate(d.date) + '</td><td class="num">' + (d.geo || 0) + '</td><td class="num">' + (d.appraisals || 0) + '</td><td class="num">' + (d.listings || 0) + '</td><td class="num">' + (d.calls || 0) + '</td><td class="num">' + (d.connections || 0) + '</td><td class="num">' + (d.appointments || 0) + '</td><td style="text-align:left;white-space:normal;min-width:160px">' + esc(d.note || '') + '</td></tr>').join('') : '<tr><td colspan="8">Nothing logged yet.</td></tr>') + '</tbody></table></div></div>' +
-      '<div class="card"><p class="eyebrow">Manager notes (' + esc(p.name) + ' cannot see these)</p><textarea id="mgr-notes" rows="4" placeholder="Checkpoint notes, agreed actions, stakes from the Monday Game Plan">' + esc(p.managerNotes || '') + '</textarea><div class="row"><button class="btn primary sm" data-act="save-notes" data-pid="' + esc(p.id) + '">Save notes</button></div></div>' +
+      '<div class="card"><p class="eyebrow">Manager notes (' + esc(p.name) + ' cannot see these)</p>' + (c.error ? '<p class="small" style="color:var(--bad)">Could not load this person\'s records. Refresh to try again.</p>' : '') + '<textarea id="mgr-notes" rows="4" placeholder="Checkpoint notes, agreed actions, stakes from the Monday Game Plan">' + esc(c.notes || '') + '</textarea><div class="row"><button class="btn primary sm" data-act="save-notes" data-pid="' + esc(p.id) + '">Save notes</button></div></div>' +
       '<div class="card"><p class="eyebrow">Settings for ' + esc(p.name) + '</p><div class="stack"><label class="f">Start date<input type="date" id="tp-start" value="' + esc(p.startDate || '') + '"></label><label class="f">Email for reminders<input type="email" id="tp-email" value="' + esc(p.email || '') + '"></label><label class="f">Farm area<input id="tp-farm" value="' + esc(p.farm || '') + '"></label><div class="row"><label class="f grow">Geo target<input type="number" id="tp-geo" value="' + esc((p.targets || {}).geo || S.config.targets.geo) + '"></label><label class="f grow">Appraisals<input type="number" id="tp-appr" value="' + esc((p.targets || {}).appraisals || S.config.targets.appraisals) + '"></label><label class="f grow">Listings<input type="number" id="tp-list" value="' + esc((p.targets || {}).listings || S.config.targets.listings) + '"></label></div><label class="f">Status<select id="tp-status">' + ['active', 'paused', 'graduated', 'left'].map(s => '<option ' + ((p.status || 'active') === s ? 'selected' : '') + '>' + s + '</option>').join('') + '</select></label><label class="f">Role<select id="tp-role"><option value="associate" ' + (p.role !== 'manager' ? 'selected' : '') + '>Associate</option><option value="manager" ' + (p.role === 'manager' ? 'selected' : '') + '>Manager</option></select></label><button class="btn primary" data-act="save-person" data-pid="' + esc(p.id) + '">Save settings</button></div></div>';
   }
   function coachSuggestions(snap, c) {
@@ -752,12 +776,14 @@
     document.addEventListener('click', onClick);
     document.addEventListener('submit', e => { if (e.target.id === 'onb') { e.preventDefault(); submitOnboarding(e.target); } });
     document.addEventListener('input', e => {
-      if (e.target.id === 'day-note') { if (S.draft) { S.draft.note = e.target.value; S.dirty = true; scheduleSave(); } }
+      if (e.target.id === 'day-note') { if (S.draft) { S.draft.note = e.target.value; S.dirty = true; S.draftRev = (S.draftRev || 0) + 1; scheduleSave(); } }
       if (e.target.id === 'scripts-q') { S.ui.scriptsQuery = e.target.value; const v = e.target.value; render(); const q = $('#scripts-q'); if (q) { q.focus(); q.setSelectionRange(v.length, v.length); } }
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'chat-in') { e.preventDefault(); sendChat(); } });
     document.addEventListener('toggle', e => { const d = e.target; if (d.matches && d.matches('details.lesson[data-lesson]')) S.ui.openLesson = d.open ? d.dataset.lesson : null; }, true);
-    window.addEventListener('beforeunload', () => { if (S.dirty) saveDay(false); });
+    const flush = () => { if (S.dirty) saveDay(false); };
+    window.addEventListener('beforeunload', flush); window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
   }
   function onClick(e) {
     const t = e.target.closest('[data-nav],[data-step],[data-act],[data-logdate],[data-week],[data-read],[data-drill],[data-qpick],[data-stab],[data-scat],[data-open-script],[data-open-template],[data-copy-script],[data-copy-template],[data-practice],[data-person],[data-tfilter],[data-pipe],[data-touch],[data-pstatus],[data-chart],[data-learn-week],[data-close],[data-role],.chips [data-v],[data-close]');
@@ -809,7 +835,7 @@
       case 'team-refresh': associates().forEach(p => loadTeamDays(p.id, true).then(render)); toast('Refreshing'); break;
       case 'open-settings': openSettingsSheet(); break;
       case 'save-config': saveConfig(); break;
-      case 'save-notes': { const v = $('#mgr-notes').value; chain(async () => { await db().doc('people/' + d.pid).update({ managerNotes: v, updatedAt: new Date().toISOString() }); toast('Notes saved'); }); break; }
+      case 'save-notes': { const v = $('#mgr-notes').value; chain(async () => { await coachRef(d.pid).set({ notes: v, updatedAt: new Date().toISOString(), by: S.me.id }); if (S.teamCache[d.pid]) S.teamCache[d.pid].notes = v; toast('Notes saved'); }); break; }
       case 'save-person': savePersonSettings(d.pid); break;
       case 'save-me': saveMe(); break;
     }

@@ -7,7 +7,8 @@
   const listeners = []; // {kind:'doc'|'col', path, fn}
   const segs = p => p.split('/').filter(Boolean);
   const meta = { fromCache: false, hasPendingWrites: false };
-  const snapOf = (path) => { const d = store.get(path); return { id: segs(path).pop(), exists: !!d, data: () => d ? JSON.parse(JSON.stringify(d)) : undefined, metadata: meta }; };
+  const deepFreeze = o => { if (o && typeof o === 'object') { Object.freeze(o); for (const k of Object.keys(o)) deepFreeze(o[k]); } return o; };
+  const snapOf = (path) => { const d = store.get(path); return { id: segs(path).pop(), exists: !!d, data: () => d ? deepFreeze(JSON.parse(JSON.stringify(d))) : undefined, metadata: meta }; };
   function notify(path) {
     const ps = segs(path); const col = ps.slice(0, -1).join('/');
     for (const l of listeners.slice()) {
