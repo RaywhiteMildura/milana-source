@@ -34,7 +34,14 @@ Live app: https://claude.ai/artifact/P2Z9UCWbcymej8pVr1FFZi
 - Every day at 5:50pm Melbourne time: each active associate gets one short email. Not logged: a nudge. Logged and on track: congratulations with their numbers. Logged and behind: the pace from here plus one Jess-style tip.
 - Monday 7:47am: managers get the weekly team report (totals vs targets, this week, days logged, learning, pipeline, coaching prompts per person).
 - Recipients come from each person's profile email and the manager list in Program settings. If someone's email is missing they are skipped and named in the task's summary.
-- Both are scheduled tasks on Damian's Claude account (see the "Scheduled tasks" section in claude.ai). Pausing or deleting them stops the emails.
+- Both are scheduled tasks on Damian's Claude account ("Launchpad daily check-in emails" and "Launchpad Monday team report"). They run inside a dedicated Claude Code session titled "Launchpad mailer", which is where the Gmail connection lives. Pausing or deleting the scheduled tasks stops the emails; archiving that session would too.
+- Manager notes written on a person's page are stored separately and are readable only by editors and the owner.
+
+**If something looks wrong**
+- An associate sees "Could not save": they were shared as Viewer or Commenter. Change them to Contributor in the Share menu.
+- Luke cannot see the Team tab: share with him as Editor, then he picks "I'm a manager" on first open (or change his role on his person page).
+- Someone started on the wrong date: open their page in Team and change the start date; every pace number recalculates.
+- The daily email did not arrive: check the person's email on their profile, then the scheduled task's last run in claude.ai.
 
 **Definitions**
 - Geo data: one new contact record from the farm area (owner name, phone or email, address) added to the CRM. Capture settlement date and email where possible.

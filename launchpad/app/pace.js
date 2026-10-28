@@ -207,6 +207,7 @@
   /** Full snapshot for a person. days = array of day docs. targets = {geo, appraisals, listings}. */
   function snapshot(person, config, days, on) {
     const targets = Object.assign({}, DEFAULT_TARGETS, (config && config.targets) || {}, (person && person.targets) || {});
+    for (const m of METRICS) targets[m] = Math.max(0, Number(targets[m])) || DEFAULT_TARGETS[m];
     const cal = calendar(person.startDate, (config && config.weeks) || 12, (config && config.workDays) || DEFAULT_WORKDAYS);
     if (!cal) return null;
     const onStr = fmtDate(parseDate(on) || today());

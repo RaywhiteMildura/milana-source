@@ -8,7 +8,7 @@
 :root {
   --bg: #f4f3ee; --surface: #ffffff; --surface-2: #ebe9e2; --fg: #17181c; --muted: #61636b; --line: #dcd9d0; --line-2: #c9c5b9;
   --accent: #ffd500; --accent-ink: #17181c; --accent-soft: #fff3b0;
-  --good: #1f7a45; --good-soft: #dff1e5; --warn: #b36b00; --warn-soft: #fdeccd; --bad: #b8322a; --bad-soft: #f9e1de; --info: #24579c; --info-soft: #e1eafa;
+  --good: #1f7a45; --good-soft: #dff1e5; --warn: #8a5200; --warn-soft: #fdeccd; --bad: #b8322a; --bad-soft: #f9e1de; --info: #24579c; --info-soft: #e1eafa;
   --shadow: 0 1px 2px rgba(23,24,28,.06), 0 8px 24px rgba(23,24,28,.06);
   --font-display: 'Bricolage Grotesque', 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -131,7 +131,7 @@ label.f { display: grid; gap: 6px; font-size: .85rem; font-weight: 600; color: v
 
 /* Steppers (daily log) */
 .steppers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-@media (max-width: 420px) { .steppers { grid-template-columns: 1fr; } }
+@media (max-width: 493px) { .steppers { grid-template-columns: 1fr; } }
 .stepper { background: var(--surface-2); border-radius: 14px; padding: 12px; display: grid; gap: 8px; text-align: center; }
 .stepper .lab { font-size: .8rem; font-weight: 700; color: var(--muted); }
 .stepper .val { font-family: var(--font-display); font-size: 2.4rem; font-weight: 800; line-height: 1; }
@@ -141,8 +141,9 @@ label.f { display: grid; gap: 6px; font-size: .85rem; font-weight: 600; color: v
 .stepper .ctr button:active { transform: scale(.95); }
 .stepper.primary { background: var(--accent-soft); }
 .stepper .hint { font-size: .72rem; color: var(--muted); }
-.mini-steppers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-@media (min-width: 560px) { .mini-steppers { grid-template-columns: repeat(4, 1fr); } }
+.mini-steppers { display: grid; grid-template-columns: 1fr; gap: 8px; }
+@media (min-width: 416px) { .mini-steppers { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 700px) { .mini-steppers { grid-template-columns: repeat(4, 1fr); } }
 .mini { display: grid; gap: 6px; background: var(--surface-2); border-radius: 12px; padding: 10px; }
 .mini .lab { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .mini .ctr { display: flex; align-items: center; gap: 6px; }
@@ -271,13 +272,13 @@ pre.tpl { white-space: pre-wrap; font: inherit; margin: 0; background: var(--sur
     <nav id="railnav" aria-label="Sections"></nav>
     <div class="rail-foot" id="railfoot"></div>
   </aside>
-  <main id="main"><div id="view" aria-live="polite">
+  <main id="main"><div id="view">
     <div class="card">
       <div class="brand"><div class="mark">3</div><div><div class="name">Launchpad</div><div class="sub">300 geo data · 30 appraisals · 3 listings · 12 weeks</div></div></div>
       <h1>Signing you in</h1>
       <p class="muted">Your daily sheet, your pace, this week's lesson and a practice partner are loading. If this stays for more than a few seconds, open the link while signed in to claude.ai.</p>
     </div>
-  </div></main>
+  </div><p id="live" class="sr" role="status"></p></main>
   <nav id="tabbar" aria-label="Main"></nav>
   <div id="sheet-root"></div>
   <canvas id="confetti" hidden></canvas>

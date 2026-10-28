@@ -7,6 +7,8 @@
   const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const clone = v => (v == null ? v : JSON.parse(JSON.stringify(v)));
+  const num = v => Number(v) || 0;
+  const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
   const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   const uid = () => 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const todayStr = () => P.fmtDate(P.today());
@@ -69,12 +71,14 @@
     { id: 'learn', label: 'Learn', icon: 'learn' }, { id: 'practice', label: 'Practice', icon: 'practice' },
     { id: 'scripts', label: 'Scripts', icon: 'scripts' }, { id: 'team', label: 'Team', icon: 'team', managers: true }, { id: 'me', label: 'Profile', icon: 'me' },
   ];
-  const isManager = () => !!(S.person && S.person.role === 'manager');
+  const isManager = () => !!(S.me.canEdit && S.person && S.person.role === 'manager');
   const emptyDay = date => ({ date, geo: 0, appraisals: 0, listings: 0, calls: 0, connections: 0, appointments: 0, sessions: 0, note: '', closed: false, updatedAt: null });
   const snapFor = (person, days, on) => P.snapshot(person, S.config, days, on || todayStr());
-  const mySnap = () => (S.person && S.person.role !== 'manager' ? snapFor(S.person, daysWithDraft()) : null);
+  const mySnap = () => (S.person && !isManager() ? snapFor(S.person, daysWithDraft()) : null);
   function daysWithDraft() { if (!S.draft || (!S.dirty && !S.draft.updatedAt)) return S.days; const rest = S.days.filter(d => d.date !== S.draft.date); return rest.concat([S.draft]); }
   function defaultLearning() { return { lessonsRead: {}, drillsDone: {}, quiz: {}, practice: { count: 0, scores: [] }, updatedAt: null }; }
+  function normLearning(data) { const L = Object.assign(defaultLearning(), isObj(data) ? clone(data) : {}); for (const k of ['lessonsRead', 'drillsDone', 'quiz']) if (!isObj(L[k])) L[k] = {}; if (!isObj(L.practice)) L.practice = { count: 0, scores: [] }; if (!Array.isArray(L.practice.scores)) L.practice.scores = []; return L; }
+  function announce(msg) { const l = $('#live'); if (!l) return; l.textContent = ''; setTimeout(() => { l.textContent = msg; }, 50); }
 
   // ---------- Toast / sheet / confetti ----------
   let toastTimer = null;
@@ -84,13 +88,29 @@
   }
   function sheet(html, opts) {
     const root = $('#sheet-root');
-    root.innerHTML = '<div class="backdrop" data-close="1"><div class="sheet fade" role="dialog" aria-modal="true"><div class="handle"></div>' + html + '</div></div>';
-    const bd = $('.backdrop', root);
+    S.ui.sheetOpener = document.activeElement;
+    root.innerHTML = '<div class="backdrop" data-close="1"><div class="sheet fade" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="handle"></div>' + html + '</div></div>';
+    const bd = $('.backdrop', root); const sh = $('.sheet', root);
+    const h = $('h1,h2,h3', sh); if (h) h.id = 'sheet-title'; else sh.removeAttribute('aria-labelledby');
     bd.addEventListener('click', e => { if (e.target === bd && !(opts && opts.sticky)) closeSheet(); });
+    sh.addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      const f = $$('button,input,select,textarea,a[href],[tabindex]:not([tabindex="-1"])', sh).filter(x => !x.disabled && !x.hidden);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    document.body.style.overflow = 'hidden';
     if (opts && opts.onOpen) opts.onOpen(root);
-    const f = $('input,textarea,button', $('.sheet', root)); if (f && !(opts && opts.noFocus)) setTimeout(() => f.focus(), 50);
+    const f = $('input,textarea,button', sh); if (f && !(opts && opts.noFocus)) setTimeout(() => f.focus(), 50);
   }
-  function closeSheet() { $('#sheet-root').innerHTML = ''; }
+  function closeSheet() {
+    const root = $('#sheet-root'); if (!root.innerHTML) return;
+    root.innerHTML = ''; document.body.style.overflow = '';
+    const o = S.ui.sheetOpener; S.ui.sheetOpener = null;
+    if (o && o.focus && document.contains(o)) { try { o.focus({ preventScroll: true }); } catch (e) { } }
+  }
   function confetti() {
     const c = $('#confetti'); if (!c || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const ctx = c.getContext('2d'); c.hidden = false; c.width = innerWidth; c.height = innerHeight;
@@ -143,6 +163,7 @@
     S.unsubs.push(myRef().onSnapshot(snap => {
       S.person = snap.exists ? snap.data() : null; S.personLoaded = true; S.caps.ready = true;
       if (S.person && !S.unsubs.personal) subscribePersonal();
+      if (isManager()) subscribeRoster();
       render();
     }, e => { console.error(e); S.personLoaded = true; S.caps.ready = true; render(); }));
   }
@@ -153,13 +174,13 @@
       if (!S.dirty) S.draft = Object.assign(emptyDay(S.logDate), S.days.find(d => d.date === S.logDate) || {});
       render();
     }, e => console.error(e)));
-    S.unsubs.push(db().collection('people/' + S.me.id + '/pipeline').onSnapshot(qs => { S.pipeline = qs.docs.map(d => Object.assign({ id: d.id }, d.data())); render(); }, e => console.error(e)));
-    S.unsubs.push(learnRef(S.me.id).onSnapshot(snap => { S.learning = snap.exists ? Object.assign(defaultLearning(), clone(snap.data())) : defaultLearning(); render(); }, e => console.error(e)));
-    if (S.person && S.person.role === 'manager') subscribeRoster();
+    S.unsubs.push(db().collection('people/' + S.me.id + '/pipeline').onSnapshot(qs => { S.pipeline = qs.docs.map(d => Object.assign({}, d.data(), { id: d.id })); render(); }, e => console.error(e)));
+    S.unsubs.push(learnRef(S.me.id).onSnapshot(snap => { S.learning = snap.exists ? normLearning(snap.data()) : defaultLearning(); render(); }, e => console.error(e)));
+    if (isManager()) subscribeRoster();
   }
   function subscribeRoster() {
     if (S.unsubs.roster) return; S.unsubs.roster = true;
-    S.unsubs.push(db().collection('people').onSnapshot(qs => { S.roster = qs.docs.map(d => d.data()).filter(p => p && p.id); S.rosterLoaded = true; render(); }, e => console.error(e)));
+    S.unsubs.push(db().collection('people').onSnapshot(qs => { S.roster = qs.docs.map(d => Object.assign({}, isObj(d.data()) ? d.data() : {}, { id: d.id })); S.rosterLoaded = true; render(); }, e => console.error(e)));
   }
   function route() {
     const h = (location.hash || '').replace('#', '');
@@ -167,13 +188,28 @@
     if (v === 'team' && !isManager()) { S.view = 'today'; } else S.view = v;
     if (S.view !== 'practice' && S.ui.practice && S.ui.practice.ctl) { try { S.ui.practice.ctl.abort(); } catch (e) { } }
     render(); window.scrollTo(0, 0);
+    const hd = $('#view h1, #view h2'); if (hd) announce(hd.textContent);
   }
   function go(v) { if (location.hash !== '#' + v) location.hash = '#' + v; else { S.view = v; render(); } }
 
   // ---------- Render ----------
+  function focusKey(a) {
+    if (!a || a === document.body || !a.closest('#view,#railnav,#tabbar')) return null;
+    if (a.id) return '#' + CSS.escape(a.id);
+    const attrs = Array.from(a.attributes).filter(x => x.name.startsWith('data-')).map(x => '[' + x.name + '="' + CSS.escape(x.value) + '"]').join('');
+    return attrs ? a.tagName.toLowerCase() + attrs : null;
+  }
   function render() {
     renderNav();
     const el = $('#view'); if (!el) return;
+    // Keep unsaved field edits, focus and caret across the innerHTML swap (listeners can re-render at any time).
+    const act = document.activeElement; const key = focusKey(act);
+    const sel = key && act && typeof act.selectionStart === 'number' ? [act.selectionStart, act.selectionEnd] : null;
+    const keep = {};
+    for (const f of $$('input[id],textarea[id],select[id]', el)) {
+      const dirty = f.tagName === 'SELECT' ? !Array.from(f.options).some(o => o.selected && o.defaultSelected) : (f.type === 'checkbox' ? f.checked !== f.defaultChecked : f.value !== f.defaultValue);
+      if (dirty) keep[f.id] = f.type === 'checkbox' ? f.checked : f.value;
+    }
     let html;
     if (!S.caps.ready) html = loadingHtml();
     else if (S.caps.signedOut) html = signedOutHtml();
@@ -191,6 +227,8 @@
       }
     }
     el.innerHTML = html;
+    for (const id of Object.keys(keep)) { const f = document.getElementById(id); if (f) { if (f.type === 'checkbox') f.checked = keep[id]; else f.value = keep[id]; } }
+    if (key) { const f = $(key); if (f && f !== document.activeElement) { try { f.focus({ preventScroll: true }); if (sel && typeof f.setSelectionRange === 'function' && (f.tagName === 'TEXTAREA' || /^(text|search|url|tel|password)$/.test(f.type))) f.setSelectionRange(sel[0], sel[1]); } catch (e) { } } }
     afterRender();
   }
   function renderNav() {
@@ -257,7 +295,7 @@
     const logging = S.logDate === todayStr() ? 'Today' : niceDate(S.logDate);
     const inProgram = S.logDate >= snap.cal.start && S.logDate <= snap.cal.end;
     parts.push('<div class="card"><div class="row between"><div><p class="eyebrow">Daily sheet</p><h2>' + esc(logging) + (S.logDate !== todayStr() ? ' <span class="muted small">(' + S.logDate + ')</span>' : '') + '</h2></div><button class="btn sm ghost" data-act="pick-date">Change day</button></div>' +
-      (!inProgram ? '<div class="pill warn">Outside your 12 weeks: still counts toward the totals shown to you and your managers.</div>' : '') +
+      (!inProgram ? '<div class="card warn" style="padding:10px 12px"><p class="small">Outside your ' + S.config.weeks + ' weeks: still counts toward the totals shown to you and your managers.</p></div>' : '') +
       '<div class="steppers">' + stepper('geo', 'Geo data', d.geo, 'new contact records', true) + stepper('appraisals', 'Appraisals', d.appraisals, 'curbside or walk-through') + stepper('listings', 'Listings', d.listings, 'signed and live') + '</div>' +
       '<details ' + ((d.calls || d.connections || d.appointments || d.sessions) ? 'open' : '') + '><summary class="row between" style="cursor:pointer;list-style:none"><strong>Call sessions</strong><span class="small muted">calls · connections · appointments</span></summary><div class="mini-steppers" style="margin-top:10px">' +
       mini('sessions', '45-min sessions', d.sessions, 1) + mini('calls', 'Calls', d.calls, 5) + mini('connections', 'Connections', d.connections, 1) + mini('appointments', 'Appointments', d.appointments, 1) + '</div>' +
@@ -296,6 +334,7 @@
     if (snap.overall === 'done') return 'All three targets hit. Keep logging; everything from here is proof for your next 90 days.';
     const bits = [P.metricLine(g)];
     if (snap.metrics.appraisals.inPlay) bits.push(P.metricLine(snap.metrics.appraisals));
+    if (snap.metrics.listings.inPlay) bits.push(P.metricLine(snap.metrics.listings));
     return bits.join(' ');
   }
   function bandPill(band) { return '<span class="pill ' + tone(band) + '"><span class="dot"></span>' + esc(bandLabel(band)) + '</span>'; }
@@ -326,6 +365,7 @@
     if (after === before) return;
     S.draft[key] = after; S.dirty = true; S.draftRev = (S.draftRev || 0) + 1;
     const el = $('[data-val="' + key + '"]'); if (el) el.textContent = after;
+    announce((P.LABELS[key] || key) + ' ' + after);
     const st = $('#save-state'); if (st) st.textContent = 'Saving…';
     if (n > 0 && key === 'appraisals') openAppraisalSheet();
     else if (n > 0 && key === 'listings') openListingSheet();
@@ -353,7 +393,7 @@
       const days = daysWithDraft(); const snap = snapFor(S.person, days);
       const summary = summarize(snap);
       await myRef().update({ lastLogDate: latestDate(days), summary, updatedAt: new Date().toISOString() });
-      const st = $('#save-state'); if (st) st.textContent = 'Saved ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const st = $('#save-state'); if (st) st.textContent = 'Saved ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); announce('Saved');
       if (close) {
         const nextTotals = { geo: P.total(days, 'geo'), appraisals: P.total(days, 'appraisals'), listings: P.total(days, 'listings') };
         showVerdict(snap, doc, P.milestones(prevTotals, nextTotals, snap.streak));
@@ -610,9 +650,23 @@
         '<div class="card"><p class="eyebrow">What worked</p><ul style="margin:0;padding-left:18px">' + (f.strengths || []).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul><p class="eyebrow">Work on</p><ul style="margin:0;padding-left:18px">' + (f.improve || []).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' + (f.oneThing ? '<div class="jess">' + esc(f.oneThing) + '<span class="who">The one thing</span></div>' : '') + (f.wordForWord ? '<p class="small"><strong>Try this line next time:</strong> “' + esc(f.wordForWord) + '”</p>' : '') + '</div>' +
         '<div class="row"><button class="btn primary" data-practice="' + esc(rp.id) + '">Go again</button><button class="btn" data-act="practice-exit">Pick another</button></div>';
     }
-    return head + '<div class="card"><div class="chat" id="chat">' + (pr.turns.length ? '' : '<div class="msg sys">' + esc(rp.opener === 'associate opens' || /associate opens/i.test(rp.opener) ? 'You open the call. Say your first line below.' : 'Waiting for them to answer…') + '</div>') + pr.turns.map(t => '<div class="msg ' + (t.role === 'user' ? 'me' : 'them') + '">' + esc(t.content.replace(/\s*END OF CALL\s*$/i, '')) + '</div>').join('') + (pr.busy ? '<div class="msg them" id="typing">…</div>' : '') + (pr.ended ? '<div class="msg sys">Call ended.</div>' : '') + '</div>' +
-      (pr.ended ? '' : '<div class="composer"><textarea id="chat-in" rows="2" placeholder="Say it out loud, then type what you said" ' + (pr.busy ? 'disabled' : '') + '></textarea><button class="btn primary" data-act="chat-send" ' + (pr.busy ? 'disabled' : '') + '>Send</button></div>') +
-      '<div class="row between"><button class="btn ' + (pr.ended ? 'primary' : '') + '" data-act="practice-feedback" ' + (pr.turns.length < 2 || pr.busy ? 'disabled' : '') + '>End call and get feedback</button>' + (pr.busy ? '<button class="btn ghost sm" data-act="chat-stop">Stop</button>' : '') + '</div>' + (pr.error ? '<p class="small" style="color:var(--bad)">' + esc(pr.error) + '</p>' : '') + '</div>';
+    return head + '<div class="card"><div class="chat" id="chat">' + chatBubblesHtml(pr) + '</div>' +
+      (pr.ended ? '' : '<div class="composer"><textarea id="chat-in" rows="2" placeholder="Say it out loud, then type what you said"></textarea><button class="btn primary" data-act="chat-send" ' + (pr.busy ? 'disabled' : '') + '>Send</button></div>') +
+      '<div class="row between"><button class="btn ' + (pr.ended ? 'primary' : '') + '" data-act="practice-feedback" ' + (shownTurns(pr).length < 2 || pr.busy ? 'disabled' : '') + '>End call and get feedback</button><button class="btn ghost sm" data-act="chat-stop" ' + (pr.busy ? '' : 'hidden') + '>Stop</button></div>' + (pr.error ? '<p class="small" style="color:var(--bad)">' + esc(pr.error) + '</p>' : '') + '</div>';
+  }
+  const HIDDEN_TURN = /^\(The call connects/;
+  function shownTurns(pr) { return pr.turns.filter(t => !HIDDEN_TURN.test(t.content)); }
+  function chatBubblesHtml(pr) {
+    const rp = pr.rp; const shown = shownTurns(pr);
+    return (shown.length ? '' : '<div class="msg sys">' + esc(/associate opens/i.test(rp.opener) ? 'You open the call. Say your first line below.' : 'Waiting for them to answer…') + '</div>') + shown.map(t => '<div class="msg ' + (t.role === 'user' ? 'me' : 'them') + '">' + esc(t.content.replace(/\s*END OF CALL\s*$/i, '')) + '</div>').join('') + (pr.busy ? '<div class="msg them" id="typing">…</div>' : '') + (pr.ended ? '<div class="msg sys">Call ended.</div>' : '');
+  }
+  function renderChat() {
+    const pr = S.ui.practice; const chat = $('#chat'); if (!pr || !chat || pr.ended || pr.error) { render(); return; }
+    chat.innerHTML = chatBubblesHtml(pr);
+    const send = $('[data-act="chat-send"]'); if (send) send.disabled = pr.busy;
+    const fb = $('[data-act="practice-feedback"]'); if (fb) fb.disabled = shownTurns(pr).length < 2 || pr.busy;
+    const stop = $('[data-act="chat-stop"]'); if (stop) stop.hidden = !pr.busy;
+    chat.scrollTop = chat.scrollHeight;
   }
   function rulesFor(rp) {
     const C = CONTENT(); const script = C.scripts.find(s => s.id === rp.scriptId);
@@ -626,7 +680,7 @@
   }
   async function askPartner() {
     const pr = S.ui.practice; if (!pr || pr.busy) return;
-    pr.busy = true; pr.error = null; pr.ctl = new AbortController(); render();
+    pr.busy = true; pr.error = null; pr.ctl = new AbortController(); renderChat();
     const msgs = [{ role: 'user', content: rulesFor(pr.rp) }].concat(pr.turns);
     try {
       let streamed = '';
@@ -640,9 +694,8 @@
       else pr.error = 'Something went wrong talking to Claude. Try again.';
       console.warn(e);
     }
-    pr.busy = false; pr.ctl = null; render();
-    const ta = $('#chat-in'); if (ta) ta.focus();
-    const chat = $('#chat'); if (chat) chat.scrollTop = chat.scrollHeight;
+    pr.busy = false; pr.ctl = null; renderChat();
+    announce(pr.turns.length && pr.turns[pr.turns.length - 1].role === 'assistant' ? pr.turns[pr.turns.length - 1].content.replace(/\s*END OF CALL\s*$/i, '') : '');
   }
   function sendChat() {
     const pr = S.ui.practice; const ta = $('#chat-in'); if (!pr || !ta) return; const text = ta.value.trim(); if (!text) return;
@@ -651,14 +704,15 @@
   async function practiceFeedback() {
     const pr = S.ui.practice; if (!pr || pr.busy) return;
     pr.busy = true; pr.error = null; pr.ctl = new AbortController(); render();
-    const transcript = pr.turns.filter(t => !/^\(The call connects/.test(t.content)).map(t => (t.role === 'user' ? 'ASSOCIATE: ' : 'THEM: ') + t.content.replace(/\s*END OF CALL\s*$/i, '')).join('\n');
+    const transcript = shownTurns(pr).map(t => (t.role === 'user' ? 'ASSOCIATE: ' : 'THEM: ') + t.content.replace(/\s*END OF CALL\s*$/i, '')).join('\n');
     const prompt = 'You are a warm, direct real estate sales coach reviewing a role-play by a brand-new associate at ' + S.config.officeName + ' who is practising "' + pr.rp.title + '" (' + pr.rp.setting + '). Jess Densley\'s standard: courtesy first, a reason for the call, value before the ask, listen (why\'s that? tell me more), update details, the cash-buyer question where it fits, always offer two times, never burn a bridge.\n\nGOAL: ' + pr.rp.goal + '\n\nRUBRIC (score each 0, 1 or 2):\n' + pr.rp.rubric.map((r, i) => (i + 1) + '. ' + r).join('\n') + '\n\nTRANSCRIPT:\n' + transcript + '\n\nReply with ONLY a JSON object: {"scores":[{"criterion":"<rubric item, shortened>","score":0,"note":"<one short sentence>"}],"total":<sum>,"max":<2 x number of criteria>,"strengths":["<2-3 short items>"],"improve":["<2-3 short items>"],"oneThing":"<the single most useful change, one sentence>","wordForWord":"<one line the associate could say next time, in Jess\'s style>"}. Australian English, plain words, no em-dashes.';
     try {
       const f = await S.caps.sample.json(prompt, { modelTier: 'default', cache: false, signal: pr.ctl.signal });
-      if (f && Array.isArray(f.scores)) {
-        f.max = f.max || f.scores.length * 2; f.total = Math.min(f.max, f.total || f.scores.reduce((s, x) => s + (Number(x.score) || 0), 0));
-        pr.feedback = f;
-        const pct = f.max ? Math.round(f.total / f.max * 100) : 0;
+      const scores = f && Array.isArray(f.scores) ? f.scores.filter(x => isObj(x)).map(x => ({ criterion: String(x.criterion || ''), note: String(x.note || ''), score: Math.max(0, Math.min(2, Math.round(Number(x.score)) || 0)) })) : [];
+      if (scores.length) {
+        const max = scores.length * 2; const total = scores.reduce((a, x) => a + x.score, 0);
+        pr.feedback = { scores, max, total, strengths: [].concat(f.strengths || []).map(String).slice(0, 5), improve: [].concat(f.improve || []).map(String).slice(0, 5), oneThing: String(f.oneThing || ''), wordForWord: String(f.wordForWord || '') };
+        const pct = Math.round(total / max * 100);
         setLearning(L => { L.practice = L.practice || { count: 0, scores: [] }; L.practice.count = (L.practice.count || 0) + 1; L.practice.lastAt = new Date().toISOString(); L.practice.scores = (L.practice.scores || []).concat([{ rp: pr.rp.id, pct, at: new Date().toISOString() }]).slice(-40); });
         if (pct >= 75) confetti();
       } else pr.error = 'The coach reply was not readable. Try again.';
@@ -675,7 +729,7 @@
     const p = (async () => {
       try {
         const [ds, ps, ls, cs] = await Promise.all([db().collection('people/' + pid + '/days').get(), db().collection('people/' + pid + '/pipeline').get(), learnRef(pid).get(), coachRef(pid).get()]);
-        const entry = { at: Date.now(), days: ds.docs.map(d => d.data()).filter(d => d && d.date), pipeline: ps.docs.map(d => Object.assign({ id: d.id }, d.data())), learning: ls.exists ? Object.assign(defaultLearning(), clone(ls.data())) : defaultLearning(), notes: cs.exists ? String(cs.data().notes || '') : '', notesVersion: cs.exists };
+        const entry = { at: Date.now(), days: ds.docs.map(d => d.data()).filter(d => d && d.date), pipeline: ps.docs.map(d => Object.assign({}, d.data(), { id: d.id })), learning: ls.exists ? normLearning(ls.data()) : defaultLearning(), notes: cs.exists ? String(cs.data().notes || '') : '', notesVersion: cs.exists };
         S.teamCache[pid] = entry; return entry;
       } catch (e) { console.warn('team load', e); const entry = { at: Date.now(), error: true, days: [], pipeline: [], learning: defaultLearning(), notes: '' }; S.teamCache[pid] = entry; return entry; }
       finally { delete S.teamLoading[pid]; }
@@ -715,7 +769,7 @@
     const recent = c.days.slice().sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 7);
     return head + progressFor(snap, c.days, c.pipeline, c.learning, p, true) +
       '<div class="card info"><p class="eyebrow">Coaching prompts for the Monday meeting</p><ul style="margin:0;padding-left:18px">' + coach.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul><p class="small muted">Jess\'s close: Do you need any support? Can you do all that? Will you do all that?</p></div>' +
-      '<div class="card"><p class="eyebrow">Last 7 logged days</p><div class="table-wrap"><table><thead><tr><th>Day</th><th>Geo</th><th>Appr</th><th>List</th><th>Calls</th><th>Conn</th><th>Appt</th><th style="text-align:left">Note</th></tr></thead><tbody>' + (recent.length ? recent.map(d => '<tr><td>' + niceDate(d.date) + '</td><td class="num">' + (d.geo || 0) + '</td><td class="num">' + (d.appraisals || 0) + '</td><td class="num">' + (d.listings || 0) + '</td><td class="num">' + (d.calls || 0) + '</td><td class="num">' + (d.connections || 0) + '</td><td class="num">' + (d.appointments || 0) + '</td><td style="text-align:left;white-space:normal;min-width:160px">' + esc(d.note || '') + '</td></tr>').join('') : '<tr><td colspan="8">Nothing logged yet.</td></tr>') + '</tbody></table></div></div>' +
+      '<div class="card"><p class="eyebrow">Last 7 logged days</p><div class="table-wrap"><table><thead><tr><th>Day</th><th>Geo</th><th>Appr</th><th>List</th><th>Calls</th><th>Conn</th><th>Appt</th><th style="text-align:left">Note</th></tr></thead><tbody>' + (recent.length ? recent.map(d => '<tr><td>' + niceDate(d.date) + '</td><td class="num">' + num(d.geo) + '</td><td class="num">' + num(d.appraisals) + '</td><td class="num">' + num(d.listings) + '</td><td class="num">' + num(d.calls) + '</td><td class="num">' + num(d.connections) + '</td><td class="num">' + num(d.appointments) + '</td><td style="text-align:left;white-space:normal;min-width:160px">' + esc(d.note || '') + '</td></tr>').join('') : '<tr><td colspan="8">Nothing logged yet.</td></tr>') + '</tbody></table></div></div>' +
       '<div class="card"><p class="eyebrow">Manager notes (' + esc(p.name) + ' cannot see these)</p>' + (c.error ? '<p class="small" style="color:var(--bad)">Could not load this person\'s records. Refresh to try again.</p>' : '') + '<textarea id="mgr-notes" rows="4" placeholder="Checkpoint notes, agreed actions, stakes from the Monday Game Plan">' + esc(c.notes || '') + '</textarea><div class="row"><button class="btn primary sm" data-act="save-notes" data-pid="' + esc(p.id) + '">Save notes</button></div></div>' +
       '<div class="card"><p class="eyebrow">Settings for ' + esc(p.name) + '</p><div class="stack"><label class="f">Start date<input type="date" id="tp-start" value="' + esc(p.startDate || '') + '"></label><label class="f">Email for reminders<input type="email" id="tp-email" value="' + esc(p.email || '') + '"></label><label class="f">Farm area<input id="tp-farm" value="' + esc(p.farm || '') + '"></label><div class="row"><label class="f grow">Geo target<input type="number" id="tp-geo" value="' + esc((p.targets || {}).geo || S.config.targets.geo) + '"></label><label class="f grow">Appraisals<input type="number" id="tp-appr" value="' + esc((p.targets || {}).appraisals || S.config.targets.appraisals) + '"></label><label class="f grow">Listings<input type="number" id="tp-list" value="' + esc((p.targets || {}).listings || S.config.targets.listings) + '"></label></div><label class="f">Status<select id="tp-status">' + ['active', 'paused', 'graduated', 'left'].map(s => '<option ' + ((p.status || 'active') === s ? 'selected' : '') + '>' + s + '</option>').join('') + '</select></label><label class="f">Role<select id="tp-role"><option value="associate" ' + (p.role !== 'manager' ? 'selected' : '') + '>Associate</option><option value="manager" ' + (p.role === 'manager' ? 'selected' : '') + '>Manager</option></select></label><button class="btn primary" data-act="save-person" data-pid="' + esc(p.id) + '">Save settings</button></div></div>';
   }
@@ -777,7 +831,7 @@
     document.addEventListener('submit', e => { if (e.target.id === 'onb') { e.preventDefault(); submitOnboarding(e.target); } });
     document.addEventListener('input', e => {
       if (e.target.id === 'day-note') { if (S.draft) { S.draft.note = e.target.value; S.dirty = true; S.draftRev = (S.draftRev || 0) + 1; scheduleSave(); } }
-      if (e.target.id === 'scripts-q') { S.ui.scriptsQuery = e.target.value; const v = e.target.value; render(); const q = $('#scripts-q'); if (q) { q.focus(); q.setSelectionRange(v.length, v.length); } }
+      if (e.target.id === 'scripts-q') { S.ui.scriptsQuery = e.target.value; render(); }
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'chat-in') { e.preventDefault(); sendChat(); } });
     document.addEventListener('toggle', e => { const d = e.target; if (d.matches && d.matches('details.lesson[data-lesson]')) S.ui.openLesson = d.open ? d.dataset.lesson : null; }, true);
