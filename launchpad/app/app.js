@@ -60,7 +60,7 @@
     me: { id: null, name: '', email: '', isOwner: false, canEdit: false, canWrite: null },
     config: { officeName: 'Ray White Mildura', programName: 'Launchpad', targets: { geo: 300, appraisals: 30, listings: 3 }, weeks: 12, workDays: [1, 2, 3, 4, 5], managerEmails: [], nudgeHour: 18, timezone: 'Australia/Melbourne' },
     configLoaded: false, person: null, personLoaded: false, days: [], pipeline: [], learning: null,
-    roster: [], rosterLoaded: false, teamCache: {}, teamLoading: {}, saveFailed: false, busy: 0,
+    roster: [], rosterLoaded: false, teamCache: {}, teamLoading: {}, saveFailed: false, busy: 0, daysLoaded: false, daysError: false, learnDirty: false, learnRev: 0, logPinned: false,
     view: 'today', logDate: todayStr(), draft: null, dirty: false, saving: null, saveTimer: null, learnTimer: null,
     ui: { learnWeek: null, quiz: null, practice: null, teamPerson: null, scriptsTab: 'scripts', scriptsQuery: '', scriptsCat: 'all', openScript: null, teamFilter: 'active', confetti: null },
     unsubs: [],
@@ -171,11 +171,12 @@
     S.unsubs.personal = true;
     S.unsubs.push(db().collection('people/' + S.me.id + '/days').onSnapshot(qs => {
       S.days = qs.docs.map(d => d.data()).filter(d => d && d.date);
+      S.daysLoaded = true; S.daysError = false;
       if (!S.dirty) S.draft = Object.assign(emptyDay(S.logDate), S.days.find(d => d.date === S.logDate) || {});
       render();
-    }, e => console.error(e)));
+    }, e => { console.error(e); S.daysError = true; render(); }));
     S.unsubs.push(db().collection('people/' + S.me.id + '/pipeline').onSnapshot(qs => { S.pipeline = qs.docs.map(d => Object.assign({}, d.data(), { id: d.id })); render(); }, e => console.error(e)));
-    S.unsubs.push(learnRef(S.me.id).onSnapshot(snap => { S.learning = snap.exists ? normLearning(snap.data()) : defaultLearning(); render(); }, e => console.error(e)));
+    S.unsubs.push(learnRef(S.me.id).onSnapshot(snap => { if (S.learnDirty) return; S.learning = snap.exists ? normLearning(snap.data()) : defaultLearning(); render(); }, e => console.error(e)));
     if (isManager()) subscribeRoster();
   }
   function subscribeRoster() {
@@ -200,6 +201,7 @@
     return attrs ? a.tagName.toLowerCase() + attrs : null;
   }
   function render() {
+    if (isManager() && (S.view === 'today' || S.view === 'progress')) S.view = 'team';
     renderNav();
     const el = $('#view'); if (!el) return;
     // Keep unsaved field edits, focus and caret across the innerHTML swap (listeners can re-render at any time).
@@ -294,7 +296,8 @@
     // Log card
     const logging = S.logDate === todayStr() ? 'Today' : niceDate(S.logDate);
     const inProgram = S.logDate >= snap.cal.start && S.logDate <= snap.cal.end;
-    parts.push('<div class="card"><div class="row between"><div><p class="eyebrow">Daily sheet</p><h2>' + esc(logging) + (S.logDate !== todayStr() ? ' <span class="muted small">(' + S.logDate + ')</span>' : '') + '</h2></div><button class="btn sm ghost" data-act="pick-date">Change day</button></div>' +
+    if (!S.daysLoaded) parts.push('<div class="card"><p class="eyebrow">Daily sheet</p><h2>' + (S.daysError ? 'Could not load your sheet' : 'Loading your sheet') + '</h2><p class="small muted">' + (S.daysError ? 'Refresh the page to try again.' : 'Your numbers are on their way.') + '</p></div>');
+    else parts.push('<div class="card"><div class="row between"><div><p class="eyebrow">Daily sheet</p><h2>' + esc(logging) + (S.logDate !== todayStr() ? ' <span class="muted small">(' + S.logDate + ')</span>' : '') + '</h2></div><button class="btn sm ghost" data-act="pick-date">Change day</button></div>' +
       (!inProgram ? '<div class="card warn" style="padding:10px 12px"><p class="small">Outside your ' + S.config.weeks + ' weeks: still counts toward the totals shown to you and your managers.</p></div>' : '') +
       '<div class="steppers">' + stepper('geo', 'Geo data', d.geo, 'new contact records', true) + stepper('appraisals', 'Appraisals', d.appraisals, 'curbside or walk-through') + stepper('listings', 'Listings', d.listings, 'signed and live') + '</div>' +
       '<details ' + ((d.calls || d.connections || d.appointments || d.sessions) ? 'open' : '') + '><summary class="row between" style="cursor:pointer;list-style:none"><strong>Call sessions</strong><span class="small muted">calls · connections · appointments</span></summary><div class="mini-steppers" style="margin-top:10px">' +
@@ -359,7 +362,8 @@
     return '<div class="card accent"><p class="eyebrow" style="color:inherit;opacity:.7">Twelve weeks done</p><h2>' + m.geo.actual + ' geo data · ' + m.appraisals.actual + ' appraisals · ' + m.listings.actual + ' listings</h2><p>Sit down with Damian and Luke for the graduation review in Week 12 of Learn. Your pipeline keeps running: every appraisal comes back around at 12 months.</p></div>';
   }
 
-  function step(key, n) {
+  function step(key, n, opts) {
+    if (!S.daysLoaded) { toast(S.daysError ? 'Could not load your sheet. Refresh to try again.' : 'One moment, loading your sheet'); return; }
     if (!S.draft) S.draft = emptyDay(S.logDate);
     const before = S.draft[key] || 0; const after = Math.max(0, before + n);
     if (after === before) return;
@@ -368,7 +372,7 @@
     announce((P.LABELS[key] || key) + ' ' + after);
     const st = $('#save-state'); if (st) st.textContent = 'Saving…';
     if (n > 0 && key === 'appraisals') openAppraisalSheet();
-    else if (n > 0 && key === 'listings') openListingSheet();
+    else if (n > 0 && key === 'listings' && !(opts && opts.quiet)) openListingSheet();
     scheduleSave();
     if (['geo', 'appraisals', 'listings'].includes(key)) refreshPaceStrip();
   }
@@ -376,10 +380,10 @@
   function scheduleSave() { clearTimeout(S.saveTimer); S.saveFailed = false; S.saveTimer = setTimeout(() => saveDay(false), 900); }
   function saveDay(close, retried) {
     clearTimeout(S.saveTimer);
-    if (!S.draft || (!S.dirty && !close)) return Promise.resolve();
+    if (!S.daysLoaded || !S.draft || (!S.dirty && !close)) return Promise.resolve();
     const note = $('#day-note'); if (note) S.draft.note = note.value;
     const doc = Object.assign({}, S.draft, { closed: close ? true : !!S.draft.closed, updatedAt: new Date().toISOString() });
-    const prevTotals = { geo: P.total(S.days, 'geo'), appraisals: P.total(S.days, 'appraisals'), listings: P.total(S.days, 'listings') };
+    const prevTotals = Object.assign({ geo: 0, appraisals: 0, listings: 0 }, (S.person && isObj(S.person.celebrated)) ? S.person.celebrated : (S.days.length ? { geo: P.total(S.days, 'geo'), appraisals: P.total(S.days, 'appraisals'), listings: P.total(S.days, 'listings') } : {}));
     const rev = S.draftRev || 0;
     return chain(async () => {
       try { await dayRef(S.me.id, doc.date).set(doc); }
@@ -392,12 +396,12 @@
       if ((S.draftRev || 0) === rev) S.dirty = false; else scheduleSave();
       const days = daysWithDraft(); const snap = snapFor(S.person, days);
       const summary = summarize(snap);
-      await myRef().update({ lastLogDate: latestDate(days), summary, updatedAt: new Date().toISOString() });
+      const nextTotals = { geo: P.total(days, 'geo'), appraisals: P.total(days, 'appraisals'), listings: P.total(days, 'listings') };
+      const patch = { lastLogDate: latestDate(days), summary, updatedAt: new Date().toISOString() };
+      if (close) patch.celebrated = nextTotals;
+      await myRef().update(patch);
       const st = $('#save-state'); if (st) st.textContent = 'Saved ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); announce('Saved');
-      if (close) {
-        const nextTotals = { geo: P.total(days, 'geo'), appraisals: P.total(days, 'appraisals'), listings: P.total(days, 'listings') };
-        showVerdict(snap, doc, P.milestones(prevTotals, nextTotals, snap.streak));
-      }
+      if (close) showVerdict(snap, doc, P.milestones(prevTotals, nextTotals, snap.streak));
     });
   }
   function latestDate(days) { let m = null; for (const d of days) if (d.date && (!m || d.date > m)) m = d.date; return m; }
@@ -424,7 +428,15 @@
   }
   function setLogDate(date) {
     if (!P.parseDate(date) || date > todayStr()) { toast('Pick a day up to today'); return; }
-    saveDay(false).then(() => { S.logDate = date; S.dirty = false; S.draft = Object.assign(emptyDay(date), S.days.find(d => d.date === date) || {}); closeSheet(); render(); });
+    const go = () => { S.logDate = date; S.logPinned = date !== todayStr(); S.dirty = false; S.draft = Object.assign(emptyDay(date), S.days.find(d => d.date === date) || {}); closeSheet(); render(); };
+    if (!S.dirty) { go(); return; }
+    saveDay(false).then(() => { if (S.dirty) { toast('Save your numbers first. Tap a number to retry.', 4000); return; } go(); });
+  }
+  function rollDate() {
+    if (S.logPinned || S.logDate === todayStr() || !S.daysLoaded) return false;
+    const sw = () => { S.logDate = todayStr(); S.dirty = false; S.draft = Object.assign(emptyDay(S.logDate), S.days.find(d => d.date === S.logDate) || {}); render(); toast('New day: now logging ' + niceDate(S.logDate)); };
+    if (S.dirty) saveDay(false).then(sw, sw); else sw();
+    return true;
   }
   function openAppraisalSheet() {
     sheet('<h3>Appraisal details <span class="muted small">(optional)</span></h3><p class="small muted">Jess: an appraisal only counts once it has an action plan and a pipeline category. Thirty seconds now saves the follow-up later.</p>' +
@@ -464,7 +476,12 @@
     chain(async () => { await db().doc('people/' + S.me.id + '/pipeline/' + id).update({ lastTouch: todayStr(), nextTouch: next }); toast('Next touch ' + niceDate(next)); });
   }
   function setPipelineStatus(id, status) {
-    chain(async () => { await db().doc('people/' + S.me.id + '/pipeline/' + id).update({ status, updatedAt: new Date().toISOString() }); closeSheet(); toast(status === 'active' ? 'Back in the pipeline' : 'Marked ' + status); });
+    chain(async () => {
+      const patch = { status, updatedAt: new Date().toISOString() }; if (status === 'listed') patch.listedDate = S.logDate;
+      await db().doc('people/' + S.me.id + '/pipeline/' + id).update(patch); closeSheet();
+      if (status === 'listed') { step('listings', 1, { quiet: true }); toast('Marked listed and counted on ' + niceDate(S.logDate)); }
+      else toast(status === 'active' ? 'Back in the pipeline' : 'Marked ' + status);
+    });
   }
   function openPipelineItem(id) {
     const p = S.pipeline.find(x => x.id === id); if (!p) return;
@@ -582,8 +599,10 @@
     return '<div class="card"><div class="row between"><p class="eyebrow">Question ' + (q.i + 1) + ' of ' + w.quiz.length + '</p><button class="btn sm ghost" data-act="quiz-close">Quit</button></div><h3>' + esc(item.q) + '</h3><div class="stack">' + item.options.map((o, i) => '<button class="quiz-opt ' + (q.picked == null ? '' : (i === item.answer ? 'right' : (i === q.picked ? 'wrong' : ''))) + '" data-qpick="' + i + '" ' + (q.picked == null ? '' : 'disabled') + '>' + esc(o) + '</button>').join('') + '</div>' + (q.picked == null ? '' : '<div class="card soft"><p class="small"><strong>' + (q.picked === item.answer ? 'Correct.' : 'Not quite.') + '</strong> ' + esc(item.explain || '') + '</p></div><button class="btn primary" data-act="quiz-next">' + (q.i + 1 >= w.quiz.length ? 'See score' : 'Next') + '</button>') + '</div>';
   }
   function setLearning(mut) {
-    S.learning = S.learning || defaultLearning(); mut(S.learning); S.learning.updatedAt = new Date().toISOString(); render();
-    clearTimeout(S.learnTimer); S.learnTimer = setTimeout(() => chain(() => learnRef(S.me.id).set(S.learning)), 600);
+    if (!S.learning) { toast('One moment, your progress is still loading'); return; }
+    mut(S.learning); S.learning.updatedAt = new Date().toISOString(); S.learnDirty = true; S.learnRev++; render();
+    clearTimeout(S.learnTimer);
+    S.learnTimer = setTimeout(() => { const rev = S.learnRev; const body = clone(S.learning); chain(async () => { await learnRef(S.me.id).set(body); if (S.learnRev === rev) S.learnDirty = false; }); }, 600);
   }
   function quizPick(i) {
     const q = S.ui.quiz; const w = CONTENT().weeks.find(x => x.week === q.week); if (!q || q.picked != null) return;
@@ -729,9 +748,9 @@
     const p = (async () => {
       try {
         const [ds, ps, ls, cs] = await Promise.all([db().collection('people/' + pid + '/days').get(), db().collection('people/' + pid + '/pipeline').get(), learnRef(pid).get(), coachRef(pid).get()]);
-        const entry = { at: Date.now(), days: ds.docs.map(d => d.data()).filter(d => d && d.date), pipeline: ps.docs.map(d => Object.assign({}, d.data(), { id: d.id })), learning: ls.exists ? normLearning(ls.data()) : defaultLearning(), notes: cs.exists ? String(cs.data().notes || '') : '', notesVersion: cs.exists };
+        const entry = { at: Date.now(), personUpdatedAt: (S.roster.find(x => x.id === pid) || {}).updatedAt || null, days: ds.docs.map(d => d.data()).filter(d => d && d.date), pipeline: ps.docs.map(d => Object.assign({}, d.data(), { id: d.id })), learning: ls.exists ? normLearning(ls.data()) : defaultLearning(), notes: cs.exists ? String(cs.data().notes || '') : '', notesVersion: cs.exists };
         S.teamCache[pid] = entry; return entry;
-      } catch (e) { console.warn('team load', e); const entry = { at: Date.now(), error: true, days: [], pipeline: [], learning: defaultLearning(), notes: '' }; S.teamCache[pid] = entry; return entry; }
+      } catch (e) { console.warn('team load', e); const entry = { at: Date.now(), error: true, personUpdatedAt: (S.roster.find(x => x.id === pid) || {}).updatedAt || null, days: [], pipeline: [], learning: defaultLearning(), notes: '' }; S.teamCache[pid] = entry; return entry; }
       finally { delete S.teamLoading[pid]; }
     })();
     S.teamLoading[pid] = p; return p;
@@ -807,7 +826,7 @@
   function savePersonSettings(pid) {
     const start = $('#tp-start').value; if (!P.parseDate(start)) { toast('Start date needed'); return; }
     const patch = { startDate: start, email: $('#tp-email').value.trim(), farm: $('#tp-farm').value.trim(), targets: { geo: Number($('#tp-geo').value) || S.config.targets.geo, appraisals: Number($('#tp-appr').value) || S.config.targets.appraisals, listings: Number($('#tp-list').value) || S.config.targets.listings }, status: $('#tp-status').value, role: $('#tp-role').value, updatedAt: new Date().toISOString() };
-    chain(async () => { await db().doc('people/' + pid).update(patch); toast('Saved'); delete S.teamCache[pid]; });
+    chain(async () => { await db().doc('people/' + pid).update(patch); toast('Saved'); });
   }
 
   // ---------- Profile ----------
@@ -830,14 +849,15 @@
     document.addEventListener('click', onClick);
     document.addEventListener('submit', e => { if (e.target.id === 'onb') { e.preventDefault(); submitOnboarding(e.target); } });
     document.addEventListener('input', e => {
-      if (e.target.id === 'day-note') { if (S.draft) { S.draft.note = e.target.value; S.dirty = true; S.draftRev = (S.draftRev || 0) + 1; scheduleSave(); } }
+      if (e.target.id === 'day-note') { if (S.draft && S.daysLoaded) { S.draft.note = e.target.value; S.dirty = true; S.draftRev = (S.draftRev || 0) + 1; scheduleSave(); } }
       if (e.target.id === 'scripts-q') { S.ui.scriptsQuery = e.target.value; render(); }
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'chat-in') { e.preventDefault(); sendChat(); } });
     document.addEventListener('toggle', e => { const d = e.target; if (d.matches && d.matches('details.lesson[data-lesson]')) S.ui.openLesson = d.open ? d.dataset.lesson : null; }, true);
     const flush = () => { if (S.dirty) saveDay(false); };
     window.addEventListener('beforeunload', flush); window.addEventListener('pagehide', flush);
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); else if (S.person && !isManager()) rollDate(); });
+    setInterval(() => { if (S.person && !isManager() && document.visibilityState === 'visible') rollDate(); }, 60000);
   }
   function onClick(e) {
     const t = e.target.closest('[data-nav],[data-step],[data-act],[data-logdate],[data-week],[data-read],[data-drill],[data-qpick],[data-stab],[data-scat],[data-open-script],[data-open-template],[data-copy-script],[data-copy-template],[data-practice],[data-person],[data-tfilter],[data-pipe],[data-touch],[data-pstatus],[data-chart],[data-learn-week],[data-close],[data-role],.chips [data-v],[data-close]');
@@ -899,7 +919,7 @@
     sheet('<h3>More</h3><div class="list">' + items.map(n => '<button class="item" data-nav="' + n.id + '" data-close="1"><div class="row">' + ICONS[n.icon] + '<div class="t">' + n.label + '</div></div><span class="muted">›</span></button>').join('') + '</div>');
   }
   function afterRender() {
-    if (S.view === 'team' && isManager() && S.rosterLoaded) { for (const p of associates()) if (!S.teamCache[p.id]) loadTeamDays(p.id).then(() => { if (S.view === 'team') render(); }); }
+    if (S.view === 'team' && isManager() && S.rosterLoaded) { for (const p of associates()) { const c = S.teamCache[p.id]; if (!S.teamLoading[p.id] && (!c || c.personUpdatedAt !== (p.updatedAt || null))) loadTeamDays(p.id, !!c).then(() => { if (S.view === 'team') render(); }); } }
     if (S.view === 'practice' && S.ui.practice) { const chat = $('#chat'); if (chat) chat.scrollTop = chat.scrollHeight; }
   }
   if (window.claude && window.claude.use) boot(); else { S.caps.signedOut = true; S.caps.ready = true; render(); }
