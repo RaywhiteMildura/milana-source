@@ -564,6 +564,7 @@ export function predictAll(pack: MeetingPack, settings: Settings, now: Date, onl
     const previous = pack.predictions[race.number];
     const prediction = predictRace(race, {
       venueSlug: pack.meeting.venueSlug,
+      raceDate: pack.meeting.date,
       weather: pack.weather,
       news: pack.news,
       dayPatterns: pack.dayPatterns,

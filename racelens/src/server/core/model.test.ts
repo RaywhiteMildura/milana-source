@@ -417,3 +417,22 @@ describe('honesty rules', () => {
     else expect(['bet', 'small']).toContain(plan.stance);
   });
 });
+
+describe('a race rated after it has run never sees its own result', () => {
+  it('leaves out race-day form, the race-day run in the career record, and news from after the jump', () => {
+    const before = makeRace(10, { startTime: '2026-10-24T03:10:00.000Z' });
+    // The same race read from the feeds after it ran: horse 7 now shows that day's win and a win more in its career.
+    const after = makeRace(10, { startTime: '2026-10-24T03:10:00.000Z' });
+    const h7 = after.runners[6];
+    h7.form = [{ ...h7.form[0], date: '2026-10-24', position: 1, margin: 0 }, ...h7.form];
+    h7.career = { ...h7.career!, starts: h7.career!.starts + 1, wins: h7.career!.wins + 1 };
+    const news = [{ id: 'n1', source: 'demo-news', title: 'Horse 7 storms home to win', url: 'u', publishedAt: '2026-10-24T03:20:00.000Z', mentions: ['Horse 7'], sentiment: 1, relevance: 1 }] as never[];
+    const opts = { venueSlug: 'flemington', settings, now: NOW, simulations: 1000, seed: 3 };
+    const clean = predictRace(before, opts);
+    const leaked = predictRace(after, { ...opts, news });
+    const guarded = predictRace(after, { ...opts, news, raceDate: '2026-10-24' });
+    const p7 = (p: ReturnType<typeof predictRace>) => p.ranked.find((r) => r.number === 7)!.winProb;
+    expect(p7(leaked)).toBeGreaterThan(p7(clean) + 0.005);
+    expect(p7(guarded)).toBeCloseTo(p7(clean), 4);
+  });
+});

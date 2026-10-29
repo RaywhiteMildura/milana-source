@@ -39,6 +39,11 @@ export interface PredictOptions {
   settings: Settings;
   now?: Date;
   previous?: Prediction;
+  /**
+   * The meeting's date (YYYY-MM-DD, track time). Form from that day or later is left out, and news published after
+   * the jump: a race rated after it has run must not see its own result.
+   */
+  raceDate?: string;
   /** Temperature on strengths → probabilities. */
   beta?: number;
   /** Weight of the market in the log-linear pool (0..1). */
@@ -225,7 +230,8 @@ function reasonsAndConcerns(f: FactorScore[], runner: Runner): { reasons: string
 
 export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
   const now = opts.now ?? new Date();
-  const race: Race = { ...raceIn, runners: summariseRaceMarket(raceIn.runners) };
+  const race: Race = { ...raceIn, runners: summariseRaceMarket(beforeRaceDay(raceIn.runners, opts.raceDate)) };
+  const jumpAt = Date.parse(raceIn.startTime ?? '');
   // Emergencies waiting for a vacancy are left out: they would take win chance from the real starters
   // and change the place terms.
   const active = starters(race.runners);
@@ -237,7 +243,7 @@ export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
     race,
     venueSlug: opts.venueSlug,
     expectedTrackRating: expectedRating,
-    news: opts.news || [],
+    news: (opts.news || []).filter((n) => !Number.isFinite(jumpAt) || !n.publishedAt || !(Date.parse(n.publishedAt) >= jumpAt)),
     now,
     fieldStats: computeFieldStats(race),
   };
@@ -327,6 +333,27 @@ export function predictRace(raceIn: Race, opts: PredictOptions): Prediction {
   };
   if (opts.previous) prediction.changes = diffPredictions(opts.previous, prediction, raceIn);
   return prediction;
+}
+
+/**
+ * Runners as they stood before race day: a feed read after the race lists that day's run as the latest start and
+ * counts it in the career record, which would hand a race rated afterwards its own result. Those runs are taken out
+ * of the form and the career record (track, distance and going records cannot be split, so they stay as given).
+ */
+export function beforeRaceDay(runners: Runner[], raceDate?: string): Runner[] {
+  if (!raceDate) return runners;
+  return runners.map((r) => {
+    const later = (r.form || []).filter((f) => f.date && f.date.slice(0, 10) >= raceDate);
+    if (!later.length) return r;
+    const career = r.career && {
+      ...r.career,
+      starts: Math.max(0, r.career.starts - later.length),
+      wins: Math.max(0, r.career.wins - later.filter((f) => f.position === 1).length),
+      seconds: Math.max(0, r.career.seconds - later.filter((f) => f.position === 2).length),
+      thirds: Math.max(0, r.career.thirds - later.filter((f) => f.position === 3).length),
+    };
+    return { ...r, form: r.form.filter((f) => !later.includes(f)), career };
+  });
 }
 
 function summarise(race: Race, ranked: RunnerAssessment[], c: ConfidenceRating, patterns: DayPattern[]): string {
