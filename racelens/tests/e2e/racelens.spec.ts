@@ -817,7 +817,9 @@ test.describe('phone at the track', () => {
 
   test('coming back from the lock screen updates the countdown and checks for news at once', async ({ page }) => {
     await page.clock.install();
-    const start = new Date(Date.now() + 2 * 3600_000).toISOString();
+    // Two hours after the server's own clock (the app counts down on server time; the test server runs on demo time).
+    const serverNow = Date.parse((await (await page.request.get('/api/health')).json()).time);
+    const start = new Date(serverNow + 2 * 3600_000).toISOString();
     await servePackWith(page, (pack) => ({ races: pack.races.map((r) => ({ ...r, startTime: start })) }));
     await openFirstMeeting(page);
     const countdown = page.getByTestId('countdown').locator('strong');

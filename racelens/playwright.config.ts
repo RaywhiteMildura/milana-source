@@ -37,15 +37,17 @@ export default defineConfig({
       use: { baseURL: 'http://localhost:4852' },
     },
   ],
+  // The servers run on the bundled meeting's own race morning (Sat 24 Oct 2026, before R1 at 12:25 pm), so the
+  // tests behave the same on any calendar day: with the real clock every demo race has already jumped.
   webServer: [
     {
-      command: 'npx cross-env RACELENS_MODE=demo RACELENS_PORT=4851 RACELENS_DATA_DIR=./data-e2e node dist/server/index.js',
+      command: 'npx cross-env RACELENS_MODE=demo RACELENS_PORT=4851 RACELENS_DATA_DIR=./data-e2e RACELENS_FAKE_NOW=2026-10-24T11:00:00+11:00 node dist/server/index.js',
       url: 'http://localhost:4851/api/health',
       reuseExistingServer: false,
       timeout: 60_000,
     },
     {
-      command: 'npx cross-env RACELENS_MODE=demo RACELENS_PORT=4852 RACELENS_DATA_DIR=./data-e2e-auth RACELENS_PASSWORD=racelens-test node dist/server/index.js',
+      command: 'npx cross-env RACELENS_MODE=demo RACELENS_PORT=4852 RACELENS_DATA_DIR=./data-e2e-auth RACELENS_PASSWORD=racelens-test RACELENS_FAKE_NOW=2026-10-24T11:00:00+11:00 node dist/server/index.js',
       url: 'http://localhost:4852/api/health',
       reuseExistingServer: false,
       timeout: 60_000,
