@@ -36,9 +36,11 @@ const lastSaturday = (() => {
 // Arguments, or LIVE_* environment variables (blank means "use the default").
 const arg = (i: number, env: string) => process.argv[2 + i] || process.env[env] || undefined;
 const upDate = arg(0, 'LIVE_UP_DATE') ?? raceDay;
-const upVenue = arg(1, 'LIVE_UP_VENUE') ?? 'flemington';
+// No venue named: the best meeting that is actually on that day (see pickMeeting), so the check never fails just
+// because the calendar moved on.
+const upVenue = arg(1, 'LIVE_UP_VENUE');
 const resDate = arg(2, 'LIVE_RES_DATE') ?? lastSaturday;
-const resVenue = arg(3, 'LIVE_RES_VENUE') ?? 'caulfield';
+const resVenue = arg(3, 'LIVE_RES_VENUE');
 const outDir = arg(4, 'LIVE_OUT_DIR') ?? 'live-check-out';
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -86,7 +88,18 @@ function printSteps(job: JobProgress) {
   for (const s of job.steps) console.log(`   [${s.status.padEnd(7)}] ${s.label}${s.detail ? ` – ${s.detail.slice(0, 220)}` : ''}`);
 }
 
-async function research(date: string, venueSlug: string): Promise<MeetingPack | null> {
+/** Metropolitan tracks first (Melbourne, then the other capitals), else the Australian gallops meeting with most races. */
+const PREFERRED = ['flemington', 'caulfield', 'moonee-valley', 'sandown', 'randwick', 'rosehill', 'eagle-farm', 'doomben', 'morphettville', 'ascot'];
+function pickMeeting(meetings: MeetingSummary[]): MeetingSummary | undefined {
+  const gallops = meetings.filter((m) => m.raceType === 'thoroughbred' && (m.raceCount ?? 0) >= 5);
+  for (const slug of PREFERRED) {
+    const hit = gallops.find((m) => m.venueSlug === slug);
+    if (hit) return hit;
+  }
+  return [...gallops].sort((a, b) => (b.raceCount ?? 0) - (a.raceCount ?? 0) || b.sources.length - a.sources.length)[0];
+}
+
+async function research(date: string, venueSlug: string | undefined): Promise<MeetingPack | null> {
   console.log(`\n## Meetings on ${date}`);
   const listed = await api<{ meetings: MeetingSummary[]; sourceStatuses: SourceStatus[] }>('GET', `/api/meetings?date=${date}&force=1`);
   printStatuses(listed.sourceStatuses);
@@ -95,9 +108,11 @@ async function research(date: string, venueSlug: string): Promise<MeetingPack | 
   const slugs = listed.meetings.filter((m) => m.raceType === 'thoroughbred').map((m) => m.venueSlug);
   const dupes = slugs.filter((s, i) => slugs.indexOf(s) !== i || slugs.some((o) => o !== s && (s.endsWith(`-${o}`) || o.endsWith(`-${s}`))));
   if (dupes.length) fail(`The same meeting is listed twice (${[...new Set(dupes)].join(', ')}) – the phone would show duplicate cards`);
-  const meeting = listed.meetings.find((m) => m.venueSlug === venueSlug) ?? listed.meetings.find((m) => m.venueSlug.startsWith(venueSlug));
+  const meeting = venueSlug
+    ? (listed.meetings.find((m) => m.venueSlug === venueSlug) ?? listed.meetings.find((m) => m.venueSlug.startsWith(venueSlug)))
+    : pickMeeting(listed.meetings);
   if (!meeting) {
-    fail(`No '${venueSlug}' meeting on ${date}`);
+    fail(venueSlug ? `No '${venueSlug}' meeting on ${date}` : `No gallops meeting of 5+ races on ${date}`);
     return null;
   }
   console.log(`\n## Researching ${meeting.venue} ${date} (found by ${meeting.sources.join(', ')})`);
@@ -163,7 +178,7 @@ function printRawMeetingSamples() {
 }
 
 try {
-  console.log(`RaceLens live check – upcoming ${upDate} ${upVenue}; results ${resDate} ${resVenue}; server clock ${new Date().toISOString()}`);
+  console.log(`RaceLens live check – upcoming ${upDate} ${upVenue ?? '(best meeting on)'}; results ${resDate} ${resVenue ?? '(best meeting on)'}; server clock ${new Date().toISOString()}`);
   const upcoming = await research(upDate, upVenue);
   if (upcoming) summarise(upcoming);
 

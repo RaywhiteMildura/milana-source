@@ -1,8 +1,8 @@
 # RaceLens checks on GitHub's machines (free for this public repository).
 #   tests-linux  – clean install from the lockfile, typecheck, unit tests, build, browser tests
 #   tests-mac    – the same on an Apple-silicon Mac (stands in for the Mac mini), plus the Mac installer
-#   live-check   – a real research run against the live racing sources (tomorrow's Flemington card)
-#                  and a real results run (last Saturday). GitHub's machines are in the USA, so TAB and
+#   live-check   – a real research run against the live racing sources (today's or tomorrow's best meeting)
+#                  and a real results run (last Saturday's). GitHub's machines are in the USA, so TAB and
 #                  Sportsbet are expected to refuse them (they only answer Australian addresses).
 name: RaceLens
 
@@ -13,9 +13,9 @@ on:
   workflow_dispatch:
     inputs:
       upcoming_date: { description: 'Meeting to research (YYYY-MM-DD, blank = tomorrow in Melbourne)', required: false, default: '' }
-      upcoming_venue: { description: 'Venue slug', required: false, default: 'flemington' }
+      upcoming_venue: { description: 'Venue slug (blank = the best meeting on that day)', required: false, default: '' }
       results_date: { description: 'Past meeting for results (YYYY-MM-DD, blank = last Saturday)', required: false, default: '' }
-      results_venue: { description: 'Venue slug for results', required: false, default: 'caulfield' }
+      results_venue: { description: 'Venue slug for results (blank = the best meeting on that day)', required: false, default: '' }
 
 permissions:
   contents: read
