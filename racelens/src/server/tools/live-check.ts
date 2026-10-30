@@ -146,6 +146,15 @@ function summarise(pack: MeetingPack) {
     console.log(`      picks: ${top}  confidence=${p?.confidence.overall ?? '-'} ${p?.confidence.label ?? ''} stance=${p?.betting.stance ?? '-'}`);
     if (!p) fail(`R${race.number} has no prediction`);
     if (active.length && withOdds === 0) console.log(`::warning::R${race.number}: no runner has odds from any source`);
+    // Scratchings as each source reported them, so a horse shown running that a source scratched can be traced.
+    for (const r of race.runners) {
+      const f = r.fields?.scratched;
+      const word = (v: unknown) => (v ? 'scratched' : 'running');
+      const votes = f ? `${f.agree.join('+')} say ${word(f.value)}${f.disagree.length ? `; ${f.disagree.map((d) => `${d.source} says ${word(d.value)}`).join(', ')}` : ''}` : 'no votes';
+      if (r.scratched || f?.disagree.length) console.log(`      ${r.scratched ? 'SCR' : 'run'} ${r.number} ${r.name}: ${votes}${r.emergency ? ' (emergency)' : ''}`);
+    }
+    if (process.env.LIVE_DETAIL_RACE === String(race.number))
+      for (const r of race.runners) console.log(`      #${r.number} ${r.name} scratched=${r.scratched} sources=${r.sources.join(',')} bestWin=${r.market?.bestWin ?? '-'} quotes=${r.odds?.length ?? 0}`);
   }
 }
 
