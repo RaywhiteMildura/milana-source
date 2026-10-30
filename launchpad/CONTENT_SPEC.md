@@ -1,16 +1,17 @@
 # Launchpad 300·30·3 — content spec
 
 The app is a 12-week (3-month) accountability + learning program for brand-new real-estate associates at
-Ray White Mildura (Victoria, Australia), built on Jess Densley's coaching material. Core targets:
+Ray White Mildura (Victoria, Australia), built on the coaching material in the office's Drive folder. Core targets:
 300 geo data (one unit = a NEW CONTACT RECORD from the geographic farm area: owner name + phone and/or email + address,
 added to the CRM), 30 appraisals, 3 listings. Two managers coach them: Damian and Luke.
 
 Voice: plain Australian English, second person ("you"), short sentences, warm but direct, like a good coach.
-No marketing fluff, no em-dashes, no emoji. Jess's material is the source of truth; adapt "XYZ real estate" / "ABC real
-estate" / "(agency)" to "Ray White Mildura", "Jess" the agent to "(your name)", "Josh" the prospect stays as a sample name.
-Never invent a Jess Densley quote: anything attributed to Jess (jessSays) must be verbatim from the source files.
-Where Jess's material has gaps (objection handling, pricing method, compliance), write it clearly as "our office guidance",
-not as Jess's. Never invent statistics. Keep the content specific to the 300/30/3 chain: geo data -> calls -> appraisals -> listings.
+No marketing fluff, no em-dashes, no emoji. The source material is the source of truth; adapt "XYZ real estate" / "ABC real
+estate" / "(agency)" to "Ray White Mildura", the example agent's name to "(your name)", "Josh" the prospect stays as a sample name.
+NEVER name the author of the source material (or any outside coach or trainer) anywhere in the course: present the methods as the
+program's own ("the program", "the script", "the benchmark"). Never invent a key line: keyLine must be verbatim from the source files.
+Where the source material has gaps (objection handling, pricing method, compliance), write it clearly as "our office guidance",
+not as program material. Never invent statistics. Keep the content specific to the 300/30/3 chain: geo data -> calls -> appraisals -> listings.
 
 Source files (raw text): /tmp/claude-0/-home-user-milana-source/1ecac0c8-d68d-5af7-bd53-2180ed41fbad/scratchpad/content/*.md
 Curriculum synthesis (per-week plan to follow): /tmp/claude-0/-home-user-milana-source/1ecac0c8-d68d-5af7-bd53-2180ed41fbad/scratchpad/synthesis.json  (weeklyCurriculum[n])
@@ -30,7 +31,7 @@ window.LAUNCHPAD_CONTENT.weeks.push({
   week: N,
   theme: "Short theme (max 7 words)",
   tagline: "One line that sells the week (max 16 words)",
-  module: "Jess module name, e.g. Client Connections / The 15-Minute Appraisal / Sales is a Contact Sport / The 30-Day Lead Amplifier / The Listing Advantage / The Agent Dashboard",
+  module: "program module name, e.g. Client Connections / The 15-Minute Appraisal / Sales is a Contact Sport / The 30-Day Lead Amplifier / The Listing Advantage / The Agent Dashboard",
   sources: ["file names used"],
   focus: "2-3 sentences: what the numbers should look like this week and why (use the suggestedTargets from synthesis as a guide, phrased softly: 'aim for about...'; the app computes exact pace)",
   intro: "markdown-lite, 120-220 words, addressed to the associate: why this week matters in the 300/30/3 chain",
@@ -38,7 +39,7 @@ window.LAUNCHPAD_CONTENT.weeks.push({
     { id: "wN-lK", title: "...", minutes: 4,
       body: "markdown-lite",
       keyTakeaways: ["2-4 short lines"],
-      jessSays: "VERBATIM quote from the source, or omit the key entirely",
+      keyLine: "VERBATIM line from the source (no person named), or omit the key entirely",
       source: "file name" }
   ],
   drills: [             // 3 to 5 concrete actions for the week; the app shows them as a checklist
@@ -58,7 +59,7 @@ SCRIPT IDS (spoken): train-to-prospect-phone, train-to-prospect-door, two-minute
   database-call-script, call-toolkit (extenders + appointment setters + enders), pipeline-1-2-month-call, pipeline-2-12-month-call,
   traffic-call-buyer, front-door-script, touch-point-in-person, touch-point-phone, tighten-timeline-buyer-line,
   monthly-video-script, market-update-video-script, give-ask-lines, just-listed-door-knock, just-listed-phone,
-  just-sold-door-knock, just-sold-phone, buyers-post-sale-call, ofi-callback, objection-handlers (office guidance, not Jess)
+  just-sold-door-knock, just-sold-phone, buyers-post-sale-call, ofi-callback, objection-handlers (office guidance, not from the program)
 TEMPLATE IDS (written): appraisal-drive-letter, seven-year-letter, twelve-month-appraisal-letter, twelve-month-reappraisal-automation-letter,
   introduction-letter, testimonial-letter, presentation-letter, legal-letter, broker-letter, storage-letter, just-listed-letter,
   just-sold-letter, ofi-invitation, just-listed-email, just-sold-email, monday-wrap-email, five-star-prospect-sms,
@@ -75,23 +76,23 @@ ROLE-PLAY IDS: rp-train-to-prospect-door, rp-train-to-prospect-phone, rp-magic-5
 window.LAUNCHPAD_CONTENT.scripts.push({
   id: "<SCRIPT ID>", title: "...", category: "Prospecting|Appraisal|Pipeline|Listing Advantage|Buyers|Video",
   when: "when to use it, one sentence", goal: "what a win looks like, one sentence",
-  steps: [ { label: "beat name e.g. Introduce", line: "the words, verbatim from Jess with placeholders adapted: (your name), Ray White Mildura, (address)" } ],
+  steps: [ { label: "beat name e.g. Introduce", line: "the words, verbatim from the source with placeholders adapted: (your name), Ray White Mildura, (address)" } ],
   tips: ["2-4 short coaching tips drawn from the material"],
   source: "file name"
 });
-Cover EVERY script id. Keep Jess's wording; fix obvious typos only (e.g. 'nnanced' -> 'financed', 'onversation' -> 'conversation').
+Cover EVERY script id. Keep the source wording; fix obvious typos only (e.g. 'nnanced' -> 'financed', 'onversation' -> 'conversation').
 objection-handlers is office guidance: 6-8 common objections (not interested / already have an agent / how did you get my number /
 what's it worth / just send me something / we're not selling / I'm busy / take me off your list) each with a 1-3 sentence response
-consistent with Jess's style (courtesy, value first, never burn a bridge, offer two times).
+consistent with the program's style (courtesy, value first, never burn a bridge, offer two times).
 
 ## Templates file: build/content/templates.js
 window.LAUNCHPAD_CONTENT.templates.push({
   id: "<TEMPLATE ID>", title: "...", kind: "letter|email|sms|form|checklist|worksheet",
-  when: "one sentence", body: "full text, markdown-lite, with [brackets] for merge fields; letters keep the exclusive-agency note where Jess has it",
+  when: "one sentence", body: "full text, markdown-lite, with [brackets] for merge fields; letters keep the exclusive-agency note where the source has it",
   source: "file name"
 });
 Cover EVERY template id. For forms/worksheets reproduce the fields as bullet lists. For amplifier-sequences include all three
-30-day sequences day by day. For monday-wrap-email make a fill-in-the-blanks version of Jess's example.
+30-day sequences day by day. For monday-wrap-email make a fill-in-the-blanks version of the source example.
 
 ## Role-plays file: build/content/roleplays.js
 window.LAUNCHPAD_CONTENT.rolePlays.push({

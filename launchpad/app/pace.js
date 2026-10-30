@@ -3,7 +3,7 @@
 (function (root) {
   'use strict';
 
-  // Soft guide curve: Jess's funnel ramp, per week, summing to the default targets.
+  // Soft guide curve: the program's funnel ramp, per week, summing to the default targets.
   // Geo data front-loaded, appraisals ramp from week 2, listings expected from week 8.
   // The curve is stretched to the configured number of weeks (see cumAt).
   const WEEKLY = {
@@ -246,8 +246,8 @@
   function ratios(s, m) {
     const pct = (a, b) => (b > 0 ? Math.round(a / b * 100) : null);
     return {
-      connectionRate: pct(s.connections, s.calls),             // Jess: ~45-50%
-      appointmentRate: pct(s.appointments, s.connections),     // Jess: 1-3 appointments from 8-12 connections
+      connectionRate: pct(s.connections, s.calls),             // benchmark: ~45-50%
+      appointmentRate: pct(s.appointments, s.connections),     // benchmark: 1-3 appointments from 8-12 connections
       appraisalsPer100Geo: m.geo.actual > 0 ? round1(m.appraisals.actual / m.geo.actual * 100) : null,  // program: 10
       listingsPerAppraisal: pct(m.listings.actual, m.appraisals.actual), // program: 10%
     };
@@ -312,7 +312,7 @@
   /** Milestones reached by a save (for celebrations). prev/next are totals before and after. */
   function milestones(prev, next, streakNow) {
     const out = [];
-    for (const n of [50, 100, 150, 200, 250, 300]) if (prev.geo < n && next.geo >= n) out.push(n + ' geo data records. On Jess\'s maths that is $' + (n * 500 / 1000) + 'K of future income.');
+    for (const n of [50, 100, 150, 200, 250, 300]) if (prev.geo < n && next.geo >= n) out.push(n + ' geo data records. At $500 a contact, that is $' + (n * 500 / 1000) + 'K of future income.');
     for (const n of [1, 5, 10, 15, 20, 25, 30]) if (prev.appraisals < n && next.appraisals >= n) out.push(n === 1 ? 'First appraisal logged. The pipeline has begun.' : n + ' appraisals. The pipeline is real.');
     for (const n of [1, 2, 3]) if (prev.listings < n && next.listings >= n) out.push(n === 1 ? 'First listing. This is the moment the program is built for.' : (n === 3 ? 'Three listings. Program target hit.' : 'Listing number ' + n + '.'));
     for (const n of [5, 10, 20, 30, 40, 50, 60]) if (streakNow === n) out.push(n + ' working days logged in a row.');

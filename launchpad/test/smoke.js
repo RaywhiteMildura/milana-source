@@ -69,18 +69,18 @@ async function run(role, port) {
     const weekTitle = await page.textContent('h1'); log('learn h1:', weekTitle);
     await page.click('details.lesson summary'); await page.waitForTimeout(200); await shot('09-lesson-open');
     await page.click('[data-read]'); await page.waitForTimeout(300);
-    const drill = await page.$('[data-drill]'); if (drill) await drill.click();
+    if (await page.$('[data-drill]')) await page.click('[data-drill]');
     await page.click('[data-act="quiz-start"]'); await page.waitForSelector('[data-qpick]');
-    for (let i = 0; i < 12; i++) { const opt = await page.$('[data-qpick="0"]:not([disabled])'); if (!opt) break; await opt.click(); await page.waitForTimeout(100); const nx = await page.$('[data-act="quiz-next"]'); if (nx) await nx.click(); await page.waitForTimeout(100); }
+    for (let i = 0; i < 12; i++) { if (!(await page.$('[data-qpick="0"]:not([disabled])'))) break; await page.click('[data-qpick="0"]:not([disabled])'); await page.waitForTimeout(100); if (await page.$('[data-act="quiz-next"]')) await page.click('[data-act="quiz-next"]'); await page.waitForTimeout(100); }
     await shot('10-quiz-done');
     const scripts = await page.evaluate(() => (window.LAUNCHPAD_CONTENT || {}).scripts ? window.LAUNCHPAD_CONTENT.scripts.length : 0); log('scripts loaded:', scripts);
     await page.click('#tabbar [data-nav="practice"]'); await page.waitForSelector('[data-practice]', { timeout: 5000 }); await shot('11-practice-list');
     await page.click('[data-practice]'); await page.waitForTimeout(400);
     for (const line of ['Hi, it\'s Taylor from Ray White Mildura. Just a courtesy call today.', 'I\'m touching base because we have a local market report out. Your neighbours have loved it. Can I grab your details and send one?', 'Totally understand. It\'s just a report, no obligation. Any real estate needs in the next 12 months?', 'Great. Does Thursday 2pm or 4pm suit?']) {
-      const ta = await page.$('#chat-in:not([disabled])'); if (!ta) break; await page.fill('#chat-in', line); await page.click('[data-act="chat-send"]'); await page.waitForTimeout(400);
+      if (!(await page.$('#chat-in'))) break; await page.fill('#chat-in', line); await page.click('[data-act="chat-send"]'); await page.waitForTimeout(400);
     }
     await shot('12-practice-chat');
-    const fb = await page.$('[data-act="practice-feedback"]:not([disabled])'); if (fb) { await fb.click(); await page.waitForTimeout(600); await shot('13-practice-feedback'); }
+    if (await page.$('[data-act="practice-feedback"]:not([disabled])')) { await page.click('[data-act="practice-feedback"]'); await page.waitForTimeout(600); await shot('13-practice-feedback'); }
     await page.click('#tabbar [data-nav="more"]'); await page.waitForSelector('.sheet'); await page.click('.sheet [data-nav="scripts"]'); await page.waitForSelector('#scripts-q', { timeout: 5000 });
     await page.fill('#scripts-q', 'magic'); await page.waitForTimeout(200); await page.click('details.lesson summary'); await shot('14-scripts');
     await page.click('[data-stab="templates"]'); await page.waitForTimeout(200); await shot('15-templates');

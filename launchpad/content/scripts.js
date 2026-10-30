@@ -1,8 +1,8 @@
 window.LAUNCHPAD_CONTENT = window.LAUNCHPAD_CONTENT || { weeks: [], scripts: [], templates: [], rolePlays: [] };
 
 // Launchpad 300.30.3 - spoken scripts library.
-// Jess Densley's wording is kept verbatim (typos fixed, placeholders adapted to Ray White Mildura).
-// Anything labelled "office wording" or "office guidance" is ours, not Jess's.
+// Program wording is kept verbatim (typos fixed, placeholders adapted to Ray White Mildura).
+// Anything labelled "office wording" or "office guidance" is ours, not from the program.
 
 window.LAUNCHPAD_CONTENT.scripts.push(
 {
@@ -22,7 +22,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
   tips: [
     "The reason is the lead magnet, so hold it in your hand before you dial: know what it is, what is in it and why a neighbour would want it.",
     "One completed call with name, address and phone (or email) in the CRM is one of your 300. Thirty prepared names before every session, no computer, notepad only.",
-    "Jess's session benchmark: 18 to 24 calls, 8 to 12 connections, 1 to 3 appointments in 45 minutes. Strike them off the call sheet as you go.",
+    "The session benchmark: 18 to 24 calls, 8 to 12 connections, 1 to 3 appointments in 45 minutes. Strike them off the call sheet as you go.",
     "A yes to the 12-month question goes straight onto your pipeline list and gets an appraisal offer on the spot: Does 2pm or 4pm suit?"
   ],
   source: "prospecting-scripts--prospecting-scripts.md"
@@ -62,7 +62,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
     { label: "Offer two times", line: "Does 2pm or 4pm suit?" }
   ],
   tips: [
-    "Jess's rule: if you are on the phone for 2 minutes or longer you need to be looking to close the call and book an appointment.",
+    "The program's rule: if you are on the phone for 2 minutes or longer you need to be looking to close the call and book an appointment.",
     "Two options, not an open question. 'When suits?' gets 'I'll let you know'. '2pm or 4pm?' gets a time.",
     "The appointment is usually a market report drop that becomes a 15-minute appraisal. Each one is a step toward your 30.",
     "If neither time works, offer two more. If they still say no, book the next call instead and move on; keep the session moving."
@@ -87,7 +87,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
     "A yes to 'I will let you know the result' is permission for a second call. That is two touches from one listing, which is how a board in the street turns into geo data and the next appraisal.",
     "The listing does not have to be ours. Any board in the street is a reason to call 50 homes.",
     "Only mention the cash buyer if we actually have one. Ask Damian or Luke who is on the office buyer list before the session.",
-    "Fifty calls is two to three 45-minute sessions at Jess's pace of 18 to 24 calls a session. Prepare the 50 names and numbers the day the board goes up."
+    "Fifty calls is two to three 45-minute sessions at the benchmark pace of 18 to 24 calls a session. Prepare the 50 names and numbers the day the board goes up."
   ],
   source: "client-connections--prospecting-call-scripts.md"
 },
@@ -129,7 +129,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
   tips: [
     "'It's just a quick call' lowers the guard. Then keep the promise: aim to be off in two minutes unless they want to talk, and if they do, the 2 Minute Rule applies.",
     "The activity line only works with real numbers. Get this month's office sales and median from Damian or Luke before the session and write them on your call sheet. Say what the numbers actually say, and never quote a figure you cannot back up.",
-    "The rapport beat is why you take notes. 'Billy starting footy' is Jess's example; your version comes from the last note in the CRM. If there is no note, this call makes one.",
+    "The rapport beat is why you take notes. 'Billy starting footy' is the script's example; your version comes from the last note in the CRM. If there is no note, this call makes one.",
     "This is communication over information. The newsletter is the information; the call is the relationship."
   ],
   source: "client-connections--the-client-connection-model-interactive.md"
@@ -181,7 +181,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
     { label: "The buyer line", line: "Mr and Mrs Vendor, we are currently working with a buyer who has recently missed out on another property in your area. They are a cash buyer. Would you be happy for me to mention your property? Or would you prefer me to sell them something else?" }
   ],
   tips: [
-    "Jess's contact key: 0 to 2 months, weekly. 2 to 12 months, monthly. Diary it so the call happens without thinking.",
+    "The program's contact key: 0 to 2 months, weekly. 2 to 12 months, monthly. Diary it so the call happens without thinking.",
     "One reason per call. Six reasons means six weeks of calls that each feel new.",
     "The buyer line is the tightener: 'mention your property' and 'sell them something else' both get a real answer about timing. Only use it with a real buyer.",
     "Every pipeline seller is a future appraisal and a future listing. After the call, update the board (Trello or the office CRM) before you dial the next one."
@@ -267,7 +267,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
     { label: "Action after the visit", line: "(Update the pipeline board: Trello or the office CRM. Note what they said about timing.)" }
   ],
   tips: [
-    "Jess's post-call action is one line: update the Trello board. Do it in the car, not at the end of the day.",
+    "The workbook's post-call action is one line: update the Trello board. Do it in the car, not at the end of the day.",
     "'I was in the area' is only true if you planned the route. Stack pipeline drops with your door knocking and market report drops so one trip does three jobs.",
     "Say what is actually in the report. If results in their street were soft, say so; honesty is the value.",
     "An in-person touch is worth more than a call for the 0 to 2 month group. Make at least one of their weekly touches face to face."
@@ -333,7 +333,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
     "Every number must be real and checked: office sales, median, open home numbers. If the median fell, say it fell and change the 'rising market' line to match. Never read a figure you cannot source.",
     "Only name sold prices that are public. Ask Damian or Luke which results the office is happy to quote.",
     "Community beat: pick two things actually on in Mildura that month (a school fete, the show, a footy final, something on the river). It is the beat people remember.",
-    "Fix a filming day and time each month. Jess's rule for video: done beats perfect."
+    "Fix a filming day and time each month. The program's rule for video: done beats perfect."
   ],
   source: "client-connections--the-client-connection-model-interactive.md"
 },
@@ -350,7 +350,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
     { label: "Next step", line: "Hope your week is going well. If you'd like to take the next step, (book a time / reply here)." }
   ],
   tips: [
-    "Jess's six steps: draft the script with Claude or ChatGPT, ask for it as four bullet points, open VideoAsk (iPhone) or BigVU (Android), paste the bullets on screen, press record and talk to the points in one take, share the link by SMS, email or the CRM.",
+    "The workbook's six steps: draft the script with Claude or ChatGPT, ask for it as four bullet points, open VideoAsk (iPhone) or BigVU (Android), paste the bullets on screen, press record and talk to the points in one take, share the link by SMS, email or the CRM.",
     "Under sixty seconds. Talk to one person, not a crowd. Good light, quiet room, phone at eye level.",
     "The next step changes with the group: for a skeptic there is no ask, just 'reply here'; for an advocate it is 'book a time'.",
     "Done beats perfect. Send the first one this week, and diary the day and time you film every week after."
@@ -378,8 +378,8 @@ window.LAUNCHPAD_CONTENT.scripts.push(
     { label: "Office wording: an advocate day 15 call", line: "Hi Josh, (your name) here. You've had the appraisal and the presentation tips. I'd love to look after the sale for you. Shall we lock in a launch date?" }
   ],
   tips: [
-    "The give and ask lists and the day-by-day calls are Jess's. The three sentences labelled 'office wording' are ours; make them sound like you.",
-    "As a new associate most of your leads are skeptics. That is fine: Jess says the top two groups, skeptics and audience, are where the listings are won and lost, and giving is a skill you can practise from day one.",
+    "The give and ask lists and the day-by-day calls are from the program. The three sentences labelled 'office wording' are ours; make them sound like you.",
+    "As a new associate most of your leads are skeptics. That is fine: the program says the top two groups, skeptics and audience, are where the listings are won and lost, and giving is a skill you can practise from day one.",
     "Every open home visitor, every door that answers and every geo data call is a skeptic until they ring you back. Load them into the skeptic amplifier the day you meet them.",
     "Keep the order: give first, ask last. The appraisal (your 30) is the ask for audience; the listing (your 3) is the ask for advocates."
   ],
@@ -517,7 +517,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
   tips: [
     "Ask the appraisal question first, before feedback. Every open home visitor is a possible seller, and this is where a good share of your 30 appraisals comes from.",
     "A 'no' still gives you an address and an email: that is a piece of geo data from every call.",
-    "Before you use the finance beat, confirm with Damian or Luke which broker we work with, how many lenders they really have and how the referral fee is disclosed. Say the real numbers, not Jess's sample.",
+    "Before you use the finance beat, confirm with Damian or Luke which broker we work with, how many lenders they really have and how the referral fee is disclosed. Say the real numbers, not the sample in the script.",
     "Feedback goes to the vendor the same day. The callback is on their behalf, so report what you heard, good and bad."
   ],
   source: "listing-advantage--ofi-callback-question.md"
@@ -539,7 +539,7 @@ window.LAUNCHPAD_CONTENT.scripts.push(
     { label: "Take me off your list", line: "No problem at all, I'll do that now, and I'm sorry for the interruption. If you ever need anything in real estate, I'm (your name) at Ray White Mildura. Have a good day." }
   ],
   tips: [
-    "These responses are office guidance, not Jess's words. The principles are hers: never burn your bridges with a prospect, and remember that the rejection you experience has nothing to do with you personally.",
+    "These responses are office guidance, not from the program. The principles come from the program: never burn your bridges with a prospect, and remember that the rejection you experience has nothing to do with you personally.",
     "Value first, every time. The lead magnet, the market update and the 15-minute appraisal are what you offer; you are never asking them to sell.",
     "Offer two times, not an open question. Wednesday or Friday, 2pm or 4pm.",
     "'Take me off your list' means exactly that: mark the record do-not-call in the CRM before the next dial and follow the office do-not-call process. One kept promise protects the whole farm."

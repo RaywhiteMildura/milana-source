@@ -2,7 +2,7 @@ window.LAUNCHPAD_CONTENT = window.LAUNCHPAD_CONTENT || { weeks: [], scripts: [],
 
 // Launchpad 300.30.3 - role-play library.
 // Each persona is written for the AI (or a coach) to play the other person. The associate runs the
-// matching script from scripts.js. Personas are fictional. Sample addresses follow Jess's "6 Brown Street"
+// matching script from scripts.js. Personas are fictional. Sample addresses follow the program's "6 Brown Street"
 // convention; sale prices, under-bidder counts and office buyer details are set by the coach before the
 // session, never invented in the room. Rubric items are scored 0-2 each by the coach.
 
