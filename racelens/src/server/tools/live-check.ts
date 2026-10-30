@@ -186,10 +186,52 @@ function printRawMeetingSamples() {
   }
 }
 
+/**
+ * The owner's case: a meeting researched before a horse was scratched, then "Pre-race check all". Every scratched
+ * runner is put back to running in the saved pack (and into the picks by a re-rate), then the real per-race refresh
+ * runs against the live sources and must scratch each of them again and take them out of the picks.
+ */
+async function stalePackRecheck(pack: MeetingPack) {
+  const file = path.join(dataDir, 'packs', `${encodeURIComponent(pack.id)}.json`);
+  if (!fs.existsSync(file)) {
+    console.log(`\n## Stale-pack check skipped: ${file} not found`);
+    return;
+  }
+  const saved = JSON.parse(fs.readFileSync(file, 'utf8')) as MeetingPack;
+  const flipped: Array<[number, number, string]> = [];
+  for (const race of saved.races)
+    for (const r of race.runners)
+      if (r.scratched) {
+        r.scratched = false;
+        r.fields.scratched = { value: false, agree: r.sources, disagree: [], confidence: 0.8 };
+        flipped.push([race.number, r.number, r.name]);
+      }
+  console.log(`\n## Stale-pack check: ${flipped.length} scratched runner(s) put back to running, then "Pre-race check all"`);
+  if (!flipped.length) return;
+  fs.writeFileSync(file, JSON.stringify(saved));
+  const { jobId } = await api<{ jobId: string }>('POST', `/api/packs/${encodeURIComponent(pack.id)}/recheck`, {});
+  const job = await waitJob(jobId);
+  printSteps(job);
+  if (job.status !== 'done') fail(`Pre-race check failed: ${job.error}`);
+  const after = await api<MeetingPack>('GET', `/api/packs/${encodeURIComponent(pack.id)}`);
+  for (const [raceNo, number, name] of flipped) {
+    const race = after.races.find((x) => x.number === raceNo)!;
+    const r = race.runners.find((x) => x.number === number);
+    const inPicks = after.predictions[raceNo]?.ranked.some((a) => a.number === number) ?? false;
+    const f = r?.fields?.scratched;
+    const votes = f ? `${f.agree.join('+')} say ${f.value ? 'scratched' : 'running'}${f.disagree.length ? `; ${f.disagree.map((d) => `${d.source} says ${d.value ? 'scratched' : 'running'}`).join(', ')}` : ''}` : 'no votes';
+    console.log(`   R${raceNo} #${number} ${name}: ${r?.scratched ? 'scratched again' : 'STILL RUNNING'}${inPicks ? ', STILL IN PICKS' : ''} – ${votes}; conflicts: ${r?.verification.conflicts.slice(-2).join(' | ') || 'none'}`);
+    if (!r?.scratched) fail(`R${raceNo} ${name} is scratched at the sources but the pre-race check left it running`);
+    if (inPicks) fail(`R${raceNo} ${name} is scratched but still in the picks after the pre-race check`);
+  }
+  console.log(`   history: ${after.history.slice(-1).map((h) => h.summary).join(' | ')}`);
+}
+
 try {
   console.log(`RaceLens live check – upcoming ${upDate} ${upVenue ?? '(best meeting on)'}; results ${resDate} ${resVenue ?? '(best meeting on)'}; server clock ${new Date().toISOString()}`);
   const upcoming = await research(upDate, upVenue);
   if (upcoming) summarise(upcoming);
+  if (upcoming) await stalePackRecheck(upcoming);
 
   const past = await research(resDate, resVenue);
   if (past) summarise(past);
